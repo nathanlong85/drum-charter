@@ -3,6 +3,7 @@
 import React from 'react';
 import { SongChart, GrooveGrid } from '@/lib/types/groove';
 import { SongChartView } from '@/components/chart/SongChartView';
+import { AuthStatus } from '@/components/auth/AuthStatus';
 
 const SAMPLE_GRID: GrooveGrid = {
   timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
@@ -84,6 +85,9 @@ const SAMPLE_CHART: SongChart = {
 export default function Home() {
   return (
     <main className="min-h-screen bg-zinc-50 py-12">
+      <div className="max-w-4xl mx-auto mb-8 px-8 flex justify-end">
+        <AuthStatus />
+      </div>
       <SongChartView chart={SAMPLE_CHART} />
     </main>
   );

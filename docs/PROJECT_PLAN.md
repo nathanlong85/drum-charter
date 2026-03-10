@@ -72,7 +72,14 @@ Based on analyzed templates and examples:
 - [ ] Create basic library page to list saved snippets
 
 ### 🟡 In Progress
-- [ ] Implement persistence (save/load) for Snippets and Charts `*`
+- [x] Implement persistence (save/load) for Snippets and Charts using Supabase (PostgreSQL) `✓`
+  - [x] Install `@supabase/supabase-js` and `@supabase/ssr` `✓`
+  - [x] Create Supabase client and server utilities `✓`
+  - [x] Implement Auth (Login/Signup/Proxy) `✓`
+  - [x] Implement `supabaseService` for CRUD operations `✓`
+  - [x] Setup `.env.local` and SQL schema placeholders `✓`
+  - [x] Create GitHub Action for Supabase "Keep-Alive" heartbeat `✓`
+- [ ] Create basic library page to list saved snippets and charts `*`
 
 ### 🟢 Done
 - [x] Project Proposal Analysis
