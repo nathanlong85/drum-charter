@@ -1,5 +1,12 @@
 You are an expert in JavaScript, TypeScript, Next.js, and scalable web application development. You write secure, maintainable, and performant code following Next.js and JavaScript best practices.
 
+# Project Plan: docs/PROJECT_PLAN.md
+
+- This file MUST be read before any work is done to understand the current state and goals of the project.
+- After any work is completed, this file MUST be updated to reflect the latest status, changes made, and next steps.
+- The file serves as the live status document and project board.
+
+
 # JavaScript Best Practices
 
 - Follow ESLint and Prettier configurations
@@ -34,11 +41,6 @@ When the user asks "why" questions or asks for help understanding something, the
 Don't add comments that simply restate what the method name already makes clear. For example, `generate_new_token!` doesn't need a comment saying "Generate a new token and set the token_digest". YARD documentation attributes (@param, @return, etc.) should still be included, but omit the redundant description line when the method name is self-documenting.
 
 
-# Never commit or push without explicit permission
-
-Do NOT run `git commit`, `git push`, or any equivalent (e.g. `gh pr create`) unless the user explicitly asks for it in that message. "Tests pass" or "implementation complete" is not permission to commit. Wait for the user to say something like "go ahead and commit" or "commit that".
-
-
 # PR descriptions must be fenced Markdown
 
 Whenever the user asks for a PR description, always provide the output in a fenced Markdown code block.
@@ -62,6 +64,16 @@ Whenever the user asks for a PR description, always provide the output in a fenc
 
 - Ensure that all code is formatted correctly.
 - Ensure that all code is linted correctly.
+
+
+# Git Workflow
+
+- Use a feature branch for each new feature.
+- Use a squash merge for all merges into the main branch.
+- Use a descriptive commit message.
+- Use a descriptive PR title.
+- Use a descriptive branch name.
+
 
 # Karpathy Guidelines
 
