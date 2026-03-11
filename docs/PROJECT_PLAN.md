@@ -1,14 +1,13 @@
-# Drum Charter Project Plan
+# DrumCharter Project Plan
 
-## Project Overview
-Drum Charter is a web application tailored for drummers to create, manage, and share drum charts, practice exercises, and groove snippets. It aims to replace cumbersome word processor templates with a streamlined, interactive tool.
+DrumCharter is a web application tailored for drummers to create, manage, and share drum charts, practice exercises, and groove snippets. It aims to replace cumbersome word processor templates with a streamlined, interactive tool.
 
 ### Core Vision
 - **Interactive Groove Grid**: A visual, editable grid for drum patterns.
 - **Song Charts**: Structured song documents with headers, sections, sub-sections, and inline grooves.
 - [x] **Comprehensive Library**: A central place for song charts, notebooks (routines/ideas), and snippets. `✓`
-- [ ] **High-Quality Output**: Optimized for printing and PDF export.
-- [ ] **Sharing & Collaboration**: Public/private visibility and cloning capabilities.
+- [x] **High-Quality Output**: Optimized for printing and physical drum charts. `✓`
+- [x] **Sharing & Collaboration**: Public/private visibility and public viewing routes. `✓`
 - [x] **Notebooks (Ideas & Practice)**: `✓`
   - [x] Data structure for Notebooks (Title, Sections, Flexible Grids) `✓`
   - [x] Support for freeform notes and practice routines `✓`
@@ -26,77 +25,76 @@ Drum Charter is a web application tailored for drummers to create, manage, and s
   - **Component/Integration**: React Testing Library
   - **E2E**: Playwright
 - **Linting/Formatting**: ESLint 9 + Prettier
-- **State Management**: React `useReducer` / `Zustand` (as needed)
+- **State Management**: React `useReducer` / `lodash.debounce` persistence
 
 ---
 
 ## V1 Feature Scope
-- [ ] **Project Foundation**:
-  - [x] Next.js 16 Initial Setup
-  - [x] Tailwind 4 Configuration
-  - [x] Vitest & Prettier Setup
-  - [x] Playwright Setup
-- [ ] **Groove Grid Core**:
-  - [x] Data structure for Grids (JSON)
-  - [x] Support for multiple resolutions (Quarter, 8th, 16th notes)
-  - [x] Support for multiple measures
-  - [x] Inline editing of drum hits (Toggle and Symbol Picker)
-  - [x] Full Drum Symbols integration (Required and Optional):
-    - [x] Analyze Drum Symbols Library (`Drum Symbols.xlsx`) `✓`
-    - [x] Implement Symbol Picker in Grid UI `✓`
-    - [x] Import and use SVG icons from `Drum Icons` `✓`
-- [ ] **Song Charts**:
+- [x] **Project Foundation**:
+  - [x] Next.js 16 Initial Setup `✓`
+  - [x] Tailwind 4 Configuration `✓`
+  - [x] Vitest & Prettier Setup `✓`
+  - [x] Playwright Setup `✓`
+- [x] **Groove Grid Core**:
+  - [x] Data structure for Grids (JSON) `✓`
+  - [x] Support for multiple resolutions (Quarter, 8th, 16th notes) `✓`
+  - [x] Support for multiple measures `✓`
+  - [x] Inline editing of drum hits (Toggle and Symbol Picker) `✓`
+  - [x] Full Drum Symbols integration (Required and Optional) `✓`
+- [x] **Song Charts**:
   - [x] Data structure for Song Charts (Header, Sections, Sub-sections) `✓`
   - [x] Section/Sub-section measure counts (e.g., "Chorus (6M)") `✓`
   - [x] Inline Groove Grid integration `✓`
   - [x] Bullet point notes per section `✓`
+  - [x] Implement Song editor UI (Dynamic sections, Auto-save) `✓`
 - [x] **Notebooks**:
   - [x] Flexible data structure (No global BPM/TimeSig) `✓`
   - [x] Support for sketches, routines, and songwriting ideas `✓`
-  - [x] Inline Groove Grid integration `✓`
-- [ ] **Groove Snippets**:
-  - [ ] Metadata (Title, Tags, Time Signature)
-  - [x] Library View integration `✓`
-  - [ ] Create/Edit/Save Snippets
+  - [x] Implement Notebook editor UI (Dynamic sections, Auto-save) `✓`
+- [x] **Groove Snippets**:
+  - [x] Metadata (Title, Tags, Time Signature) `✓`
+  - [x] Create/Edit/Save Snippets `✓`
 - [x] **Library View**:
   - [x] Three-tabbed dashboard (Songs, Notebooks, Snippets) `✓`
   - [x] Search and filter by tags/title `✓`
   - [x] Edit/Delete actions `✓`
-- [ ] **Printing**:
-  - [ ] Print-friendly layout for individual snippets
-
----
-
-## Data Entities (Context)
-Based on analyzed workflows:
-- **Song Chart**: Title, BPM, Time Signature, Sections/Sub-sections (Structured).
-- **Notebook**: Title, Sections (Freeform). No global BPM/TimeSig required.
-- **Groove Snippet**: Title, Tags, Single Groove Grid (Reusable).
+- [x] **Printing & Sharing**:
+  - [x] Print-friendly CSS (@media print) `✓`
+  - [x] Public viewing routes (/public/songs/[id]) `✓`
+  - [x] Public/Private visibility toggle `✓`
 
 ---
 
 ## Status Board (Kanban)
 
-### 🔴 To Do
-- [ ] Add support for multiple time signatures and resolutions
-- [ ] Implement Notebook editor UI
-
 ### 🟡 In Progress
-- [ ] Implement Notebook editor UI
-- [ ] Implement Snippet editor UI
+- [ ] Comprehensive E2E Test Suite stabilization
+- [ ] UI Workflow Documentation refinement
+- [ ] Audio Playback (MVP) `*`
 
 ### 🟢 Done
-- [x] Project Proposal Analysis
-- [x] Initial Repository Structure decision (Unified)
-- [x] Creation of `docs/PROJECT_PLAN.md` with Song Chart structure
-- [x] Verification of Local Document Paths and Contents
-- [x] Interactive Groove Grid UI with Symbol Picker
-- [x] Implement `SongChart` UI components (Header, Sections, Sub-sections, Grid integration) `✓`
-- [x] Implement persistence (save/load) for Snippets and Charts using Supabase (PostgreSQL) `✓`
-- [x] Implement Auth (Login/Signup/Proxy) `✓`
-- [x] Create basic library page with three tabs (Songs, Notebooks, Snippets) `✓`
-- [x] Define `Notebook` TypeScript interfaces in `lib/types/groove.ts` `✓`
-- [x] Create `docs/USE_CASES.md` documenting user workflows `✓`
+- [x] Public routes and read-only views for Notebooks and Snippets `✓`
+- [x] Document CLI usage patterns in `.junie/CLI_REFERENCE.md` `✓`
+- [x] Fix: Create missing `notebooks` table in Supabase via CLI migration `✓`
+- [x] Restore full type safety for Notebook operations in `supabaseService` `✓`
+- [x] Clone/Duplicate functionality for Songs, Notebooks, and Snippets `✓`
+- [x] Supabase TypeScript Type Generation and Service Refactor `✓`
+- [x] Initialize CHANGELOG.md (v0.1.0-alpha) `✓`
+- [x] Implement @media print styles and "PRINT" button `✓`
+- [x] Implement Public Viewing routes for Song Charts `✓`
+- [x] Codify "Stop-and-Wait" protocol in `.junie/STRICT_PAIR_PROGRAMMING.md` `✓`
+- [x] Document UI workflows in `docs/UI_WORKFLOWS.md` `✓`
+- [x] Implement Unit Tests for all core editors (Song, Notebook, Snippet) `✓`
+- [x] Move dev server and Playwright to Port 3001 `✓`
+- [x] Fix "Error creating new item" in Library and add creation flow unit tests `✓`
+- [x] Rebrand to DrumCharter and landing page redesign `✓`
+- [x] Implement Anonymous Sign-In (Guest Mode) `✓`
+- [x] Groove Grid Core (Resolutions, Measures, Symbols) `✓`
+
+### 🔵 Backlog
+- [ ] Audio Playback (MVP)
+- [ ] Dark Mode support
+- [ ] Offline support (PWA)
 
 ---
 

@@ -29,6 +29,8 @@ export function AuthStatus() {
     await supabase.auth.signOut()
   }
 
+  const isGuest = user?.is_anonymous;
+
   if (loading) return <div className="text-sm text-gray-400">Loading auth...</div>
 
   if (!user) {
@@ -58,7 +60,14 @@ export function AuthStatus() {
       </div>
       <div className="flex gap-4 items-center">
         <span className="text-sm text-gray-700">
-          Hi, <span className="font-semibold text-blue-600">{user.email}</span>
+          {isGuest ? (
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span>
+              Guest Mode
+            </span>
+          ) : (
+            <>Hi, <span className="font-semibold text-blue-600">{user.email}</span></>
+          )}
         </span>
         <button 
           onClick={handleLogout}

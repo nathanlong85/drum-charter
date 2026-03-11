@@ -6,7 +6,8 @@ export type GrooveAction =
   | { type: 'ADD_INSTRUMENT'; id: string; label: string }
   | { type: 'REMOVE_INSTRUMENT'; id: string }
   | { type: 'SET_RESOLUTION'; resolution: 4 | 8 | 16 }
-  | { type: 'SET_MEASURES'; measures: number };
+  | { type: 'SET_MEASURES'; measures: number }
+  | { type: 'SET_TIME_SIGNATURE'; beatsPerMeasure: number; beatValue: number };
 
 export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGrid {
   switch (action.type) {
@@ -88,6 +89,31 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
         ...newState,
         instruments: state.instruments.map((inst) => {
           const newNotes = Array(newTotalNotes).fill('none');
+          for (let i = 0; i < Math.min(inst.notes.length, newTotalNotes); i++) {
+            newNotes[i] = inst.notes[i];
+          }
+          return { ...inst, notes: newNotes };
+        }),
+      };
+    }
+
+    case 'SET_TIME_SIGNATURE': {
+      const newState = { 
+        ...state, 
+        timeSignature: { 
+          beatsPerMeasure: action.beatsPerMeasure, 
+          beatValue: action.beatValue 
+        } 
+      };
+      const newTotalNotes = calculateTotalNotes(newState);
+      
+      return {
+        ...newState,
+        instruments: state.instruments.map((inst) => {
+          const newNotes = Array(newTotalNotes).fill('none');
+          // Note: Changing time signature fundamentally changes the grid layout, 
+          // so preserving notes by index might not make musical sense, 
+          // but it's the most "stable" UI behavior for now.
           for (let i = 0; i < Math.min(inst.notes.length, newTotalNotes); i++) {
             newNotes[i] = inst.notes[i];
           }

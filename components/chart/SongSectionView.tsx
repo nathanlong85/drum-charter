@@ -14,9 +14,9 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({
   onGridChange,
 }) => {
   return (
-    <div className="mb-8 last:mb-0">
+    <div className="mb-8 last:mb-0 print:mb-6">
       <div className="flex items-center gap-4 mb-2">
-        <h2 className="text-xl font-bold uppercase text-gray-800 bg-gray-100 px-3 py-1 rounded">
+        <h2 className="text-xl font-bold uppercase text-gray-800 bg-gray-100 px-3 py-1 rounded print:bg-transparent print:p-0">
           {section.name}
           <span className="ml-2 text-gray-500 font-medium">({section.measuresCount}M)</span>
         </h2>
@@ -44,7 +44,7 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({
           <div className="mt-4 space-y-6">
             {section.subSections.map((sub) => (
               <div key={sub.id} className="border-l-4 border-gray-200 pl-4">
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                <h3 className="text-lg font-semibold text-gray-700 mb-2 print:text-base">
                   {sub.name} <span className="text-gray-400 font-normal">({sub.measuresCount}M)</span>
                 </h3>
                 

@@ -50,7 +50,7 @@ const symbolToIcon: Record<DrumSymbol, string | null> = {
   hi_hat_closed: '/icons/drum-symbols/hi_hat_closed_hit.svg',
   hi_hat_closed_opt: '/icons/drum-symbols/hi_hat_closed_hit_opt.svg',
   hi_hat_loose: '/icons/drum-symbols/hi_hat_loose_hit.svg',
-  hi_hat_loose_opt: '/icons/drum-symbols/hi_hat_loose_opt.svg',
+  hi_hat_loose_opt: '/icons/drum-symbols/hi_hat_loose_hit_opt.svg',
   hi_hat_open: '/icons/drum-symbols/hi_hat_open_hit.svg',
   hi_hat_open_opt: '/icons/drum-symbols/hi_hat_open_hit_opt.svg',
   hi_hat_pedal_chick: '/icons/drum-symbols/hi_hat_pedal_chick.svg',

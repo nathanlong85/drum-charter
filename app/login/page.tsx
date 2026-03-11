@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
   const [message, setMessage] = useState('');
 
   const supabase = createClient();
@@ -27,7 +28,7 @@ export default function LoginPage() {
       setMessage(`Error: ${error.message}`);
       setLoading(false);
     } else {
-      router.push('/');
+      router.push('/library');
       router.refresh();
     }
   };
@@ -51,6 +52,21 @@ export default function LoginPage() {
       setMessage('Check your email for the confirmation link.');
     }
     setLoading(false);
+  };
+
+  const handleGuestSignIn = async () => {
+    setGuestLoading(true);
+    setMessage('');
+    
+    const { error } = await supabase.auth.signInAnonymously();
+
+    if (error) {
+      setMessage(`Error: ${error.message}`);
+      setGuestLoading(false);
+    } else {
+      router.push('/library');
+      router.refresh();
+    }
   };
 
   return (
@@ -95,6 +111,25 @@ export default function LoginPage() {
           type="button"
         >
           Sign Up
+        </button>
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div className="w-full border-t border-zinc-200"></div>
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-2 bg-white text-zinc-500 uppercase tracking-wider text-[10px] font-bold">Or</span>
+          </div>
+        </div>
+        <button
+          onClick={handleGuestSignIn}
+          className="w-full bg-zinc-900 text-white rounded-md px-4 py-2 hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          disabled={loading || guestLoading}
+          type="button"
+        >
+          {guestLoading ? 'Starting session...' : 'Continue as Guest'}
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
         </button>
         {message && (
           <p className="mt-4 p-4 bg-zinc-100 text-zinc-900 text-center rounded">

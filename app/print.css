@@ -1,0 +1,69 @@
+@layer base {
+  @media print {
+    /* Hide navigation, buttons, and settings */
+    header, nav, footer,
+    button, 
+    .no-print,
+    [role="button"],
+    input[type="checkbox"],
+    select {
+      display: none !important;
+    }
+
+    /* Reset background and text colors for high contrast */
+    body {
+      background: white !important;
+      color: black !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* Ensure chart elements are visible and properly spaced */
+    main {
+      padding: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      max-width: none !important;
+    }
+
+    /* Force background colors for grid cells (most browsers need this) */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Layout optimizations for drum charts */
+    .grid-editor-container {
+      break-inside: avoid;
+      margin-bottom: 2rem !important;
+      border: 1px solid #eee !important;
+    }
+
+    /* Hide the "Saving..." status */
+    .save-status {
+      display: none !important;
+    }
+
+    /* Ensure title is prominent */
+    h1 {
+      font-size: 2.5rem !important;
+      margin-bottom: 1rem !important;
+      border-bottom: 2px solid black !important;
+      padding-bottom: 0.5rem !important;
+    }
+
+    /* Make tags look like plain text instead of badges */
+    .tag-badge {
+      background: none !important;
+      border: 1px solid #ccc !important;
+      color: black !important;
+      padding: 2px 6px !important;
+    }
+
+    /* Ensure sections don't break across pages if small */
+    section {
+      break-inside: avoid;
+      margin-bottom: 3rem !important;
+    }
+  }
+}

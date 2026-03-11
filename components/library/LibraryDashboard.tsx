@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { LibraryCard } from './LibraryCard';
 import { supabaseService } from '@/lib/services/supabase-service';
+import { Notebook, GrooveSnippet, SongChart } from '@/lib/types/groove';
 
 type ItemType = 'song' | 'notebook' | 'snippet';
 
@@ -43,6 +44,28 @@ export default function LibraryDashboard({
     }
   };
 
+  const handleDuplicate = async (id: string, type: ItemType) => {
+    try {
+      let duplicated;
+      if (type === 'song') {
+        duplicated = await supabaseService.duplicateSongChart(id);
+        setSongs([duplicated, ...songs]);
+      } else if (type === 'notebook') {
+        duplicated = await supabaseService.duplicateNotebook(id);
+        setNotebooks([duplicated, ...notebooks]);
+      } else if (type === 'snippet') {
+        duplicated = await supabaseService.duplicateGrooveSnippet(id);
+        setSnippets([duplicated, ...snippets]);
+      }
+      
+      // Optional: redirect to the new item
+      // window.location.href = `/${type}s/${duplicated.id}`;
+    } catch (error) {
+      console.error('Error duplicating item:', error);
+      alert('Failed to duplicate item.');
+    }
+  };
+
   const filterItems = (items: any[]) => {
     return items.filter((item) => {
       const titleMatch = (item.title || '').toLowerCase().includes(searchQuery.toLowerCase());
@@ -63,6 +86,52 @@ export default function LibraryDashboard({
     activeTab === 'song' ? filterItems(songs) :
     activeTab === 'notebook' ? filterItems(notebooks) :
     filterItems(snippets);
+
+  const handleCreateNew = async () => {
+    try {
+      if (activeTab === 'song') {
+        const newSong: Partial<SongChart> = {
+          header: {
+            title: 'Untitled Song',
+            timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+          },
+          sections: [],
+          tags: [],
+          isPublic: false,
+        };
+        const saved = await supabaseService.saveSongChart(newSong as SongChart);
+        window.location.href = `/songs/${saved.id}`;
+      } else if (activeTab === 'notebook') {
+        const newNotebook: Partial<Notebook> = {
+          title: 'Untitled Notebook',
+          sections: [],
+          tags: [],
+          isPublic: false,
+        };
+        const saved = await supabaseService.saveNotebook(newNotebook as Notebook);
+        window.location.href = `/notebooks/${saved.id}`;
+      } else if (activeTab === 'snippet') {
+        const newSnippet: Partial<GrooveSnippet> = {
+          title: 'Untitled Snippet',
+          tags: [],
+          isPublic: false,
+          timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+          resolution: 16,
+          measures: 1,
+          instruments: [
+            { instrumentId: 'kick', label: 'Kick', notes: Array(16).fill('none') },
+            { instrumentId: 'snare', label: 'Snare', notes: Array(16).fill('none') },
+            { instrumentId: 'hihat', label: 'Hi-Hat', notes: Array(16).fill('none') },
+          ],
+        };
+        const saved = await supabaseService.saveGrooveSnippet(newSnippet as GrooveSnippet);
+        window.location.href = `/snippets/${saved.id}`;
+      }
+    } catch (error) {
+      console.error('Error creating new item:', error instanceof Error ? error.message : error, error);
+      alert('Failed to create new item.');
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -111,7 +180,10 @@ export default function LibraryDashboard({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <button className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-zinc-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all group">
+        <button
+          onClick={handleCreateNew}
+          className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-zinc-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all group"
+        >
           <div className="w-12 h-12 bg-zinc-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-blue-100">
             <svg className="w-6 h-6 text-zinc-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -134,6 +206,7 @@ export default function LibraryDashboard({
               createdAt: item.created_at || item.createdAt,
             }}
             onDelete={handleDelete}
+            onDuplicate={handleDuplicate}
           />
         ))}
       </div>
