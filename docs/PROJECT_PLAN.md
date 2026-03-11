@@ -6,9 +6,14 @@ Drum Charter is a web application tailored for drummers to create, manage, and s
 ### Core Vision
 - **Interactive Groove Grid**: A visual, editable grid for drum patterns.
 - **Song Charts**: Structured song documents with headers, sections, sub-sections, and inline grooves.
-- **Comprehensive Library**: A central place for practice routines, song charts, and snippets.
-- **High-Quality Output**: Optimized for printing and PDF export.
-- **Sharing & Collaboration**: Public/private visibility and cloning capabilities.
+- [x] **Comprehensive Library**: A central place for song charts, notebooks (routines/ideas), and snippets. `✓`
+- [ ] **High-Quality Output**: Optimized for printing and PDF export.
+- [ ] **Sharing & Collaboration**: Public/private visibility and cloning capabilities.
+- [x] **Notebooks (Ideas & Practice)**: `✓`
+  - [x] Data structure for Notebooks (Title, Sections, Flexible Grids) `✓`
+  - [x] Support for freeform notes and practice routines `✓`
+  - [x] Library View integration `✓`
+  - [x] CRUD operations in Supabase `✓`
 
 ---
 
@@ -45,41 +50,40 @@ Drum Charter is a web application tailored for drummers to create, manage, and s
   - [x] Section/Sub-section measure counts (e.g., "Chorus (6M)") `✓`
   - [x] Inline Groove Grid integration `✓`
   - [x] Bullet point notes per section `✓`
+- [x] **Notebooks**:
+  - [x] Flexible data structure (No global BPM/TimeSig) `✓`
+  - [x] Support for sketches, routines, and songwriting ideas `✓`
+  - [x] Inline Groove Grid integration `✓`
 - [ ] **Groove Snippets**:
   - [ ] Metadata (Title, Tags, Time Signature)
-  - [ ] Basic Library View
+  - [x] Library View integration `✓`
   - [ ] Create/Edit/Save Snippets
+- [x] **Library View**:
+  - [x] Three-tabbed dashboard (Songs, Notebooks, Snippets) `✓`
+  - [x] Search and filter by tags/title `✓`
+  - [x] Edit/Delete actions `✓`
 - [ ] **Printing**:
   - [ ] Print-friendly layout for individual snippets
 
 ---
 
-## Song Chart Structure (Context)
-Based on analyzed templates and examples:
-- **Header**: Title, BPM, Time Signature, Song Section list.
-- **Section**: Name, Total Measures (e.g., "Intro (4M)"), Groove Grid (optional), Bullet notes.
-- **Sub-Section**: Nested within sections, has its own measure count, Groove Grid, and notes.
-- **Groove Grid**: Resolution-aware (1 e + a), supports multiple drum symbols.
+## Data Entities (Context)
+Based on analyzed workflows:
+- **Song Chart**: Title, BPM, Time Signature, Sections/Sub-sections (Structured).
+- **Notebook**: Title, Sections (Freeform). No global BPM/TimeSig required.
+- **Groove Snippet**: Title, Tags, Single Groove Grid (Reusable).
 
 ---
 
 ## Status Board (Kanban)
 
 ### 🔴 To Do
-- [ ] Define `GrooveGrid` TypeScript interfaces in `lib/types/groove.ts`
-- [ ] Implement initial `GrooveGrid` React component
 - [ ] Add support for multiple time signatures and resolutions
-- [ ] Create basic library page to list saved snippets
+- [ ] Implement Notebook editor UI
 
 ### 🟡 In Progress
-- [x] Implement persistence (save/load) for Snippets and Charts using Supabase (PostgreSQL) `✓`
-  - [x] Install `@supabase/supabase-js` and `@supabase/ssr` `✓`
-  - [x] Create Supabase client and server utilities `✓`
-  - [x] Implement Auth (Login/Signup/Proxy) `✓`
-  - [x] Implement `supabaseService` for CRUD operations `✓`
-  - [x] Setup `.env.local` and SQL schema placeholders `✓`
-  - [x] Create GitHub Action for Supabase "Keep-Alive" heartbeat `✓`
-- [ ] Create basic library page to list saved snippets and charts `*`
+- [ ] Implement Notebook editor UI
+- [ ] Implement Snippet editor UI
 
 ### 🟢 Done
 - [x] Project Proposal Analysis
@@ -88,6 +92,11 @@ Based on analyzed templates and examples:
 - [x] Verification of Local Document Paths and Contents
 - [x] Interactive Groove Grid UI with Symbol Picker
 - [x] Implement `SongChart` UI components (Header, Sections, Sub-sections, Grid integration) `✓`
+- [x] Implement persistence (save/load) for Snippets and Charts using Supabase (PostgreSQL) `✓`
+- [x] Implement Auth (Login/Signup/Proxy) `✓`
+- [x] Create basic library page with three tabs (Songs, Notebooks, Snippets) `✓`
+- [x] Define `Notebook` TypeScript interfaces in `lib/types/groove.ts` `✓`
+- [x] Create `docs/USE_CASES.md` documenting user workflows `✓`
 
 ---
 

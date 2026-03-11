@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-import { SongChart, GrooveSnippet } from '../types/groove'
+import { SongChart, GrooveSnippet, Notebook } from '../types/groove'
 
 const supabase = createClient()
 
@@ -43,6 +43,72 @@ export const supabaseService = {
 
     if (error) throw error
     return data
+  },
+
+  // --- Notebooks ---
+  async saveNotebook(notebook: Notebook) {
+    const { data, error } = await supabase
+      .from('notebooks')
+      .upsert({
+        id: notebook.id,
+        title: notebook.title,
+        sections: notebook.sections,
+        tags: notebook.tags,
+        is_public: notebook.isPublic,
+        updated_at: new Date().toISOString(),
+      })
+      .select()
+
+    if (error) throw error
+    return data[0]
+  },
+
+  async getNotebook(id: string) {
+    const { data, error } = await supabase
+      .from('notebooks')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) throw error
+    return data
+  },
+
+  async listNotebooks() {
+    const { data, error } = await supabase
+      .from('notebooks')
+      .select('id, title, created_at')
+      .order('updated_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  },
+
+  async deleteSongChart(id: string) {
+    const { error } = await supabase
+      .from('song_charts')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
+  },
+
+  async deleteNotebook(id: string) {
+    const { error } = await supabase
+      .from('notebooks')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
+  },
+
+  async deleteGrooveSnippet(id: string) {
+    const { error } = await supabase
+      .from('groove_snippets')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
   },
 
   // --- Groove Snippets ---

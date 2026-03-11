@@ -74,6 +74,30 @@ export interface GrooveSnippet extends GrooveGrid {
 }
 
 /**
+ * Represents a section of a notebook (more flexible than SongSection).
+ */
+export interface NotebookSection {
+  id: string;
+  name: string;
+  grid?: GrooveGrid;
+  notes?: string[];
+}
+
+/**
+ * A notebook for ideas, sketches, and practice routines.
+ */
+export interface Notebook {
+  id: string;
+  title: string;
+  sections: NotebookSection[];
+  tags: string[];
+  userId?: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
  * Represents a section of a song (e.g., "Chorus").
  */
 export interface SongSection {

@@ -70,3 +70,27 @@
     "NEW INSTRUCTION": "WHEN integrating Supabase with Next.js 16 THEN use Supabase SSR examples and Next.js proxy"
 }
 
+[2026-03-11 00:37] - Updated by Junie
+{
+    "TYPE": "positive",
+    "CATEGORY": "Approval and docs reminder",
+    "EXPECTATION": "The plan matches what the user wanted and they appreciate that their informal input was correctly understood; they also expect project docs to be updated as work progresses.",
+    "NEW INSTRUCTION": "WHEN implementing approved work or plans THEN update docs/PROJECT_PLAN.md with changes"
+}
+
+[2026-03-11 00:38] - Updated by Junie
+{
+    "TYPE": "positive",
+    "CATEGORY": "Approval and docs update",
+    "EXPECTATION": "The user is happy with the plan and appreciates that their informal input was correctly interpreted; they want project docs kept up to date.",
+    "NEW INSTRUCTION": "WHEN proceeding with approved work THEN update docs/PROJECT_PLAN.md with changes"
+}
+
+[2026-03-11 00:51] - Updated by Junie
+{
+    "TYPE": "preference",
+    "CATEGORY": "Data reset timing",
+    "EXPECTATION": "They want the option to wipe test data later near a stable release, not during the baseline schema setup.",
+    "NEW INSTRUCTION": "WHEN running baseline schema migrations THEN do not delete data; keep reset separate"
+}
+

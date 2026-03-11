@@ -46,16 +46,27 @@ export function AuthStatus() {
   }
 
   return (
-    <div className="flex gap-4 items-center">
-      <span className="text-sm text-gray-700">
-        Hi, <span className="font-semibold text-blue-600">{user.email}</span>
-      </span>
-      <button 
-        onClick={handleLogout}
-        className="text-xs text-gray-400 hover:text-red-500 transition-colors underline"
-      >
-        Sign Out
-      </button>
+    <div className="flex gap-6 items-center">
+      <div className="flex gap-4 items-center">
+        <a 
+          href="/library" 
+          className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors"
+        >
+          My Library
+        </a>
+        <span className="w-px h-4 bg-gray-300"></span>
+      </div>
+      <div className="flex gap-4 items-center">
+        <span className="text-sm text-gray-700">
+          Hi, <span className="font-semibold text-blue-600">{user.email}</span>
+        </span>
+        <button 
+          onClick={handleLogout}
+          className="text-xs text-gray-400 hover:text-red-500 transition-colors underline"
+        >
+          Sign Out
+        </button>
+      </div>
     </div>
   )
 }
