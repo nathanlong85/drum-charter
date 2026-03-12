@@ -17,22 +17,6 @@ export default async function SongPage({ params }: SongPageProps) {
       notFound();
     }
 
-    // Map DB fields to TypeScript interface
-    const chart = {
-      id: rawChart.id,
-      header: {
-        title: rawChart.title,
-        bpm: rawChart.bpm,
-        timeSignature: rawChart.time_signature,
-      },
-      sections: rawChart.sections || [],
-      tags: rawChart.tags || [],
-      userId: rawChart.user_id,
-      isPublic: rawChart.is_public,
-      createdAt: rawChart.created_at,
-      updatedAt: rawChart.updated_at,
-    };
-
     return (
       <div className="min-h-screen bg-zinc-50">
         <nav className="bg-white border-b border-zinc-200 py-4 px-8">
@@ -53,7 +37,7 @@ export default async function SongPage({ params }: SongPageProps) {
         </nav>
 
         <main className="py-8">
-          <SongEditor initialSong={chart} />
+          <SongEditor initialSong={rawChart} />
         </main>
       </div>
     );

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useReducer, useEffect, useCallback, useState } from 'react';
+import React, { useReducer, useEffect, useCallback, useState, useRef } from 'react';
 import { Notebook, NotebookSection, GrooveGrid } from '@/lib/types/groove';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
@@ -105,11 +105,24 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
     []
   );
 
+  // CodeRabbit: Use ref to skip initial render save
+  const isInitialRender = useRef(true);
+
   useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
+    
+    // CodeRabbit: Use deeper comparison if needed, but state identity change 
+    // from useReducer is generally sufficient if we skip initial render.
     if (state !== initialNotebook) {
       setIsSaving(true);
       debouncedSave(state);
     }
+    return () => {
+      debouncedSave.cancel();
+    };
   }, [state, initialNotebook, debouncedSave]);
 
   return (

@@ -33,6 +33,7 @@ const mockSong: SongChart = {
     },
   ],
   tags: ['rock'],
+  isPublic: false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };

@@ -136,6 +136,8 @@ export interface SongChart {
     title: string;
     bpm?: number;
     timeSignature: TimeSignature;
+    metronomeEnabled: boolean;
+    metronomeVolume: number;
   };
   sections: SongSection[];
   tags: string[];

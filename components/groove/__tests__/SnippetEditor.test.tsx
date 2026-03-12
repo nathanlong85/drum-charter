@@ -22,6 +22,7 @@ const mockSnippet: GrooveSnippet = {
     { instrumentId: 'hh', label: 'Hi-Hat', notes: Array(16).fill('none') },
   ],
   tags: ['funk'],
+  isPublic: false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };

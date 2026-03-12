@@ -260,7 +260,9 @@ export const supabaseService = {
       throw error
     }
 
-    if (!data) {
+    let finalData = data;
+
+    if (!finalData) {
       // Try one more time after a short delay to handle local Supabase sync issues
       console.warn(`[supabaseService] Snippet not found initially: ${id}. Retrying...`);
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -270,28 +272,25 @@ export const supabaseService = {
         .eq('id', id)
         .maybeSingle();
       
-      if (retryResult.data) {
-        console.log(`[supabaseService] Snippet found after retry: ${id}`);
-        return {
-          ...retryResult.data,
-          grid_data: retryResult.data.grid_data as unknown as GrooveGrid
-        } as unknown as GrooveSnippet;
+      if (!retryResult.data) {
+        console.error(`Groove snippet not found: ${id}`);
+        throw new Error('Snippet not found');
       }
 
-      console.error(`Groove snippet not found: ${id}`);
-      throw new Error('Snippet not found');
+      finalData = retryResult.data;
+      console.log(`[supabaseService] Snippet found after retry: ${id}`);
     }
     
-    const gridData = data.grid_data as unknown as GrooveGrid;
+    const gridData = finalData.grid_data as unknown as GrooveGrid;
     
     return {
-      id: data.id,
-      title: data.title,
-      tags: data.tags || [],
-      userId: data.user_id,
-      isPublic: !!data.is_public,
-      createdAt: data.created_at || '',
-      updatedAt: data.updated_at || '',
+      id: finalData.id,
+      title: finalData.title,
+      tags: finalData.tags || [],
+      userId: finalData.user_id,
+      isPublic: !!finalData.is_public,
+      createdAt: finalData.created_at || '',
+      updatedAt: finalData.updated_at || '',
       ...gridData
     }
   },

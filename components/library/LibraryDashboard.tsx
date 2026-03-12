@@ -261,7 +261,7 @@ export default function LibraryDashboard({
 
       {currentItems.length === 0 && searchQuery && (
         <div className="text-center py-12">
-          <p className="text-zinc-400">No results found for "{searchQuery}"</p>
+          <p className="text-zinc-400">No results found for &quot;{searchQuery}&quot;</p>
         </div>
       )}
     </div>

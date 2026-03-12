@@ -26,7 +26,7 @@ export const SongChartView: React.FC<SongChartViewProps> = ({ chart }) => {
       
       <div className="mt-16 pt-8 border-t border-gray-200 text-sm text-gray-400 text-center print:mt-8 print:pt-4">
         <p>Created on {new Date(chart.createdAt).toLocaleDateString()}</p>
-        {chart.tags.length > 0 && (
+        {chart.tags && chart.tags.length > 0 && (
           <div className="flex justify-center gap-2 mt-2 print:hidden">
             {chart.tags.map((tag) => (
               <span key={tag} className="bg-gray-100 px-2 py-0.5 rounded text-xs">#{tag}</span>

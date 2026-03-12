@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -79,6 +80,7 @@ export default function LoginPage() {
           Email
         </label>
         <input
+          id="email"
           className="rounded-md px-4 py-2 bg-inherit border mb-6"
           name="email"
           placeholder="you@example.com"
@@ -90,6 +92,7 @@ export default function LoginPage() {
           Password
         </label>
         <input
+          id="password"
           className="rounded-md px-4 py-2 bg-inherit border mb-6"
           type="password"
           name="password"
@@ -138,9 +141,9 @@ export default function LoginPage() {
         )}
       </form>
       <div className="mt-8 text-center">
-        <a href="/" className="text-sm text-gray-500 hover:underline">
+        <Link href="/" className="text-sm text-gray-500 hover:underline">
           ← Back to home
-        </a>
+        </Link>
       </div>
     </div>
   );

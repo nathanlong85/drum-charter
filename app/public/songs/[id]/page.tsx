@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { SongChartView } from '@/components/chart/SongChartView';
 import { SongChart } from '@/lib/types/groove';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function PublicSongPage({
   params,
@@ -18,28 +19,14 @@ export default function PublicSongPage({
     const fetchSong = async () => {
       const { id } = await params;
       try {
-        const rawSong = await supabaseService.getSongChart(id);
+        const data = await supabaseService.getSongChart(id);
         
-        if (!rawSong || !rawSong.is_public) {
+        if (!data || !data.isPublic) {
           setLoading(false);
           return;
         }
 
-        const mappedSong: SongChart = {
-          id: rawSong.id,
-          userId: rawSong.user_id,
-          header: {
-            title: rawSong.title,
-            bpm: rawSong.bpm,
-            timeSignature: rawSong.time_signature,
-          },
-          sections: rawSong.sections,
-          tags: rawSong.tags || [],
-          isPublic: rawSong.is_public,
-          createdAt: rawSong.created_at,
-          updatedAt: rawSong.updated_at,
-        };
-        setSong(mappedSong);
+        setSong(data);
       } catch (error) {
         console.error('Error fetching public song:', error);
       } finally {
@@ -78,7 +65,7 @@ export default function PublicSongPage({
       </div>
       <footer className="max-w-4xl mx-auto mt-8 text-center no-print">
         <p className="text-sm text-zinc-400">
-          Create your own charts at <a href="/" className="text-blue-600 font-bold hover:underline">DrumCharter.com</a>
+          Create your own charts at <Link href="/" className="text-blue-600 font-bold hover:underline">DrumCharter.com</Link>
         </p>
       </footer>
     </main>

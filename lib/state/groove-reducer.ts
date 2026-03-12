@@ -8,10 +8,16 @@ export type GrooveAction =
   | { type: 'REMOVE_INSTRUMENT'; id: string }
   | { type: 'SET_RESOLUTION'; resolution: 4 | 8 | 16 }
   | { type: 'SET_MEASURES'; measures: number }
-  | { type: 'SET_TIME_SIGNATURE'; beatsPerMeasure: number; beatValue: number };
+  | { type: 'SET_TIME_SIGNATURE'; beatsPerMeasure: number; beatValue: number }
+  | { type: 'SET_GRID'; payload: InstrumentGrid[] };
 
 export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGrid {
   switch (action.type) {
+    case 'SET_GRID':
+      return {
+        ...state,
+        instruments: action.payload
+      };
     case 'TOGGLE_NOTE': {
       const nextMap: Record<string, DrumSymbol> = {
         'none': 'standard',

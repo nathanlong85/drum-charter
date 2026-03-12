@@ -2,7 +2,7 @@
 
 DrumCharter is a web application tailored for drummers to create, manage, and share drum charts, practice exercises, and groove snippets. It aims to replace cumbersome word processor templates with a streamlined, interactive tool.
 
-### Core Vision
+## Core Vision
 - **Interactive Groove Grid**: A visual, editable grid for drum patterns.
 - **Song Charts**: Structured song documents with headers, sections, sub-sections, and inline grooves.
 - [x] **Comprehensive Library**: A central place for song charts, notebooks (routines/ideas), and snippets. `✓`

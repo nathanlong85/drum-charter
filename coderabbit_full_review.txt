@@ -1,0 +1,548 @@
+Starting CodeRabbit review in plain text mode...
+
+Connecting to review service
+Setting up
+Analyzing
+Reviewing
+
+============================================================================
+File: CHANGELOG.md
+Line: 62
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @CHANGELOG.md at line 62, The changelog uses inconsistent spelling for "synthesized/synthesised"; update the line under the "Audio Decoding" entry that currently reads "ensuring valid synthesised WAV samples" to use the same spelling as line 53 ("Synthesized")—i.e., replace "synthesised" with "synthesized"—and scan the rest of CHANGELOG.md for any other occurrences to standardize them.
+
+
+
+============================================================================
+File: package.json
+Line: 18
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @package.json at line 18, Move the "@types/lodash" entry out of the dependencies section and into devDependencies in package.json so type definitions are only installed for development; update the JSON by removing the "@types/lodash" key from "dependencies" and adding it (with the same version string "^4.17.24") under "devDependencies", then run your package manager to sync installs.
+
+
+
+============================================================================
+File: pnpm-workspace.yaml
+Line: 1 to 3
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @pnpm-workspace.yaml around lines 1 - 3, Replace the deprecated ignoredBuiltDependencies list with the new allowBuilds mapping: remove the ignoredBuiltDependencies key and instead add an allowBuilds entry that sets sharp: false and unrs-resolver: false so those packages are explicitly disallowed from running build scripts; ensure the top-level key name is exactly allowBuilds and the package names match the existing entries (sharp, unrs-resolver).
+
+
+
+============================================================================
+File: app/login/actions.ts
+Line: 1 to 9
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/login/actions.ts around lines 1 - 9, This file is missing the Next.js server action directive so the functions can't be used as form actions; add the 'use server' directive as the first statement in the file and ensure it precedes the definitions of login(formData: FormData) and signup(formData: FormData) so both functions run as server actions (no other code or comments before the directive).
+
+
+
+============================================================================
+File: .github/workflows/keep-alive.yml
+Line: 17 to 23
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @.github/workflows/keep-alive.yml around lines 17 - 23, The curl invocation in the keep-alive GitHub Actions step should fail the step on HTTP error responses; update the curl command in .github/workflows/keep-alive.yml (the GET to "${SUPABASE_URL}/rest/v1/profiles?select=count") to include the --fail flag (e.g., curl --fail ...) so non-2xx/3xx responses cause a non-zero exit code and the workflow fails visibly.
+
+
+
+============================================================================
+File: app/login/actions.ts
+Line: 4
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/login/actions.ts at line 4, Remove the direct PII console log in app/login/actions.ts: do not log formData.get('email') or any raw email; instead log a non-identifying indicator (e.g., "login attempt for user ID masked" or just "login attempt") or omit logging entirely. Update the console.log call that references formData.get('email') to use a sanitized placeholder or remove it, ensuring no email or other PII is written to logs.
+
+
+
+============================================================================
+File: docs/PROJECT_PLAN.md
+Line: 5
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @docs/PROJECT_PLAN.md at line 5, The "Core Vision" heading uses h3 ("### Core Vision") immediately after the document's h1, causing a level jump; update the heading to the appropriate h2 ("## Core Vision") (or adjust surrounding headings so each heading increments by one level) to restore proper document structure and accessibility, locating the "### Core Vision" token and replacing it accordingly.
+
+
+
+============================================================================
+File: tsconfig.json
+Line: 35 to 38
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @tsconfig.json around lines 35 - 38, The include paths in tsconfig.json contain a duplicated segment ".next/dev/dev/types//.ts"; update the include array to remove or correct that entry (replace ".next/dev/dev/types//.ts" with the intended ".next/dev/types//.ts" or simply remove the redundant pattern) so only the valid paths (e.g., ".next/types//.ts" and ".next/dev/types//*.ts") remain; verify the include array no longer contains the duplicate "dev/dev" string.
+
+
+
+============================================================================
+File: tests/verify-samples.test.ts
+Line: 39 to 42
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @tests/verify-samples.test.ts around lines 39 - 42, The current sequence using fs.openSync + fs.readSync + fs.closeSync can leak the file descriptor if fs.readSync throws; wrap the read and close in a try/finally so fs.closeSync(fd) always runs (or replace the pattern with fs.readFileSync(filePath).subarray(0, 12) to avoid manual fd management). Update the code around Buffer.alloc, fs.openSync, fs.readSync and fs.closeSync (or switch to fs.readFileSync) to ensure the descriptor is closed in all paths.
+
+
+
+============================================================================
+File: docs/PROJECT_PROPOSAL.md
+Line: 71 to 74
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @docs/PROJECT_PROPOSAL.md around lines 71 - 74, The doc contains hard-coded local file:// links to user-specific paths for "Song Chart Template", "Drum Symbols Library", ""Have It All" Example Song Chart", and ""Center" Example Song Chart" which will break for other contributors; update PROJECT_PROPOSAL.md so those links point to repository-relative files or a shared cloud location (after adding the files to the repo or uploading them), or replace each file link with a short note (e.g., "local to author") and, if adding files to the repo, reference their new relative paths (use the visible link text like Song Chart Template, Drum Symbols Library, "Have It All" Example Song Chart, "Center" Example Song Chart to locate and update the entries).
+
+
+
+============================================================================
+File: components/notebook/__tests__/NotebookEditor.test.tsx
+Line: 19 to 33
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/notebook/__tests__/NotebookEditor.test.tsx around lines 19 - 33, The mockNotebook object is missing the required isPublic boolean required by the Notebook type; update the mockNotebook definition to include an isPublic: boolean property (e.g., isPublic: false) so it satisfies the Notebook interface used in tests; ensure any assertions or test setup that depend on visibility are adjusted to the chosen value and keep the property name exactly "isPublic" to match the Notebook type.
+
+
+
+============================================================================
+File: components/groove/__tests__/SnippetEditor.test.tsx
+Line: 14 to 27
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/groove/__tests__/SnippetEditor.test.tsx around lines 14 - 27, The mockSnippet object is missing the required isPublic boolean from the GrooveSnippet interface; update the mockSnippet definition used in SnippetEditor.test.tsx to include an isPublic: boolean property (true or false as appropriate for the test) so TypeScript aligns with the GrooveSnippet type and tests behave correctly.
+
+
+
+============================================================================
+File: tests/e2e/auth-flow.spec.ts
+Line: 6 to 11
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @tests/e2e/auth-flow.spec.ts around lines 6 - 11, The test "User can see library and navigate to existing items" currently asserts on page content without loading any page; update the test to navigate before assertions by calling page.goto('') at the start of the test or add a beforeEach hook that performs page.goto for this spec suite, ensuring the page is fully loaded (await page.goto(...); optionally await page.waitForLoadState('networkidle')) before the expect(...) calls so the "My Library", "Songs", "Notebooks", and "Snippets" assertions run against a loaded page.
+
+
+
+============================================================================
+File: supabase/migrations/20260312033718_remote_schema.sql
+Line: 107 to 119
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @supabase/migrations/20260312033718_remote_schema.sql around lines 107 - 119, The migration currently grants overly broad privileges to the anonymous role—remove the DELETE, UPDATE and TRUNCATE grants for the anon role on the tables "groove_snippets", "profiles", and "song_charts" and keep only the minimal needed privileges (e.g., SELECT, INSERT, REFERENCES, TRIGGER if used); update the SQL in the migration so any GRANT delete/update/truncate statements referencing "anon" for those three tables are deleted (or replaced with appropriate more-restrictive grants) to enforce least privilege.
+
+
+
+============================================================================
+File: table_stats.json
+Line: 1 to 60
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @table_stats.json around lines 1 - 60, The file table_stats.json is debug output (Supabase CLI logs) and must be removed and ignored; remove it from the repo (git rm table_stats.json), append "table_stats.json" to .gitignore so it won’t be committed again, commit the change with a clear message and push; also scan the repo/PR for any other auto-generated CLI log files and remove/ignore them similarly.
+
+
+
+============================================================================
+File: app/login/page.tsx
+Line: 89 to 100
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/login/page.tsx around lines 89 - 100, The password input is missing an id for proper label association; add an id (e.g., id="password") to the input element used with the  so the label correctly targets the input (the JSX around the Password label and the input using value={password} and onChange={(e) => setPassword(e.target.value)} should be updated to include the id attribute).
+
+
+
+============================================================================
+File: components/chart/SongSectionView.tsx
+Line: 51 to 55
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/chart/SongSectionView.tsx around lines 51 - 55, SongSectionView renders editable GrooveGridEditor for the main section with onChange={onGridChange} but renders subsection GrooveGridEditor instances without an onChange, so subsection edits never propagate; update SongSectionView to accept and pass a handler such as onSubSectionGridChange?: (subSectionId: string, grid: GrooveGrid) => void and wire it into the subsection GrooveGridEditor (call onSubSectionGridChange(sub.id, newGrid) from the editor callback), or explicitly document/mark the subsection GrooveGridEditor as read-only if edits are not intended.
+
+
+
+============================================================================
+File: app/login/page.tsx
+Line: 140 to 144
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/login/page.tsx around lines 140 - 144, Replace the plain anchor used for the "← Back to home" link with Next.js client-side navigation: import Link from 'next/link' in app/login/page.tsx and swap the  element for a  wrapper that preserves the existing className ("text-sm text-gray-500 hover:underline") and inner text, so navigation uses Next.js' Link component instead of causing a full page reload.
+
+
+
+============================================================================
+File: supabase/migrations/20260312033718_remote_schema.sql
+Line: 252 to 257
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @supabase/migrations/20260312033718_remote_schema.sql around lines 252 - 257, The UPDATE policy "Users can update own groove snippets." on "public"."groove_snippets" lacks a WITH CHECK clause, allowing user_id to be changed; update the policy to add WITH CHECK ((auth.uid() = user_id)) so that updates are only allowed when the new row's user_id matches the current user (same condition as the USING clause), referencing the policy name "Users can update own groove snippets." and the table "groove_snippets".
+
+
+
+============================================================================
+File: supabase/migrations/20260312040052_remote_schema.sql
+Line: 85 to 90
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @supabase/migrations/20260312040052_remote_schema.sql around lines 85 - 90, The UPDATE policy "Users can update own notebooks" on "public"."notebooks" lacks a WITH CHECK clause, so users could update the user_id and steal ownership; modify the policy so it includes a WITH CHECK clause that enforces auth.uid() = user_id for the new row (i.e., add a WITH CHECK condition using auth.uid() = user_id) so updates are only allowed when the resulting row still belongs to the authenticated user.
+
+
+
+============================================================================
+File: app/login/page.tsx
+Line: 78 to 88
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/login/page.tsx around lines 78 - 88, The label uses htmlFor="email" but the corresponding input lacks an id, breaking label association and accessibility; update the input element (the JSX with attributes name="email" value={email} onChange={(e) => setEmail(e.target.value)}) to include id="email" (or a unique id if there are multiple forms) while keeping the existing name, placeholder, required and onChange props so the label properly targets the input.
+
+
+
+============================================================================
+File: supabase/migrations/20260312033718_remote_schema.sql
+Line: 315 to 320
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @supabase/migrations/20260312033718_remote_schema.sql around lines 315 - 320, The UPDATE policy "Users can update own song charts." on "public"."song_charts" lacks a WITH CHECK clause, allowing updates that could bypass row-level checks; update the policy definition for "public"."song_charts" to include a WITH CHECK condition mirroring the USING expression (e.g., WITH CHECK ((auth.uid() = user_id))) so that auth.uid() = user_id is enforced both for selecting allowed rows and for validating new row values during updates.
+
+
+
+============================================================================
+File: lib/services/__tests__/supabase-service.test.ts
+Line: 48 to 54
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @lib/services/__tests__/supabase-service.test.ts around lines 48 - 54, The test assertion expects id: '' but the implementation in duplicateSongChart sets id: undefined; update the assertions in supabase-service.test.ts to expect id: undefined (or to use expect(property).toBeUndefined()) for the saveSpy calls that verify objectContaining in the duplicateSongChart tests (and make the same change for the other two similar assertions referenced around the other failing saveSpy checks at the locations noted in the review: the blocks corresponding to lines roughly 78-82 and 108-112).
+
+
+
+============================================================================
+File: app/auth/callback/route.ts
+Line: 7 to 9
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/auth/callback/route.ts around lines 7 - 9, The redirect uses the raw search param next which allows open redirects; in the route handler (app/auth/callback/route.ts) validate and sanitize next before using it: parse the value from searchParams.get('next'), allow only same-origin relative paths (e.g., values starting with a single '/' and not '//' or containing a scheme/host), reject or fallback to '/' for anything else, and then use that sanitizedNext for the redirect; update any references to next in the handler to use sanitizedNext (keep the existing code and code variable names: code and next) so untrusted external URLs cannot be returned.
+
+
+
+============================================================================
+File: components/chart/SongChartView.tsx
+Line: 29 to 35
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/chart/SongChartView.tsx around lines 29 - 35, The JSX currently accesses chart.tags.length and maps chart.tags directly, which will throw if chart.tags is undefined; update the SongChartView component to guard against undefined by using a nullish default or optional chaining (e.g., check (chart.tags ?? []).length or chart.tags?.length and iterate over (chart.tags ?? []) when mapping) so the conditional render and the .map call never run on undefined.
+
+
+
+============================================================================
+File: app/snippets/[id]/page.tsx
+Line: 26 to 38
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/snippets/[id]/page.tsx around lines 26 - 38, The console.log and manual mapping are using DB-style fields and redundantly remapping data that getGrooveSnippet already normalizes to a GrooveSnippet shape; update the code to log the normalized properties on rawSnippet (e.g., rawSnippet.userId and rawSnippet.isPublic) and remove the manual mapping that creates snippet from rawSnippet (the const snippet = { ... } block and the spread of grid_data), instead use rawSnippet directly (or rename rawSnippet → snippet) wherever the normalized GrooveSnippet is expected so you rely on getGrooveSnippet's returned shape.
+
+
+
+============================================================================
+File: supabase/migrations/20260312040052_remote_schema.sql
+Line: 24 to 36
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @supabase/migrations/20260312040052_remote_schema.sql around lines 24 - 36, The migration currently grants overly broad permissions to the anon role on "public"."notebooks" (the grant statements giving DELETE, INSERT, UPDATE, TRUNCATE, TRIGGER, REFERENCES, SELECT); remove or tighten the dangerous grants by revoking or deleting the DELETE, UPDATE and TRUNCATE grants (and TRIGGER if not required) and leave only the minimal needed rights (typically SELECT and, only if necessary for your use case, a scoped INSERT). Update the migration so the final grants for "public"."notebooks" to "anon" are limited to SELECT and an explicit INSERT only when required, and ensure any policy-based access control remains enforced.
+
+
+
+============================================================================
+File: tests/e2e/guest-flow.spec.ts
+Line: 105 to 130
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @tests/e2e/guest-flow.spec.ts around lines 105 - 130, The test "Guest Access - Library -> Create -> Edit" uses incorrect selectors ('button:has-text("NEW")' then 'button:has-text("Notebook")'); update it to interact with the actual UI by selecting the Notebooks tab if needed and clicking the single "New Notebook" control using an accessible selector such as getByRole('button', { name: /New Notebook/i }) (mirror the approach used earlier in the file), and remove the two-step NEW then Notebook clicks so the test clicks the single New Notebook button and then continues validating the redirect, Guest Mode indicator, title edit, and auto-save assertions.
+
+
+
+============================================================================
+File: scripts/create-full-drumkit.js
+Line: 60 to 87
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @scripts/create-full-drumkit.js around lines 60 - 87, The two generator scripts conflict by writing identical filenames (e.g., kick.wav, snare.wav) into the same output folder; update the project so only the intended script runs or they don't clobber each other: either (A) add npm scripts and documentation in package.json/README stating which to run (e.g., "create-full-drumkit" vs "create-dummy-audio") and mark the preferred one, or (B) change create-full-drumkit.js (the drumKit array entries like 'kick.wav' and 'snare.wav') to write into a distinct directory or use unique filenames (e.g., suffix or subfolder), or (C) make create-full-drumkit.js check for existing files and skip/backup instead of overwriting; pick one approach and apply it consistently so drumKit generation no longer overwrites files from create-dummy-audio.js.
+
+
+
+============================================================================
+File: app/public/songs/[id]/page.tsx
+Line: 21 to 41
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/public/songs/[id]/page.tsx around lines 21 - 41, The code incorrectly treats the object returned by supabaseService.getSongChart as raw DB rows (checking rawSong.is_public and remapping fields) even though getSongChart already returns a SongChart with camelCase properties (isPublic, userId, etc.); remove the redundant manual mapping block and update the early-return check to use rawSong.isPublic (or simply use the returned SongChart directly), keeping setLoading(false) behavior and preserving assignment to the component state/variable that previously used mappedSong.
+
+
+
+============================================================================
+File: components/notebook/NotebookEditor.tsx
+Line: 94 to 106
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/notebook/NotebookEditor.tsx around lines 94 - 106, The debouncedSave callback (created via debounce inside useCallback) is not cleaned up on unmount which can lead to setState after unmount; add a cleanup that cancels the debounced function to prevent stray invocations: reference the debouncedSave symbol and in a useEffect hook return a cleanup that calls debouncedSave.cancel() (or appropriate cancel/flush method from your debounce impl) so any pending auto-save is cancelled when the component unmounts.
+
+
+
+============================================================================
+File: app/songs/[id]/page.tsx
+Line: 36 to 63
+Type: refactor_suggestion
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/songs/[id]/page.tsx around lines 36 - 63, The JSX return is inside a try/catch which only surrounds render-time JSX (so child render errors aren’t caught) — move all data fetching and error handling out of the render and render JSX unguarded: perform the async fetch that produces chart and id (the code that currently populates chart used as prop initialSong for  and id.slice(0,8) used in the nav) in a separate try/catch (call notFound() or log inside that block) then return the JSX (including  and the BACK TO LIBRARY link showing id.slice(0,8)) outside the try/catch so rendering is not wrapped by the try/catch.
+
+
+
+============================================================================
+File: app/songs/[id]/page.tsx
+Line: 10 to 34
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/songs/[id]/page.tsx around lines 10 - 34, SongPage fetches the chart via supabaseService.getSongChart but does not verify authentication or ownership, allowing unauthorized access; update SongPage to obtain the current user (e.g., via getCurrentUser or your existing auth utility), then after fetching rawChart compare rawChart.user_id to the current user's id and if they differ and rawChart.is_public is false, call notFound() or throw/redirect to deny access; reference SongPage, supabaseService.getSongChart, rawChart.user_id, rawChart.is_public and notFound when making the change.
+
+
+
+============================================================================
+File: components/demo/GrooveDemo.tsx
+Line: 49 to 52
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/demo/GrooveDemo.tsx around lines 49 - 52, GrooveDemo dispatches { type: 'SET_GRID', payload: updatedGrid } from GrooveGridEditor but the reducer never handles SET_GRID; update lib/state/groove-reducer.ts by adding 'SET_GRID' to the GrooveAction union and implement a case in grooveReducer that returns { ...state, grid: action.payload } (or the equivalent shape used there) so editor changes update parent state; alternatively remove the dispatched action and implement a useEffect in GrooveDemo to sync the grid prop from GrooveGridEditor back to parent, but the simplest fix is to add the SET_GRID action and handler in grooveReducer to accept the updatedGrid payload and replace the grid.
+
+
+
+============================================================================
+File: components/auth/AuthStatus.tsx
+Line: 10 to 26
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/auth/AuthStatus.tsx around lines 10 - 26, The effect is re-running because createClient() is invoked on each render producing a new supabase.auth reference; change to memoize the client so the reference is stable: import and use useMemo to create supabase once (e.g., wrap createClient() in useMemo inside the AuthStatus component), keep getUser and the onAuthStateChange subscription logic unchanged, and ensure the effect dependency array uses the memoized supabase.auth (or just supabase) so the cleanup via subscription.unsubscribe() and setUser/setLoading behavior remain correct.
+
+
+
+============================================================================
+File: app/songs/[id]/page.tsx
+Line: 20 to 34
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/songs/[id]/page.tsx around lines 20 - 34, The mapping block builds a chart from rawChart using snake_case keys that don't exist because getSongChart already returns a SongChart with camelCase properties; remove the redundant mapping and use the returned object directly (replace the chart construction with assignment like const chart = rawChart or return the getSongChart result), or if you truly need raw DB fields, call the lower-level DB method instead of getSongChart; update usages of chart to rely on camelCase fields (e.g., title, userId, isPublic, createdAt, updatedAt) and remove references to time_signature/user_id/is_public/created_at/updated_at.
+
+
+
+============================================================================
+File: components/notebook/NotebookEditor.tsx
+Line: 108 to 113
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/notebook/NotebookEditor.tsx around lines 108 - 113, The current useEffect in NotebookEditor incorrectly uses reference equality (state !== initialNotebook) which triggers saves on every new state object; change the dirty check to compare meaningful persisted fields (e.g., state.updatedAt or notebook content) or maintain a lastSavedRef/lastSavedAt timestamp to determine real changes before calling setIsSaving(true) and debouncedSave; update the effect to skip the initial render (use an isInitialRender ref) and only set isSaving/call debouncedSave when the comparison of state (via state.updatedAt or a shallow/deep compare of content) shows a real change, referencing the existing symbols state, initialNotebook, debouncedSave, setIsSaving, and the NotebookEditor useEffect.
+
+
+
+============================================================================
+File: components/chart/SongEditor.tsx
+Line: 45 to 54
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/chart/SongEditor.tsx around lines 45 - 54, The reducer case 'UPDATE_METRONOME' reads header.metronomeEnabled and header.metronomeVolume, but the SongChart type's header lacks these fields; update the SongChart.header definition in lib/types/groove.ts to include metronomeEnabled: boolean and metronomeVolume: number (or the appropriate types used in the reducer) so the reducer's references (state.header.metronomeEnabled, state.header.metronomeVolume) and the UPDATE_METRONOME action are type-safe.
+
+
+
+============================================================================
+File: lib/types/groove.ts
+Line: 133 to 146
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @lib/types/groove.ts around lines 133 - 146, The SongChart.type's header is missing the metronome fields referenced by SongEditor.tsx; update the SongChart interface (specifically the header object in SongChart) to include metronomeEnabled: boolean and metronomeVolume: number (or make them optional if they can be undefined) so that state.header.metronomeEnabled and state.header.metronomeVolume are type-safe and align with the usage in SongEditor.tsx.
+
+
+
+============================================================================
+File: app/public/snippets/[id]/page.tsx
+Line: 67
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @app/public/snippets/[id]/page.tsx at line 67, The inline anchor "Capture your own groove snippets at DrumCharter.com" triggers the @next/next/no-html-link-for-pages rule; replace it with Next's Link component from next/link, import Link at the top of the file, and render DrumCharter.com (preserving the existing className and hover styles) so navigation is client-side and ESLint-compliant; update any surrounding JSX accordingly.
+
+
+
+============================================================================
+File: playwright-report/index.html
+Line: 3 to 85
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @playwright-report/index.html around lines 3 - 85, The repo contains a generated Playwright report (playwright-report/index.html with the embedded base64 ZIP in the element id="playwrightReportBase64") which should not be checked in. Remove the generated output and stop committing it: add "playwright-report/" to .gitignore, run "git rm --cached -r playwright-report && git commit -m 'remove generated playwright report and ignore directory'" (or rewrite history if you must purge sensitive/large files), and push. Also update CI/artefact publishing to upload the generated playwright-report/ as a build artifact instead of committing it (look for the code that writes out the report / embeds it — e.g. element id="playwrightReportBase64" and class my.load in the diff) and confirm consumers load artifacts from CI storage rather than repository.
+
+
+
+============================================================================
+File: lib/hooks/useAudioPlayback.ts
+Line: 81 to 90
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @lib/hooks/useAudioPlayback.ts around lines 81 - 90, The fetch loop that loads samples (iterating over sampleMap and using fetch, response.arrayBuffer, and context.decodeAudioData) should check response.ok before calling arrayBuffer/decode to give clearer errors for missing files; update the try block in the loader that sets samplesRef.current (and related functions) to inspect response.ok (and include response.status/text in the error message), throw or log and continue the loop if not ok, then proceed to arrayBuffer and decode only when the response is successful.
+
+
+
+============================================================================
+File: components/library/LibraryDashboard.tsx
+Line: 262 to 266
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @components/library/LibraryDashboard.tsx around lines 262 - 266, In LibraryDashboard, the JSX uses literal curly quotes around {searchQuery} which triggers a lint warning; change the string to use escaped entity quotes (e.g. replace “No results found for "{searchQuery}"” with "No results found for &quot;{searchQuery}&quot;") or concatenate explicit quote characters around searchQuery so the literal quotes are HTML-safe; update the JSX where currentItems.length === 0 && searchQuery is rendered to use &quot; or explicit quote characters instead of curly quotes.
+
+
+
+============================================================================
+File: playwright-report/index.html
+Line: 84 to 85
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @playwright-report/index.html around lines 84 - 85, The script element with id "playwrightReportBase64" is placed after , which is invalid; move the  element so it appears immediately before the closing  tag (i.e., insert it before  and remove it from after ) to ensure the report script resides inside the document body.
+
+
+
+============================================================================
+File: lib/services/supabase-service.ts
+Line: 263 to 283
+Type: potential_issue
+
+Prompt for AI Agent:
+Verify each finding against the current code and only fix it if needed.
+
+In @lib/services/supabase-service.ts around lines 263 - 283, The retry branch uses a raw DB row shape while the success branch maps DB columns to the GrooveSnippet shape (userId, isPublic) and casts grid_data; make the return shapes consistent and avoid the fragile sleep-based retry: update the retryResult handling in the supabaseService retrieval so it maps DB fields the same way as the normal-success path (map user_id -> userId, is_public -> isPublic, and convert grid_data to GrooveGrid) and remove or replace the 1500ms setTimeout retry with a proper retry strategy (or better, remove it and fix upstream race); ensure the code path uses the same mapping logic (extract or reuse the existing mapping function used by the success branch) and still throws the same Error('Snippet not found') when absent.
+
+
+
+Review completed: 45 findings ✔

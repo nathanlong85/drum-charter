@@ -64,6 +64,9 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
       setIsSaving(true);
       debouncedSave(state);
     }
+    return () => {
+      debouncedSave.cancel();
+    };
   }, [state, initialSnippet, debouncedSave]);
 
   return (

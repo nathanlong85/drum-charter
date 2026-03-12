@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useReducer, useEffect, useCallback, useState } from 'react';
+import React, { useReducer, useEffect, useCallback, useState, useRef } from 'react';
 import { SongChart, SongSection, SongSubSection, GrooveGrid } from '@/lib/types/groove';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
@@ -151,6 +151,9 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
       setIsSaving(true);
       debouncedSave(state);
     }
+    return () => {
+      debouncedSave.cancel();
+    };
   }, [state, initialSong, debouncedSave]);
 
   return (
@@ -401,6 +404,20 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                         <span>M)</span>
                       </div>
                     </div>
+                    {sub.grid && (
+                      <div className="mb-3">
+                        <GrooveGridEditor 
+                          initialGrid={sub.grid} 
+                          onChange={(grid) => dispatch({ type: 'UPDATE_SUBSECTION', sectionId: section.id, subSectionId: sub.id, updates: { grid } })}
+                          bpm={state.header.bpm}
+                          onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
+                          metronomeEnabled={state.header.metronomeEnabled}
+                          onMetronomeToggle={(enabled) => dispatch({ type: 'UPDATE_METRONOME', enabled })}
+                          metronomeVolume={state.header.metronomeVolume}
+                          onMetronomeVolumeChange={(volume) => dispatch({ type: 'UPDATE_METRONOME', volume })}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
                 <button

@@ -34,6 +34,8 @@ global.AudioContext = vi.fn().mockImplementation(function() {
   return new MockAudioContext();
 });
 global.fetch = vi.fn().mockResolvedValue({
+  ok: true,
+  status: 200,
   arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
 });
 
