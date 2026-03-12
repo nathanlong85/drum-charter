@@ -61,9 +61,9 @@ describe('useAudioPlayback', () => {
       { symbol: 'standard', expected: 0.7 },
       { symbol: 'ghost', expected: 0.2 },
       { symbol: 'none', expected: 0 },
-      { symbol: 'snare_accent' as DrumSymbol, expected: 1.1 },
-      { symbol: 'hi_hat_ghost' as DrumSymbol, expected: 0.2 },
-      { symbol: 'hi_hat_closed_hit_opt' as DrumSymbol, expected: 0.7 },
+      { symbol: 'accent_opt', expected: 1.1 },
+      { symbol: 'ghost_opt', expected: 0.2 },
+      { symbol: 'hi_hat_closed_opt', expected: 0.7 },
     ];
 
     it.each(testCases)('returns $expected for symbol $symbol', ({ symbol, expected }) => {
