@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5-alpha] - 2026-03-12
+
+### Added
+- **Isolated Local Development**: Established a local Supabase environment using Docker, enabling safe development and testing without affecting the production database.
+- **Local Test Configuration**: Added `.env.test` and updated `playwright.config.ts` to automatically switch to the local instance during E2E test runs.
+- **Database Baselining**: Created a formal, single "Source of Truth" migration by pulling and merging the remote schema.
+- **Local Seed Data**: Synchronized the local database with a dump of the remote public data to provide a consistent testing baseline.
+
+### Fixed
+- **Migration History**: Repaired divergent migration history on the remote server and removed redundant/loose SQL files.
+- **Anonymous Sign-In**: Enabled anonymous authentication in the local Supabase configuration (`config.toml`).
+
+### Changed
+- **Strict Protocol Update**: Updated `.junie/STRICT_PAIR_PROGRAMMING.md` with "Drop and Listen" and "No Overwhelming Context" rules to improve focus and collaboration.
+
 ## [0.1.4-alpha] - 2026-03-11
 
 ### Added

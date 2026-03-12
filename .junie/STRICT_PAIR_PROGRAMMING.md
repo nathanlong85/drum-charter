@@ -10,6 +10,8 @@ To ensure high-quality collaboration and maintain the stability of the DrumChart
 
 ## 2. Communication Rules
 - **Direct Answers First**: If a user asks a question (e.g., "Why was this not tested?"), the entire response must focus on the answer and discussion. Zero code edits or file changes should occur in that turn.
+- **Drop and Listen**: When the user stops a task or flags an issue, immediately halt all other activity. The priority shifts entirely to addressing that specific concern before any more work or planning is done.
+- **No Overwhelming Context**: Do not bundle unrelated technical updates, plans, or implementation details into a response to a specific question or issue. Focus only on the direct answer.
 - **Proactive Suggestions**: To maintain momentum, always conclude a status update or task completion by proposing the next 2–3 logical tasks for discussion.
 - **State Assumptions**: Always explicitly state assumptions and present multiple interpretations if they exist.
 

@@ -12,13 +12,28 @@ const initialGrid: GrooveGrid = {
 };
 
 describe('grooveReducer', () => {
-  it('handles TOGGLE_NOTE', () => {
+  it('handles TOGGLE_NOTE cycle and default velocities', () => {
     const action = { type: 'TOGGLE_NOTE', instrumentId: 'hh', noteIndex: 0 } as const;
-    const nextState = grooveReducer(initialGrid, action);
-    expect(nextState.instruments[0].notes[0]).toBe('standard');
     
-    const secondState = grooveReducer(nextState, action);
-    expect(secondState.instruments[0].notes[0]).toBe('ghost');
+    // Toggle 1: Standard
+    const state1 = grooveReducer(initialGrid, action);
+    expect(state1.instruments[0].notes[0]).toBe('standard');
+    expect(state1.instruments[0].velocities?.[0]).toBe(0.7);
+    
+    // Toggle 2: Accent
+    const state2 = grooveReducer(state1, action);
+    expect(state2.instruments[0].notes[0]).toBe('accent');
+    expect(state2.instruments[0].velocities?.[0]).toBe(1.0);
+    
+    // Toggle 3: Ghost
+    const state3 = grooveReducer(state2, action);
+    expect(state3.instruments[0].notes[0]).toBe('ghost');
+    expect(state3.instruments[0].velocities?.[0]).toBe(0.3);
+    
+    // Toggle 4: None
+    const state4 = grooveReducer(state3, action);
+    expect(state4.instruments[0].notes[0]).toBe('none');
+    expect(state4.instruments[0].velocities?.[0]).toBe(0);
   });
 
   it('handles SET_RESOLUTION', () => {

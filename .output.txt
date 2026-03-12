@@ -1,213 +1,202 @@
-Command finished with exit code 1.
+Command finished with exit code 0.
 Command output:
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:74282) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:75023) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:75023) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+××F××F××F····
 
-Running 7 tests using 1 worker
-(node:59024) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:59024) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:59325) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:59325) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:59860) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:59860) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:60366) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:60366) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:60682) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:60682) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:61148) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:61148) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:61691) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:61691) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:62304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-(node:62304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-×±××F××F····
+  1) [chromium] › tests/e2e/auth-flow.spec.ts:22:7 › Authentication and Core Flow › User can see library and navigate to existing items 
 
-  1) [chromium] › tests/e2e/guest-flow.spec.ts:27:7 › Guest Access & Library Flow › should allow creating a new notebook and navigating to editor 
-
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
-
-    Locator: locator('text=Saving...')
-    Expected: visible
-    Timeout: 10000ms
-    Error: element(s) not found
-
+    TimeoutError: page.fill: Timeout 30000ms exceeded.
     Call log:
-    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
-    [2m  - waiting for locator('text=Saving...')[22m
+    [2m  - waiting for locator('input[type="email"]')[22m
 
 
-      51 |     
-      52 |     // Should show "Saving..." then "Saved"
-    > 53 |     await expect(page.locator('text=Saving...')).toBeVisible();
-         |                                                  ^
-      54 |     await expect(page.locator('text=Saved')).toBeVisible({ timeout: 10000 });
-      55 |   });
-      56 |
-        at /Users/nlong/Projects/drum-charter/tests/e2e/guest-flow.spec.ts:53:50
+       8 |     const password = 'password123';
+       9 |     
+    > 10 |     await page.fill('input[type="email"]', email);
+         |                ^
+      11 |     await page.fill('input[type="password"]', password);
+      12 |     await page.click('button:has-text("Sign Up")');
+      13 |     
+        at /Users/nlong/Projects/drum-charter/tests/e2e/auth-flow.spec.ts:10:16
 
-    Error Context: test-results/guest-flow-Guest-Access-Li-fdff0-ok-and-navigating-to-editor-chromium/error-context.md
+    Error Context: test-results/auth-flow-Authentication-a-f4f6b--navigate-to-existing-items-chromium/error-context.md
 
     Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
 
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
-
-    Locator: locator('text=Saving...')
-    Expected: visible
-    Timeout: 10000ms
-    Error: element(s) not found
-
+    TimeoutError: page.fill: Timeout 30000ms exceeded.
     Call log:
-    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
-    [2m  - waiting for locator('text=Saving...')[22m
+    [2m  - waiting for locator('input[type="email"]')[22m
 
 
-      51 |     
-      52 |     // Should show "Saving..." then "Saved"
-    > 53 |     await expect(page.locator('text=Saving...')).toBeVisible();
-         |                                                  ^
-      54 |     await expect(page.locator('text=Saved')).toBeVisible({ timeout: 10000 });
-      55 |   });
-      56 |
-        at /Users/nlong/Projects/drum-charter/tests/e2e/guest-flow.spec.ts:53:50
+       8 |     const password = 'password123';
+       9 |     
+    > 10 |     await page.fill('input[type="email"]', email);
+         |                ^
+      11 |     await page.fill('input[type="password"]', password);
+      12 |     await page.click('button:has-text("Sign Up")');
+      13 |     
+        at /Users/nlong/Projects/drum-charter/tests/e2e/auth-flow.spec.ts:10:16
 
-    Error Context: test-results/guest-flow-Guest-Access-Li-fdff0-ok-and-navigating-to-editor-chromium-retry1/error-context.md
+    Error Context: test-results/auth-flow-Authentication-a-f4f6b--navigate-to-existing-items-chromium-retry1/error-context.md
 
     attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/guest-flow-Guest-Access-Li-fdff0-ok-and-navigating-to-editor-chromium-retry1/trace.zip
+    test-results/auth-flow-Authentication-a-f4f6b--navigate-to-existing-items-chromium-retry1/trace.zip
     Usage:
 
-        npx playwright show-trace test-results/guest-flow-Guest-Access-Li-fdff0-ok-and-navigating-to-editor-chromium-retry1/trace.zip
+        npx playwright show-trace test-results/auth-flow-Authentication-a-f4f6b--navigate-to-existing-items-chromium-retry1/trace.zip
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
     Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
 
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
-
-    Locator: locator('text=Saving...')
-    Expected: visible
-    Timeout: 10000ms
-    Error: element(s) not found
-
+    TimeoutError: page.fill: Timeout 30000ms exceeded.
     Call log:
-    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
-    [2m  - waiting for locator('text=Saving...')[22m
+    [2m  - waiting for locator('input[type="email"]')[22m
 
 
-      51 |     
-      52 |     // Should show "Saving..." then "Saved"
-    > 53 |     await expect(page.locator('text=Saving...')).toBeVisible();
-         |                                                  ^
-      54 |     await expect(page.locator('text=Saved')).toBeVisible({ timeout: 10000 });
-      55 |   });
-      56 |
-        at /Users/nlong/Projects/drum-charter/tests/e2e/guest-flow.spec.ts:53:50
+       8 |     const password = 'password123';
+       9 |     
+    > 10 |     await page.fill('input[type="email"]', email);
+         |                ^
+      11 |     await page.fill('input[type="password"]', password);
+      12 |     await page.click('button:has-text("Sign Up")');
+      13 |     
+        at /Users/nlong/Projects/drum-charter/tests/e2e/auth-flow.spec.ts:10:16
 
-    Error Context: test-results/guest-flow-Guest-Access-Li-fdff0-ok-and-navigating-to-editor-chromium-retry2/error-context.md
+    Error Context: test-results/auth-flow-Authentication-a-f4f6b--navigate-to-existing-items-chromium-retry2/error-context.md
 
-  2) [chromium] › tests/e2e/guest-flow.spec.ts:57:7 › Guest Access & Library Flow › should persist data after reload 
+  2) [chromium] › tests/e2e/auth-flow.spec.ts:29:7 › Authentication and Core Flow › User can create and edit a new snippet with persistence 
 
-    TimeoutError: locator.fill: Timeout 15000ms exceeded.
+    TimeoutError: page.fill: Timeout 30000ms exceeded.
     Call log:
-    [2m  - waiting for getByPlaceholder(/Snippet Title/i)[22m
+    [2m  - waiting for locator('input[type="email"]')[22m
 
 
-      72 |     const titleInput = page.getByPlaceholder(/Snippet Title/i);
-      73 |     const uniqueTitle = `Unique Snippet ${Date.now()}`;
-    > 74 |     await titleInput.fill(uniqueTitle);
-         |                      ^
-      75 |     
-      76 |     // Wait for save - check for any saving indicator
-      77 |     await expect(page.getByText(/saving/i)).toBeVisible();
-        at /Users/nlong/Projects/drum-charter/tests/e2e/guest-flow.spec.ts:74:22
+       8 |     const password = 'password123';
+       9 |     
+    > 10 |     await page.fill('input[type="email"]', email);
+         |                ^
+      11 |     await page.fill('input[type="password"]', password);
+      12 |     await page.click('button:has-text("Sign Up")');
+      13 |     
+        at /Users/nlong/Projects/drum-charter/tests/e2e/auth-flow.spec.ts:10:16
 
-    Error Context: test-results/guest-flow-Guest-Access-Li-3efde-d-persist-data-after-reload-chromium/error-context.md
+    Error Context: test-results/auth-flow-Authentication-a-78efe-ew-snippet-with-persistence-chromium/error-context.md
 
     Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
 
-    TimeoutError: locator.fill: Timeout 15000ms exceeded.
+    TimeoutError: page.fill: Timeout 30000ms exceeded.
     Call log:
-    [2m  - waiting for getByPlaceholder(/Snippet Title/i)[22m
+    [2m  - waiting for locator('input[type="email"]')[22m
 
 
-      72 |     const titleInput = page.getByPlaceholder(/Snippet Title/i);
-      73 |     const uniqueTitle = `Unique Snippet ${Date.now()}`;
-    > 74 |     await titleInput.fill(uniqueTitle);
-         |                      ^
-      75 |     
-      76 |     // Wait for save - check for any saving indicator
-      77 |     await expect(page.getByText(/saving/i)).toBeVisible();
-        at /Users/nlong/Projects/drum-charter/tests/e2e/guest-flow.spec.ts:74:22
+       8 |     const password = 'password123';
+       9 |     
+    > 10 |     await page.fill('input[type="email"]', email);
+         |                ^
+      11 |     await page.fill('input[type="password"]', password);
+      12 |     await page.click('button:has-text("Sign Up")');
+      13 |     
+        at /Users/nlong/Projects/drum-charter/tests/e2e/auth-flow.spec.ts:10:16
 
-    Error Context: test-results/guest-flow-Guest-Access-Li-3efde-d-persist-data-after-reload-chromium-retry1/error-context.md
+    Error Context: test-results/auth-flow-Authentication-a-78efe-ew-snippet-with-persistence-chromium-retry1/error-context.md
 
     attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/guest-flow-Guest-Access-Li-3efde-d-persist-data-after-reload-chromium-retry1/trace.zip
+    test-results/auth-flow-Authentication-a-78efe-ew-snippet-with-persistence-chromium-retry1/trace.zip
     Usage:
 
-        npx playwright show-trace test-results/guest-flow-Guest-Access-Li-3efde-d-persist-data-after-reload-chromium-retry1/trace.zip
+        npx playwright show-trace test-results/auth-flow-Authentication-a-78efe-ew-snippet-with-persistence-chromium-retry1/trace.zip
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
     Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
 
-    TimeoutError: locator.fill: Timeout 15000ms exceeded.
+    TimeoutError: page.fill: Timeout 30000ms exceeded.
     Call log:
-    [2m  - waiting for getByPlaceholder(/Snippet Title/i)[22m
+    [2m  - waiting for locator('input[type="email"]')[22m
 
 
-      72 |     const titleInput = page.getByPlaceholder(/Snippet Title/i);
-      73 |     const uniqueTitle = `Unique Snippet ${Date.now()}`;
-    > 74 |     await titleInput.fill(uniqueTitle);
-         |                      ^
-      75 |     
-      76 |     // Wait for save - check for any saving indicator
-      77 |     await expect(page.getByText(/saving/i)).toBeVisible();
-        at /Users/nlong/Projects/drum-charter/tests/e2e/guest-flow.spec.ts:74:22
+       8 |     const password = 'password123';
+       9 |     
+    > 10 |     await page.fill('input[type="email"]', email);
+         |                ^
+      11 |     await page.fill('input[type="password"]', password);
+      12 |     await page.click('button:has-text("Sign Up")');
+      13 |     
+        at /Users/nlong/Projects/drum-charter/tests/e2e/auth-flow.spec.ts:10:16
 
-    Error Context: test-results/guest-flow-Guest-Access-Li-3efde-d-persist-data-after-reload-chromium-retry2/error-context.md
+    Error Context: test-results/auth-flow-Authentication-a-78efe-ew-snippet-with-persistence-chromium-retry2/error-context.md
 
-  3) [chromium] › tests/e2e/guest-flow.spec.ts:4:7 › Guest Access & Library Flow › should allow a user to sign in as guest and see the library 
+  3) [chromium] › tests/e2e/auth-flow.spec.ts:58:7 › Authentication and Core Flow › User can create and edit a new notebook 
 
-    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveURL[2m([22m[32mexpected[39m[2m)[22m failed
-
-    Expected pattern: [32m/\/library/[39m
-    Received string:  [31m"http://localhost:3001/login"[39m
-    Timeout: 10000ms
-
+    TimeoutError: page.fill: Timeout 30000ms exceeded.
     Call log:
-    [2m  - Expect "toHaveURL" with timeout 10000ms[22m
-    [2m    14 × unexpected value "http://localhost:3001/login"[22m
+    [2m  - waiting for locator('input[type="email"]')[22m
 
 
-      14 |
-      15 |     // Should redirect to library
-    > 16 |     await expect(page).toHaveURL(/\/library/);
-         |                        ^
-      17 |     
-      18 |     // Should show Guest Mode indicator
-      19 |     await expect(page.locator('text=Guest Mode')).toBeVisible();
-        at /Users/nlong/Projects/drum-charter/tests/e2e/guest-flow.spec.ts:16:24
+       8 |     const password = 'password123';
+       9 |     
+    > 10 |     await page.fill('input[type="email"]', email);
+         |                ^
+      11 |     await page.fill('input[type="password"]', password);
+      12 |     await page.click('button:has-text("Sign Up")');
+      13 |     
+        at /Users/nlong/Projects/drum-charter/tests/e2e/auth-flow.spec.ts:10:16
 
-    Error Context: test-results/guest-flow-Guest-Access-Li-3e96c-s-guest-and-see-the-library-chromium/error-context.md
+    Error Context: test-results/auth-flow-Authentication-a-a7269-ate-and-edit-a-new-notebook-chromium/error-context.md
 
-  2 failed
-    [chromium] › tests/e2e/guest-flow.spec.ts:27:7 › Guest Access & Library Flow › should allow creating a new notebook and navigating to editor 
-    [chromium] › tests/e2e/guest-flow.spec.ts:57:7 › Guest Access & Library Flow › should persist data after reload 
-  1 flaky
-    [chromium] › tests/e2e/guest-flow.spec.ts:4:7 › Guest Access & Library Flow › should allow a user to sign in as guest and see the library 
-  4 passed (1.9m)
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.fill: Timeout 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[type="email"]')[22m
+
+
+       8 |     const password = 'password123';
+       9 |     
+    > 10 |     await page.fill('input[type="email"]', email);
+         |                ^
+      11 |     await page.fill('input[type="password"]', password);
+      12 |     await page.click('button:has-text("Sign Up")');
+      13 |     
+        at /Users/nlong/Projects/drum-charter/tests/e2e/auth-flow.spec.ts:10:16
+
+    Error Context: test-results/auth-flow-Authentication-a-a7269-ate-and-edit-a-new-notebook-chromium-retry1/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-flow-Authentication-a-a7269-ate-and-edit-a-new-notebook-chromium-retry1/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-flow-Authentication-a-a7269-ate-and-edit-a-new-notebook-chromium-retry1/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Retry #2 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.fill: Timeout 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[type="email"]')[22m
+
+
+       8 |     const password = 'password123';
+       9 |     
+    > 10 |     await page.fill('input[type="email"]', email);
+         |                ^
+      11 |     await page.fill('input[type="password"]', password);
+      12 |     await page.click('button:has-text("Sign Up")');
+      13 |     
+        at /Users/nlong/Projects/drum-charter/tests/e2e/auth-flow.spec.ts:10:16
+
+    Error Context: test-results/auth-flow-Authentication-a-a7269-ate-and-edit-a-new-notebook-chromium-retry2/error-context.md
+
+  3 failed
+    [chromium] › tests/e2e/auth-flow.spec.ts:22:7 › Authentication and Core Flow › User can see library and navigate to existing items 
+    [chromium] › tests/e2e/auth-flow.spec.ts:29:7 › Authentication and Core Flow › User can create and edit a new snippet with persistence 
+    [chromium] › tests/e2e/auth-flow.spec.ts:58:7 › Authentication and Core Flow › User can create and edit a new notebook 
+  4 passed (4.9m)

@@ -61,6 +61,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
 
   useEffect(() => {
     if (state !== initialSnippet) {
+      setIsSaving(true);
       debouncedSave(state);
     }
   }, [state, initialSnippet, debouncedSave]);

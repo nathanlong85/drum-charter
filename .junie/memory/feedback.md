@@ -414,3 +414,99 @@
     "NEW INSTRUCTION": "WHEN executing Tasks 1–3 THEN follow branch plan and await approval before merging"
 }
 
+[2026-03-11 22:49] - Updated by Junie
+{
+    "TYPE": "preference",
+    "CATEGORY": "Git workflow sequencing",
+    "EXPECTATION": "Start Task 1 in the current branch with an initial commit, merge it, then create a new branch for Task 2 and only merge after explicit approval; repeat for Task 3.",
+    "NEW INSTRUCTION": "WHEN executing Tasks 1–3 THEN follow: Task1 commit+merge; Task2/3 new branch; merge after approval"
+}
+
+[2026-03-11 22:50] - Updated by Junie
+{
+    "TYPE": "preference",
+    "CATEGORY": "Git workflow sequencing",
+    "EXPECTATION": "Start Task 1 in the current branch with an initial commit, then merge; create a new branch for Task 2 and only merge after explicit approval; repeat for Task 3.",
+    "NEW INSTRUCTION": "WHEN executing Tasks 1–3 THEN Task1 commit+merge; Task2/3 new branch; merge after approval"
+}
+
+[2026-03-11 22:52] - Updated by Junie
+{
+    "TYPE": "preference",
+    "CATEGORY": "Git workflow sequencing",
+    "EXPECTATION": "Start Task 1 in current branch with an initial commit, then merge; create a new branch for Tasks 2 and 3 and only merge after explicit approval.",
+    "NEW INSTRUCTION": "WHEN executing tasks 1–3 sequentially THEN Task1 commit+merge; Task2/3 new branch; merge after approval"
+}
+
+[2026-03-11 22:57] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "Schema migration integrity",
+    "EXPECTATION": "Use the known base migration pulled from Supabase and apply any further schema changes as additional migrations; do not rely on ad-hoc files that were 'found' and clearly acknowledge provenance.",
+    "NEW INSTRUCTION": "WHEN discussing schema sync or files THEN cite provenance and follow migration chain only"
+}
+
+[2026-03-11 22:58] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "Schema migration integrity",
+    "EXPECTATION": "Use the known base migration pulled from Supabase and apply further schema changes as additional migrations only; do not trust or use ad-hoc files and clearly state provenance.",
+    "NEW INSTRUCTION": "WHEN discussing schema sync or migrations THEN cite provenance and follow the migration chain only"
+}
+
+[2026-03-11 23:04] - Updated by Junie
+{
+    "TYPE": "negative",
+    "CATEGORY": "Direct answers and focus",
+    "EXPECTATION": "They want simple questions answered directly and succinctly, without digressions, and for multiple points to be addressed explicitly.",
+    "NEW INSTRUCTION": "WHEN the user asks a direct question THEN answer it concisely first before anything else"
+}
+
+[2026-03-11 23:09] - Updated by Junie
+{
+    "TYPE": "negative",
+    "CATEGORY": "Direct answer compliance",
+    "EXPECTATION": "They wanted only a direct, realistic answer to how to keep the assistant focused, not unrelated migration details.",
+    "NEW INSTRUCTION": "WHEN user requests focus or says 'only answer my question' THEN answer that question concisely and omit all other topics"
+}
+
+[2026-03-11 23:12] - Updated by Junie
+{
+    "TYPE": "positive",
+    "CATEGORY": "Responsiveness acknowledgment",
+    "EXPECTATION": "The assistant followed the user's request precisely and stayed aligned with their instructions, which the user appreciated.",
+    "NEW INSTRUCTION": "WHEN the user gives a specific instruction or correction THEN follow it exactly and avoid unrelated topics"
+}
+
+[2026-03-11 23:14] - Updated by Junie
+{
+    "TYPE": "positive",
+    "CATEGORY": "Responsiveness acknowledgment",
+    "EXPECTATION": "The assistant followed the user's instructions closely and stayed on-topic, which the user appreciated.",
+    "NEW INSTRUCTION": "WHEN user gives a specific instruction or correction THEN follow it exactly and stay on-topic"
+}
+
+[2026-03-11 23:21] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "Approval gating breach",
+    "EXPECTATION": "They expected us to await explicit approval before executing migrations/CLI, avoid plan-packing, and not make unnoticed project plan changes.",
+    "NEW INSTRUCTION": "WHEN proposing migrations or CLI actions THEN await explicit approval before executing"
+}
+
+[2026-03-11 23:31] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "Interruption handling",
+    "EXPECTATION": "When the user asks a question or flags something, the assistant must stop ongoing plans and address it immediately with a direct, concise answer before continuing.",
+    "NEW INSTRUCTION": "WHEN user asks a question or flags an issue THEN pause work, apologize if needed, answer succinctly, and await approval"
+}
+
+[2026-03-12 00:08] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "Test failures resolution",
+    "EXPECTATION": "They want any failing tests identified and fixed immediately, with clear failure details.",
+    "NEW INSTRUCTION": "WHEN tests fail in CI or locally THEN list failing tests with errors and implement fixes before proceeding"
+}
+

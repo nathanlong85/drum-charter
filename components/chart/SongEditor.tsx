@@ -137,6 +137,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
 
   useEffect(() => {
     if (state !== initialSong) {
+      setIsSaving(true);
       debouncedSave(state);
     }
   }, [state, initialSong, debouncedSave]);

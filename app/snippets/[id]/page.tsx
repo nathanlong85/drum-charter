@@ -2,6 +2,7 @@ import { supabaseService } from '@/lib/services/supabase-service';
 import SnippetEditor from '@/components/groove/SnippetEditor';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 
 interface SnippetPageProps {
   params: { id: string };
@@ -9,13 +10,20 @@ interface SnippetPageProps {
 
 export default async function SnippetPage({ params }: SnippetPageProps) {
   const { id } = await params;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  console.log(`[SnippetPage] Loading snippet: ${id} (User: ${user?.id || 'Anonymous'})`);
 
   try {
     const rawSnippet = await supabaseService.getGrooveSnippet(id);
     
     if (!rawSnippet) {
+      console.error(`[SnippetPage] Snippet not found in DB: ${id}`);
       notFound();
     }
+
+    console.log(`[SnippetPage] Snippet found: ${rawSnippet.title} (Owner: ${rawSnippet.user_id}, Public: ${rawSnippet.is_public})`);
 
     // Map DB fields to TypeScript interface
     const snippet = {

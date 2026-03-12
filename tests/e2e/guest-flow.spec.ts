@@ -88,13 +88,44 @@ test.describe('Guest Access & Library Flow', () => {
     const uniqueTitle = `Unique Snippet ${Date.now()}`;
     await titleInput.fill(uniqueTitle);
     
-    // Wait for save
+    // Wait for save - need to wait for SAVING then SAVED to ensure debounce + save completed
+    await expect(page.getByText(/SAVING/)).toBeVisible();
     await expect(page.getByText(/SAVED/)).toBeVisible({ timeout: 20000 });
+    
+    // Additional wait to ensure DB is truly updated
+    await page.waitForTimeout(2000);
     
     // Reload page
     await page.reload({ waitUntil: 'networkidle' });
     
     // Check if title persisted
     await expect(page.getByDisplayValue(uniqueTitle)).toBeVisible({ timeout: 20000 });
+  });
+
+  test('Guest Access - Library -> Create -> Edit', async ({ page }) => {
+    // Navigate to Login and click Guest
+    await page.goto('/login');
+    await page.click('button:has-text("Continue as Guest")');
+    await page.waitForURL('/library');
+    
+    // Create new notebook
+    await page.click('button:has-text("NEW")');
+    await page.click('button:has-text("Notebook")');
+    
+    // Should redirect to notebook editor
+    await expect(page).toHaveURL(/\/notebooks\/.+/);
+    
+    // Check for "Guest Mode" indicator
+    await expect(page.getByText(/Guest Mode/i)).toBeVisible();
+    
+    // Edit title
+    const titleInput = page.getByPlaceholder(/Notebook Title/i);
+    const uniqueTitle = `My Notebook ${Date.now()}`;
+    await titleInput.clear();
+    await titleInput.fill(uniqueTitle);
+    
+    // Wait for auto-save
+    await expect(page.getByText(/SAVING/)).toBeVisible();
+    await expect(page.getByText(/SAVED/)).toBeVisible({ timeout: 20000 });
   });
 });

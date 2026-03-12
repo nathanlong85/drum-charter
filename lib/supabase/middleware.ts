@@ -3,6 +3,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { Database } from './database.types'
 
 export async function updateSession(request: NextRequest) {
+  const cookieCount = request.cookies.getAll().length;
+  console.log(`[Middleware] Updating session for: ${request.nextUrl.pathname} (Cookies: ${cookieCount})`);
+
   let supabaseResponse = NextResponse.next({
     request,
   })

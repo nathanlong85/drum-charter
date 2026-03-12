@@ -107,6 +107,7 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
 
   useEffect(() => {
     if (state !== initialNotebook) {
+      setIsSaving(true);
       debouncedSave(state);
     }
   }, [state, initialNotebook, debouncedSave]);

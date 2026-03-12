@@ -68,16 +68,36 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## Status Board (Kanban)
 
 ### 🟡 In Progress
-- [ ] Comprehensive E2E Test Suite stabilization
-- [ ] UI Workflow Documentation refinement
+- [ ] Task 1: Velocity & Accent Support (Visual & Audio)
+- [ ] Task 2: E2E Stabilization (timeouts, persistence anchors)
 
 ### 🟢 Done
+- [x] Task 3: Isolated Local Development Environment (Supabase Docker) `✓`
+- [x] Schema Baselining & Migration Repair `✓`
+- [x] Synchronized Local Seed Data `✓`
 - [x] Full Drum Kit Overhaul (17 sounds, Symbol Mapping) `✓`
 - [x] Fix: RLS Violation (42501) on item creation `✓`
 - [x] Fix: Audio Decoding and Supabase Error Visibility `✓`
 - [x] Audio Playback MVP (Kick, Snare, Hi-Hat) with sample-accurate Web Audio API scheduler `✓`
 - [x] Visual Playhead synchronization and BPM management for all entity types `✓`
 - [x] Public routes and read-only views for Notebooks and Snippets `✓`
+- [x] Clone/Duplicate Item logic and UI `✓`
+- [x] notebooks table creation and Supabase type safety `✓`
+- [x] v0.1.1-alpha: Management Layer (Duplicate, Sharing) `✓`
+- [x] v0.1.0-alpha: Core Editors & Testing Baseline `✓`
+- [x] Print-Friendly Layout & @media print styles `✓`
+- [x] Public Sharing & Public Routes (Songs) `✓`
+- [x] Library Navigation and AuthStatus improvements `✓`
+- [x] Guest Mode (Anonymous Sign-In) `✓`
+- [x] Landing Page Redesign (Hero, Demo, Features) `✓`
+- [x] Snippet Editor UI `✓`
+- [x] Interactive Song Editor UI `✓`
+- [x] Dynamic Time Signatures & Resolution `✓`
+- [x] Notebook Editor UI `✓`
+- [x] CRUD Service Integration `✓`
+- [x] Supabase Connection & Schema `✓`
+- [x] Groove Grid Engine `✓`
+- [x] Project Documentation & Use Cases `✓`
 - [x] Document CLI usage patterns in `.junie/CLI_REFERENCE.md` `✓`
 - [x] Fix: Create missing `notebooks` table in Supabase via CLI migration `✓`
 - [x] Restore full type safety for Notebook operations in `supabaseService` `✓`

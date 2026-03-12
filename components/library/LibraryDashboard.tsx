@@ -116,8 +116,15 @@ export default function LibraryDashboard({
           isPublic: false,
         };
         const saved = await supabaseService.saveSongChart(newSong as SongChart);
-        console.log('Created song:', saved.id);
-        window.location.href = `/songs/${saved.id}`;
+        if (saved && saved.id) {
+          console.log('Created song:', saved.id);
+          // Wait briefly for local sync before redirecting
+          setTimeout(() => {
+            window.location.href = `/songs/${saved.id}`;
+          }, 500);
+        } else {
+          throw new Error('Song creation failed - no ID returned');
+        }
       } else if (activeTab === 'notebook') {
         const newNotebook: Partial<Notebook> = {
           userId,
@@ -127,8 +134,15 @@ export default function LibraryDashboard({
           isPublic: false,
         };
         const saved = await supabaseService.saveNotebook(newNotebook as Notebook);
-        console.log('Created notebook:', saved.id);
-        window.location.href = `/notebooks/${saved.id}`;
+        if (saved && saved.id) {
+          console.log('Created notebook:', saved.id);
+          // Wait briefly for local sync before redirecting
+          setTimeout(() => {
+            window.location.href = `/notebooks/${saved.id}`;
+          }, 500);
+        } else {
+          throw new Error('Notebook creation failed - no ID returned');
+        }
       } else if (activeTab === 'snippet') {
         const newSnippet: Partial<GrooveSnippet> = {
           userId,
@@ -145,8 +159,15 @@ export default function LibraryDashboard({
           ],
         };
         const saved = await supabaseService.saveGrooveSnippet(newSnippet as GrooveSnippet);
-        console.log('Created snippet:', saved.id);
-        window.location.href = `/snippets/${saved.id}`;
+        if (saved && saved.id) {
+          console.log('Created snippet:', saved.id);
+          // Wait briefly for local sync before redirecting
+          setTimeout(() => {
+            window.location.href = `/snippets/${saved.id}`;
+          }, 500);
+        } else {
+          throw new Error('Snippet creation failed - no ID returned');
+        }
       }
     } catch (error: any) {
       console.error('Error creating new item:', {

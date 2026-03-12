@@ -15,9 +15,16 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
     case 'TOGGLE_NOTE': {
       const nextMap: Record<string, DrumSymbol> = {
         'none': 'standard',
-        'standard': 'ghost',
-        'ghost': 'accent',
-        'accent': 'none'
+        'standard': 'accent',
+        'accent': 'ghost',
+        'ghost': 'none'
+      };
+
+      const velocityMap: Record<string, number> = {
+        'standard': 0.7,
+        'accent': 1.0,
+        'ghost': 0.3,
+        'none': 0
       };
 
       return {
@@ -26,28 +33,37 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
           if (inst.instrumentId !== action.instrumentId) return inst;
           const newNotes = [...inst.notes];
           const current = newNotes[action.noteIndex] || 'none';
-          newNotes[action.noteIndex] = nextMap[current] || 'none';
+          const nextSymbol = nextMap[current] || 'none';
+          newNotes[action.noteIndex] = nextSymbol;
 
-          // Clear explicit velocity when note is toggled off
-          if (newNotes[action.noteIndex] === 'none' && inst.velocities) {
-            const newVelocities = [...inst.velocities];
-            newVelocities[action.noteIndex] = 0;
-            return { ...inst, notes: newNotes, velocities: newVelocities };
-          }
+          // Automatically set velocity based on symbol if not already set or being reset
+          const newVelocities = inst.velocities ? [...inst.velocities] : Array(newNotes.length).fill(0);
+          newVelocities[action.noteIndex] = velocityMap[nextSymbol] || 0;
 
-          return { ...inst, notes: newNotes };
+          return { ...inst, notes: newNotes, velocities: newVelocities };
         }),
       };
     }
 
     case 'SET_SYMBOL': {
+      const velocityMap: Record<string, number> = {
+        'standard': 0.7,
+        'accent': 1.0,
+        'ghost': 0.3,
+        'none': 0
+      };
+
       return {
         ...state,
         instruments: state.instruments.map((inst) => {
           if (inst.instrumentId !== action.instrumentId) return inst;
           const newNotes = [...inst.notes];
           newNotes[action.noteIndex] = action.symbol;
-          return { ...inst, notes: newNotes };
+          
+          const newVelocities = inst.velocities ? [...inst.velocities] : Array(newNotes.length).fill(0);
+          newVelocities[action.noteIndex] = velocityMap[action.symbol] || newVelocities[action.noteIndex];
+          
+          return { ...inst, notes: newNotes, velocities: newVelocities };
         }),
       };
     }

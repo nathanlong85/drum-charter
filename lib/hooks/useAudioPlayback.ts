@@ -77,8 +77,10 @@ export function useAudioPlayback({ grid, bpm, onStepChange }: UseAudioPlaybackPr
     
     source.buffer = samplesRef.current.get(sampleKey as DrumSymbol)!;
     
-    // Set volume based on velocity
-    gainNode.gain.setValueAtTime(velocity, time);
+    // Set volume based on velocity (0-1 range)
+    // Using an exponential curve for more natural volume transitions
+    const gainValue = Math.pow(velocity, 1.5);
+    gainNode.gain.setValueAtTime(gainValue, time);
     
     source.connect(gainNode);
     gainNode.connect(audioContextRef.current.destination);
@@ -87,10 +89,15 @@ export function useAudioPlayback({ grid, bpm, onStepChange }: UseAudioPlaybackPr
   };
 
   const getVelocityForSymbol = (symbol: DrumSymbol): number => {
+    if (symbol === 'accent') return 1.0;
+    if (symbol === 'ghost') return 0.3;
+    if (symbol === 'standard') return 0.7;
+    if (symbol === 'none') return 0;
+    
+    // Handle _opt variants and other symbols
     if (symbol.includes('accent')) return 1.0;
     if (symbol.includes('ghost')) return 0.3;
-    if (symbol === 'none') return 0;
-    return 0.7; // Standard
+    return 0.7; // Default for everything else
   };
 
   const scheduleNote = (step: number, time: number) => {
