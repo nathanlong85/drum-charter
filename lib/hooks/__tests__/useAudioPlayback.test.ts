@@ -125,7 +125,59 @@ describe('useAudioPlayback', () => {
       vi.advanceTimersByTime(100);
     });
 
-    // Check if setValueAtTime was called with 0.5 (our explicit velocity)
-    expect(mockSetValueAtTime).toHaveBeenCalledWith(0.5, expect.any(Number));
+    // Check if setValueAtTime was called with the calculated gain
+    // 0.5 ^ 1.5 = 0.35355...
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(
+      expect.closeTo(0.35355, 5), 
+      expect.any(Number)
+    );
+  });
+
+  it('handles metronome toggling and volume', () => {
+    const { result } = renderHook(() => useAudioPlayback({ 
+      grid: mockGrid, 
+      bpm: 120,
+      initialMetronomeEnabled: true,
+      initialMetronomeVolume: 0.8
+    }));
+
+    expect(result.current.metronomeEnabled).toBe(true);
+    expect(result.current.metronomeVolume).toBe(0.8);
+
+    act(() => {
+      result.current.setMetronomeEnabled(false);
+    });
+    expect(result.current.metronomeEnabled).toBe(false);
+
+    act(() => {
+      result.current.setMetronomeVolume(0.2);
+    });
+    expect(result.current.metronomeVolume).toBe(0.2);
+  });
+
+  it('schedules metronome clicks correctly', async () => {
+    // 4/4 grid at 16th resolution = 4 steps per beat
+    const { result } = renderHook(() => useAudioPlayback({ 
+      grid: mockGrid, 
+      bpm: 120,
+      initialMetronomeEnabled: true 
+    }));
+
+    // Wait for samples
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    act(() => {
+      result.current.togglePlayback();
+    });
+
+    // Advance to trigger first note (Step 0 - Beat 1)
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    // Metronome click should be scheduled
+    expect(mockStart).toHaveBeenCalled();
   });
 });

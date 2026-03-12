@@ -1,10 +1,44 @@
-You are an expert in JavaScript, TypeScript, Next.js, and scalable web application development. You write secure, maintainable, and performant code following Next.js and JavaScript best practices.
+**You are an expert in JavaScript, TypeScript, Next.js, Supabase, and scalable web application development. You write secure, maintainable, and performant code following Next.js and JavaScript best practices.**
+
+
+# STRICT PAIR PROGRAMMING PROTOCOL
+
+To ensure high-quality collaboration and maintain the stability of the DrumCharter codebase, the following "Stop-and-Wait" protocol is strictly enforced.
+
+## 1. Stop-and-Wait Protocol
+- **No Silent Implementation**: Never bundle code fixes, refactors, or new features into a response unless the previous turn was an explicit approval to do so.
+- **Explicit Approval Tokens**: Only messages containing clear, affirmative approval (e.g., "Go ahead," "Proceed," "Approved," "Yes, do that") are treated as a green light to make project changes.
+- **Step-by-Step Approval**: For multi-step tasks, seek approval for each individual step before moving on to the next. Do not assume that approval for a plan is approval for all its sub-tasks.
+- **Conflict Resolution**: General directives like "plow through" or "move fast" are acknowledged as a desire for momentum, but they do NOT override the requirement to discuss and wait for specific feature approvals.
+
+## 2. Communication Rules
+- **Direct Answers First**: If a user asks a question (e.g., "Why was this not tested?"), the entire response must focus on the answer and discussion. Zero code edits or file changes should occur in that turn.
+- **Drop and Listen**: When the user stops a task or flags an issue, immediately halt all other activity. The priority shifts entirely to addressing that specific concern before any more work or planning is done.
+- **No Overwhelming Context**: Do not bundle unrelated technical updates, plans, or implementation details into a response to a specific question or issue. Focus only on the direct answer.
+- **Proactive Suggestions**: To maintain momentum, always conclude a status update or task completion by proposing the next 2–3 logical tasks for discussion.
+- **State Assumptions**: Always explicitly state assumptions and present multiple interpretations if they exist.
+
+## 3. Mode Selection
+- Follow the interaction mode rules strictly. For non-trivial project changes, use `[CODE]` mode and provide regular status updates via `update_status`.
+
 
 # Project Plan: docs/PROJECT_PLAN.md
 
 - This file MUST be read before any work is done to understand the current state and goals of the project.
 - After any work is completed, this file MUST be updated to reflect the latest status, changes made, and next steps.
 - The file serves as the live status document and project board.
+
+
+# Commit Authorship & Identity
+- **Authorship**: All commits must be made on behalf of the user only.
+- **No Co-authors**: Do not add Junie as a co-author (e.g., using `--trailer "Co-authored-by: Junie <junie@jetbrains.com>"`).
+- **History Rewriting**: When performing a git history rewrite, update all previous commits to match the user's preferred name and email, removing any non-user attribution.
+
+
+# Technical Requirements
+- **100% Test Coverage**: All new features and core logic must have corresponding unit (Vitest) and/or E2E (Playwright) tests.
+- **Documentation First**: Maintain `docs/PROJECT_PLAN.md` and `docs/USE_CASES.md` as the live status documents.
+- **Safety Guards**: All UI components (especially `GrooveGridEditor`) must handle potential `undefined` or uninitialized states to prevent runtime crashes.
 
 
 # JavaScript Best Practices
@@ -18,10 +52,10 @@ You are an expert in JavaScript, TypeScript, Next.js, and scalable web applicati
 
 # Next.js: ALWAYS read docs before coding
 
-Before any Next.js work, find and read the relevant doc in `node_modules/next/dist/docs/`. Your training data is outdated — the docs are the source of truth.
+Before any Next.js work, find and read the relevant docs. Your training data is outdated — the docs are the source of truth.
 
 
-# Always discuss implementation approach
+# Always discuss the implementation approach
 
 When the user presents a task or requirement, ALWAYS discuss the implementation approach and get their approval before writing any code unless explicitly told to go ahead without asking. This is pair programming - present the plan, discuss tradeoffs and options, and wait for the user to give the go-ahead. Do NOT immediately start implementing with tool calls. The user has repeatedly emphasized this and finds it frustrating when I jump straight to coding without discussion first.
 
@@ -69,10 +103,42 @@ Whenever the user asks for a PR description, always provide the output in a fenc
 # Git Workflow
 
 - Use a feature branch for each new feature.
-- Use a squash merge for all merges into the main branch.
 - Use a descriptive commit message.
 - Use a descriptive PR title.
 - Use a descriptive branch name.
+
+
+# CLI Commands
+
+- `.junie/CLI_REFERENCE.md` exists as a reference for non-trivial CLI commands that you have previously struggled to produce the correct syntax for. The benefits of this file are:
+  - Saving you time, effort, and tokens in the future.
+  -  Helping you remember the syntax and options for each command.
+  -  Helping you avoid mistakes.
+- Before running ANY non-trivial CLI command (Supabase, Git, Playwright), check `.junie/CLI_REFERENCE.md`. If the command isn't there, research the official docs first, then add the verified command to the reference BEFORE executing it.
+- When you encounter a new CLI command that you are struggling to produce the correct syntax for, **always** add a new entry to `.junie/CLI_REFERENCE.md` with notes or instructions to help yourself in the future.
+- `.junie/CLI_REFERENCE.md` is a living document and should be updated as needed.
+
+
+# Development Workflow (Local-First & PR-Based)
+
+- **Local-First Development**:
+  - All development work and E2E testing MUST target the local Supabase Docker instance (`http://localhost:54321`).
+  - Never connect to the production database during development or testing.
+  - Use `pnpm dev --port 3001` for the local server to avoid port conflicts.
+- **Branching Strategy**:
+  - Always create a new `feature/` or `fix/` branch for every task.
+  - Never work directly on `main`.
+- **Feedback Loop (CodeRabbit)**:
+  - Follow the PR-based feedback loop:
+    1. Create a branch and implement changes.
+    2. Commit, push, and open a Pull Request.
+    3. Wait for CodeRabbit to provide automated feedback.
+    4. Review and address all CodeRabbit comments.
+    5. Iterate until the PR is clean.
+- **Human Oversight & Merging**:
+  - The human (Nate) is the final quality gate.
+  - Do not merge PRs yourself. Once the PR is ready and all feedback (CodeRabbit + Human) is addressed, Nate will perform the final merge.
+  - Always provide a detailed, fenced Markdown description for every PR.
 
 
 # Karpathy Guidelines

@@ -5,7 +5,7 @@ import { GrooveGrid, DrumSymbol, BeatResolution } from '@/lib/types/groove';
 import { grooveReducer, GrooveAction } from '@/lib/state/groove-reducer';
 import { InstrumentRow } from './InstrumentRow';
 import { SymbolPicker } from './SymbolPicker';
-import { Settings, Plus, Minus, Play, Square } from 'lucide-react';
+import { Settings, Plus, Minus, Play, Square, Bell, BellOff, Volume2 } from 'lucide-react';
 import { useAudioPlayback } from '@/lib/hooks/useAudioPlayback';
 
 interface GrooveGridEditorProps {
@@ -13,6 +13,10 @@ interface GrooveGridEditorProps {
   onChange?: (grid: GrooveGrid) => void;
   bpm?: number;
   onBpmChange?: (bpm: number) => void;
+  metronomeEnabled?: boolean;
+  onMetronomeToggle?: (enabled: boolean) => void;
+  metronomeVolume?: number;
+  onMetronomeVolumeChange?: (volume: number) => void;
 }
 
 export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
@@ -20,6 +24,10 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   onChange,
   bpm: parentBpm,
   onBpmChange,
+  metronomeEnabled: parentMetronomeEnabled,
+  onMetronomeToggle,
+  metronomeVolume: parentMetronomeVolume,
+  onMetronomeVolumeChange,
 }) => {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
   const [pickerPos, setPickerPos] = useState<{ top: number; left: number; instrumentId: string; noteIndex: number } | null>(null);
@@ -28,12 +36,35 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   const [localBpm, setLocalBpm] = useState(120);
 
   const bpm = parentBpm !== undefined ? parentBpm : localBpm;
+  const [showMetronomeSettings, setShowMetronomeSettings] = useState(false);
 
-  const { isPlaying, togglePlayback } = useAudioPlayback({
+  const { 
+    isPlaying, 
+    togglePlayback, 
+    metronomeEnabled, 
+    setMetronomeEnabled,
+    metronomeVolume,
+    setMetronomeVolume
+  } = useAudioPlayback({
     grid: state,
     bpm,
     onStepChange: (step) => setActiveStep(step),
+    initialMetronomeEnabled: parentMetronomeEnabled,
+    initialMetronomeVolume: parentMetronomeVolume,
   });
+
+  // Sync internal audio state with external props if they change
+  useEffect(() => {
+    if (parentMetronomeEnabled !== undefined && parentMetronomeEnabled !== metronomeEnabled) {
+      setMetronomeEnabled(parentMetronomeEnabled);
+    }
+  }, [parentMetronomeEnabled, setMetronomeEnabled, metronomeEnabled]);
+
+  useEffect(() => {
+    if (parentMetronomeVolume !== undefined && parentMetronomeVolume !== metronomeVolume) {
+      setMetronomeVolume(parentMetronomeVolume);
+    }
+  }, [parentMetronomeVolume, setMetronomeVolume, metronomeVolume]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -187,6 +218,65 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
               max="300"
             />
           </div>
+        </div>
+
+        <div className="flex items-center gap-1 border-r border-gray-300 pr-4 relative">
+          <button
+            onClick={() => {
+              const newState = !metronomeEnabled;
+              setMetronomeEnabled(newState);
+              onMetronomeToggle?.(newState);
+            }}
+            className={`p-1.5 rounded transition-colors ${
+              metronomeEnabled 
+                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
+                : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+            }`}
+            title={metronomeEnabled ? "Disable Metronome" : "Enable Metronome"}
+          >
+            {metronomeEnabled ? <Bell size={18} /> : <BellOff size={18} />}
+          </button>
+          
+          <button
+            onClick={() => setShowMetronomeSettings(!showMetronomeSettings)}
+            className={`p-1.5 rounded transition-colors hover:bg-gray-200 text-gray-600 ${
+              showMetronomeSettings ? 'bg-gray-200' : ''
+            }`}
+            title="Metronome Settings"
+          >
+            <Volume2 size={18} />
+          </button>
+
+          {showMetronomeSettings && (
+            <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-300 rounded shadow-lg p-3 min-w-[120px]">
+              <div className="flex flex-col gap-2">
+                <span className="text-xs font-bold text-gray-500 uppercase">Click Volume</span>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="1" 
+                  step="0.05" 
+                  value={metronomeVolume}
+                  onChange={(e) => {
+                    const newVal = parseFloat(e.target.value);
+                    setMetronomeVolume(newVal);
+                    onMetronomeVolumeChange?.(newVal);
+                  }}
+                  className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                />
+                <div className="flex justify-between text-[10px] text-gray-400">
+                  <span>Soft</span>
+                  <span>Loud</span>
+                </div>
+              </div>
+              <button 
+                className="w-full mt-2 text-[10px] text-blue-600 hover:underline text-center"
+                onClick={() => setShowMetronomeSettings(false)}
+              >
+                Close
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2">

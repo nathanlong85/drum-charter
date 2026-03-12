@@ -68,21 +68,18 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## Status Board (Kanban)
 
 ### 🟢 Done
+- [x] [Feature] Audio Playback: Metronome Support (#2) `✓`
 - [x] GitHub Formalization (Issues, Kanban, Templates) `✓`
-- [x] Task 1: Velocity & Accent Support (Visual & Audio) `✓`
-- [x] Task 2: E2E Stabilization (timeouts, persistence anchors) `✓`
-- [x] Local-First Development: Target local Supabase (port 54321) from dev server (port 3001) `✓`
-- [x] Task 3: Isolated Local Development Environment (Supabase Docker) `✓`
+- [x] Local-First Development Environment (Supabase Docker) `✓`
 - [x] Schema Baselining & Migration Repair `✓`
 - [x] Synchronized Local Seed Data `✓`
+- [x] Audio Playback MVP (Kick, Snare, Hi-Hat) with sample-accurate Web Audio API scheduler `✓`
 - [x] Full Drum Kit Overhaul (17 sounds, Symbol Mapping) `✓`
 - [x] Fix: RLS Violation (42501) on item creation `✓`
 - [x] Fix: Audio Decoding and Supabase Error Visibility `✓`
-- [x] Audio Playback MVP (Kick, Snare, Hi-Hat) with sample-accurate Web Audio API scheduler `✓`
 - [x] Visual Playhead synchronization and BPM management for all entity types `✓`
 - [x] Public routes and read-only views for Notebooks and Snippets `✓`
 - [x] Clone/Duplicate Item logic and UI `✓`
-- [x] notebooks table creation and Supabase type safety `✓`
 - [x] v0.1.1-alpha: Management Layer (Duplicate, Sharing) `✓`
 - [x] v0.1.0-alpha: Core Editors & Testing Baseline `✓`
 - [x] Print-Friendly Layout & @media print styles `✓`
@@ -94,20 +91,14 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [x] Interactive Song Editor UI `✓`
 - [x] Dynamic Time Signatures & Resolution `✓`
 - [x] Notebook Editor UI `✓`
-- [x] CRUD Service Integration `✓`
 - [x] Supabase Connection & Schema `✓`
 - [x] Groove Grid Engine `✓`
 - [x] Project Documentation & Use Cases `✓`
 - [x] Document CLI usage patterns in `.junie/CLI_REFERENCE.md` `✓`
 - [x] Fix: Create missing `notebooks` table in Supabase via CLI migration `✓`
 - [x] Restore full type safety for Notebook operations in `supabaseService` `✓`
-- [x] Clone/Duplicate functionality for Songs, Notebooks, and Snippets `✓`
 - [x] Supabase TypeScript Type Generation and Service Refactor `✓`
 - [x] Initialize CHANGELOG.md (v0.1.0-alpha) `✓`
-- [x] Implement @media print styles and "PRINT" button `✓`
-- [x] Implement Public Viewing routes for Song Charts `✓`
-- [x] Codify "Stop-and-Wait" protocol in `.junie/STRICT_PAIR_PROGRAMMING.md` `✓`
-- [x] Document UI workflows in `docs/UI_WORKFLOWS.md` `✓`
 - [x] Implement Unit Tests for all core editors (Song, Notebook, Snippet) `✓`
 - [x] Move dev server and Playwright to Port 3001 `✓`
 - [x] Fix "Error creating new item" in Library and add creation flow unit tests `✓`
@@ -115,13 +106,39 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [x] Implement Anonymous Sign-In (Guest Mode) `✓`
 - [x] Groove Grid Core (Resolutions, Measures, Symbols) `✓`
 
-### 🔵 Backlog
-- [ ] Multi-layer velocity support for Crescendos/Accents
-- [ ] Dark Mode support
-- [ ] Offline support (PWA)
+### 🟡 In Progress
+- [ ] [Feature] Multi-layer Velocity Support (#3)
+
+### 🔵 Backlog (GitHub Issues)
+- [ ] [Feature] Dark Mode Support (#4)
+- [ ] [Feature] Offline Support (PWA) (#5)
+- [ ] [Feature] Snippet Tagging & Metadata UI (#6)
+- [ ] [E2E] Stabilization (timeouts, persistence anchors)
+
+---
+
+## Project Rules & Collaborative Protocols
+
+To ensure high-quality collaboration and maintain the stability of the DrumCharter codebase, the following protocols are strictly enforced. **These take precedence over all other instructions and are now formally located in `.junie/guidelines.md`.**
+
+### 1. Stop-and-Wait Protocol
+- **No Silent Implementation**: Never bundle code fixes, refactors, or new features into a response unless the previous turn was an explicit approval to do so.
+- **Explicit Approval Tokens**: Only messages containing clear, affirmative approval (e.g., "Go ahead," "Proceed," "Approved," "Yes, do that") are treated as a green light to make project changes.
+- **Step-by-Step Approval**: For multi-step tasks, seek approval for each individual step before moving on to the next.
+
+### 2. Communication Rules
+- **Direct Answers First**: If a user asks a question, the entire response must focus on the answer and discussion. Zero code edits or file changes should occur in that turn.
+- **Drop and Listen**: When the user stops a task or flags an issue, immediately halt all other activity and address that concern.
+- **No Overwhelming Context**: Do not bundle unrelated technical updates or plans into a response to a specific question.
+- **Answer-First**: Start every response with a direct, concise answer to the user's question.
+
+### 3. Technical & Mode Rules
+- **100% Test Coverage**: All new features and core logic must have corresponding unit (Vitest) and/or E2E (Playwright) tests.
+- **Local-First Dev**: Always use the local Supabase Docker instance for development and testing.
+- **Commit Identity**: All commits must be made exclusively on behalf of `Nathan Long <nathanlong85@gmail.com>`. No co-author trailers.
 
 ---
 
 ## Instructions for Agents
-- **Read Before Work**: This file MUST be read before any work is done to understand the current state and goals.
-- **Update After Work**: This file MUST be updated after every task is completed to reflect the latest status, changes made, and next steps.
+- **Read Before Work**: This file MUST be read before any work is done.
+- **Update After Work**: This file MUST be updated after every task is completed.

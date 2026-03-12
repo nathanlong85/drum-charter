@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8-alpha] - 2026-03-12
+
+### Added
+- **Metronome Support**: Integrated professional-grade metronome with Beat 1 accent.
+- **Synthesized Click Samples**: High-accuracy oscillator-based clicks for the metronome.
+- **Audio Persistence**: Metronome settings (enabled/volume) are now persisted in Song Charts.
+
+## [0.1.7-alpha] - 2026-03-12
+
+### Added
+- **Protocol Consolidation**: Moved the "STRICT PAIR PROGRAMMING PROTOCOL" to the top of `.junie/guidelines.md` for maximum visibility and priority.
+- **Documentation**: Deleted `.junie/STRICT_PAIR_PROGRAMMING.md` and updated `docs/PROJECT_PLAN.md`.
+
 ## [0.1.6-alpha] - 2026-03-12
 
 ### Added

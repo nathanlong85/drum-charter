@@ -69,3 +69,21 @@ This document outlines the core user journeys and system interactions for DrumCh
 - **Trigger**: Press `Ctrl+P` or click "Print" in the browser.
 - **CSS**: `@media print` rules hide navigation, buttons, and settings.
 - **Layout**: Renders the chart in a clean, high-contrast, black-and-white layout optimized for standard paper.
+
+---
+
+## 6. Audio Playback & Metronome
+
+### Workflow: Playback Control
+- **Trigger**: Click "Play" or "Stop" in `GrooveGridEditor`.
+- **Action**: `useAudioPlayback` hook starts/stops the Web Audio API scheduler.
+- **Visual State**: A visual playhead (active step highlight) moves across the grid in real-time.
+- **Audio State**: Samples (Kick, Snare, Hi-Hat, etc.) are triggered based on the grid's note state and symbols.
+
+### Workflow: Metronome Integration
+- **Trigger**: Click the "Metronome" (Bell) icon in the editor toolbar.
+- **Action**: Toggles `metronomeEnabled` state in `useAudioPlayback`.
+- **Logic**: A click is scheduled on every beat (1/4 note). 
+- **Accent**: The first beat of every measure (Beat 1) uses a high-pitched click; other beats use a standard click.
+- **Settings**: Users can adjust metronome volume via a popover slider.
+- **Persistence**: In Songs, the metronome enabled/disabled state and volume are persisted in the song header.

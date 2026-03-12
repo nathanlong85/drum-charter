@@ -510,3 +510,27 @@
     "NEW INSTRUCTION": "WHEN tests fail in CI or locally THEN list failing tests with errors and implement fixes before proceeding"
 }
 
+[2026-03-12 11:04] - Updated by Junie
+{
+    "TYPE": "positive",
+    "CATEGORY": "Next steps prompt",
+    "EXPECTATION": "After saying 'Nice!', the user wants 2–3 specific next features proposed immediately and a plan to proceed, while maintaining full quality and tests.",
+    "NEW INSTRUCTION": "WHEN user says 'Nice' and asks what's next THEN propose 2–3 actionable features and include test plans"
+}
+
+[2026-03-12 11:35] - Updated by Junie
+{
+    "TYPE": "positive",
+    "CATEGORY": "Next steps and pace",
+    "EXPECTATION": "They want immediate proposals for the next 2–3 features and to move quickly while maintaining full quality.",
+    "NEW INSTRUCTION": "WHEN user asks what's next or mentions speed THEN propose 2–3 next tasks and reaffirm tests"
+}
+
+[2026-03-12 11:58] - Updated by Junie
+{
+    "TYPE": "positive",
+    "CATEGORY": "Next steps prompt",
+    "EXPECTATION": "They expressed satisfaction ('Nice!') and want immediate proposals for the next 2–3 features to tackle.",
+    "NEW INSTRUCTION": "WHEN user asks what's next THEN propose 2–3 actionable next tasks and await approval"
+}
+

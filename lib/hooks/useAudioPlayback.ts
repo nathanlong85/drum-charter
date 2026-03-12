@@ -7,12 +7,23 @@ interface UseAudioPlaybackProps {
   grid: GrooveGrid;
   bpm: number;
   onStepChange?: (step: number) => void;
+  initialMetronomeEnabled?: boolean;
+  initialMetronomeVolume?: number;
 }
 
-export function useAudioPlayback({ grid, bpm, onStepChange }: UseAudioPlaybackProps) {
+export function useAudioPlayback({ 
+  grid, 
+  bpm, 
+  onStepChange,
+  initialMetronomeEnabled = false,
+  initialMetronomeVolume = 0.5
+}: UseAudioPlaybackProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [metronomeEnabled, setMetronomeEnabled] = useState(initialMetronomeEnabled);
+  const [metronomeVolume, setMetronomeVolume] = useState(initialMetronomeVolume);
+  
   const audioContextRef = useRef<AudioContext | null>(null);
-  const samplesRef = useRef<Map<DrumSymbol, AudioBuffer>>(new Map());
+  const samplesRef = useRef<Map<DrumSymbol | string, AudioBuffer>>(new Map());
   const nextNoteTimeRef = useRef(0);
   const currentStepRef = useRef(0);
   const timerIDRef = useRef<number | null>(null);
@@ -46,6 +57,8 @@ export function useAudioPlayback({ grid, bpm, onStepChange }: UseAudioPlaybackPr
         'tom_medium': '/audio/samples/drum-kit/default/tom_medium.wav',
         'tom_floor': '/audio/samples/drum-kit/default/tom_floor.wav',
         'standard': '/audio/samples/drum-kit/default/snare.wav', // Fallback
+        'click_high': '/audio/samples/metronome/click_high.wav',
+        'click_low': '/audio/samples/metronome/click_low.wav',
       };
 
       for (const [symbol, url] of Object.entries(sampleMap)) {
@@ -101,7 +114,20 @@ export function useAudioPlayback({ grid, bpm, onStepChange }: UseAudioPlaybackPr
   };
 
   const scheduleNote = (step: number, time: number) => {
-    // Check each instrument at this step
+    // 1. Schedule Metronome if enabled
+    if (metronomeEnabled) {
+      const stepsPerBeat = grid.resolution / grid.timeSignature.beatValue;
+      const isBeat = step % stepsPerBeat === 0;
+
+      if (isBeat) {
+        const beatInMeasure = Math.floor(step / stepsPerBeat) % grid.timeSignature.beatsPerMeasure;
+        const isFirstBeat = beatInMeasure === 0;
+        const sampleKey = isFirstBeat ? 'click_high' : 'click_low';
+        playSample(sampleKey, time, metronomeVolume);
+      }
+    }
+
+    // 2. Check each instrument at this step
     grid.instruments.forEach((inst) => {
       const symbol = inst.notes[step];
       if (symbol && symbol !== 'none') {
@@ -154,8 +180,6 @@ export function useAudioPlayback({ grid, bpm, onStepChange }: UseAudioPlaybackPr
 
   const nextNote = () => {
     const secondsPerBeat = 60.0 / bpm;
-    // We assume resolution is 16th notes (4 notes per beat) for now
-    // TODO: Use grid.resolution to calculate this accurately
     const secondsPerStep = secondsPerBeat / (grid.resolution / grid.timeSignature.beatValue);
     
     nextNoteTimeRef.current += secondsPerStep;
@@ -192,5 +216,12 @@ export function useAudioPlayback({ grid, bpm, onStepChange }: UseAudioPlaybackPr
     }
   };
 
-  return { isPlaying, togglePlayback };
+  return { 
+    isPlaying, 
+    togglePlayback, 
+    metronomeEnabled, 
+    setMetronomeEnabled, 
+    metronomeVolume, 
+    setMetronomeVolume 
+  };
 }

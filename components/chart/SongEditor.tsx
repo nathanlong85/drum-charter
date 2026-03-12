@@ -12,6 +12,7 @@ type SongAction =
   | { type: 'UPDATE_BPM'; bpm: number }
   | { type: 'UPDATE_TIME_SIGNATURE'; beatsPerMeasure: number; beatValue: number }
   | { type: 'UPDATE_TAGS'; tags: string[] }
+  | { type: 'UPDATE_METRONOME'; enabled?: boolean; volume?: number }
   | { type: 'ADD_SECTION' }
   | { type: 'REMOVE_SECTION'; sectionId: string }
   | { type: 'UPDATE_SECTION'; sectionId: string; updates: Partial<SongSection> }
@@ -41,6 +42,16 @@ function songReducer(state: SongChart, action: SongAction): SongChart {
       };
     case 'UPDATE_TAGS':
       return { ...state, tags: action.tags, updatedAt: timestamp };
+    case 'UPDATE_METRONOME':
+      return { 
+        ...state, 
+        header: { 
+          ...state.header, 
+          metronomeEnabled: action.enabled !== undefined ? action.enabled : state.header.metronomeEnabled,
+          metronomeVolume: action.volume !== undefined ? action.volume : state.header.metronomeVolume
+        }, 
+        updatedAt: timestamp 
+      };
     case 'ADD_SECTION': {
       const newSection: SongSection = {
         id: crypto.randomUUID(),
@@ -341,6 +352,10 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                     onChange={(grid) => dispatch({ type: 'UPDATE_SECTION', sectionId: section.id, updates: { grid } })}
                     bpm={state.header.bpm}
                     onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
+                    metronomeEnabled={state.header.metronomeEnabled}
+                    onMetronomeToggle={(enabled) => dispatch({ type: 'UPDATE_METRONOME', enabled })}
+                    metronomeVolume={state.header.metronomeVolume}
+                    onMetronomeVolumeChange={(volume) => dispatch({ type: 'UPDATE_METRONOME', volume })}
                   />
                 )}
               </div>
