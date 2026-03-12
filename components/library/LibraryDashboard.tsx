@@ -102,6 +102,7 @@ export default function LibraryDashboard({
       }
 
       const userId = user.id;
+      console.log('Creating new item...', { activeTab, userId });
 
       if (activeTab === 'song') {
         const newSong: Partial<SongChart> = {
@@ -115,6 +116,7 @@ export default function LibraryDashboard({
           isPublic: false,
         };
         const saved = await supabaseService.saveSongChart(newSong as SongChart);
+        console.log('Created song:', saved.id);
         window.location.href = `/songs/${saved.id}`;
       } else if (activeTab === 'notebook') {
         const newNotebook: Partial<Notebook> = {
@@ -125,6 +127,7 @@ export default function LibraryDashboard({
           isPublic: false,
         };
         const saved = await supabaseService.saveNotebook(newNotebook as Notebook);
+        console.log('Created notebook:', saved.id);
         window.location.href = `/notebooks/${saved.id}`;
       } else if (activeTab === 'snippet') {
         const newSnippet: Partial<GrooveSnippet> = {
@@ -142,6 +145,7 @@ export default function LibraryDashboard({
           ],
         };
         const saved = await supabaseService.saveGrooveSnippet(newSnippet as GrooveSnippet);
+        console.log('Created snippet:', saved.id);
         window.location.href = `/snippets/${saved.id}`;
       }
     } catch (error: any) {

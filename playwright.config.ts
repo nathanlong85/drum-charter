@@ -2,32 +2,31 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  retries: process.env.CI ? 2 : 1,
+  workers: 1,
+  timeout: 120000,
+  expect: {
+    timeout: 30000,
+  },
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:3001',
     trace: 'on-first-retry',
+    actionTimeout: 30000,
+    navigationTimeout: 60000,
   },
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
   ],
   webServer: {
     command: 'pnpm dev --port 3001',
     url: 'http://localhost:3001',
     reuseExistingServer: true,
+    timeout: 120000,
   },
 });

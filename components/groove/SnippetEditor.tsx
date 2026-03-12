@@ -100,9 +100,13 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                 )}
               </div>
             </div>
-            {isSaving && (
+            {isSaving ? (
               <span className="text-xs font-mono text-blue-500 animate-pulse bg-blue-50 px-2 py-1 rounded">
                 SAVING...
+              </span>
+            ) : (
+              <span className="text-xs font-mono text-emerald-500 bg-emerald-50 px-2 py-1 rounded">
+                SAVED
               </span>
             )}
             <div className="text-right">

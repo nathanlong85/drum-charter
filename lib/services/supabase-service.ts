@@ -248,9 +248,22 @@ export const supabaseService = {
       .from('groove_snippets')
       .select('*')
       .eq('id', id)
-      .single()
+      .maybeSingle()
 
-    if (error) throw error
+    if (error) {
+      console.error(`Supabase error in getGrooveSnippet:`, {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      throw error
+    }
+
+    if (!data) {
+      console.error(`Groove snippet not found: ${id}`);
+      throw new Error('Snippet not found');
+    }
     
     const gridData = data.grid_data as unknown as GrooveGrid;
     

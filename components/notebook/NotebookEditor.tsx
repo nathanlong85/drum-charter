@@ -159,8 +159,12 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
                 DUPLICATE
               </button>
             </div>
-            <div className="text-xs font-medium text-zinc-400 uppercase tracking-widest">
-              {isSaving ? 'Saving...' : 'Saved'}
+            <div className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
+              {isSaving ? (
+                <span className="text-blue-500 animate-pulse bg-blue-50 px-2 py-1 rounded">SAVING...</span>
+              ) : (
+                <span className="text-emerald-500 bg-emerald-50 px-2 py-1 rounded">SAVED</span>
+              )}
             </div>
           </div>
         </div>
