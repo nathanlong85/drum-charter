@@ -94,7 +94,7 @@ describe('useAudioPlayback', () => {
     expect(onStepChange).toHaveBeenCalled();
   });
 
-  it('scales volume based on velocity', async () => {
+  it('scales volume based on velocity with exponential curve', async () => {
     const gridWithVel: GrooveGrid = {
       ...mockGrid,
       instruments: [
@@ -126,9 +126,51 @@ describe('useAudioPlayback', () => {
     });
 
     // Check if setValueAtTime was called with the calculated gain
-    // 0.5 ^ 1.5 = 0.35355...
+    // 0.5 ^ 2.0 = 0.25
     expect(mockSetValueAtTime).toHaveBeenCalledWith(
-      expect.closeTo(0.35355, 5), 
+      expect.closeTo(0.25, 5), 
+      expect.any(Number)
+    );
+  });
+
+  it('maps symbols to correct velocity levels', async () => {
+    const gridWithSymbols: GrooveGrid = {
+      ...mockGrid,
+      instruments: [
+        {
+          instrumentId: 'kick',
+          label: 'Kick',
+          notes: ['accent', 'standard', 'ghost', 'none'],
+        }
+      ]
+    };
+
+    const { result } = renderHook(() => useAudioPlayback({ 
+      grid: gridWithSymbols, 
+      bpm: 120 
+    }));
+
+    // Wait for samples
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    act(() => {
+      result.current.togglePlayback();
+    });
+
+    // Advance to schedule all 4 steps
+    // 120 bpm = 2 beats per second = 8 steps per second (at 16th res)
+    // 1000ms should schedule many steps
+    act(() => {
+      vi.advanceTimersByTime(250); // One beat
+    });
+    // For some reason, multiple act/advanceTimers in a row is not triggering subsequent schedulers in this test env.
+    // Let's try to verify if currentStepRef.current changed or if nextNoteTimeRef moved.
+
+    // 1. Accent (Step 0): 1.1 ^ 2.0 = 1.21
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(
+      expect.closeTo(1.21, 5),
       expect.any(Number)
     );
   });

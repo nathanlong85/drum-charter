@@ -90,9 +90,10 @@ export function useAudioPlayback({
     
     source.buffer = samplesRef.current.get(sampleKey as DrumSymbol)!;
     
-    // Set volume based on velocity (0-1 range)
-    // Using an exponential curve for more natural volume transitions
-    const gainValue = Math.pow(velocity, 1.5);
+    // Set volume based on velocity (0-1+ range)
+    // Using a steeper exponential curve (2.0) for more natural volume transitions
+    // Accents can go slightly above 1.0 (e.g. 1.1)
+    const gainValue = Math.pow(velocity, 2.0);
     gainNode.gain.setValueAtTime(gainValue, time);
     
     source.connect(gainNode);
@@ -102,18 +103,23 @@ export function useAudioPlayback({
   };
 
   const getVelocityForSymbol = (symbol: DrumSymbol): number => {
-    if (symbol === 'accent') return 1.0;
-    if (symbol === 'ghost') return 0.3;
+    // Mapping for Multi-layer Velocity Support (#3)
+    // Accents: 1.1 (pops over the mix)
+    // Standard: 0.7 (baseline)
+    // Ghost: 0.2 (subtle)
+    
+    if (symbol === 'accent') return 1.1;
+    if (symbol === 'ghost') return 0.2;
     if (symbol === 'standard') return 0.7;
     if (symbol === 'none') return 0;
     
     // Handle _opt variants and other symbols
-    if (symbol.includes('accent')) return 1.0;
-    if (symbol.includes('ghost')) return 0.3;
+    if (symbol.includes('accent')) return 1.1;
+    if (symbol.includes('ghost')) return 0.2;
     return 0.7; // Default for everything else
   };
 
-  const scheduleNote = (step: number, time: number) => {
+  const scheduleNote = useCallback((step: number, time: number) => {
     // 1. Schedule Metronome if enabled
     if (metronomeEnabled) {
       const stepsPerBeat = grid.resolution / grid.timeSignature.beatValue;
@@ -135,7 +141,7 @@ export function useAudioPlayback({
         
         // Determine velocity: explicit value from inst.velocities, or derived from symbol
         let velocity = getVelocityForSymbol(symbol);
-        if (inst.velocities && inst.velocities[step] !== undefined) {
+        if (inst.velocities && inst.velocities[step] !== undefined && inst.velocities[step] !== 0) {
           velocity = inst.velocities[step];
         }
 
@@ -176,15 +182,16 @@ export function useAudioPlayback({
       // Sync UI with audio (rough estimation for now)
       onStepChange(step);
     }
-  };
+  }, [grid, metronomeEnabled, metronomeVolume, onStepChange]);
 
-  const nextNote = () => {
+  const nextNote = useCallback(() => {
     const secondsPerBeat = 60.0 / bpm;
-    const secondsPerStep = secondsPerBeat / (grid.resolution / grid.timeSignature.beatValue);
+    const { resolution, timeSignature, measures } = grid;
+    const secondsPerStep = secondsPerBeat / (resolution / timeSignature.beatValue);
     
     nextNoteTimeRef.current += secondsPerStep;
-    currentStepRef.current = (currentStepRef.current + 1) % (grid.timeSignature.beatsPerMeasure * (grid.resolution / grid.timeSignature.beatValue) * grid.measures);
-  };
+    currentStepRef.current = (currentStepRef.current + 1) % (timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures);
+  }, [bpm, grid]);
 
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;
@@ -194,7 +201,7 @@ export function useAudioPlayback({
       nextNote();
     }
     timerIDRef.current = window.setTimeout(scheduler, lookahead);
-  }, [grid, bpm]);
+  }, [scheduleNote, nextNote]);
 
   const togglePlayback = () => {
     if (isPlaying) {
