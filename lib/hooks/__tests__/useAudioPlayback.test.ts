@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useAudioPlayback } from '../useAudioPlayback';
+import { useAudioPlayback, getVelocityForSymbol } from '../useAudioPlayback';
 import { GrooveGrid, DrumSymbol } from '@/lib/types/groove';
 
 // Mock AudioContext
@@ -53,6 +53,22 @@ describe('useAudioPlayback', () => {
     vi.clearAllMocks();
     mockSetValueAtTime.mockClear();
     vi.useFakeTimers();
+  });
+
+  describe('getVelocityForSymbol', () => {
+    const testCases: { symbol: DrumSymbol; expected: number }[] = [
+      { symbol: 'accent', expected: 1.1 },
+      { symbol: 'standard', expected: 0.7 },
+      { symbol: 'ghost', expected: 0.2 },
+      { symbol: 'none', expected: 0 },
+      { symbol: 'snare_accent' as DrumSymbol, expected: 1.1 },
+      { symbol: 'hi_hat_ghost' as DrumSymbol, expected: 0.2 },
+      { symbol: 'hi_hat_closed_hit_opt' as DrumSymbol, expected: 0.7 },
+    ];
+
+    it.each(testCases)('returns $expected for symbol $symbol', ({ symbol, expected }) => {
+      expect(getVelocityForSymbol(symbol)).toBe(expected);
+    });
   });
 
   it('initializes with isPlaying as false', () => {
@@ -163,8 +179,8 @@ describe('useAudioPlayback', () => {
     
     // 1. Accent (Step 0): 1.1 ^ 2.0 = 1.21
     act(() => {
-      // @ts-ignore - accessing internal for testing
-      result.current.togglePlayback(); // Just to initialize refs if needed
+      // Just to initialize refs if needed
+      result.current.togglePlayback(); 
     });
     
     // We can't easily call scheduleNote directly as it's internal,

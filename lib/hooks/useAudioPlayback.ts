@@ -11,6 +11,23 @@ interface UseAudioPlaybackProps {
   initialMetronomeVolume?: number;
 }
 
+export function getVelocityForSymbol(symbol: DrumSymbol): number {
+  // Mapping for Multi-layer Velocity Support (#3)
+  // Accents: 1.1 (pops over the mix)
+  // Standard: 0.7 (baseline)
+  // Ghost: 0.2 (subtle)
+  
+  if (symbol === 'accent') return 1.1;
+  if (symbol === 'ghost') return 0.2;
+  if (symbol === 'standard') return 0.7;
+  if (symbol === 'none') return 0;
+  
+  // Handle _opt variants and other symbols
+  if (symbol.includes('accent')) return 1.1;
+  if (symbol.includes('ghost')) return 0.2;
+  return 0.7; // Default for everything else
+}
+
 export function useAudioPlayback({ 
   grid, 
   bpm, 
@@ -103,21 +120,8 @@ export function useAudioPlayback({
     source.start(time);
   }, []);
 
-  const getVelocityForSymbol = useCallback((symbol: DrumSymbol): number => {
-    // Mapping for Multi-layer Velocity Support (#3)
-    // Accents: 1.1 (pops over the mix)
-    // Standard: 0.7 (baseline)
-    // Ghost: 0.2 (subtle)
-    
-    if (symbol === 'accent') return 1.1;
-    if (symbol === 'ghost') return 0.2;
-    if (symbol === 'standard') return 0.7;
-    if (symbol === 'none') return 0;
-    
-    // Handle _opt variants and other symbols
-    if (symbol.includes('accent')) return 1.1;
-    if (symbol.includes('ghost')) return 0.2;
-    return 0.7; // Default for everything else
+  const getVelocityForSymbolInHook = useCallback((symbol: DrumSymbol): number => {
+    return getVelocityForSymbol(symbol);
   }, []);
 
   const scheduleNote = useCallback((step: number, time: number) => {
@@ -183,7 +187,7 @@ export function useAudioPlayback({
       // Sync UI with audio (rough estimation for now)
       onStepChange(step);
     }
-  }, [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample, getVelocityForSymbol]);
+  }, [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample]);
 
   const nextNote = useCallback(() => {
     const secondsPerBeat = 60.0 / bpm;
@@ -201,7 +205,7 @@ export function useAudioPlayback({
       scheduleNote(currentStepRef.current, nextNoteTimeRef.current);
       nextNote();
     }
-    timerIDRef.current = window.setTimeout(scheduler, lookahead);
+    timerIDRef.current = window.setTimeout(() => scheduler(), lookahead);
   }, [scheduleNote, nextNote]);
 
   const togglePlayback = () => {
