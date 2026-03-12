@@ -534,3 +534,11 @@
     "NEW INSTRUCTION": "WHEN user asks what's next THEN propose 2–3 actionable next tasks and await approval"
 }
 
+[2026-03-12 13:46] - Updated by Junie
+{
+    "TYPE": "positive",
+    "CATEGORY": "Next steps prompt",
+    "EXPECTATION": "They are happy with progress and want immediate proposals for the next 2–3 features to implement, moving quickly.",
+    "NEW INSTRUCTION": "WHEN user says 'Nice' and asks what's next THEN propose 2–3 actionable next tasks and await approval"
+}
+

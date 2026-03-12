@@ -82,7 +82,7 @@ export function useAudioPlayback({
     };
   }, []);
 
-  const playSample = (sampleKey: string, time: number, velocity: number = 1.0) => {
+  const playSample = useCallback((sampleKey: string, time: number, velocity: number = 1.0) => {
     if (!audioContextRef.current || !samplesRef.current.has(sampleKey as DrumSymbol)) return;
 
     const source = audioContextRef.current.createBufferSource();
@@ -93,16 +93,17 @@ export function useAudioPlayback({
     // Set volume based on velocity (0-1+ range)
     // Using a steeper exponential curve (2.0) for more natural volume transitions
     // Accents can go slightly above 1.0 (e.g. 1.1)
-    const gainValue = Math.pow(velocity, 2.0);
+    // Clamping to 1.5 to prevent extreme clipping as per CodeRabbit recommendation
+    const gainValue = Math.min(Math.pow(velocity, 2.0), 1.5);
     gainNode.gain.setValueAtTime(gainValue, time);
     
     source.connect(gainNode);
     gainNode.connect(audioContextRef.current.destination);
     
     source.start(time);
-  };
+  }, []);
 
-  const getVelocityForSymbol = (symbol: DrumSymbol): number => {
+  const getVelocityForSymbol = useCallback((symbol: DrumSymbol): number => {
     // Mapping for Multi-layer Velocity Support (#3)
     // Accents: 1.1 (pops over the mix)
     // Standard: 0.7 (baseline)
@@ -117,7 +118,7 @@ export function useAudioPlayback({
     if (symbol.includes('accent')) return 1.1;
     if (symbol.includes('ghost')) return 0.2;
     return 0.7; // Default for everything else
-  };
+  }, []);
 
   const scheduleNote = useCallback((step: number, time: number) => {
     // 1. Schedule Metronome if enabled
@@ -182,7 +183,7 @@ export function useAudioPlayback({
       // Sync UI with audio (rough estimation for now)
       onStepChange(step);
     }
-  }, [grid, metronomeEnabled, metronomeVolume, onStepChange]);
+  }, [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample, getVelocityForSymbol]);
 
   const nextNote = useCallback(() => {
     const secondsPerBeat = 60.0 / bpm;
