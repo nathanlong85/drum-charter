@@ -7,7 +7,7 @@ This document outlines the tiered approach for managing secrets in the DrumChart
 ### 1. `.env.local` (Standard Local Development)
 - **Purpose**: Non-sensitive local environment variables.
 - **Examples**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-- **Visibility**: Included in `.gitignore`. Not shared.
+- **Visibility**: Included in `.gitignore`. Targets the local Supabase container by default (port 54321).
 
 ### 2. `.env.junie` (Collaborative Secrets)
 - **Purpose**: Secrets specifically required for Junie to perform tasks (e.g., database schema pulls, specialized CLI authentications).

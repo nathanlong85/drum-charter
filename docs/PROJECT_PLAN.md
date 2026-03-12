@@ -68,10 +68,12 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## Status Board (Kanban)
 
 ### 🟡 In Progress
+- [ ] GitHub Formalization Sprint (Issues, Kanban, Templates)
 - [ ] Task 1: Velocity & Accent Support (Visual & Audio)
 - [ ] Task 2: E2E Stabilization (timeouts, persistence anchors)
 
 ### 🟢 Done
+- [x] Local-First Development: Target local Supabase (port 54321) from dev server (port 3001) `✓`
 - [x] Task 3: Isolated Local Development Environment (Supabase Docker) `✓`
 - [x] Schema Baselining & Migration Repair `✓`
 - [x] Synchronized Local Seed Data `✓`
