@@ -1,24 +1,45 @@
 'use client';
 
-import React, { useReducer, useState } from 'react';
+import React, { useReducer, useState, useEffect } from 'react';
 import { GrooveGrid, DrumSymbol, BeatResolution } from '@/lib/types/groove';
 import { grooveReducer, GrooveAction } from '@/lib/state/groove-reducer';
 import { InstrumentRow } from './InstrumentRow';
 import { SymbolPicker } from './SymbolPicker';
-import { Settings, Plus, Minus } from 'lucide-react';
+import { Settings, Plus, Minus, Play, Square } from 'lucide-react';
+import { useAudioPlayback } from '@/lib/hooks/useAudioPlayback';
 
 interface GrooveGridEditorProps {
   initialGrid: GrooveGrid;
   onChange?: (grid: GrooveGrid) => void;
+  bpm?: number;
+  onBpmChange?: (bpm: number) => void;
 }
 
 export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   initialGrid,
   onChange,
+  bpm: parentBpm,
+  onBpmChange,
 }) => {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
   const [pickerPos, setPickerPos] = useState<{ top: number; left: number; instrumentId: string; noteIndex: number } | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [localBpm, setLocalBpm] = useState(120);
+
+  const bpm = parentBpm !== undefined ? parentBpm : localBpm;
+
+  const { isPlaying, togglePlayback } = useAudioPlayback({
+    grid: state,
+    bpm,
+    onStepChange: (step) => setActiveStep(step),
+  });
+
+  useEffect(() => {
+    if (!isPlaying) {
+      setActiveStep(null);
+    }
+  }, [isPlaying]);
 
   const wrappedDispatch = (action: GrooveAction) => {
     dispatch(action);
@@ -41,10 +62,20 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     });
   };
 
+  const handleVelocityChange = (instrumentId: string, noteIndex: number, velocity: number) => {
+    wrappedDispatch({ type: 'SET_VELOCITY', instrumentId, noteIndex, velocity });
+  };
+
   const handleSymbolSelect = (symbol: DrumSymbol) => {
     if (!pickerPos) return;
     wrappedDispatch({ type: 'SET_SYMBOL', instrumentId: pickerPos.instrumentId, noteIndex: pickerPos.noteIndex, symbol });
-    setPickerPos(null);
+  };
+
+  const getVelocityForSymbol = (symbol: DrumSymbol): number => {
+    if (symbol.includes('accent')) return 1.0;
+    if (symbol.includes('ghost')) return 0.3;
+    if (symbol === 'none') return 0;
+    return 0.7; // Standard
   };
 
   const updateMeasures = (delta: number) => {
@@ -97,6 +128,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           className={`w-8 h-8 flex items-center justify-center text-xs font-bold border-r border-gray-300 bg-gray-100 select-none
             ${subIndex === 0 ? 'text-blue-600' : 'text-gray-500'}
             ${isMeasureBoundary ? 'border-r-2 border-r-gray-800' : ''}
+            ${activeStep === i ? 'bg-yellow-200' : ''}
           `}
         >
           {label}
@@ -115,6 +147,48 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   return (
     <div className="flex flex-col gap-2 print:gap-1 no-print-break">
       <div className="flex items-center gap-4 bg-gray-50 p-2 rounded border border-gray-200 text-sm no-print">
+        <div className="flex items-center gap-2 pr-4 border-r border-gray-300">
+          <button
+            onClick={togglePlayback}
+            className={`flex items-center gap-2 px-4 py-1.5 rounded font-bold transition-colors ${
+              isPlaying 
+                ? 'bg-red-600 text-white hover:bg-red-700' 
+                : 'bg-green-600 text-white hover:bg-green-700'
+            }`}
+          >
+            {isPlaying ? (
+              <>
+                <Square size={16} fill="currentColor" />
+                Stop
+              </>
+            ) : (
+              <>
+                <Play size={16} fill="currentColor" />
+                Play
+              </>
+            )}
+          </button>
+
+          <div className="flex items-center gap-2 ml-2">
+            <span className="text-gray-600 font-medium">BPM:</span>
+            <input 
+              type="number" 
+              value={bpm}
+              onChange={(e) => {
+                const newBpm = parseInt(e.target.value) || 60;
+                if (onBpmChange) {
+                  onBpmChange(newBpm);
+                } else {
+                  setLocalBpm(newBpm);
+                }
+              }}
+              className="w-16 px-2 py-1 border border-gray-300 rounded text-center font-bold"
+              min="40"
+              max="300"
+            />
+          </div>
+        </div>
+
         <div className="flex items-center gap-2">
           <span className="text-gray-600 font-medium">Measures:</span>
           <div className="flex items-center border border-gray-300 rounded overflow-hidden bg-white">
@@ -186,6 +260,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
               instrumentId={inst.instrumentId}
               label={inst.label}
               notes={inst.notes}
+              velocities={inst.velocities}
               grid={state}
               onNoteClick={(idx) => handleNoteClick(inst.instrumentId, idx)}
               onNoteContextMenu={(idx, e) => handleNoteContextMenu(inst.instrumentId, idx, e)}
@@ -197,6 +272,11 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           <SymbolPicker
             position={{ top: pickerPos.top, left: pickerPos.left }}
             onSelect={handleSymbolSelect}
+            onVelocityChange={(vel) => handleVelocityChange(pickerPos.instrumentId, pickerPos.noteIndex, vel)}
+            currentVelocity={
+              state.instruments.find(i => i.instrumentId === pickerPos.instrumentId)?.velocities?.[pickerPos.noteIndex] ?? 
+              getVelocityForSymbol(state.instruments.find(i => i.instrumentId === pickerPos.instrumentId)?.notes[pickerPos.noteIndex] ?? 'none')
+            }
             onClose={() => setPickerPos(null)}
           />
         )}

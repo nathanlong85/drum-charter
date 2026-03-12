@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { LibraryCard } from './LibraryCard';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { Notebook, GrooveSnippet, SongChart } from '@/lib/types/groove';
+import { createClient } from '@/lib/supabase/client';
+
+const supabase = createClient();
 
 type ItemType = 'song' | 'notebook' | 'snippet';
 
@@ -89,8 +92,20 @@ export default function LibraryDashboard({
 
   const handleCreateNew = async () => {
     try {
+      // Get current user to avoid RLS violation 42501
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        console.error('Authentication required to create items:', authError);
+        alert('Please log in or continue as a guest to create items.');
+        return;
+      }
+
+      const userId = user.id;
+
       if (activeTab === 'song') {
         const newSong: Partial<SongChart> = {
+          userId,
           header: {
             title: 'Untitled Song',
             timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
@@ -103,6 +118,7 @@ export default function LibraryDashboard({
         window.location.href = `/songs/${saved.id}`;
       } else if (activeTab === 'notebook') {
         const newNotebook: Partial<Notebook> = {
+          userId,
           title: 'Untitled Notebook',
           sections: [],
           tags: [],
@@ -112,6 +128,7 @@ export default function LibraryDashboard({
         window.location.href = `/notebooks/${saved.id}`;
       } else if (activeTab === 'snippet') {
         const newSnippet: Partial<GrooveSnippet> = {
+          userId,
           title: 'Untitled Snippet',
           tags: [],
           isPublic: false,
@@ -127,9 +144,15 @@ export default function LibraryDashboard({
         const saved = await supabaseService.saveGrooveSnippet(newSnippet as GrooveSnippet);
         window.location.href = `/snippets/${saved.id}`;
       }
-    } catch (error) {
-      console.error('Error creating new item:', error instanceof Error ? error.message : error, error);
-      alert('Failed to create new item.');
+    } catch (error: any) {
+      console.error('Error creating new item:', {
+        message: error.message || error,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+        fullError: error
+      });
+      alert('Failed to create new item. Check console for details.');
     }
   };
 

@@ -6,6 +6,7 @@ import { DrumSymbol } from '@/lib/types/groove';
 
 interface NoteCellProps {
   symbol: DrumSymbol;
+  velocity?: number;
   onClick: () => void;
   onContextMenu: (e: React.MouseEvent) => void;
   isBeat?: boolean;
@@ -46,6 +47,7 @@ const symbolToIcon: Record<DrumSymbol, string | null> = {
 
 export const NoteCell: React.FC<NoteCellProps> = ({
   symbol,
+  velocity,
   onClick,
   onContextMenu,
   isBeat,
@@ -53,13 +55,28 @@ export const NoteCell: React.FC<NoteCellProps> = ({
 }) => {
   const iconPath = symbolToIcon[symbol];
 
+  // Visual feedback for velocity (opacity)
+  // If velocity is provided, we use it. 
+  // If not, we infer a default opacity based on symbol type.
+  const getOpacity = () => {
+    if (velocity !== undefined && velocity > 0) {
+      // Scale velocity (0.1 - 1.0) to opacity
+      return Math.max(0.2, velocity);
+    }
+    if (symbol.includes('accent')) return 1.0;
+    if (symbol.includes('ghost')) return 0.4;
+    return 0.8; // standard
+  };
+
+  const opacity = getOpacity();
+
   return (
     <div
       onClick={onClick}
       onContextMenu={onContextMenu}
       className={`
         w-8 h-8 flex items-center justify-center border-r border-gray-300 cursor-pointer
-        hover:bg-blue-50 transition-colors
+        hover:bg-blue-50 transition-colors relative
         ${isBeat ? 'bg-gray-50' : ''}
         ${isMeasureBoundary ? 'border-r-2 border-r-gray-800' : ''}
       `}
@@ -70,7 +87,15 @@ export const NoteCell: React.FC<NoteCellProps> = ({
           alt={symbol}
           width={24}
           height={24}
-          className="select-none pointer-events-none"
+          style={{ opacity }}
+          className="select-none pointer-events-none transition-opacity"
+        />
+      )}
+      {/* Velocity indicator (mini bar if explicit velocity exists) */}
+      {velocity !== undefined && velocity > 0 && (
+        <div 
+          className="absolute bottom-0 left-0 h-0.5 bg-blue-500 transition-all" 
+          style={{ width: `${velocity * 100}%` }}
         />
       )}
     </div>

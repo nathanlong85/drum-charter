@@ -338,6 +338,8 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                   <GrooveGridEditor
                     initialGrid={section.grid}
                     onChange={(grid) => dispatch({ type: 'UPDATE_SECTION', sectionId: section.id, updates: { grid } })}
+                    bpm={state.header.bpm}
+                    onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
                   />
                 )}
               </div>

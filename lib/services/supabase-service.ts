@@ -22,13 +22,18 @@ export const supabaseService = {
         tags: chart.tags,
         is_public: chart.isPublic,
         updated_at: new Date().toISOString(),
-        user_id: chart.userId || '', // This will be handled by RLS if empty, but we need it for types
+        user_id: chart.userId || undefined, // Let Supabase handle it via auth.uid() if not provided
       })
       .select()
       .single()
 
     if (error) {
-      console.error('Supabase error in saveSongChart:', error);
+      console.error(`Supabase error in saveSongChart:`, {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       throw error;
     }
     return data
@@ -81,13 +86,18 @@ export const supabaseService = {
         tags: notebook.tags,
         is_public: notebook.isPublic,
         updated_at: new Date().toISOString(),
-        user_id: notebook.userId || '',
+        user_id: notebook.userId || undefined,
       })
       .select()
       .single()
 
     if (error) {
-      console.error('Supabase error in saveNotebook:', error);
+      console.error(`Supabase error in saveNotebook:`, {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       throw error;
     }
     return data
@@ -206,13 +216,18 @@ export const supabaseService = {
         } as unknown as Database['public']['Tables']['groove_snippets']['Insert']['grid_data'],
         is_public: snippet.isPublic,
         updated_at: new Date().toISOString(),
-        user_id: snippet.userId || '',
+        user_id: snippet.userId || undefined,
       })
       .select()
       .single()
 
     if (error) {
-      console.error('Supabase error in saveGrooveSnippet:', error);
+      console.error(`Supabase error in saveGrooveSnippet:`, {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       throw error;
     }
     return data

@@ -54,4 +54,21 @@ describe('grooveReducer', () => {
     // 6 beats * (16 / 8) = 12 notes per measure
     expect(nextState.instruments[0].notes.length).toBe(12);
   });
+
+  it('handles SET_VELOCITY', () => {
+    const action = { type: 'SET_VELOCITY', instrumentId: 'hh', noteIndex: 0, velocity: 0.5 } as const;
+    const nextState = grooveReducer(initialGrid, action);
+    expect(nextState.instruments[0].velocities?.[0]).toBe(0.5);
+  });
+
+  it('preserves velocities on grid resize', () => {
+    const velAction = { type: 'SET_VELOCITY', instrumentId: 'hh', noteIndex: 0, velocity: 0.9 } as const;
+    const stateWithVel = grooveReducer(initialGrid, velAction);
+    
+    const resizeAction = { type: 'SET_MEASURES', measures: 2 } as const;
+    const nextState = grooveReducer(stateWithVel, resizeAction);
+    
+    expect(nextState.instruments[0].velocities?.length).toBe(32);
+    expect(nextState.instruments[0].velocities?.[0]).toBe(0.9);
+  });
 });

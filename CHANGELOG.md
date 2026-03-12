@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4-alpha] - 2026-03-11
+
+### Added
+- **Full Drum Kit**: Expanded the audio engine to support 17 distinct drum sounds (including rim shots, flams, cross-sticks, and toms).
+- **Symbol-Based Audio Mapping**: The playback engine now intelligently maps drum symbols (e.g., `rim_shot`, `flam`) to specific audio samples.
+- **High-Fidelity Synthesis**: Generated a comprehensive set of 17 synthesized drum samples to replace low-quality placeholders.
+
+### Fixed
+- **RLS Violation (42501)**: Resolved critical item creation failures by explicitly passing `user_id` to Supabase from the `LibraryDashboard`.
+- **Audio Sample Integrity**: Updated `tests/verify-samples.test.ts` to cover the full 17-sample kit.
+
+## [0.1.3-alpha] - 2026-03-11
+
+### Fixed
+- **Audio Decoding**: Fixed `Unable to decode audio data` by ensuring valid synthesised WAV samples are generated/provided.
+- **Supabase Error Visibility**: Improved error logging in the Library and Editor to surface detailed Supabase error objects instead of empty strings.
+- **Item Creation**: Fixed silent item creation failure by correcting `user_id` fallback in the service layer, preventing RLS/FK violations.
+
+### Added
+- **Audio Integrity Test**: Added `tests/verify-samples.test.ts` to ensure audio assets are valid RIFF/WAVE files during testing.
+
+## [0.1.2-alpha] - 2026-03-11
+
+### Added
+- **Audio Playback MVP**: Real-time audio engine using Web Audio API to play drum patterns with high-quality samples (Kick, Snare, Hi-Hat).
+- **BPM Management**: Persistent BPM control for all entity types (Songs, Notebooks, Snippets) to synchronize audio and visual grids.
+- **Visual Playhead**: Real-time visual feedback on the grid while audio is playing.
+
 ## [0.1.1-alpha] - 2026-03-11
 
 ### Added

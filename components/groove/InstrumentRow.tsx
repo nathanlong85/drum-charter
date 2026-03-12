@@ -8,6 +8,7 @@ interface InstrumentRowProps {
   label: string;
   instrumentId: string;
   notes: DrumSymbol[];
+  velocities?: number[];
   grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'>;
   onNoteClick: (index: number) => void;
   onNoteContextMenu: (index: number, e: React.MouseEvent) => void;
@@ -16,6 +17,7 @@ interface InstrumentRowProps {
 export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   label,
   notes,
+  velocities,
   grid,
   onNoteClick,
   onNoteContextMenu,
@@ -33,11 +35,13 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
         {notes.map((symbol, i) => {
           const isBeat = i % notesPerBeat === 0;
           const isMeasureBoundary = (i + 1) % totalNotesPerMeasure === 0;
+          const velocity = velocities ? velocities[i] : undefined;
           
           return (
             <NoteCell
               key={i}
               symbol={symbol}
+              velocity={velocity}
               onClick={() => onNoteClick(i)}
               onContextMenu={(e) => onNoteContextMenu(i, e)}
               isBeat={isBeat}

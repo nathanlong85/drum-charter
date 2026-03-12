@@ -11,7 +11,8 @@ type SnippetAction =
   | { type: 'UPDATE_TITLE'; title: string }
   | { type: 'UPDATE_TAGS'; tags: string[] }
   | { type: 'UPDATE_PUBLIC'; isPublic: boolean }
-  | { type: 'UPDATE_GRID'; grid: GrooveGrid };
+  | { type: 'UPDATE_GRID'; grid: GrooveGrid }
+  | { type: 'UPDATE_BPM'; bpm: number };
 
 function snippetReducer(state: GrooveSnippet, action: SnippetAction): GrooveSnippet {
   switch (action.type) {
@@ -29,6 +30,8 @@ function snippetReducer(state: GrooveSnippet, action: SnippetAction): GrooveSnip
         ...action.grid,
         updatedAt: new Date().toISOString(),
       };
+    case 'UPDATE_BPM':
+      return { ...state, bpm: action.bpm, updatedAt: new Date().toISOString() };
     default:
       return state;
   }
@@ -155,6 +158,8 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
               instruments: state.instruments,
             }}
             onChange={(grid) => dispatch({ type: 'UPDATE_GRID', grid })}
+            bpm={state.bpm}
+            onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
           />
         </section>
       </div>

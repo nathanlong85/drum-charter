@@ -15,7 +15,8 @@ type NotebookAction =
   | { type: 'REMOVE_SECTION'; sectionId: string }
   | { type: 'UPDATE_SECTION_NAME'; sectionId: string; name: string }
   | { type: 'UPDATE_SECTION_GRID'; sectionId: string; grid: GrooveGrid }
-  | { type: 'UPDATE_SECTION_NOTES'; sectionId: string; notes: string[] };
+  | { type: 'UPDATE_SECTION_NOTES'; sectionId: string; notes: string[] }
+  | { type: 'UPDATE_SECTION_BPM'; sectionId: string; bpm: number };
 
 function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
   switch (action.type) {
@@ -66,6 +67,14 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
         ...state,
         sections: state.sections.map((s) =>
           s.id === action.sectionId ? { ...s, notes: action.notes } : s
+        ),
+        updatedAt: new Date().toISOString(),
+      };
+    case 'UPDATE_SECTION_BPM':
+      return {
+        ...state,
+        sections: state.sections.map((s) =>
+          s.id === action.sectionId ? { ...s, bpm: action.bpm } : s
         ),
         updatedAt: new Date().toISOString(),
       };
@@ -225,6 +234,10 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
                     initialGrid={section.grid}
                     onChange={(grid) => 
                       dispatch({ type: 'UPDATE_SECTION_GRID', sectionId: section.id, grid })
+                    }
+                    bpm={section.bpm}
+                    onBpmChange={(bpm) => 
+                      dispatch({ type: 'UPDATE_SECTION_BPM', sectionId: section.id, bpm })
                     }
                   />
                   <button

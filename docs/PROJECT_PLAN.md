@@ -70,9 +70,13 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ### 🟡 In Progress
 - [ ] Comprehensive E2E Test Suite stabilization
 - [ ] UI Workflow Documentation refinement
-- [ ] Audio Playback (MVP) `*`
 
 ### 🟢 Done
+- [x] Full Drum Kit Overhaul (17 sounds, Symbol Mapping) `✓`
+- [x] Fix: RLS Violation (42501) on item creation `✓`
+- [x] Fix: Audio Decoding and Supabase Error Visibility `✓`
+- [x] Audio Playback MVP (Kick, Snare, Hi-Hat) with sample-accurate Web Audio API scheduler `✓`
+- [x] Visual Playhead synchronization and BPM management for all entity types `✓`
 - [x] Public routes and read-only views for Notebooks and Snippets `✓`
 - [x] Document CLI usage patterns in `.junie/CLI_REFERENCE.md` `✓`
 - [x] Fix: Create missing `notebooks` table in Supabase via CLI migration `✓`
@@ -92,7 +96,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [x] Groove Grid Core (Resolutions, Measures, Symbols) `✓`
 
 ### 🔵 Backlog
-- [ ] Audio Playback (MVP)
+- [ ] Multi-layer velocity support for Crescendos/Accents
 - [ ] Dark Mode support
 - [ ] Offline support (PWA)
 

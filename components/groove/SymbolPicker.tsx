@@ -6,6 +6,8 @@ import { DrumSymbol } from '@/lib/types/groove';
 
 interface SymbolPickerProps {
   onSelect: (symbol: DrumSymbol) => void;
+  onVelocityChange: (velocity: number) => void;
+  currentVelocity: number;
   onClose: () => void;
   position: { top: number; left: number };
 }
@@ -62,6 +64,8 @@ const symbolToIcon: Record<DrumSymbol, string | null> = {
 
 export const SymbolPicker: React.FC<SymbolPickerProps> = ({
   onSelect,
+  onVelocityChange,
+  currentVelocity,
   onClose,
   position,
 }) => {
@@ -72,31 +76,76 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
         onClick={onClose} 
       />
       <div
-        className="fixed z-50 bg-white border border-gray-300 shadow-xl rounded p-2 grid grid-cols-6 gap-1"
+        className="fixed z-50 bg-white border border-gray-300 shadow-xl rounded p-3 flex flex-col gap-3"
         style={{ top: position.top, left: position.left }}
       >
-        {symbols.map((sym) => (
-          <button
-            key={sym}
-            onClick={() => {
-              onSelect(sym);
-              onClose();
-            }}
-            className="w-10 h-10 flex items-center justify-center hover:bg-blue-100 rounded transition-colors border border-transparent hover:border-blue-200"
-            title={sym.replace(/_/g, ' ')}
-          >
-            {sym === 'none' ? (
-              <span className="text-xs text-gray-400">∅</span>
-            ) : (
-              <Image
-                src={symbolToIcon[sym]!}
-                alt={sym}
-                width={28}
-                height={28}
-              />
-            )}
-          </button>
-        ))}
+        <div className="grid grid-cols-6 gap-1">
+          {symbols.map((sym) => (
+            <button
+              key={sym}
+              onClick={() => {
+                onSelect(sym);
+                // Don't close immediately to allow velocity adjustment
+              }}
+              className="w-10 h-10 flex items-center justify-center hover:bg-blue-100 rounded transition-colors border border-transparent hover:border-blue-200"
+              title={sym.replace(/_/g, ' ')}
+            >
+              {sym === 'none' ? (
+                <span className="text-xs text-gray-400">∅</span>
+              ) : (
+                <Image
+                  src={symbolToIcon[sym]!}
+                  alt={sym}
+                  width={28}
+                  height={28}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+
+        <div className="border-t border-gray-200 pt-3 flex flex-col gap-1">
+          <div className="flex justify-between text-xs text-gray-500 mb-1">
+            <span>Velocity</span>
+            <span className="font-mono">{Math.round(currentVelocity * 100)}%</span>
+          </div>
+          <input 
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value={currentVelocity}
+            onChange={(e) => onVelocityChange(parseFloat(e.target.value))}
+            className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+          />
+          <div className="flex justify-between mt-1">
+            <button 
+              onClick={() => onVelocityChange(0.3)}
+              className="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
+            >
+              Ghost
+            </button>
+            <button 
+              onClick={() => onVelocityChange(0.7)}
+              className="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
+            >
+              Std
+            </button>
+            <button 
+              onClick={() => onVelocityChange(1.0)}
+              className="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
+            >
+              Accent
+            </button>
+          </div>
+        </div>
+
+        <button 
+          onClick={onClose}
+          className="w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors"
+        >
+          Done
+        </button>
       </div>
     </>
   );

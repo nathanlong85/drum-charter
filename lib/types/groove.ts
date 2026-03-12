@@ -47,6 +47,11 @@ export interface InstrumentGrid {
    * For 4/4 at 16th resolution, 1 measure: (4 * (16 / 4)) * 1 = 16 notes.
    */
   notes: DrumSymbol[];
+  /**
+   * Optional velocities for each note (0-1).
+   * If not provided, defaults to 1.0 (accent), 0.7 (standard), or 0.3 (ghost) based on symbol.
+   */
+  velocities?: number[];
 }
 
 /**
@@ -67,6 +72,7 @@ export interface GrooveSnippet extends GrooveGrid {
   id: string;
   title: string;
   tags: string[];
+  bpm?: number;
   userId?: string;
   isPublic: boolean;
   createdAt: string;
@@ -81,6 +87,7 @@ export interface NotebookSection {
   name: string;
   grid?: GrooveGrid;
   notes?: string[];
+  bpm?: number;
 }
 
 /**

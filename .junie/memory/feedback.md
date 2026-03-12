@@ -366,3 +366,51 @@
     "NEW INSTRUCTION": "WHEN creating, amending, or rewriting git commits THEN attribute commits solely to the user; do not add co-authors"
 }
 
+[2026-03-11 16:29] - Updated by Junie
+{
+    "TYPE": "positive",
+    "CATEGORY": "Plan approval",
+    "EXPECTATION": "They approved the proposed next steps and want immediate execution without re-asking.",
+    "NEW INSTRUCTION": "WHEN user replies 'Do it' to a plan THEN proceed to next steps and update docs"
+}
+
+[2026-03-11 17:10] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "Error handling and tests",
+    "EXPECTATION": "Failures on main page load and 'create new chart' should be covered by tests, and errors must surface detailed messages instead of {} placeholders.",
+    "NEW INSTRUCTION": "WHEN decoding or loading audio THEN add failure-path tests, mock decoding, and show fallback error"
+}
+
+[2026-03-11 17:32] - Updated by Junie
+{
+    "TYPE": "negative",
+    "CATEGORY": "Audio sample quality",
+    "EXPECTATION": "They expected realistic drum sounds and want the option to use their own samples instead of the current beep placeholders.",
+    "NEW INSTRUCTION": "WHEN user reports poor drum sounds THEN propose quality sample kits and explain custom sample import steps"
+}
+
+[2026-03-11 19:05] - Updated by Junie
+{
+    "TYPE": "correction",
+    "CATEGORY": "Drum sample mapping; create-flow error",
+    "EXPECTATION": "They want a clear filename-to-instrument mapping for the full base drum kit with correct sounds, and they expect the 'create new item' flow to work or at least surface detailed Supabase error info with tests covering failures.",
+    "NEW INSTRUCTION": "WHEN asked about drum samples THEN provide filename-to-instrument map and propose replacements"
+}
+
+[2026-03-11 21:10] - Updated by Junie
+{
+    "TYPE": "preference",
+    "CATEGORY": "Git workflow sequencing",
+    "EXPECTATION": "Follow the user's specified branch/commit/merge flow: implement Task 1 in the current branch with an initial commit, then merge; create a new branch for Task 2 and only merge after explicit approval; repeat for Task 3.",
+    "NEW INSTRUCTION": "WHEN executing Tasks 1–3 THEN follow branch plan and await approval before merging"
+}
+
+[2026-03-11 21:11] - Updated by Junie
+{
+    "TYPE": "preference",
+    "CATEGORY": "Git workflow sequencing",
+    "EXPECTATION": "Start Task 1 in the current branch with an initial commit, then merge; create a new branch for Task 2 and only merge after explicit approval; repeat for Task 3.",
+    "NEW INSTRUCTION": "WHEN executing Tasks 1–3 THEN follow branch plan and await approval before merging"
+}
+
