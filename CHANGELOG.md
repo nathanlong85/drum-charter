@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.6-alpha] - 2026-03-12
+
+### Added
+- **GitHub Formalization**: Added GitHub Issue Templates (YAML) for bug reports and feature requests.
+- **Velocity & Accent Support**: Implemented a four-state toggle (**Standard -> Accent -> Ghost -> None**) for grid notes with visual indicators and exponential gain audio transitions.
+- **Improved E2E Coverage**: Stabilized the Playwright suite and added full coverage for public sharing routes against the local environment.
+- **Rebranding**: Standardized the application name to **DrumCharter** across all documentation and the landing page.
+
+### Fixed
+- **Audio Sample Mapping**: Corrected drum sample mapping to support symbol-specific hits (e.g., Rim Shot, Bell, Flams).
+- **Git Attribution**: Rewrote historical commits to correctly attribute authorship to `Nathan Long <nathanlong85@gmail.com>` and removed co-author tags.
+
 ## [0.1.5-alpha] - 2026-03-12
 
 ### Added
