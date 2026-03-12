@@ -276,6 +276,16 @@ export const supabaseService = {
         .eq('id', id)
         .maybeSingle();
       
+      if (retryResult.error) {
+        console.error(`Supabase retry error in getGrooveSnippet:`, {
+          message: retryResult.error.message,
+          details: retryResult.error.details,
+          hint: retryResult.error.hint,
+          code: retryResult.error.code
+        });
+        throw retryResult.error;
+      }
+
       if (!retryResult.data) {
         console.error(`Groove snippet not found: ${id}`);
         throw new Error('Snippet not found');

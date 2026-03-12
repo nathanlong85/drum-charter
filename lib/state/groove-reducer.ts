@@ -1,4 +1,4 @@
-import { DrumSymbol, GrooveGrid, calculateTotalNotes } from '../types/groove';
+import { DrumSymbol, GrooveGrid, InstrumentGrid, calculateTotalNotes } from '../types/groove';
 
 export type GrooveAction =
   | { type: 'TOGGLE_NOTE'; instrumentId: string; noteIndex: number }

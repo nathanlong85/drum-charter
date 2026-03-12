@@ -64,10 +64,14 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
       setIsSaving(true);
       debouncedSave(state);
     }
+  }, [state, initialSnippet, debouncedSave]);
+
+  // Separate cleanup effect that only runs on unmount
+  useEffect(() => {
     return () => {
       debouncedSave.cancel();
     };
-  }, [state, initialSnippet, debouncedSave]);
+  }, [debouncedSave]);
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white min-h-screen">

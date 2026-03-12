@@ -114,16 +114,18 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
       return;
     }
     
-    // CodeRabbit: Use deeper comparison if needed, but state identity change 
-    // from useReducer is generally sufficient if we skip initial render.
     if (state !== initialNotebook) {
       setIsSaving(true);
       debouncedSave(state);
     }
+  }, [state, initialNotebook, debouncedSave]);
+
+  // Separate cleanup effect that only runs on unmount
+  useEffect(() => {
     return () => {
       debouncedSave.cancel();
     };
-  }, [state, initialNotebook, debouncedSave]);
+  }, [debouncedSave]);
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white min-h-screen">

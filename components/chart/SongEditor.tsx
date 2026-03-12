@@ -151,10 +151,14 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
       setIsSaving(true);
       debouncedSave(state);
     }
+  }, [state, initialSong, debouncedSave]);
+
+  // Separate cleanup effect that only runs on unmount
+  useEffect(() => {
     return () => {
       debouncedSave.cancel();
     };
-  }, [state, initialSong, debouncedSave]);
+  }, [debouncedSave]);
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white min-h-screen relative">
