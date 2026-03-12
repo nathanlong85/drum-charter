@@ -68,10 +68,10 @@ I would like to build a web app (and maybe some day a mobile app) that is tailor
 
 
 # References and Links
-- [Song Chart Template](local-to-author)
-- [Drum Symbols Library](local-to-author)
-- ["Have It All" Example Song Chart](local-to-author)
-- ["Center" Example Song Chart](local-to-author)
+- Song Chart Template (kept locally by author)
+- Drum Symbols Library (kept locally by author)
+- "Have It All" Example Song Chart (kept locally by author)
+- "Center" Example Song Chart (kept locally by author)
 
 # Conclusion
 

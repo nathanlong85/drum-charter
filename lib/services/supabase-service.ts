@@ -21,6 +21,8 @@ export const supabaseService = {
         sections: chart.sections as unknown as Database['public']['Tables']['song_charts']['Insert']['sections'],
         tags: chart.tags,
         is_public: chart.isPublic,
+        metronome_enabled: chart.header.metronomeEnabled,
+        metronome_volume: chart.header.metronomeVolume,
         updated_at: new Date().toISOString(),
         user_id: chart.userId || undefined, // Let Supabase handle it via auth.uid() if not provided
       })
@@ -55,6 +57,8 @@ export const supabaseService = {
         title: data.title,
         bpm: data.bpm || undefined,
         timeSignature: data.time_signature as unknown as TimeSignature,
+        metronomeEnabled: !!data.metronome_enabled,
+        metronomeVolume: data.metronome_volume ?? 0.5,
       },
       sections: data.sections as unknown as SongSection[],
       tags: data.tags || [],

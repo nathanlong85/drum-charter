@@ -17,6 +17,16 @@ export default async function SongPage({ params }: SongPageProps) {
       notFound();
     }
 
+    // Ensure metronome settings have defaults
+    const songWithDefaults = {
+      ...rawChart,
+      header: {
+        ...rawChart.header,
+        metronomeEnabled: rawChart.header.metronomeEnabled ?? false,
+        metronomeVolume: rawChart.header.metronomeVolume ?? 0.5,
+      }
+    };
+
     return (
       <div className="min-h-screen bg-zinc-50">
         <nav className="bg-white border-b border-zinc-200 py-4 px-8">
@@ -37,7 +47,7 @@ export default async function SongPage({ params }: SongPageProps) {
         </nav>
 
         <main className="py-8">
-          <SongEditor initialSong={rawChart} />
+          <SongEditor initialSong={songWithDefaults} />
         </main>
       </div>
     );

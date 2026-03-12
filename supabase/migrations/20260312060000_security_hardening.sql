@@ -30,7 +30,7 @@ USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
 -- notebooks
-DROP POLICY IF EXISTS "Users can update own notebooks." ON public.notebooks;
+DROP POLICY IF EXISTS "Users can update own notebooks" ON public.notebooks;
 CREATE POLICY "Users can update own notebooks"
 ON public.notebooks
 FOR UPDATE
