@@ -11,6 +11,23 @@ interface UseAudioPlaybackProps {
   initialMetronomeVolume?: number;
 }
 
+export function getVelocityForSymbol(symbol: DrumSymbol): number {
+  // Mapping for Multi-layer Velocity Support (#3)
+  // Accents: 1.1 (pops over the mix)
+  // Standard: 0.7 (baseline)
+  // Ghost: 0.2 (subtle)
+  
+  if (symbol === 'accent') return 1.1;
+  if (symbol === 'ghost') return 0.2;
+  if (symbol === 'standard') return 0.7;
+  if (symbol === 'none') return 0;
+  
+  // Handle _opt variants and other symbols
+  if (symbol.includes('accent')) return 1.1;
+  if (symbol.includes('ghost')) return 0.2;
+  return 0.7; // Default for everything else
+}
+
 export function useAudioPlayback({ 
   grid, 
   bpm, 
@@ -82,7 +99,7 @@ export function useAudioPlayback({
     };
   }, []);
 
-  const playSample = (sampleKey: string, time: number, velocity: number = 1.0) => {
+  const playSample = useCallback((sampleKey: string, time: number, velocity: number = 1.0) => {
     if (!audioContextRef.current || !samplesRef.current.has(sampleKey as DrumSymbol)) return;
 
     const source = audioContextRef.current.createBufferSource();
@@ -90,30 +107,24 @@ export function useAudioPlayback({
     
     source.buffer = samplesRef.current.get(sampleKey as DrumSymbol)!;
     
-    // Set volume based on velocity (0-1 range)
-    // Using an exponential curve for more natural volume transitions
-    const gainValue = Math.pow(velocity, 1.5);
+    // Set volume based on velocity (0-1+ range)
+    // Using a steeper exponential curve (2.0) for more natural volume transitions
+    // Accents can go slightly above 1.0 (e.g. 1.1)
+    // Clamping to 1.5 to prevent extreme clipping as per CodeRabbit recommendation
+    const gainValue = Math.min(Math.pow(velocity, 2.0), 1.5);
     gainNode.gain.setValueAtTime(gainValue, time);
     
     source.connect(gainNode);
     gainNode.connect(audioContextRef.current.destination);
     
     source.start(time);
-  };
+  }, []);
 
-  const getVelocityForSymbol = (symbol: DrumSymbol): number => {
-    if (symbol === 'accent') return 1.0;
-    if (symbol === 'ghost') return 0.3;
-    if (symbol === 'standard') return 0.7;
-    if (symbol === 'none') return 0;
-    
-    // Handle _opt variants and other symbols
-    if (symbol.includes('accent')) return 1.0;
-    if (symbol.includes('ghost')) return 0.3;
-    return 0.7; // Default for everything else
-  };
+  const getVelocityForSymbolInHook = useCallback((symbol: DrumSymbol): number => {
+    return getVelocityForSymbol(symbol);
+  }, []);
 
-  const scheduleNote = (step: number, time: number) => {
+  const scheduleNote = useCallback((step: number, time: number) => {
     // 1. Schedule Metronome if enabled
     if (metronomeEnabled) {
       const stepsPerBeat = grid.resolution / grid.timeSignature.beatValue;
@@ -135,7 +146,7 @@ export function useAudioPlayback({
         
         // Determine velocity: explicit value from inst.velocities, or derived from symbol
         let velocity = getVelocityForSymbol(symbol);
-        if (inst.velocities && inst.velocities[step] !== undefined) {
+        if (inst.velocities && inst.velocities[step] !== undefined && inst.velocities[step] !== 0) {
           velocity = inst.velocities[step];
         }
 
@@ -176,15 +187,16 @@ export function useAudioPlayback({
       // Sync UI with audio (rough estimation for now)
       onStepChange(step);
     }
-  };
+  }, [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample]);
 
-  const nextNote = () => {
+  const nextNote = useCallback(() => {
     const secondsPerBeat = 60.0 / bpm;
-    const secondsPerStep = secondsPerBeat / (grid.resolution / grid.timeSignature.beatValue);
+    const { resolution, timeSignature, measures } = grid;
+    const secondsPerStep = secondsPerBeat / (resolution / timeSignature.beatValue);
     
     nextNoteTimeRef.current += secondsPerStep;
-    currentStepRef.current = (currentStepRef.current + 1) % (grid.timeSignature.beatsPerMeasure * (grid.resolution / grid.timeSignature.beatValue) * grid.measures);
-  };
+    currentStepRef.current = (currentStepRef.current + 1) % (timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures);
+  }, [bpm, grid]);
 
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;
@@ -193,8 +205,8 @@ export function useAudioPlayback({
       scheduleNote(currentStepRef.current, nextNoteTimeRef.current);
       nextNote();
     }
-    timerIDRef.current = window.setTimeout(scheduler, lookahead);
-  }, [grid, bpm]);
+    timerIDRef.current = window.setTimeout(() => scheduler(), lookahead);
+  }, [scheduleNote, nextNote]);
 
   const togglePlayback = () => {
     if (isPlaying) {

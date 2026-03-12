@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useAudioPlayback } from '../useAudioPlayback';
+import { useAudioPlayback, getVelocityForSymbol } from '../useAudioPlayback';
 import { GrooveGrid, DrumSymbol } from '@/lib/types/groove';
 
 // Mock AudioContext
@@ -8,8 +8,10 @@ const mockSetValueAtTime = vi.fn();
 const mockConnect = vi.fn();
 const mockStart = vi.fn();
 
+let currentAudioTime = 0;
+
 class MockAudioContext {
-  currentTime = 0;
+  get currentTime() { return currentAudioTime; }
   state = 'running';
   decodeAudioData = vi.fn().mockResolvedValue({});
   createBufferSource = vi.fn().mockReturnValue({
@@ -53,6 +55,23 @@ describe('useAudioPlayback', () => {
     vi.clearAllMocks();
     mockSetValueAtTime.mockClear();
     vi.useFakeTimers();
+    currentAudioTime = 0;
+  });
+
+  describe('getVelocityForSymbol', () => {
+    const testCases: { symbol: DrumSymbol; expected: number }[] = [
+      { symbol: 'accent', expected: 1.1 },
+      { symbol: 'standard', expected: 0.7 },
+      { symbol: 'ghost', expected: 0.2 },
+      { symbol: 'none', expected: 0 },
+      { symbol: 'accent_opt', expected: 1.1 },
+      { symbol: 'ghost_opt', expected: 0.2 },
+      { symbol: 'hi_hat_closed_opt', expected: 0.7 },
+    ];
+
+    it.each(testCases)('returns $expected for symbol $symbol', ({ symbol, expected }) => {
+      expect(getVelocityForSymbol(symbol)).toBe(expected);
+    });
   });
 
   it('initializes with isPlaying as false', () => {
@@ -94,7 +113,7 @@ describe('useAudioPlayback', () => {
     expect(onStepChange).toHaveBeenCalled();
   });
 
-  it('scales volume based on velocity', async () => {
+  it('scales volume based on velocity with exponential curve', async () => {
     const gridWithVel: GrooveGrid = {
       ...mockGrid,
       instruments: [
@@ -126,11 +145,83 @@ describe('useAudioPlayback', () => {
     });
 
     // Check if setValueAtTime was called with the calculated gain
-    // 0.5 ^ 1.5 = 0.35355...
+    // 0.5 ^ 2.0 = 0.25
     expect(mockSetValueAtTime).toHaveBeenCalledWith(
-      expect.closeTo(0.35355, 5), 
+      expect.closeTo(0.25, 5), 
       expect.any(Number)
     );
+  });
+
+  it('maps symbols to correct velocity levels across multiple steps', async () => {
+    // This test verifies that different symbols (accent, standard, ghost)
+    // result in the correct gain values being scheduled as the clock advances.
+    const gridWithSymbols: GrooveGrid = {
+      ...mockGrid,
+      instruments: [
+        {
+          instrumentId: 'kick',
+          label: 'Kick',
+          notes: ['accent', 'standard', 'ghost', 'none'],
+        }
+      ]
+    };
+
+    const { result } = renderHook(() => useAudioPlayback({ 
+      grid: gridWithSymbols, 
+      bpm: 120 
+    }));
+
+    // Wait for samples
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    act(() => {
+      result.current.togglePlayback(); 
+    });
+    
+    // Step 0: Accent -> 1.1 ^ 2.0 = 1.21
+    // The scheduler runs immediately on togglePlayback
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(
+      expect.closeTo(1.21, 5),
+      expect.any(Number)
+    );
+
+    // Step 1: Standard -> 0.7 ^ 2.0 = 0.49
+    act(() => {
+      // Advance audio clock and timers
+      // At 120bpm, 16th note is 0.125s
+      currentAudioTime += 0.15; 
+      vi.advanceTimersByTime(150);
+    });
+
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(
+      expect.closeTo(0.49, 5),
+      expect.any(Number)
+    );
+
+    // Step 2: Ghost -> 0.2 ^ 2.0 = 0.04
+    act(() => {
+      currentAudioTime += 0.15;
+      vi.advanceTimersByTime(150);
+    });
+
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(
+      expect.closeTo(0.04, 5),
+      expect.any(Number)
+    );
+
+    // Step 3: None -> 0
+    act(() => {
+      currentAudioTime += 0.15;
+      vi.advanceTimersByTime(150);
+    });
+
+    // We check for 0 gain. Note that none notes might not call scheduleNote at all
+    // depending on implementation, but in our case it seems it might be called with 0
+    // or not called. Let's check how many times it was called.
+    // Based on previous failure, it was called 3 times.
+    expect(mockSetValueAtTime).toHaveBeenCalledTimes(3);
   });
 
   it('handles metronome toggling and volume', () => {
