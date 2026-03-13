@@ -10,49 +10,40 @@ interface SongPageProps {
 export default async function SongPage({ params }: SongPageProps) {
   const { id } = await params;
 
+  let rawChart;
   try {
-    const rawChart = await supabaseService.getSongChart(id);
-    
-    if (!rawChart) {
-      notFound();
-    }
-
-    // Ensure metronome settings have defaults
-    const songWithDefaults = {
-      ...rawChart,
-      header: {
-        ...rawChart.header,
-        metronomeEnabled: rawChart.header.metronomeEnabled ?? false,
-        metronomeVolume: rawChart.header.metronomeVolume ?? 0.5,
-      }
-    };
-
-    return (
-      <div className="min-h-screen bg-zinc-50">
-        <nav className="bg-white border-b border-zinc-200 py-4 px-8">
-          <div className="max-w-4xl mx-auto flex justify-between items-center">
-            <Link 
-              href="/library" 
-              className="text-sm font-bold text-zinc-500 hover:text-zinc-900 flex items-center gap-2 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              BACK TO LIBRARY
-            </Link>
-            <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
-              DrumCharter / Song / {id.slice(0, 8)}
-            </div>
-          </div>
-        </nav>
-
-        <main className="py-8">
-          <SongEditor initialSong={songWithDefaults} />
-        </main>
-      </div>
-    );
+    rawChart = await supabaseService.getSongChart(id);
   } catch (error) {
     console.error('Error loading song chart:', error);
     notFound();
   }
+  
+  if (!rawChart) {
+    notFound();
+  }
+
+  return (
+    <div className="min-h-screen bg-zinc-50">
+      <nav className="bg-white border-b border-zinc-200 py-4 px-8">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <Link 
+            href="/library" 
+            className="text-sm font-bold text-zinc-500 hover:text-zinc-900 flex items-center gap-2 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            BACK TO LIBRARY
+          </Link>
+          <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+            DrumCharter / Song / {id.slice(0, 8)}
+          </div>
+        </div>
+      </nav>
+
+      <main className="py-8">
+        <SongEditor initialSong={rawChart} />
+      </main>
+    </div>
+  );
 }
