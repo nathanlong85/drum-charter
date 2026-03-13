@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9-alpha] - 2026-03-13
+
+### Added
+- **PWA Support**: Implemented Progressive Web App capabilities using `@ducanh2912/next-pwa`.
+- **Offline Mode**: Added a service worker with custom caching strategies for Supabase REST API and metronome audio samples.
+- **Offline Indicator**: Created an `OfflineStatus` component that alerts users when their internet connection is lost.
+- **E2E Testing**: Added Playwright tests to verify offline detection and PWA manifest integration.
+
 ## [0.1.8-alpha] - 2026-03-12
 
 ### Added

@@ -68,6 +68,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## Status Board (Kanban)
 
 ### 🟢 Done
+- [x] [Feature] Offline Support (PWA) (#5) `✓`
 - [x] [Feature] Audio Playback: Metronome Support (#2) `✓`
 - [x] GitHub Formalization (Issues, Kanban, Templates) `✓`
 - [x] Local-First Development Environment (Supabase Docker) `✓`
@@ -111,7 +112,6 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🔵 Backlog (GitHub Issues)
 - [ ] [Feature] Dark Mode Support (#4)
-- [ ] [Feature] Offline Support (PWA) (#5)
 - [ ] [Feature] Snippet Tagging & Metadata UI (#6)
 - [ ] [E2E] Stabilization (timeouts, persistence anchors)
 
