@@ -53,9 +53,30 @@ describe('TagInput', () => {
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'j' } });
     
-    const suggestionBtn = screen.getByText(/jazz/i);
-    fireEvent.mouseDown(suggestionBtn); // Use mouseDown as per new implementation
+    const suggestionBtn = screen.getByRole('button', { name: /jazz/i });
+    fireEvent.mouseDown(suggestionBtn);
     
+    expect(defaultProps.onChange).toHaveBeenCalledWith(['funk', 'linear', 'jazz']);
+  });
+
+  it('adds a tag from suggestions using keyboard', () => {
+    render(<TagInput {...defaultProps} placeholder="Add tag..." />);
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'j' } });
+    
+    const suggestionBtn = screen.getByRole('button', { name: /jazz/i });
+    
+    // Test Enter key
+    fireEvent.keyDown(suggestionBtn, { key: 'Enter' });
+    expect(defaultProps.onChange).toHaveBeenCalledWith(['funk', 'linear', 'jazz']);
+    
+    // Reset for Space test
+    vi.clearAllMocks();
+    fireEvent.change(input, { target: { value: 'j' } });
+    const suggestionBtnSpace = screen.getByRole('button', { name: /jazz/i });
+    
+    // Test Space key
+    fireEvent.keyDown(suggestionBtnSpace, { key: ' ' });
     expect(defaultProps.onChange).toHaveBeenCalledWith(['funk', 'linear', 'jazz']);
   });
 

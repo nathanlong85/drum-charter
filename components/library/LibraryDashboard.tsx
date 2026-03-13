@@ -29,9 +29,9 @@ export default function LibraryDashboard({
   const [snippets, setSnippets] = useState(initialSnippets);
 
   const allAvailableTags = Array.from(new Set([
-    ...songs.flatMap(s => (s.tags || []).map((t: string) => t.trim().toLowerCase())),
-    ...notebooks.flatMap(n => (n.tags || []).map((t: string) => t.trim().toLowerCase())),
-    ...snippets.flatMap(s => (s.tags || []).map((t: string) => t.trim().toLowerCase()))
+    ...songs.flatMap(s => (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean)),
+    ...notebooks.flatMap(n => (n.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean)),
+    ...snippets.flatMap(s => (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean))
   ])).sort();
 
   const toggleTag = (tag: string) => {
@@ -88,14 +88,18 @@ export default function LibraryDashboard({
 
   const filterItems = (items: any[]) => {
     return items.filter((item) => {
-      const titleMatch = (item.title || '').toLowerCase().includes(searchQuery.toLowerCase());
-      const queryTagMatch = (item.tags || []).some((tag: string) =>
-        tag.toLowerCase().includes(searchQuery.toLowerCase())
+      const normalizedItemTags = (item.tags || [])
+        .map((t: string) => t.trim().toLowerCase())
+        .filter(Boolean);
+        
+      const titleMatch = (item.title || '').toLowerCase().includes(searchQuery.trim().toLowerCase());
+      const queryTagMatch = normalizedItemTags.some((tag: string) =>
+        tag.includes(searchQuery.trim().toLowerCase())
       );
       
       const selectedTagsMatch = selectedTags.length === 0 || 
         selectedTags.every(tag => 
-          (item.tags || []).some(t => t.toLowerCase() === tag.toLowerCase())
+          normalizedItemTags.includes(tag.trim().toLowerCase())
         );
 
       return (titleMatch || queryTagMatch) && selectedTagsMatch;
@@ -228,7 +232,11 @@ export default function LibraryDashboard({
           </div>
 
           <div className="relative w-full md:w-64">
-            <form role="search" aria-label="Library search">
+            <form 
+              role="search" 
+              aria-label="Library search"
+              onSubmit={(e) => e.preventDefault()}
+            >
               <input
                 type="text"
                 placeholder="Search by title or tag..."

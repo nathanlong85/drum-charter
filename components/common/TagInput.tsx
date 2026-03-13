@@ -24,8 +24,8 @@ export function TagInput({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const filteredSuggestions = suggestions.filter(
-    s => !tags.some(t => t.toLowerCase() === s.toLowerCase()) && 
-    s.toLowerCase().includes(inputValue.toLowerCase())
+    s => !tags.some(t => t.trim().toLowerCase() === s.trim().toLowerCase()) && 
+    s.toLowerCase().includes(inputValue.trim().toLowerCase())
   );
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function TagInput({
 
   const addTag = (tag: string) => {
     const trimmed = tag.trim().toLowerCase();
-    if (trimmed && !tags.some(t => t.toLowerCase() === trimmed)) {
+    if (trimmed && !tags.some(t => t.trim().toLowerCase() === trimmed)) {
       onChange([...tags, trimmed]);
     }
     setInputValue('');
@@ -89,11 +89,15 @@ export function TagInput({
             setIsFocused(true);
             setShowSuggestions(true);
           }}
-          onBlur={() => {
+          onBlur={(e) => {
             setIsFocused(false);
-            // Small delay to allow clicking suggestions before they disappear
-            // though onMouseDown on suggestions should handle most cases
-            setTimeout(() => setShowSuggestions(false), 200);
+            // Only hide suggestions if the focus is moving outside the container
+            const currentTarget = e.currentTarget;
+            setTimeout(() => {
+              if (!containerRef.current?.contains(document.activeElement)) {
+                setShowSuggestions(false);
+              }
+            }, 0);
           }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
@@ -123,7 +127,13 @@ export function TagInput({
                   e.preventDefault();
                   addTag(suggestion);
                 }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-zinc-800 hover:text-white transition-colors font-bold uppercase tracking-tight flex items-center justify-between group"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    addTag(suggestion);
+                  }
+                }}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-zinc-800 hover:text-white transition-colors font-bold uppercase tracking-tight flex items-center justify-between group focus:bg-zinc-800 focus:text-white focus:outline-none"
               >
                 {suggestion}
                 <Plus className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
