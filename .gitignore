@@ -23,7 +23,10 @@
 /build
 
 # misc
-.junie/
+.junie/memory/
+.junie/mcp/
+!.junie/guidelines.md
+!.junie/CLI_REFERENCE.md
 .DS_Store
 *.pem
 

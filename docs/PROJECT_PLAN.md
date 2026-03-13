@@ -121,22 +121,6 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 To ensure high-quality collaboration and maintain the stability of the DrumCharter codebase, the following protocols are strictly enforced. **These take precedence over all other instructions and are now formally located in `.junie/guidelines.md`.**
 
-### 1. Stop-and-Wait Protocol
-- **No Silent Implementation**: Never bundle code fixes, refactors, or new features into a response unless the previous turn was an explicit approval to do so.
-- **Explicit Approval Tokens**: Only messages containing clear, affirmative approval (e.g., "Go ahead," "Proceed," "Approved," "Yes, do that") are treated as a green light to make project changes.
-- **Step-by-Step Approval**: For multi-step tasks, seek approval for each individual step before moving on to the next.
-
-### 2. Communication Rules
-- **Direct Answers First**: If a user asks a question, the entire response must focus on the answer and discussion. Zero code edits or file changes should occur in that turn.
-- **Drop and Listen**: When the user stops a task or flags an issue, immediately halt all other activity and address that concern.
-- **No Overwhelming Context**: Do not bundle unrelated technical updates or plans into a response to a specific question.
-- **Answer-First**: Start every response with a direct, concise answer to the user's question.
-
-### 3. Technical & Mode Rules
-- **100% Test Coverage**: All new features and core logic must have corresponding unit (Vitest) and/or E2E (Playwright) tests.
-- **Local-First Dev**: Always use the local Supabase Docker instance for development and testing.
-- **Commit Identity**: All commits must be made exclusively on behalf of `Nathan Long <nathanlong85@gmail.com>`. No co-author trailers.
-
 ---
 
 ## Instructions for Agents
