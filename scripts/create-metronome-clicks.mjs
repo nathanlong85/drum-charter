@@ -53,7 +53,12 @@ function createMetronomeClick(filename, frequency, duration = 0.05) {
     buffer.writeInt16LE(Math.floor(val), 44 + i * 2);
   }
 
-  fs.writeFileSync(path.join(samplesDir, filename), buffer);
+  try {
+    fs.writeFileSync(path.join(samplesDir, filename), buffer);
+  } catch (err) {
+    console.error(`Failed to write ${filename}:`, err.message);
+    process.exit(1);
+  }
 }
 
 // Generate high and low clicks
