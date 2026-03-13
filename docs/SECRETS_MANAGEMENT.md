@@ -10,8 +10,9 @@ This document outlines the tiered approach for managing secrets in the DrumChart
 - **Visibility**: Included in `.gitignore`. Targets the local Supabase container by default (port 54321).
 
 ### 2. `.env.junie` (Collaborative Secrets)
-- **Purpose**: Secrets specifically required for Junie to perform tasks (e.g., database schema pulls, specialized CLI authentications).
-- **Examples**: `SUPABASE_ACCESS_TOKEN`.
+- **Purpose**: Secrets specifically required for Junie to perform tasks (e.g., database schema pulls, GitHub MCP interactions).
+- **Examples**: `SUPABASE_ACCESS_TOKEN`, `GITHUB_PERSONAL_ACCESS_TOKEN`.
+- **MCP Integration**: Secrets in this file are used to populate environment variables for MCP servers (defined in `.junie/mcp/mcp.json`), ensuring they are never hardcoded in configuration files.
 - **Visibility**: Included in `.gitignore`. Populated by the user for Junie's use.
 
 ### 3. `.env.private` (User-Only Private Secrets)
