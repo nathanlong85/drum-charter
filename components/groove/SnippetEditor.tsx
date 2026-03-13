@@ -4,7 +4,14 @@ import React, { useReducer, useEffect, useCallback, useState, useRef } from 'rea
 import { GrooveSnippet, GrooveGrid } from '@/lib/types/groove';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { TagInput } from '@/components/common/TagInput';
 import { debounce } from 'lodash';
+
+const COMMON_DRUM_TAGS = [
+  'funk', 'jazz', 'rock', 'metal', 'latin', 'afro-cuban', 'shuffle',
+  'linear', 'rudiment', 'paradiddle', 'fill', 'groove', 'independence',
+  'double-kick', 'ghost-notes', 'displacement', 'polyrhythm'
+];
 
 type SnippetAction =
   | { type: 'SET_SNIPPET'; snippet: GrooveSnippet }
@@ -154,25 +161,12 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {state.tags.map((tag, idx) => (
-            <span key={idx} className="bg-zinc-100 text-zinc-600 px-2 py-1 rounded text-xs font-medium">
-              #{tag}
-            </span>
-          ))}
-          <input
-            type="text"
-            placeholder="Add tag..."
-            className="text-xs text-zinc-400 bg-transparent border-none focus:ring-0 w-24 p-0"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                const input = e.currentTarget;
-                if (input.value.trim()) {
-                  dispatch({ type: 'UPDATE_TAGS', tags: [...state.tags, input.value.trim()] });
-                  input.value = '';
-                }
-              }
-            }}
+        <div className="mt-4">
+          <TagInput
+            tags={state.tags}
+            onChange={(tags) => dispatch({ type: 'UPDATE_TAGS', tags })}
+            suggestions={COMMON_DRUM_TAGS}
+            placeholder="Add genre, style, or technique tag..."
           />
         </div>
       </header>

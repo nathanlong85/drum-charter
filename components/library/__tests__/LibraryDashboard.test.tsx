@@ -127,3 +127,66 @@ describe('LibraryDashboard Creation Flow', () => {
     alertMock.mockRestore();
   });
 });
+
+describe('LibraryDashboard Filtering', () => {
+  const mockSongs = [
+    { id: '1', title: 'Funk Groove', tags: ['funk'], created_at: '2024-01-01' },
+    { id: '2', title: 'Rock Beat', tags: ['rock'], created_at: '2024-01-02' },
+  ];
+
+  it('filters items by search query with accessible input', () => {
+    render(
+      <LibraryDashboard 
+        initialSongs={mockSongs} 
+        initialNotebooks={[]} 
+        initialSnippets={[]} 
+      />
+    );
+
+    const searchInput = screen.getByLabelText(/Search library by title or tag/i);
+    fireEvent.change(searchInput, { target: { value: 'funk' } });
+
+    expect(screen.getByText('Funk Groove')).toBeDefined();
+    expect(screen.queryByText('Rock Beat')).toBeNull();
+  });
+
+  it('normalizes tags for case-insensitive filtering', () => {
+    const mixedCaseSongs = [
+      { id: '1', title: 'Song 1', tags: ['FUNK'], created_at: '2024-01-01' },
+      { id: '2', title: 'Song 2', tags: ['funk'], created_at: '2024-01-02' },
+    ];
+
+    render(
+      <LibraryDashboard 
+        initialSongs={mixedCaseSongs} 
+        initialNotebooks={[]} 
+        initialSnippets={[]} 
+      />
+    );
+
+    // Should only have one 'funk' button due to normalization
+    const funkButtons = screen.getAllByText(/^funk$/i);
+    expect(funkButtons.length).toBe(1);
+
+    fireEvent.click(funkButtons[0]);
+    expect(screen.getByText('Song 1')).toBeDefined();
+    expect(screen.getByText('Song 2')).toBeDefined();
+  });
+
+  it('tag buttons have correct accessibility attributes', () => {
+    render(
+      <LibraryDashboard 
+        initialSongs={mockSongs} 
+        initialNotebooks={[]} 
+        initialSnippets={[]} 
+      />
+    );
+
+    const tagButton = screen.getByText('funk');
+    expect(tagButton.getAttribute('aria-pressed')).toBe('false');
+    expect(tagButton.getAttribute('aria-label')).toBe('Filter by funk tag');
+
+    fireEvent.click(tagButton);
+    expect(tagButton.getAttribute('aria-pressed')).toBe('true');
+  });
+});
