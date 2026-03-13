@@ -23,9 +23,24 @@ export default function LibraryDashboard({
 }: LibraryDashboardProps) {
   const [activeTab, setActiveTab] = useState<ItemType>('song');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [songs, setSongs] = useState(initialSongs);
   const [notebooks, setNotebooks] = useState(initialNotebooks);
   const [snippets, setSnippets] = useState(initialSnippets);
+
+  const allAvailableTags = Array.from(new Set([
+    ...songs.flatMap(s => s.tags || []),
+    ...notebooks.flatMap(n => n.tags || []),
+    ...snippets.flatMap(s => s.tags || [])
+  ])).sort();
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag) 
+        : [...prev, tag]
+    );
+  };
 
   const handleDelete = async (id: string, type: ItemType) => {
     if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
@@ -72,10 +87,14 @@ export default function LibraryDashboard({
   const filterItems = (items: any[]) => {
     return items.filter((item) => {
       const titleMatch = (item.title || '').toLowerCase().includes(searchQuery.toLowerCase());
-      const tagMatch = (item.tags || []).some((tag: string) =>
+      const queryTagMatch = (item.tags || []).some((tag: string) =>
         tag.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      return titleMatch || tagMatch;
+      
+      const selectedTagsMatch = selectedTags.length === 0 || 
+        selectedTags.every(tag => (item.tags || []).includes(tag));
+
+      return (titleMatch || queryTagMatch) && selectedTagsMatch;
     });
   };
 
@@ -183,48 +202,77 @@ export default function LibraryDashboard({
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex bg-zinc-100 p-1 rounded-lg">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as ItemType)}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                activeTab === tab.id
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-zinc-500 hover:text-zinc-700'
-              }`}
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex bg-zinc-100 p-1 rounded-lg">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as ItemType)}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-zinc-500 hover:text-zinc-700'
+                }`}
+              >
+                {tab.label}
+                <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-zinc-200 text-zinc-600 rounded-full">
+                  {tab.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <div className="relative w-full md:w-64">
+            <input
+              type="text"
+              placeholder="Search by title or tag..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            />
+            <svg
+              className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              {tab.label}
-              <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-zinc-200 text-zinc-600 rounded-full">
-                {tab.count}
-              </span>
-            </button>
-          ))}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
         </div>
 
-        <div className="relative w-full md:w-64">
-          <input
-            type="text"
-            placeholder="Search by title or tag..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-          />
-          <svg
-            className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </div>
+        {allAvailableTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mr-2">Filter by Tags:</span>
+            {allAvailableTags.map(tag => (
+              <button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tighter transition-all ${
+                  selectedTags.includes(tag)
+                    ? 'bg-zinc-800 text-white shadow-md scale-105'
+                    : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+            {selectedTags.length > 0 && (
+              <button
+                onClick={() => setSelectedTags([])}
+                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 uppercase tracking-widest ml-2"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

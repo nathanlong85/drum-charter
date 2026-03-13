@@ -127,3 +127,68 @@ describe('LibraryDashboard Creation Flow', () => {
     alertMock.mockRestore();
   });
 });
+
+describe('LibraryDashboard Filtering', () => {
+  const mockSongs = [
+    { id: '1', title: 'Funk Groove', tags: ['funk'], created_at: '2024-01-01' },
+    { id: '2', title: 'Rock Beat', tags: ['rock'], created_at: '2024-01-02' },
+  ];
+
+  it('filters items by search query', () => {
+    render(
+      <LibraryDashboard 
+        initialSongs={mockSongs} 
+        initialNotebooks={[]} 
+        initialSnippets={[]} 
+      />
+    );
+
+    const searchInput = screen.getByPlaceholderText(/Search by title or tag/i);
+    fireEvent.change(searchInput, { target: { value: 'funk' } });
+
+    expect(screen.getByText('Funk Groove')).toBeDefined();
+    expect(screen.queryByText('Rock Beat')).toBeNull();
+  });
+
+  it('filters items by selected tags', () => {
+    render(
+      <LibraryDashboard 
+        initialSongs={mockSongs} 
+        initialNotebooks={[]} 
+        initialSnippets={[]} 
+      />
+    );
+
+    const tagButton = screen.getByText('funk');
+    fireEvent.click(tagButton);
+
+    expect(screen.getByText('Funk Groove')).toBeDefined();
+    expect(screen.queryByText('Rock Beat')).toBeNull();
+
+    // Click again to clear
+    fireEvent.click(tagButton);
+    expect(screen.getByText('Funk Groove')).toBeDefined();
+    expect(screen.getByText('Rock Beat')).toBeDefined();
+  });
+
+  it('filters items by multiple tags (AND logic)', () => {
+    const complexSongs = [
+      { id: '1', title: 'Funk Rock', tags: ['funk', 'rock'], created_at: '2024-01-01' },
+      { id: '2', title: 'Pure Funk', tags: ['funk'], created_at: '2024-01-02' },
+    ];
+
+    render(
+      <LibraryDashboard 
+        initialSongs={complexSongs} 
+        initialNotebooks={[]} 
+        initialSnippets={[]} 
+      />
+    );
+
+    fireEvent.click(screen.getByText('funk'));
+    fireEvent.click(screen.getByText('rock'));
+
+    expect(screen.getByText('Funk Rock')).toBeDefined();
+    expect(screen.queryByText('Pure Funk')).toBeNull();
+  });
+});

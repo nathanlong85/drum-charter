@@ -1,0 +1,488 @@
+Command finished with exit code 1.
+Command output:
+
+ RUN  v4.0.18 /Users/nlong/Projects/drum-charter
+
+ ❯ components/common/__tests__/TagInput.test.tsx (6 tests | 4 failed) 129ms
+     ✓ renders existing tags 22ms
+     × calls onChange with new tag when Enter is pressed 7ms
+     ✓ removes a tag when X is clicked 91ms
+     × shows suggestions when typing 3ms
+     × adds a tag from suggestions when clicked 3ms
+     × removes last tag when Backspace is pressed on empty input 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  components/common/__tests__/TagInput.test.tsx > TagInput > calls onChange with new tag when Enter is pressed
+TestingLibraryElementError: Unable to find an element with the placeholder text of: /add tag/i
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"relative w-full"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-wrap gap-2 p-2 border-2 rounded-lg transition-all border-zinc-100 bg-zinc-50"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-tag w-4 h-4 text-zinc-400 mt-1 ml-1"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"[39m
+          [36m/>[39m
+          [36m<circle[39m
+            [33mcx[39m=[32m"7.5"[39m
+            [33mcy[39m=[32m"7.5"[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mr[39m=[32m".5"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"[39m
+        [36m>[39m
+          [0mfunk[0m
+          [36m<button[39m
+            [33mclass[39m=[32m"hover:text-red-400 transition-colors"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x w-3 h-3"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</span>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"[39m
+        [36m>[39m
+          [0mlinear[0m
+          [36m<button[39m
+            [33mclass[39m=[32m"hover:text-red-400 transition-colors"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x w-3 h-3"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mclass[39m=[32m"flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 min-w-[120px] placeholder-zinc-400 font-medium"[39m
+          [33mplaceholder[39m=[32m""[39m
+          [33mtype[39m=[32m"text"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ components/common/__tests__/TagInput.test.tsx:21:26
+     19|   it('calls onChange with new tag when Enter is pressed', () => {
+     20|     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
+     21|     const input = screen.getByPlaceholderText(/add tag/i);
+       |                          ^
+     22|     fireEvent.change(input, { target: { value: 'metal' } });
+     23|     fireEvent.keyDown(input, { key: 'Enter' });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  components/common/__tests__/TagInput.test.tsx > TagInput > shows suggestions when typing
+TestingLibraryElementError: Unable to find an element with the placeholder text of: /add tag/i
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"relative w-full"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-wrap gap-2 p-2 border-2 rounded-lg transition-all border-zinc-100 bg-zinc-50"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-tag w-4 h-4 text-zinc-400 mt-1 ml-1"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+ Test Files  1 failed (1)
+        [36m>[39m
+          [36m<path[39m
+      Tests  4 failed | 2 passed (6)
+            [33md[39m=[32m"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"[39m
+          [36m/>[39m
+   Start at  12:58:16
+          [36m<circle[39m
+   Duration  1.03s (transform 48ms, setup 63ms, import 179ms, tests 129ms, environment 552ms)
+            [33mcx[39m=[32m"7.5"[39m
+
+            [33mcy[39m=[32m"7.5"[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mr[39m=[32m".5"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"[39m
+        [36m>[39m
+          [0mfunk[0m
+          [36m<button[39m
+            [33mclass[39m=[32m"hover:text-red-400 transition-colors"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x w-3 h-3"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</span>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"[39m
+        [36m>[39m
+          [0mlinear[0m
+          [36m<button[39m
+            [33mclass[39m=[32m"hover:text-red-400 transition-colors"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x w-3 h-3"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mclass[39m=[32m"flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 min-w-[120px] placeholder-zinc-400 font-medium"[39m
+          [33mplaceholder[39m=[32m""[39m
+          [33mtype[39m=[32m"text"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ components/common/__tests__/TagInput.test.tsx:39:26
+     37|   it('shows suggestions when typing', () => {
+     38|     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
+     39|     const input = screen.getByPlaceholderText(/add tag/i);
+       |                          ^
+     40|     fireEvent.change(input, { target: { value: 'j' } });
+     41|     
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  components/common/__tests__/TagInput.test.tsx > TagInput > adds a tag from suggestions when clicked
+TestingLibraryElementError: Unable to find an element with the placeholder text of: /add tag/i
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"relative w-full"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-wrap gap-2 p-2 border-2 rounded-lg transition-all border-zinc-100 bg-zinc-50"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-tag w-4 h-4 text-zinc-400 mt-1 ml-1"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"[39m
+          [36m/>[39m
+          [36m<circle[39m
+            [33mcx[39m=[32m"7.5"[39m
+            [33mcy[39m=[32m"7.5"[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mr[39m=[32m".5"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"[39m
+        [36m>[39m
+          [0mfunk[0m
+          [36m<button[39m
+            [33mclass[39m=[32m"hover:text-red-400 transition-colors"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x w-3 h-3"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</span>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"[39m
+        [36m>[39m
+          [0mlinear[0m
+          [36m<button[39m
+            [33mclass[39m=[32m"hover:text-red-400 transition-colors"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x w-3 h-3"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mclass[39m=[32m"flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 min-w-[120px] placeholder-zinc-400 font-medium"[39m
+          [33mplaceholder[39m=[32m""[39m
+          [33mtype[39m=[32m"text"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ components/common/__tests__/TagInput.test.tsx:49:26
+     47|   it('adds a tag from suggestions when clicked', () => {
+     48|     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
+     49|     const input = screen.getByPlaceholderText(/add tag/i);
+       |                          ^
+     50|     fireEvent.change(input, { target: { value: 'j' } });
+     51|     
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  components/common/__tests__/TagInput.test.tsx > TagInput > removes last tag when Backspace is pressed on empty input
+TestingLibraryElementError: Unable to find an element with the placeholder text of: /add tag/i
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"relative w-full"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"flex flex-wrap gap-2 p-2 border-2 rounded-lg transition-all border-zinc-100 bg-zinc-50"[39m
+      [36m>[39m
+        [36m<svg[39m
+          [33maria-hidden[39m=[32m"true"[39m
+          [33mclass[39m=[32m"lucide lucide-tag w-4 h-4 text-zinc-400 mt-1 ml-1"[39m
+          [33mfill[39m=[32m"none"[39m
+          [33mheight[39m=[32m"24"[39m
+          [33mstroke[39m=[32m"currentColor"[39m
+          [33mstroke-linecap[39m=[32m"round"[39m
+          [33mstroke-linejoin[39m=[32m"round"[39m
+          [33mstroke-width[39m=[32m"2"[39m
+          [33mviewBox[39m=[32m"0 0 24 24"[39m
+          [33mwidth[39m=[32m"24"[39m
+          [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+        [36m>[39m
+          [36m<path[39m
+            [33md[39m=[32m"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"[39m
+          [36m/>[39m
+          [36m<circle[39m
+            [33mcx[39m=[32m"7.5"[39m
+            [33mcy[39m=[32m"7.5"[39m
+            [33mfill[39m=[32m"currentColor"[39m
+            [33mr[39m=[32m".5"[39m
+          [36m/>[39m
+        [36m</svg>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"[39m
+        [36m>[39m
+          [0mfunk[0m
+          [36m<button[39m
+            [33mclass[39m=[32m"hover:text-red-400 transition-colors"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x w-3 h-3"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</span>[39m
+        [36m<span[39m
+          [33mclass[39m=[32m"flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"[39m
+        [36m>[39m
+          [0mlinear[0m
+          [36m<button[39m
+            [33mclass[39m=[32m"hover:text-red-400 transition-colors"[39m
+          [36m>[39m
+            [36m<svg[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"lucide lucide-x w-3 h-3"[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"24"[39m
+              [33mstroke[39m=[32m"currentColor"[39m
+              [33mstroke-linecap[39m=[32m"round"[39m
+              [33mstroke-linejoin[39m=[32m"round"[39m
+              [33mstroke-width[39m=[32m"2"[39m
+              [33mviewBox[39m=[32m"0 0 24 24"[39m
+              [33mwidth[39m=[32m"24"[39m
+              [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+            [36m>[39m
+              [36m<path[39m
+                [33md[39m=[32m"M18 6 6 18"[39m
+              [36m/>[39m
+              [36m<path[39m
+                [33md[39m=[32m"m6 6 12 12"[39m
+              [36m/>[39m
+            [36m</svg>[39m
+          [36m</button>[39m
+        [36m</span>[39m
+        [36m<input[39m
+          [33mclass[39m=[32m"flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 min-w-[120px] placeholder-zinc-400 font-medium"[39m
+          [33mplaceholder[39m=[32m""[39m
+          [33mtype[39m=[32m"text"[39m
+          [33mvalue[39m=[32m""[39m
+        [36m/>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/.pnpm/@testing-library+dom@10.4.1/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ components/common/__tests__/TagInput.test.tsx:60:26
+     58|   it('removes last tag when Backspace is pressed on empty input', () =…
+     59|     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
+     60|     const input = screen.getByPlaceholderText(/add tag/i);
+       |                          ^
+     61|     fireEvent.keyDown(input, { key: 'Backspace' });
+     62|     
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
