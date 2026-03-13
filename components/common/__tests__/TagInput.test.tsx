@@ -10,6 +10,10 @@ describe('TagInput', () => {
     suggestions: ['rock', 'jazz', 'shuffle'],
   };
 
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('renders existing tags', () => {
     render(<TagInput {...defaultProps} />);
     expect(screen.getByText(/funk/i)).toBeDefined();
@@ -18,7 +22,7 @@ describe('TagInput', () => {
 
   it('calls onChange with new tag when Enter is pressed', () => {
     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
-    const input = screen.getByPlaceholderText(/add tag/i);
+    const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'metal' } });
     fireEvent.keyDown(input, { key: 'Enter' });
     
@@ -36,7 +40,7 @@ describe('TagInput', () => {
 
   it('shows suggestions when typing', () => {
     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
-    const input = screen.getByPlaceholderText(/add tag/i);
+    const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'j' } });
     
     expect(screen.getByText(/jazz/i)).toBeDefined();
@@ -46,18 +50,18 @@ describe('TagInput', () => {
 
   it('adds a tag from suggestions when clicked', () => {
     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
-    const input = screen.getByPlaceholderText(/add tag/i);
+    const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'j' } });
     
     const suggestionBtn = screen.getByText(/jazz/i);
-    fireEvent.click(suggestionBtn);
+    fireEvent.mouseDown(suggestionBtn); // Use mouseDown as per new implementation
     
     expect(defaultProps.onChange).toHaveBeenCalledWith(['funk', 'linear', 'jazz']);
   });
 
   it('removes last tag when Backspace is pressed on empty input', () => {
     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
-    const input = screen.getByPlaceholderText(/add tag/i);
+    const input = screen.getByRole('textbox');
     fireEvent.keyDown(input, { key: 'Backspace' });
     
     expect(defaultProps.onChange).toHaveBeenCalledWith(['funk']);

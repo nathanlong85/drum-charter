@@ -92,7 +92,9 @@ export default function LibraryDashboard({
       );
       
       const selectedTagsMatch = selectedTags.length === 0 || 
-        selectedTags.every(tag => (item.tags || []).includes(tag));
+        selectedTags.every(tag => 
+          (item.tags || []).some(t => t.toLowerCase() === tag.toLowerCase())
+        );
 
       return (titleMatch || queryTagMatch) && selectedTagsMatch;
     });

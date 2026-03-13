@@ -66,6 +66,7 @@ export function TagInput({
             <button 
               onClick={() => removeTag(tag)}
               className="hover:text-red-400 transition-colors"
+              aria-label={`Remove ${tag} tag`}
             >
               <X className="w-3 h-3" />
             </button>
@@ -106,7 +107,10 @@ export function TagInput({
             {filteredSuggestions.map((suggestion) => (
               <button
                 key={suggestion}
-                onClick={() => addTag(suggestion)}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  addTag(suggestion);
+                }}
                 className="w-full text-left px-4 py-2 text-sm hover:bg-zinc-800 hover:text-white transition-colors font-bold uppercase tracking-tight flex items-center justify-between group"
               >
                 {suggestion}
