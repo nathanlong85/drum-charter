@@ -22,7 +22,8 @@ export function TagInput({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const filteredSuggestions = suggestions.filter(
-    s => !tags.includes(s) && s.toLowerCase().includes(inputValue.toLowerCase())
+    s => !tags.some(t => t.toLowerCase() === s.toLowerCase()) && 
+    s.toLowerCase().includes(inputValue.toLowerCase())
   );
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export function TagInput({
 
   const addTag = (tag: string) => {
     const trimmed = tag.trim().toLowerCase();
-    if (trimmed && !tags.includes(trimmed)) {
+    if (trimmed && !tags.some(t => t.toLowerCase() === trimmed)) {
       onChange([...tags, trimmed]);
     }
     setInputValue('');
@@ -64,6 +65,7 @@ export function TagInput({
           >
             {tag}
             <button 
+              type="button"
               onClick={() => removeTag(tag)}
               className="hover:text-red-400 transition-colors"
               aria-label={`Remove ${tag} tag`}
@@ -84,7 +86,11 @@ export function TagInput({
             setIsFocused(true);
             setShowSuggestions(true);
           }}
-          onBlur={() => setIsFocused(false)}
+          onBlur={() => {
+            setIsFocused(false);
+            // Small delay to allow clicking suggestions before they disappear
+            setTimeout(() => setShowSuggestions(false), 200);
+          }}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
@@ -107,6 +113,7 @@ export function TagInput({
             {filteredSuggestions.map((suggestion) => (
               <button
                 key={suggestion}
+                type="button"
                 onMouseDown={(e) => {
                   e.preventDefault();
                   addTag(suggestion);

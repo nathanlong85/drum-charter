@@ -29,16 +29,17 @@ export default function LibraryDashboard({
   const [snippets, setSnippets] = useState(initialSnippets);
 
   const allAvailableTags = Array.from(new Set([
-    ...songs.flatMap(s => s.tags || []),
-    ...notebooks.flatMap(n => n.tags || []),
-    ...snippets.flatMap(s => s.tags || [])
+    ...songs.flatMap(s => (s.tags || []).map((t: string) => t.trim().toLowerCase())),
+    ...notebooks.flatMap(n => (n.tags || []).map((t: string) => t.trim().toLowerCase())),
+    ...snippets.flatMap(s => (s.tags || []).map((t: string) => t.trim().toLowerCase()))
   ])).sort();
 
   const toggleTag = (tag: string) => {
+    const normalizedTag = tag.trim().toLowerCase();
     setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag) 
-        : [...prev, tag]
+      prev.includes(normalizedTag) 
+        ? prev.filter(t => t !== normalizedTag) 
+        : [...prev, normalizedTag]
     );
   };
 
@@ -226,13 +227,16 @@ export default function LibraryDashboard({
           </div>
 
           <div className="relative w-full md:w-64">
-            <input
-              type="text"
-              placeholder="Search by title or tag..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-            />
+            <form role="search" aria-label="Library search">
+              <input
+                type="text"
+                placeholder="Search by title or tag..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Search library by title or tag"
+                className="w-full pl-10 pr-4 py-2 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              />
+            </form>
             <svg
               className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400"
               fill="none"
@@ -252,19 +256,24 @@ export default function LibraryDashboard({
         {allAvailableTags.length > 0 && (
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mr-2">Filter by Tags:</span>
-            {allAvailableTags.map(tag => (
-              <button
-                key={tag}
-                onClick={() => toggleTag(tag)}
-                className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tighter transition-all ${
-                  selectedTags.includes(tag)
-                    ? 'bg-zinc-800 text-white shadow-md scale-105'
-                    : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
+            {allAvailableTags.map(tag => {
+              const isActive = selectedTags.includes(tag);
+              return (
+                <button
+                  key={tag}
+                  onClick={() => toggleTag(tag)}
+                  aria-pressed={isActive}
+                  aria-label={`Filter by ${tag} tag`}
+                  className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tighter transition-all ${
+                    isActive
+                      ? 'bg-zinc-800 text-white shadow-md scale-105'
+                      : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
+                  }`}
+                >
+                  {tag}
+                </button>
+              );
+            })}
             {selectedTags.length > 0 && (
               <button
                 onClick={() => setSelectedTags([])}

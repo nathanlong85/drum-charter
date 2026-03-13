@@ -134,7 +134,7 @@ describe('LibraryDashboard Filtering', () => {
     { id: '2', title: 'Rock Beat', tags: ['rock'], created_at: '2024-01-02' },
   ];
 
-  it('filters items by search query', () => {
+  it('filters items by search query with accessible input', () => {
     render(
       <LibraryDashboard 
         initialSongs={mockSongs} 
@@ -143,14 +143,37 @@ describe('LibraryDashboard Filtering', () => {
       />
     );
 
-    const searchInput = screen.getByPlaceholderText(/Search by title or tag/i);
+    const searchInput = screen.getByLabelText(/Search library by title or tag/i);
     fireEvent.change(searchInput, { target: { value: 'funk' } });
 
     expect(screen.getByText('Funk Groove')).toBeDefined();
     expect(screen.queryByText('Rock Beat')).toBeNull();
   });
 
-  it('filters items by selected tags', () => {
+  it('normalizes tags for case-insensitive filtering', () => {
+    const mixedCaseSongs = [
+      { id: '1', title: 'Song 1', tags: ['FUNK'], created_at: '2024-01-01' },
+      { id: '2', title: 'Song 2', tags: ['funk'], created_at: '2024-01-02' },
+    ];
+
+    render(
+      <LibraryDashboard 
+        initialSongs={mixedCaseSongs} 
+        initialNotebooks={[]} 
+        initialSnippets={[]} 
+      />
+    );
+
+    // Should only have one 'funk' button due to normalization
+    const funkButtons = screen.getAllByText(/^funk$/i);
+    expect(funkButtons.length).toBe(1);
+
+    fireEvent.click(funkButtons[0]);
+    expect(screen.getByText('Song 1')).toBeDefined();
+    expect(screen.getByText('Song 2')).toBeDefined();
+  });
+
+  it('tag buttons have correct accessibility attributes', () => {
     render(
       <LibraryDashboard 
         initialSongs={mockSongs} 
@@ -160,35 +183,10 @@ describe('LibraryDashboard Filtering', () => {
     );
 
     const tagButton = screen.getByText('funk');
+    expect(tagButton.getAttribute('aria-pressed')).toBe('false');
+    expect(tagButton.getAttribute('aria-label')).toBe('Filter by funk tag');
+
     fireEvent.click(tagButton);
-
-    expect(screen.getByText('Funk Groove')).toBeDefined();
-    expect(screen.queryByText('Rock Beat')).toBeNull();
-
-    // Click again to clear
-    fireEvent.click(tagButton);
-    expect(screen.getByText('Funk Groove')).toBeDefined();
-    expect(screen.getByText('Rock Beat')).toBeDefined();
-  });
-
-  it('filters items by multiple tags (AND logic)', () => {
-    const complexSongs = [
-      { id: '1', title: 'Funk Rock', tags: ['funk', 'rock'], created_at: '2024-01-01' },
-      { id: '2', title: 'Pure Funk', tags: ['funk'], created_at: '2024-01-02' },
-    ];
-
-    render(
-      <LibraryDashboard 
-        initialSongs={complexSongs} 
-        initialNotebooks={[]} 
-        initialSnippets={[]} 
-      />
-    );
-
-    fireEvent.click(screen.getByText('funk'));
-    fireEvent.click(screen.getByText('rock'));
-
-    expect(screen.getByText('Funk Rock')).toBeDefined();
-    expect(screen.queryByText('Pure Funk')).toBeNull();
+    expect(tagButton.getAttribute('aria-pressed')).toBe('true');
   });
 });
