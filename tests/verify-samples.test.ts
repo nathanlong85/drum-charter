@@ -24,28 +24,31 @@ describe('Audio Samples Integrity', () => {
     'tom_floor.wav'
   ];
 
-  it('verifies that all drum samples exist and are valid WAV files', () => {
-    samples.forEach(sample => {
+  it('verifies that all drum samples exist and are valid WAV files', async () => {
+    for (const sample of samples) {
       const filePath = path.join(samplesDir, sample);
       
       // 1. Check if file exists
-      expect(fs.existsSync(filePath), `${sample} is missing`).toBe(true);
+      await expect(fs.promises.access(filePath)).resolves.not.toThrow();
       
-      const stats = fs.statSync(filePath);
+      const stats = await fs.promises.stat(filePath);
       // 2. Check if file is larger than a few bytes (HTML 404s are usually small, but not always)
       expect(stats.size, `${sample} is suspiciously small (${stats.size} bytes)`).toBeGreaterThan(100);
 
       // 3. Check WAV magic bytes (RIFF at 0, WAVE at 8)
       const buffer = Buffer.alloc(12);
-      const fd = fs.openSync(filePath, 'r');
-      fs.readSync(fd, buffer, 0, 12, 0);
-      fs.closeSync(fd);
+      const handle = await fs.promises.open(filePath, 'r');
+      try {
+        await handle.read(buffer, 0, 12, 0);
+      } finally {
+        await handle.close();
+      }
 
       const riff = buffer.toString('ascii', 0, 4);
       const wave = buffer.toString('ascii', 8, 12);
 
       expect(riff, `${sample} is not a valid RIFF file (found ${riff})`).toBe('RIFF');
       expect(wave, `${sample} is not a valid WAVE file (found ${wave})`).toBe('WAVE');
-    });
+    }
   });
 });

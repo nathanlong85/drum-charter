@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { SnippetView } from '@/components/groove/SnippetView';
 import { GrooveSnippet } from '@/lib/types/groove';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function PublicSnippetPage({
   params,
@@ -64,7 +65,7 @@ export default function PublicSnippetPage({
       </div>
       <footer className="max-w-4xl mx-auto mt-8 text-center no-print">
         <p className="text-sm text-zinc-400">
-          Capture your own groove snippets at <a href="/" className="text-blue-600 font-bold hover:underline">DrumCharter.com</a>
+          Capture your own groove snippets at <Link href="/" className="text-blue-600 font-bold hover:underline">DrumCharter.com</Link>
         </p>
       </footer>
     </main>

@@ -72,6 +72,19 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     }
   }, [isPlaying]);
 
+  const hasInitialized = React.useRef(false);
+
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      return;
+    }
+
+    if (initialGrid && JSON.stringify(initialGrid.instruments) !== JSON.stringify(state.instruments)) {
+      dispatch({ type: 'SET_GRID', payload: initialGrid.instruments });
+    }
+  }, [initialGrid, state.instruments]);
+
   const wrappedDispatch = (action: GrooveAction) => {
     dispatch(action);
     // Note: This is a bit tricky because useReducer's state isn't updated yet.

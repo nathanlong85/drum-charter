@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useReducer, useEffect, useCallback, useState } from 'react';
+import React, { useReducer, useEffect, useCallback, useState, useRef } from 'react';
 import { SongChart, SongSection, SongSubSection, GrooveGrid } from '@/lib/types/groove';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
@@ -131,27 +131,51 @@ interface SongEditorProps {
 export default function SongEditor({ initialSong }: SongEditorProps) {
   const [state, dispatch] = useReducer(songReducer, initialSong);
   const [isSaving, setIsSaving] = useState(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const debouncedSave = useCallback(
     debounce(async (song: SongChart) => {
+      if (!isMountedRef.current) return;
       setIsSaving(true);
       try {
         await supabaseService.saveSongChart(song);
       } catch (error) {
         console.error('Failed to auto-save song chart:', error);
       } finally {
-        setIsSaving(false);
+        if (isMountedRef.current) {
+          setIsSaving(false);
+        }
       }
     }, 2000),
     []
   );
 
+  const isInitialRender = useRef(true);
+
   useEffect(() => {
-    if (state !== initialSong) {
-      setIsSaving(true);
-      debouncedSave(state);
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
     }
-  }, [state, initialSong, debouncedSave]);
+    
+    setIsSaving(true);
+    debouncedSave(state);
+  }, [state, debouncedSave]);
+
+  // Separate cleanup effect that only runs on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSave.flush();
+      debouncedSave.cancel();
+    };
+  }, [debouncedSave]);
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white min-h-screen relative">
@@ -401,6 +425,20 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                         <span>M)</span>
                       </div>
                     </div>
+                    {sub.grid && (
+                      <div className="mb-3">
+                        <GrooveGridEditor 
+                          initialGrid={sub.grid} 
+                          onChange={(grid) => dispatch({ type: 'UPDATE_SUBSECTION', sectionId: section.id, subSectionId: sub.id, updates: { grid } })}
+                          bpm={state.header.bpm}
+                          onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
+                          metronomeEnabled={state.header.metronomeEnabled}
+                          onMetronomeToggle={(enabled) => dispatch({ type: 'UPDATE_METRONOME', enabled })}
+                          metronomeVolume={state.header.metronomeVolume}
+                          onMetronomeVolumeChange={(volume) => dispatch({ type: 'UPDATE_METRONOME', volume })}
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
                 <button

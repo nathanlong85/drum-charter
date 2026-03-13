@@ -46,7 +46,7 @@ describe('supabaseService Duplication', () => {
 
       expect(supabaseService.getSongChart).toHaveBeenCalledWith('123');
       expect(saveSpy).toHaveBeenCalledWith(expect.objectContaining({
-        id: '',
+        id: undefined,
         header: expect.objectContaining({
           title: 'Original Song (Copy)',
         }),
@@ -76,7 +76,7 @@ describe('supabaseService Duplication', () => {
 
       expect(supabaseService.getNotebook).toHaveBeenCalledWith('nb-123');
       expect(saveSpy).toHaveBeenCalledWith(expect.objectContaining({
-        id: '',
+        id: undefined,
         title: 'Original Notebook (Copy)',
         isPublic: false,
       }));
@@ -106,7 +106,7 @@ describe('supabaseService Duplication', () => {
 
       expect(supabaseService.getGrooveSnippet).toHaveBeenCalledWith('snip-123');
       expect(saveSpy).toHaveBeenCalledWith(expect.objectContaining({
-        id: '',
+        id: undefined,
         title: 'Original Snippet (Copy)',
         isPublic: false,
       }));

@@ -28,6 +28,7 @@ const mockNotebook: Notebook = {
     },
   ],
   tags: ['technique'],
+  isPublic: false,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };

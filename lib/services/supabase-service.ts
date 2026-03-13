@@ -8,6 +8,8 @@ type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row']
 
 const supabase = createClient()
 
+export const SNIPPET_RETRY_DELAY_MS = 1500;
+
 export const supabaseService = {
   // --- Song Charts ---
   async saveSongChart(chart: SongChart): Promise<DbSongChart> {
@@ -21,6 +23,8 @@ export const supabaseService = {
         sections: chart.sections as unknown as Database['public']['Tables']['song_charts']['Insert']['sections'],
         tags: chart.tags,
         is_public: chart.isPublic,
+        metronome_enabled: chart.header.metronomeEnabled,
+        metronome_volume: chart.header.metronomeVolume,
         updated_at: new Date().toISOString(),
         user_id: chart.userId || undefined, // Let Supabase handle it via auth.uid() if not provided
       })
@@ -55,6 +59,8 @@ export const supabaseService = {
         title: data.title,
         bpm: data.bpm || undefined,
         timeSignature: data.time_signature as unknown as TimeSignature,
+        metronomeEnabled: !!data.metronome_enabled,
+        metronomeVolume: data.metronome_volume ?? 0.5,
       },
       sections: data.sections as unknown as SongSection[],
       tags: data.tags || [],
@@ -260,38 +266,47 @@ export const supabaseService = {
       throw error
     }
 
-    if (!data) {
+    let finalData = data;
+
+    if (!finalData) {
       // Try one more time after a short delay to handle local Supabase sync issues
       console.warn(`[supabaseService] Snippet not found initially: ${id}. Retrying...`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
       const retryResult = await supabase
         .from('groove_snippets')
         .select('*')
         .eq('id', id)
         .maybeSingle();
       
-      if (retryResult.data) {
-        console.log(`[supabaseService] Snippet found after retry: ${id}`);
-        return {
-          ...retryResult.data,
-          grid_data: retryResult.data.grid_data as unknown as GrooveGrid
-        } as unknown as GrooveSnippet;
+      if (retryResult.error) {
+        console.error(`Supabase retry error in getGrooveSnippet:`, {
+          message: retryResult.error.message,
+          details: retryResult.error.details,
+          hint: retryResult.error.hint,
+          code: retryResult.error.code
+        });
+        throw retryResult.error;
       }
 
-      console.error(`Groove snippet not found: ${id}`);
-      throw new Error('Snippet not found');
+      if (!retryResult.data) {
+        console.error(`Groove snippet not found: ${id}`);
+        throw new Error('Snippet not found');
+      }
+
+      finalData = retryResult.data;
+      console.log(`[supabaseService] Snippet found after retry: ${id}`);
     }
     
-    const gridData = data.grid_data as unknown as GrooveGrid;
+    const gridData = finalData.grid_data as unknown as GrooveGrid;
     
     return {
-      id: data.id,
-      title: data.title,
-      tags: data.tags || [],
-      userId: data.user_id,
-      isPublic: !!data.is_public,
-      createdAt: data.created_at || '',
-      updatedAt: data.updated_at || '',
+      id: finalData.id,
+      title: finalData.title,
+      tags: finalData.tags || [],
+      userId: finalData.user_id,
+      isPublic: !!finalData.is_public,
+      createdAt: finalData.created_at || '',
+      updatedAt: finalData.updated_at || '',
       ...gridData
     }
   },

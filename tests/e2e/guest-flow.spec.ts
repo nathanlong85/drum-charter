@@ -42,7 +42,7 @@ test.describe('Guest Access & Library Flow', () => {
     await expect(page.getByText('My Library')).toBeVisible();
 
     // Switch to Notebooks tab
-    await page.getByRole('button', { name: /Notebooks/i }).click();
+    await page.getByRole('button', { name: /Notebooks/i }).first().click();
 
     // Click "New Notebook" and wait for creation response
     const createPromise = page.waitForResponse(resp => resp.url().includes('/rest/v1/notebooks'), { timeout: 30000 });
@@ -74,7 +74,7 @@ test.describe('Guest Access & Library Flow', () => {
     await expect(page.getByText('My Library')).toBeVisible();
     
     // Switch to Snippets tab
-    await page.getByRole('button', { name: /Snippets/i }).click();
+    await page.getByRole('button', { name: /Snippets/i }).first().click();
 
     // Create new snippet
     const createPromise = page.waitForResponse(resp => resp.url().includes('/rest/v1/groove_snippets'), { timeout: 30000 });

@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
 
 # next.js
 /.next/
@@ -21,7 +23,10 @@
 /build
 
 # misc
-.junie/
+.junie/memory/
+.junie/mcp/
+!.junie/guidelines.md
+!.junie/CLI_REFERENCE.md
 .DS_Store
 *.pem
 
@@ -40,3 +45,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+table_stats.json
+coderabbit_full_review.txt

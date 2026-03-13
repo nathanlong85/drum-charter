@@ -17,7 +17,7 @@ jobs:
         run: |
           # A simple query using the Supabase REST API (PostgREST) to count profiles.
           # This counts as database activity.
-          curl -X GET "${SUPABASE_URL}/rest/v1/profiles?select=count" \
+          curl --fail -X GET "${SUPABASE_URL}/rest/v1/profiles?select=count" \
           -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
           -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
           -H "Content-Type: application/json"

@@ -68,10 +68,10 @@ I would like to build a web app (and maybe some day a mobile app) that is tailor
 
 
 # References and Links
-- [Song Chart Template](<file:///Users/nlong/Documents/Drum Charts/Styled Template.dotx>)
-- [Drum Symbols Library](<file:///Users/nlong/Documents/Drum Charts/Drum Symbols.xlsx>)
-- ["Have It All" Example Song Chart](<file:///Users/nlong/Documents/Drum Charts/Worship/Transcribed/Have It All.docx>)
-- ["Center" Example Song Chart](<file:///Users/nlong/Documents/Drum Charts/Worship/Transcribed/Center.docx>)
+- Song Chart Template (kept locally by author)
+- Drum Symbols Library (kept locally by author)
+- "Have It All" Example Song Chart (kept locally by author)
+- "Center" Example Song Chart (kept locally by author)
 
 # Conclusion
 

@@ -23,19 +23,7 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
       notFound();
     }
 
-    console.log(`[SnippetPage] Snippet found: ${rawSnippet.title} (Owner: ${rawSnippet.user_id}, Public: ${rawSnippet.is_public})`);
-
-    // Map DB fields to TypeScript interface
-    const snippet = {
-      id: rawSnippet.id,
-      title: rawSnippet.title,
-      tags: rawSnippet.tags || [],
-      userId: rawSnippet.user_id,
-      isPublic: rawSnippet.is_public,
-      createdAt: rawSnippet.created_at,
-      updatedAt: rawSnippet.updated_at,
-      ...rawSnippet.grid_data
-    };
+    console.log(`[SnippetPage] Snippet found: ${rawSnippet.title} (Owner: ${rawSnippet.userId}, Public: ${rawSnippet.isPublic})`);
 
     return (
       <div className="min-h-screen bg-zinc-50">
@@ -57,7 +45,7 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
         </nav>
 
         <main className="py-8">
-          <SnippetEditor initialSnippet={snippet} />
+          <SnippetEditor initialSnippet={rawSnippet} />
         </main>
       </div>
     );

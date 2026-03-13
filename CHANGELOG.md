@@ -59,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.3-alpha] - 2026-03-11
 
 ### Fixed
-- **Audio Decoding**: Fixed `Unable to decode audio data` by ensuring valid synthesised WAV samples are generated/provided.
+- **Audio Decoding**: Fixed `Unable to decode audio data` by ensuring valid synthesized WAV samples are generated/provided.
 - **Supabase Error Visibility**: Improved error logging in the Library and Editor to surface detailed Supabase error objects instead of empty strings.
 - **Item Creation**: Fixed silent item creation failure by correcting `user_id` fallback in the service layer, preventing RLS/FK violations.
 
