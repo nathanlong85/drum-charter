@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useReducer, useEffect, useCallback, useState } from 'react';
+import React, { useReducer, useEffect, useCallback, useState, useRef } from 'react';
 import { GrooveSnippet, GrooveGrid } from '@/lib/types/groove';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
@@ -44,31 +44,48 @@ interface SnippetEditorProps {
 export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
   const [state, dispatch] = useReducer(snippetReducer, initialSnippet);
   const [isSaving, setIsSaving] = useState(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const debouncedSave = useCallback(
     debounce(async (snippet: GrooveSnippet) => {
+      if (!isMountedRef.current) return;
       setIsSaving(true);
       try {
         await supabaseService.saveGrooveSnippet(snippet);
       } catch (error) {
         console.error('Failed to auto-save snippet:', error);
       } finally {
-        setIsSaving(false);
+        if (isMountedRef.current) {
+          setIsSaving(false);
+        }
       }
     }, 2000),
     []
   );
 
+  const isInitialRender = useRef(true);
+
   useEffect(() => {
-    if (state !== initialSnippet) {
-      setIsSaving(true);
-      debouncedSave(state);
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
     }
-  }, [state, initialSnippet, debouncedSave]);
+    
+    setIsSaving(true);
+    debouncedSave(state);
+  }, [state, debouncedSave]);
 
   // Separate cleanup effect that only runs on unmount
   useEffect(() => {
     return () => {
+      debouncedSave.flush();
       debouncedSave.cancel();
     };
   }, [debouncedSave]);

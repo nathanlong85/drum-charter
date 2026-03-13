@@ -131,31 +131,48 @@ interface SongEditorProps {
 export default function SongEditor({ initialSong }: SongEditorProps) {
   const [state, dispatch] = useReducer(songReducer, initialSong);
   const [isSaving, setIsSaving] = useState(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const debouncedSave = useCallback(
     debounce(async (song: SongChart) => {
+      if (!isMountedRef.current) return;
       setIsSaving(true);
       try {
         await supabaseService.saveSongChart(song);
       } catch (error) {
         console.error('Failed to auto-save song chart:', error);
       } finally {
-        setIsSaving(false);
+        if (isMountedRef.current) {
+          setIsSaving(false);
+        }
       }
     }, 2000),
     []
   );
 
+  const isInitialRender = useRef(true);
+
   useEffect(() => {
-    if (state !== initialSong) {
-      setIsSaving(true);
-      debouncedSave(state);
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
     }
-  }, [state, initialSong, debouncedSave]);
+    
+    setIsSaving(true);
+    debouncedSave(state);
+  }, [state, debouncedSave]);
 
   // Separate cleanup effect that only runs on unmount
   useEffect(() => {
     return () => {
+      debouncedSave.flush();
       debouncedSave.cancel();
     };
   }, [debouncedSave]);

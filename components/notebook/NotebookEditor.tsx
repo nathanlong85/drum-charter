@@ -90,16 +90,27 @@ interface NotebookEditorProps {
 export default function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
   const [state, dispatch] = useReducer(notebookReducer, initialNotebook);
   const [isSaving, setIsSaving] = useState(false);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const debouncedSave = useCallback(
     debounce(async (notebook: Notebook) => {
+      if (!isMountedRef.current) return;
       setIsSaving(true);
       try {
         await supabaseService.saveNotebook(notebook);
       } catch (error) {
         console.error('Failed to auto-save notebook:', error);
       } finally {
-        setIsSaving(false);
+        if (isMountedRef.current) {
+          setIsSaving(false);
+        }
       }
     }, 2000),
     []
@@ -114,15 +125,14 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
       return;
     }
     
-    if (state !== initialNotebook) {
-      setIsSaving(true);
-      debouncedSave(state);
-    }
-  }, [state, initialNotebook, debouncedSave]);
+    setIsSaving(true);
+    debouncedSave(state);
+  }, [state, debouncedSave]);
 
   // Separate cleanup effect that only runs on unmount
   useEffect(() => {
     return () => {
+      debouncedSave.flush();
       debouncedSave.cancel();
     };
   }, [debouncedSave]);

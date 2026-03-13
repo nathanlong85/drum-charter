@@ -8,6 +8,8 @@ type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row']
 
 const supabase = createClient()
 
+export const SNIPPET_RETRY_DELAY_MS = 1500;
+
 export const supabaseService = {
   // --- Song Charts ---
   async saveSongChart(chart: SongChart): Promise<DbSongChart> {
@@ -269,7 +271,7 @@ export const supabaseService = {
     if (!finalData) {
       // Try one more time after a short delay to handle local Supabase sync issues
       console.warn(`[supabaseService] Snippet not found initially: ${id}. Retrying...`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
       const retryResult = await supabase
         .from('groove_snippets')
         .select('*')
