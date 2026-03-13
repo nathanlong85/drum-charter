@@ -2,26 +2,28 @@ import { supabaseService } from '@/lib/services/supabase-service';
 import SongEditor from '@/components/chart/SongEditor';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { SongChart } from '@/lib/types/groove';
 
 interface SongPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function SongPage({ params }: SongPageProps) {
   const { id } = await params;
 
-  let rawChart;
+  let rawChart: SongChart;
   try {
     rawChart = await supabaseService.getSongChart(id);
-  } catch (error) {
+  } catch (error: any) {
+    // Only trigger notFound for "no rows" PostgREST error (PGRST116)
+    if (error?.code === 'PGRST116') {
+      notFound();
+    }
+    
     console.error('Error loading song chart:', error);
-    notFound();
+    throw error; // Rethrow real DB/network failures
   }
   
-  if (!rawChart) {
-    notFound();
-  }
-
   return (
     <div className="min-h-screen bg-zinc-50">
       <nav className="bg-white border-b border-zinc-200 py-4 px-8">
