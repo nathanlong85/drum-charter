@@ -8,13 +8,15 @@ interface TagInputProps {
   onChange: (tags: string[]) => void;
   suggestions?: string[];
   placeholder?: string;
+  id?: string;
 }
 
 export function TagInput({ 
   tags, 
   onChange, 
   suggestions = [], 
-  placeholder = "Add tag..." 
+  placeholder = "Add tag...",
+  id
 }: TagInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -76,6 +78,7 @@ export function TagInput({
         ))}
 
         <input
+          id={id}
           type="text"
           value={inputValue}
           onChange={(e) => {
@@ -89,6 +92,7 @@ export function TagInput({
           onBlur={() => {
             setIsFocused(false);
             // Small delay to allow clicking suggestions before they disappear
+            // though onMouseDown on suggestions should handle most cases
             setTimeout(() => setShowSuggestions(false), 200);
           }}
           onKeyDown={(e) => {
@@ -101,6 +105,7 @@ export function TagInput({
           }}
           placeholder={tags.length === 0 ? placeholder : "Add tag..."}
           className="flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 min-w-[120px] placeholder-zinc-400 font-medium"
+          aria-label={tags.length === 0 ? placeholder : "Add tag"}
         />
       </div>
 

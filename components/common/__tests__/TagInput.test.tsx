@@ -16,8 +16,8 @@ describe('TagInput', () => {
 
   it('renders existing tags', () => {
     render(<TagInput {...defaultProps} />);
-    expect(screen.getByText(/funk/i)).toBeDefined();
-    expect(screen.getByText(/linear/i)).toBeDefined();
+    expect(screen.getByText(/funk/i)).toBeInTheDocument();
+    expect(screen.getByText(/linear/i)).toBeInTheDocument();
   });
 
   it('calls onChange with new tag when Enter is pressed', () => {
@@ -31,9 +31,9 @@ describe('TagInput', () => {
 
   it('removes a tag when X is clicked', () => {
     render(<TagInput {...defaultProps} />);
-    const removeButtons = screen.getAllByRole('button');
-    // First two are remove buttons for existing tags
-    fireEvent.click(removeButtons[0]);
+    // Get the first remove button specifically by its aria-label
+    const removeButton = screen.getByLabelText(/Remove funk tag/i);
+    fireEvent.click(removeButton);
     
     expect(defaultProps.onChange).toHaveBeenCalledWith(['linear']);
   });
@@ -43,7 +43,7 @@ describe('TagInput', () => {
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'j' } });
     
-    expect(screen.getByText(/jazz/i)).toBeDefined();
+    expect(screen.getByText(/jazz/i)).toBeInTheDocument();
     // 'rock' should not be visible as it doesn't contain 'j'
     expect(screen.queryByText(/rock/i)).toBeNull();
   });
@@ -78,7 +78,7 @@ describe('TagInput', () => {
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'j' } });
     
-    expect(screen.getByText(/JAZZ/i)).toBeDefined();
+    expect(screen.getByText(/JAZZ/i)).toBeInTheDocument();
     
     // Suggestions should not include 'funk' because it's already in tags (case-insensitive)
     const suggestionsList = screen.getByText(/Suggestions/i).parentElement?.parentElement;

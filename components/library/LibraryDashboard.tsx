@@ -36,11 +36,12 @@ export default function LibraryDashboard({
 
   const toggleTag = (tag: string) => {
     const normalizedTag = tag.trim().toLowerCase();
-    setSelectedTags(prev => 
-      prev.includes(normalizedTag) 
-        ? prev.filter(t => t !== normalizedTag) 
-        : [...prev, normalizedTag]
-    );
+    setSelectedTags(prev => {
+      const normalizedPrev = prev.map(t => t.trim().toLowerCase());
+      return normalizedPrev.includes(normalizedTag) 
+        ? normalizedPrev.filter(t => t !== normalizedTag) 
+        : [...normalizedPrev, normalizedTag];
+    });
   };
 
   const handleDelete = async (id: string, type: ItemType) => {
