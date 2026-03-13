@@ -1,9 +1,17 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-const samplesDir = path.join(process.cwd(), 'public/audio/samples/metronome');
-if (!fs.existsSync(samplesDir)) {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const samplesDir = path.join(__dirname, '../public/audio/samples/metronome');
+
+try {
   fs.mkdirSync(samplesDir, { recursive: true });
+} catch (err) {
+  console.error(`Failed to create samples directory: ${err.message}`);
+  process.exit(1);
 }
 
 /**
