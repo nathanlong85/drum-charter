@@ -46,7 +46,12 @@ const serwist = new Serwist({
     },
     {
       // Audio samples (WAV, MP3, OGG) - Cache First
-      matcher: /\.(?:wav|mp3|ogg)$/i,
+      // Restrict to same-origin sample assets to avoid third-party storage pressure.
+      matcher: ({ sameOrigin, url, request }) =>
+        sameOrigin &&
+        request.method === "GET" &&
+        request.destination === "audio" &&
+        /\.(?:wav|mp3|ogg)$/i.test(url.pathname),
       handler: new CacheFirst({
         cacheName: "audio-samples",
         plugins: [
