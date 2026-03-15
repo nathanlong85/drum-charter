@@ -1,5 +1,12 @@
 # DrumCharter Project Guidelines & Collaborative Protocols
 
+## 📊 MESS-UP TALLY (PROTOCOL VIOLATIONS)
+- **🔴 PROTOCOL #1 (Answer-First Rule)**: 2
+- **🔴 PROTOCOL #2 (Stop-and-Wait)**: 4
+- **🔴 PROTOCOL #3 (Drop and Listen)**: 2
+- **🔴 PROTOCOL #2 (No "Silent Implementation")**: 2
+*(Note: Only show this section in responses when the tally changes.)*
+
 ## 🔴 STRICT PAIR PROGRAMMING PROTOCOL
 These rules are the **Highest Priority** and must be strictly followed at all times. They take precedence over all other technical or project goals.
 
@@ -18,11 +25,19 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - The user's question is the single highest priority at that moment.
 - Do not provide overwhelming context or unrelated technical updates when the user is focused on a specific issue.
 
-### 4. CodeRabbit Polling Protocol
+### 4. CodeRabbit Review & Polling Protocol
 - **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
-- **Mandatory Polling**: I must wait 3-5 minutes for CodeRabbit to finish its review. I will use the `GitHub` MCP `pull_request_read` with `get_review_comments` or `get_check_runs` to check for the bot's feedback.
-- **No "Stale" Implementation**: Before starting any new work in a feature branch, I must check the PR for any pending CodeRabbit or human feedback and address it first.
-- **Reporting**: I will summarize CodeRabbit's findings and ask for your approval before applying any fixes.
+- **Robust Polling**: Due to 60s terminal timeouts, use a "Check-and-Report" approach:
+    1. Perform one immediate check for CodeRabbit feedback.
+    2. If no feedback is found, inform the user you are in "Polling Mode" and precisely when you will perform the next check (e.g., in 2-5 minutes).
+    3. **Countdown Updates**: During the polling period, provide a status update every 30 seconds (e.g., "Next CodeRabbit Comment Check: 2:00", "1:30", etc.).
+    4. Clearly report polling status: `Last Check: [time]`, `Next Check: [time]`.
+- **Structured Feedback Review**: Treat the PR review as a state machine:
+    1. **Check PR Review Status**: Is it `CHANGES_REQUESTED`, `PENDING`, or `APPROVED`?
+    2. **Filter Unresolved/Active**: Fetch all review comments and filter for `isResolved: false` AND `isOutdated: false`.
+    3. **No "False Completeness"**: Only report "All addressed" when that filtered list is empty AND the PR status is no longer `CHANGES_REQUESTED`.
+- **No "Stale" Implementation**: Before starting any new work in a feature branch, you MUST check the PR for any pending CodeRabbit or human feedback and address it first.
+- **Reporting**: Summarize findings and ask for approval before applying fixes.
 
 ### 5. Technical & Mode Rules
 - **100% Test Coverage**: All new features and core logic must have corresponding unit (Vitest) and/or E2E (Playwright) tests.

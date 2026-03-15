@@ -2,9 +2,11 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Offline Support (PWA)', () => {
   test('should show offline status indicator when connection is lost', async ({ page }) => {
-    // Force online initially
+    // Ensure we start in a clean state
     await page.context().setOffline(false);
     await page.goto('/');
+    // Wait for the page to be fully loaded
+    await page.waitForLoadState('networkidle');
 
     // Verify online initially
     await expect(page.getByText('You are offline')).not.toBeVisible();

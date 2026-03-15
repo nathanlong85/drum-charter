@@ -1,11 +1,11 @@
 /// <reference lib="webworker" />
 import { defaultCache } from "@serwist/next/worker";
 import { Serwist } from "serwist";
-import type { SerwistGlobalConfig } from "serwist";
+import type { SerwistGlobalConfig, PrecacheEntry } from "serwist";
 import { ExpirationPlugin } from "@serwist/expiration";
 import { CacheFirst, StaleWhileRevalidate } from "@serwist/strategies";
 
-declare const self: ServiceWorkerGlobalScope & SerwistGlobalConfig & { __SW_MANIFEST: any };
+declare const self: ServiceWorkerGlobalScope & SerwistGlobalConfig & { __SW_MANIFEST: (PrecacheEntry | string)[] };
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -26,7 +26,8 @@ const serwist = new Serwist({
           {
             cacheWillUpdate: async ({ response, request }) => {
               // Only cache if there's no Authorization header to avoid private data leakage.
-              if (request.headers.has("Authorization")) {
+              // Additionally check for response.ok to avoid caching 4xx/5xx errors.
+              if (request.headers.has("Authorization") || !response.ok) {
                 return null;
               }
               return response;
