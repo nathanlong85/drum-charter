@@ -177,6 +177,11 @@ export const supabaseService = {
 
   async duplicateSongChart(id: string): Promise<DbSongChart> {
     const original = await this.getSongChart(id)
+    const { data: userData, error: userError } = await supabase.auth.getUser()
+    if (userError || !userData.user) {
+      throw new Error('Authenticated user required to duplicate a song chart')
+    }
+    
     const { id: _, userId, createdAt, updatedAt, ...rest } = original
     
     // Construct new object without ID or audit fields to satisfy TypeScript
@@ -184,7 +189,7 @@ export const supabaseService = {
     const duplicate: SongChart = {
       ...rest,
       id: undefined as unknown as string, // saveSongChart handles this if missing in DB insert
-      userId,
+      userId: userData.user.id,
       createdAt: '',
       updatedAt: '',
       header: {
@@ -199,12 +204,17 @@ export const supabaseService = {
 
   async duplicateNotebook(id: string): Promise<DbNotebook> {
     const original = await this.getNotebook(id)
+    const { data: userData, error: userError } = await supabase.auth.getUser()
+    if (userError || !userData.user) {
+      throw new Error('Authenticated user required to duplicate a notebook')
+    }
+    
     const { id: _, userId, createdAt, updatedAt, ...rest } = original
     
     const duplicate: Notebook = {
       ...rest,
       id: undefined as unknown as string,
-      userId,
+      userId: userData.user.id,
       createdAt: '',
       updatedAt: '',
       title: `${rest.title} (Copy)`,
@@ -216,12 +226,17 @@ export const supabaseService = {
 
   async duplicateGrooveSnippet(id: string): Promise<DbGrooveSnippet> {
     const original = await this.getGrooveSnippet(id)
+    const { data: userData, error: userError } = await supabase.auth.getUser()
+    if (userError || !userData.user) {
+      throw new Error('Authenticated user required to duplicate a groove snippet')
+    }
+    
     const { id: _, userId, createdAt, updatedAt, ...rest } = original
     
     const duplicate: GrooveSnippet = {
       ...rest,
       id: undefined as unknown as string,
-      userId,
+      userId: userData.user.id,
       createdAt: '',
       updatedAt: '',
       title: `${rest.title} (Copy)`,
