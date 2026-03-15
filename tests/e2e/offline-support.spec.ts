@@ -5,8 +5,10 @@ test.describe('Offline Support (PWA)', () => {
     // Ensure we start in a clean state
     await page.context().setOffline(false);
     await page.goto('/');
-    // Wait for a stable element to ensure the app is ready
-    await expect(page.locator('main')).toBeVisible();
+    
+    // Wait for the app shell to be visible
+    const appShell = page.locator('main');
+    await expect(appShell).toBeVisible();
 
     // Verify online initially
     await expect(page.getByText('You are offline')).not.toBeVisible();
@@ -20,20 +22,25 @@ test.describe('Offline Support (PWA)', () => {
 
     // Test PWA: Reload while offline
     await page.reload();
+    
     // App shell should still be visible because it's cached by the service worker
     await expect(page.locator('main')).toBeVisible();
+    
     // Offline indicator should still be there
     await expect(page.getByText('You are offline')).toBeVisible();
 
     // Test cached asset: Metronome audio should be cached
-    const audioAsset = await page.request.get('/audio/metronome-click.wav');
-    expect(audioAsset.ok()).toBeTruthy();
+    // Use a direct fetch in the browser context to verify service worker caching
+    const isCached = await page.evaluate(async () => {
+      const response = await fetch('/audio/metronome-click.wav');
+      return response.ok;
+    });
+    expect(isCached).toBeTruthy();
 
     // Go back online
     await page.context().setOffline(false);
-    await page.reload();
+    // Wait for the indicator to disappear (should be automatic via 'online' event)
     await expect(page.getByText('You are offline')).not.toBeVisible();
-    await expect(page.locator('main')).toBeVisible();
   });
 
   test('manifest should be linked in the head', async ({ page }) => {

@@ -177,11 +177,14 @@ export const supabaseService = {
 
   async duplicateSongChart(id: string): Promise<DbSongChart> {
     const original = await this.getSongChart(id)
-    const { id: _, createdAt: __, updatedAt: ___, ...rest } = original
+    const { id: _, userId, createdAt, updatedAt, ...rest } = original
     
-    return this.saveSongChart({
+    // Construct new object without ID or audit fields to satisfy TypeScript
+    // and rely on saveSongChart/Supabase to handle ID generation and user_id.
+    const duplicate: SongChart = {
       ...rest,
-      id: undefined as unknown as string,
+      id: undefined as unknown as string, // saveSongChart handles this if missing in DB insert
+      userId,
       createdAt: '',
       updatedAt: '',
       header: {
@@ -189,35 +192,43 @@ export const supabaseService = {
         title: `${rest.header.title} (Copy)`,
       },
       isPublic: false,
-    })
+    };
+
+    return this.saveSongChart(duplicate);
   },
 
   async duplicateNotebook(id: string): Promise<DbNotebook> {
     const original = await this.getNotebook(id)
-    const { id: _, createdAt: __, updatedAt: ___, ...rest } = original
+    const { id: _, userId, createdAt, updatedAt, ...rest } = original
     
-    return this.saveNotebook({
+    const duplicate: Notebook = {
       ...rest,
       id: undefined as unknown as string,
+      userId,
       createdAt: '',
       updatedAt: '',
       title: `${rest.title} (Copy)`,
       isPublic: false,
-    })
+    };
+
+    return this.saveNotebook(duplicate);
   },
 
   async duplicateGrooveSnippet(id: string): Promise<DbGrooveSnippet> {
     const original = await this.getGrooveSnippet(id)
-    const { id: _, createdAt: __, updatedAt: ___, ...rest } = original
+    const { id: _, userId, createdAt, updatedAt, ...rest } = original
     
-    return this.saveGrooveSnippet({
+    const duplicate: GrooveSnippet = {
       ...rest,
       id: undefined as unknown as string,
+      userId,
       createdAt: '',
       updatedAt: '',
       title: `${rest.title} (Copy)`,
       isPublic: false,
-    })
+    };
+
+    return this.saveGrooveSnippet(duplicate);
   },
 
   // --- Groove Snippets ---

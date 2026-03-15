@@ -27,7 +27,7 @@ const serwist = new Serwist({
             cacheWillUpdate: async ({ response, request }) => {
               // Only cache if there's no Authorization header to avoid private data leakage.
               // Additionally check for response.ok to avoid caching 4xx/5xx errors.
-              if (request.headers.has("Authorization") || !response.ok) {
+              if (request.headers.has("Authorization") || !response || !response.ok) {
                 return null;
               }
               return response;
