@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@serwist/expiration':
+        specifier: ^9.5.7
+        version: 9.5.7(browserslist@4.28.1)(typescript@5.9.3)
       '@serwist/next':
         specifier: ^9.5.7
         version: 9.5.7(next@16.1.6(@babel/core@7.29.0)(@playwright/test@1.58.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)(typescript@5.9.3)
@@ -50,6 +53,9 @@ importers:
       react-dom:
         specifier: 19.2.3
         version: 19.2.3(react@19.2.3)
+      serwist:
+        specifier: ^9.5.7
+        version: 9.5.7(browserslist@4.28.1)(typescript@5.9.3)
     devDependencies:
       '@playwright/test':
         specifier: ^1.58.2
@@ -907,6 +913,14 @@ packages:
   '@serwist/build@9.5.7':
     resolution: {integrity: sha512-bcIeDFgsMnUq8Sqhnv15KXZhusXekpP9v8MPWVtF7+6WmNqDPztqYjGVgQz2VxOhCgrTu3ji/KeGeuKV+TN8vQ==}
     engines: {node: '>=18.0.0'}
+    peerDependencies:
+      typescript: '>=5.0.0'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  '@serwist/expiration@9.5.7':
+    resolution: {integrity: sha512-2w+pFXrr98HoYwp8O+a4s7DHBdD3pAJWQsKvgh1D5aQ2jKGloO7ygb6wMNjIFzC1EhtRbjm4tFkmGJJQwtdQ9g==}
     peerDependencies:
       typescript: '>=5.0.0'
     peerDependenciesMeta:
@@ -4090,6 +4104,14 @@ snapshots:
       pretty-bytes: 6.1.1
       source-map: 0.8.0-beta.0
       zod: 4.3.6
+    optionalDependencies:
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - browserslist
+
+  '@serwist/expiration@9.5.7(browserslist@4.28.1)(typescript@5.9.3)':
+    dependencies:
+      serwist: 9.5.7(browserslist@4.28.1)(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
     transitivePeerDependencies:

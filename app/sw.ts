@@ -1,7 +1,11 @@
+/// <reference lib="webworker" />
 import { defaultCache } from "@serwist/next/worker";
-import { type PrecacheEntry, Serwist, type SerwistGlobalConfig } from "@serwist/sw";
+import { Serwist } from "serwist";
+import type { SerwistGlobalConfig } from "serwist";
+import { ExpirationPlugin } from "@serwist/expiration";
+import { CacheFirst, StaleWhileRevalidate } from "@serwist/strategies";
 
-declare const self: ServiceWorkerGlobalScope & SerwistGlobalConfig;
+declare const self: ServiceWorkerGlobalScope & SerwistGlobalConfig & { __SW_MANIFEST: any };
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -11,31 +15,17 @@ const serwist = new Serwist({
   runtimeCaching: [
     {
       // Supabase REST API caching with Authorization header check
-      urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/,
-      handler: "StaleWhileRevalidate",
-      options: {
+      matcher: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/,
+      handler: new StaleWhileRevalidate({
         cacheName: "supabase-rest-api",
-        expiration: {
-          maxEntries: 100,
-          maxAgeSeconds: 24 * 60 * 60, // 24 hours
-        },
-        // IMPORTANT: We do not cache if Authorization header is present to avoid private data leakage.
-        // If we want to cache per-user, we'd need more complex logic.
-        matchOptions: {
-          ignoreVary: false,
-        },
         plugins: [
+          new ExpirationPlugin({
+            maxEntries: 100,
+            maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          }),
           {
-            requestWillFetch: async ({ request }) => {
-              if (request.headers.has("Authorization")) {
-                // If it has Authorization, we bypass the cache entirely for this request
-                // By returning the original request or a clones one without modification here, 
-                // we're just setting up for the next step.
-              }
-              return request;
-            },
             cacheWillUpdate: async ({ response, request }) => {
-              // Only cache if there's no Authorization header
+              // Only cache if there's no Authorization header to avoid private data leakage.
               if (request.headers.has("Authorization")) {
                 return null;
               }
@@ -43,19 +33,20 @@ const serwist = new Serwist({
             },
           },
         ],
-      },
+      }),
     },
     {
       // Audio samples (WAV, MP3, OGG) - Cache First
-      urlPattern: /\.(?:wav|mp3|ogg)$/i,
-      handler: "CacheFirst",
-      options: {
+      matcher: /\.(?:wav|mp3|ogg)$/i,
+      handler: new CacheFirst({
         cacheName: "audio-samples",
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
-        },
-      },
+        plugins: [
+          new ExpirationPlugin({
+            maxEntries: 50,
+            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+          }),
+        ],
+      }),
     },
     ...defaultCache,
   ],

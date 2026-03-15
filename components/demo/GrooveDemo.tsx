@@ -48,7 +48,7 @@ export function GrooveDemo() {
       <div className="overflow-x-auto">
         <GrooveGridEditor 
           initialGrid={grid} 
-          onChange={(updatedGrid) => dispatch({ type: 'SET_GRID', payload: updatedGrid })} 
+          onChange={(updatedGrid) => dispatch({ type: 'SET_GRID', payload: updatedGrid.instruments })} 
         />
       </div>
       <p className="mt-4 text-sm text-zinc-500 italic text-center">

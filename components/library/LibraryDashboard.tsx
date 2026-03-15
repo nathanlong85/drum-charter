@@ -137,6 +137,8 @@ export default function LibraryDashboard({
           header: {
             title: 'Untitled Song',
             timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+            metronomeEnabled: false,
+            metronomeVolume: 0.5,
           },
           sections: [],
           tags: [],

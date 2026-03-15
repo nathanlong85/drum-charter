@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound, redirect } from 'next/navigation';
 import NotebookEditor from '@/components/notebook/NotebookEditor';
-import { Notebook } from '@/lib/types/groove';
+import { Notebook, NotebookSection } from '@/lib/types/groove';
 
 interface NotebookPageProps {
   params: Promise<{ id: string }>;
@@ -40,12 +40,12 @@ export default async function NotebookPage({ params }: NotebookPageProps) {
   const formattedNotebook: Notebook = {
     id: notebook.id,
     title: notebook.title,
-    sections: notebook.sections || [],
+    sections: (notebook.sections as unknown as NotebookSection[]) || [],
     tags: notebook.tags || [],
     userId: notebook.user_id,
-    isPublic: notebook.is_public,
-    createdAt: notebook.created_at,
-    updatedAt: notebook.updated_at,
+    isPublic: notebook.is_public || false,
+    createdAt: notebook.created_at || new Date().toISOString(),
+    updatedAt: notebook.updated_at || new Date().toISOString(),
   };
 
   return (
