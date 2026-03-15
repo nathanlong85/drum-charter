@@ -31,6 +31,15 @@ const serwist = new Serwist({
               }
               return response;
             },
+            cachedResponseWillBeUsed: async ({ cachedResponse, request }) => {
+              // Only use from cache if there's no Authorization header.
+              // This prevents authenticated requests from reading anonymous cached data,
+              // ensuring strict isolation.
+              if (request.headers.has("Authorization")) {
+                return undefined;
+              }
+              return cachedResponse;
+            },
           },
         ],
       }),
