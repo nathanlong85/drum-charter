@@ -2,9 +2,9 @@
 
 ## 📊 MESS-UP TALLY (PROTOCOL VIOLATIONS)
 - **🔴 PROTOCOL #1 (Answer-First Rule)**: 2
-- **🔴 PROTOCOL #2 (Stop-and-Wait)**: 4
+- **🔴 PROTOCOL #2 (Stop-and-Wait)**: 7
 - **🔴 PROTOCOL #3 (Drop and Listen)**: 2
-- **🔴 PROTOCOL #2 (No "Silent Implementation")**: 2
+- **🔴 PROTOCOL #2.1 (No "Silent Implementation")**: 2
 *(Note: Only show this section in responses when the tally changes.)*
 
 ## 🔴 STRICT PAIR PROGRAMMING PROTOCOL
