@@ -15,7 +15,14 @@ const serwist = new Serwist({
   runtimeCaching: [
     {
       // Supabase REST API caching with Authorization header check
-      matcher: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/,
+      matcher: ({ request, url }) => {
+        // Only match if it's a Supabase REST v1 URL AND not an authenticated request.
+        // This ensures authenticated requests bypass this specific cache handler entirely.
+        return (
+          /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/.test(url.href) &&
+          !request.headers.has("Authorization")
+        );
+      },
       handler: new StaleWhileRevalidate({
         cacheName: "supabase-rest-api",
         plugins: [
@@ -25,17 +32,14 @@ const serwist = new Serwist({
           }),
           {
             cacheWillUpdate: async ({ response, request }) => {
-              // Only cache if there's no Authorization header to avoid private data leakage.
-              // Additionally check for response.ok to avoid caching 4xx/5xx errors.
+              // Safety fallback: only cache if no Authorization header and response is OK.
               if (request.headers.has("Authorization") || !response || !response.ok) {
                 return null;
               }
               return response;
             },
             cachedResponseWillBeUsed: async ({ cachedResponse, request }) => {
-              // Only use from cache if there's no Authorization header.
-              // This prevents authenticated requests from reading anonymous cached data,
-              // ensuring strict isolation.
+              // Safety fallback: only use cache if no Authorization header.
               if (request.headers.has("Authorization")) {
                 return undefined;
               }
