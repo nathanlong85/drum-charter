@@ -1,16 +1,30 @@
 'use client';
 
-import React, { useReducer, useEffect, useCallback, useState, useRef } from 'react';
-import { GrooveSnippet, GrooveGrid } from '@/lib/types/groove';
-import { supabaseService } from '@/lib/services/supabase-service';
-import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
-import { TagInput } from '@/components/common/TagInput';
 import { debounce } from 'lodash';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { TagInput } from '@/components/common/TagInput';
+import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { supabaseService } from '@/lib/services/supabase-service';
+import type { GrooveGrid, GrooveSnippet } from '@/lib/types/groove';
 
 const COMMON_DRUM_TAGS = [
-  'funk', 'jazz', 'rock', 'metal', 'latin', 'afro-cuban', 'shuffle',
-  'linear', 'rudiment', 'paradiddle', 'fill', 'groove', 'independence',
-  'double-kick', 'ghost-notes', 'displacement', 'polyrhythm'
+  'funk',
+  'jazz',
+  'rock',
+  'metal',
+  'latin',
+  'afro-cuban',
+  'shuffle',
+  'linear',
+  'rudiment',
+  'paradiddle',
+  'fill',
+  'groove',
+  'independence',
+  'double-kick',
+  'ghost-notes',
+  'displacement',
+  'polyrhythm',
 ];
 
 type SnippetAction =
@@ -26,11 +40,23 @@ function snippetReducer(state: GrooveSnippet, action: SnippetAction): GrooveSnip
     case 'SET_SNIPPET':
       return action.snippet;
     case 'UPDATE_TITLE':
-      return { ...state, title: action.title, updatedAt: new Date().toISOString() };
+      return {
+        ...state,
+        title: action.title,
+        updatedAt: new Date().toISOString(),
+      };
     case 'UPDATE_TAGS':
-      return { ...state, tags: action.tags, updatedAt: new Date().toISOString() };
+      return {
+        ...state,
+        tags: action.tags,
+        updatedAt: new Date().toISOString(),
+      };
     case 'UPDATE_PUBLIC':
-      return { ...state, isPublic: action.isPublic, updatedAt: new Date().toISOString() };
+      return {
+        ...state,
+        isPublic: action.isPublic,
+        updatedAt: new Date().toISOString(),
+      };
     case 'UPDATE_GRID':
       return {
         ...state,
@@ -74,7 +100,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
         }
       }
     }, 2000),
-    []
+    [],
   );
 
   const isInitialRender = useRef(true);
@@ -84,7 +110,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
       isInitialRender.current = false;
       return;
     }
-    
+
     setIsSaving(true);
     debouncedSave(state);
   }, [state, debouncedSave]);
@@ -115,17 +141,26 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                   type="checkbox"
                   id="isPublicSnippet"
                   checked={state.isPublic}
-                  onChange={(e) => dispatch({ type: 'UPDATE_PUBLIC', isPublic: e.target.checked })}
+                  onChange={(e) =>
+                    dispatch({
+                      type: 'UPDATE_PUBLIC',
+                      isPublic: e.target.checked,
+                    })
+                  }
                   className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
                 />
-                <label htmlFor="isPublicSnippet" className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest cursor-pointer">
+                <label
+                  htmlFor="isPublicSnippet"
+                  className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest cursor-pointer"
+                >
                   Public
                 </label>
                 {state.isPublic && (
-                  <a 
-                    href={`/public/snippets/${state.id}`} 
-                    target="_blank" 
+                  <a
+                    href={`/public/snippets/${state.id}`}
+                    target="_blank"
                     className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-widest ml-1"
+                    rel="noopener"
                   >
                     View
                   </a>
@@ -147,7 +182,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                   try {
                     const duplicated = await supabaseService.duplicateGrooveSnippet(state.id);
                     window.location.href = `/snippets/${duplicated.id}`;
-                  } catch (error) {
+                  } catch (_error) {
                     alert('Failed to duplicate snippet.');
                   }
                 }}

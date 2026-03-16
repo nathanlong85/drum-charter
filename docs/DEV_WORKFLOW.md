@@ -24,10 +24,15 @@ git checkout -b feature/your-feature-name
 - Implement changes using the **Karpathy Guidelines** (Simplicity First, Surgical Changes).
 - Write or update unit/E2E tests for every change.
 - Verify changes locally (using high timeouts where necessary per CLI reference):
+  - Lint: `npm run lint` & `npm run lint:md`
+  - Lint Fix: `npm run lint:fix` (Uses Biome)
   - Unit: `npx vitest run`
   - E2E: `npx playwright test --project=chromium`
 
-### Step 2.3: Committing
+### Step 2.3: Local Code Review
+Run `coderabbit review --base main --prompt-only --plain` (Timeout: 300s) to catch issues early and ensure all CodeRabbit standards are met before pushing.
+
+### Step 2.4: Committing
 Attribute all commits to the user only:
 ```bash
 git add .

@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
-import { DrumSymbol } from '@/lib/types/groove';
+import type React from 'react';
+import type { DrumSymbol } from '@/lib/types/groove';
 
 interface SymbolPickerProps {
   onSelect: (symbol: DrumSymbol) => void;
@@ -14,20 +14,34 @@ interface SymbolPickerProps {
 
 const symbols: DrumSymbol[] = [
   'none',
-  'standard', 'standard_opt',
-  'ghost', 'ghost_opt',
-  'accent', 'accent_opt',
-  'buzz', 'buzz_opt',
-  'cross_stick', 'cross_stick_opt',
-  'cymbal_bell', 'cymbal_bell_opt',
-  'cymbal_choke', 'cymbal_choke_opt',
-  'double', 'double_opt',
-  'flam', 'flam_opt',
-  'hi_hat_closed', 'hi_hat_closed_opt',
-  'hi_hat_loose', 'hi_hat_loose_opt',
-  'hi_hat_open', 'hi_hat_open_opt',
-  'hi_hat_pedal_chick', 'hi_hat_pedal_chick_opt',
-  'rim_shot', 'rim_shot_opt',
+  'standard',
+  'standard_opt',
+  'ghost',
+  'ghost_opt',
+  'accent',
+  'accent_opt',
+  'buzz',
+  'buzz_opt',
+  'cross_stick',
+  'cross_stick_opt',
+  'cymbal_bell',
+  'cymbal_bell_opt',
+  'cymbal_choke',
+  'cymbal_choke_opt',
+  'double',
+  'double_opt',
+  'flam',
+  'flam_opt',
+  'hi_hat_closed',
+  'hi_hat_closed_opt',
+  'hi_hat_loose',
+  'hi_hat_loose_opt',
+  'hi_hat_open',
+  'hi_hat_open_opt',
+  'hi_hat_pedal_chick',
+  'hi_hat_pedal_chick_opt',
+  'rim_shot',
+  'rim_shot_opt',
 ];
 
 const symbolToIcon: Record<DrumSymbol, string | null> = {
@@ -71,10 +85,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
 }) => {
   return (
     <>
-      <div 
-        className="fixed inset-0 z-40" 
-        onClick={onClose} 
-      />
+      <div className="fixed inset-0 z-40" onClick={onClose} />
       <div
         className="fixed z-50 bg-white border border-gray-300 shadow-xl rounded p-3 flex flex-col gap-3"
         style={{ top: position.top, left: position.left }}
@@ -93,12 +104,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
               {sym === 'none' ? (
                 <span className="text-xs text-gray-400">∅</span>
               ) : (
-                <Image
-                  src={symbolToIcon[sym]!}
-                  alt={sym}
-                  width={28}
-                  height={28}
-                />
+                <Image src={symbolToIcon[sym]!} alt={sym} width={28} height={28} />
               )}
             </button>
           ))}
@@ -109,7 +115,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
             <span>Velocity</span>
             <span className="font-mono">{Math.round(currentVelocity * 100)}%</span>
           </div>
-          <input 
+          <input
             type="range"
             min="0"
             max="1"
@@ -119,19 +125,19 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
             className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
           />
           <div className="flex justify-between mt-1">
-            <button 
+            <button
               onClick={() => onVelocityChange(0.3)}
               className="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
             >
               Ghost
             </button>
-            <button 
+            <button
               onClick={() => onVelocityChange(0.7)}
               className="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
             >
               Std
             </button>
-            <button 
+            <button
               onClick={() => onVelocityChange(1.0)}
               className="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
             >
@@ -140,7 +146,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
           </div>
         </div>
 
-        <button 
+        <button
           onClick={onClose}
           className="w-full py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded transition-colors"
         >

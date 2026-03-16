@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '../supabase-service';
 
 // Mock the Supabase client
@@ -41,20 +41,24 @@ describe('supabaseService Duplication', () => {
 
       // Mock getSongChart (by mocking the chain that getSongChart uses)
       vi.spyOn(supabaseService, 'getSongChart').mockResolvedValue(mockOriginal as any);
-      
+
       // Mock saveSongChart
-      const saveSpy = vi.spyOn(supabaseService, 'saveSongChart').mockResolvedValue({ id: '456', title: 'Original Song (Copy)' } as any);
+      const saveSpy = vi
+        .spyOn(supabaseService, 'saveSongChart')
+        .mockResolvedValue({ id: '456', title: 'Original Song (Copy)' } as any);
 
       const result = await supabaseService.duplicateSongChart('123');
 
       expect(supabaseService.getSongChart).toHaveBeenCalledWith('123');
-      expect(saveSpy).toHaveBeenCalledWith(expect.objectContaining({
-        id: undefined,
-        header: expect.objectContaining({
-          title: 'Original Song (Copy)',
+      expect(saveSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          createdAt: null,
+          header: expect.objectContaining({
+            title: 'Original Song (Copy)',
+          }),
+          isPublic: false,
         }),
-        isPublic: false,
-      }));
+      );
       expect(result.id).toBe('456');
     });
   });
@@ -73,16 +77,21 @@ describe('supabaseService Duplication', () => {
       };
 
       vi.spyOn(supabaseService, 'getNotebook').mockResolvedValue(mockOriginal as any);
-      const saveSpy = vi.spyOn(supabaseService, 'saveNotebook').mockResolvedValue({ id: 'nb-456', title: 'Original Notebook (Copy)' } as any);
+      const saveSpy = vi.spyOn(supabaseService, 'saveNotebook').mockResolvedValue({
+        id: 'nb-456',
+        title: 'Original Notebook (Copy)',
+      } as any);
 
-      const result = await supabaseService.duplicateNotebook('nb-123');
+      const _result = await supabaseService.duplicateNotebook('nb-123');
 
       expect(supabaseService.getNotebook).toHaveBeenCalledWith('nb-123');
-      expect(saveSpy).toHaveBeenCalledWith(expect.objectContaining({
-        id: undefined,
-        title: 'Original Notebook (Copy)',
-        isPublic: false,
-      }));
+      expect(saveSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Original Notebook (Copy)',
+          isPublic: false,
+          createdAt: null,
+        }),
+      );
     });
   });
 
@@ -103,16 +112,21 @@ describe('supabaseService Duplication', () => {
       };
 
       vi.spyOn(supabaseService, 'getGrooveSnippet').mockResolvedValue(mockOriginal as any);
-      const saveSpy = vi.spyOn(supabaseService, 'saveGrooveSnippet').mockResolvedValue({ id: 'snip-456', title: 'Original Snippet (Copy)' } as any);
+      const saveSpy = vi.spyOn(supabaseService, 'saveGrooveSnippet').mockResolvedValue({
+        id: 'snip-456',
+        title: 'Original Snippet (Copy)',
+      } as any);
 
-      const result = await supabaseService.duplicateGrooveSnippet('snip-123');
+      const _result = await supabaseService.duplicateGrooveSnippet('snip-123');
 
       expect(supabaseService.getGrooveSnippet).toHaveBeenCalledWith('snip-123');
-      expect(saveSpy).toHaveBeenCalledWith(expect.objectContaining({
-        id: undefined,
-        title: 'Original Snippet (Copy)',
-        isPublic: false,
-      }));
+      expect(saveSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Original Snippet (Copy)',
+          isPublic: false,
+          createdAt: null,
+        }),
+      );
     });
   });
 });

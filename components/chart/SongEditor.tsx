@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useReducer, useEffect, useCallback, useState, useRef } from 'react';
-import { SongChart, SongSection, SongSubSection, GrooveGrid } from '@/lib/types/groove';
-import { supabaseService } from '@/lib/services/supabase-service';
-import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { debounce } from 'lodash';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { supabaseService } from '@/lib/services/supabase-service';
+import type { SongChart, SongSection, SongSubSection } from '@/lib/types/groove';
 
 type SongAction =
   | { type: 'SET_SONG'; song: SongChart }
   | { type: 'UPDATE_TITLE'; title: string }
   | { type: 'UPDATE_BPM'; bpm: number }
-  | { type: 'UPDATE_TIME_SIGNATURE'; beatsPerMeasure: number; beatValue: number }
+  | {
+      type: 'UPDATE_TIME_SIGNATURE';
+      beatsPerMeasure: number;
+      beatValue: number;
+    }
   | { type: 'UPDATE_TAGS'; tags: string[] }
   | { type: 'UPDATE_METRONOME'; enabled?: boolean; volume?: number }
   | { type: 'ADD_SECTION' }
@@ -18,39 +22,57 @@ type SongAction =
   | { type: 'UPDATE_SECTION'; sectionId: string; updates: Partial<SongSection> }
   | { type: 'ADD_SUBSECTION'; sectionId: string }
   | { type: 'REMOVE_SUBSECTION'; sectionId: string; subSectionId: string }
-  | { type: 'UPDATE_SUBSECTION'; sectionId: string; subSectionId: string; updates: Partial<SongSubSection> }
+  | {
+      type: 'UPDATE_SUBSECTION';
+      sectionId: string;
+      subSectionId: string;
+      updates: Partial<SongSubSection>;
+    }
   | { type: 'TOGGLE_PUBLIC' };
 
 function songReducer(state: SongChart, action: SongAction): SongChart {
   const timestamp = new Date().toISOString();
-  
+
   switch (action.type) {
     case 'SET_SONG':
       return action.song;
     case 'UPDATE_TITLE':
-      return { ...state, header: { ...state.header, title: action.title }, updatedAt: timestamp };
+      return {
+        ...state,
+        header: { ...state.header, title: action.title },
+        updatedAt: timestamp,
+      };
     case 'UPDATE_BPM':
-      return { ...state, header: { ...state.header, bpm: action.bpm }, updatedAt: timestamp };
+      return {
+        ...state,
+        header: { ...state.header, bpm: action.bpm },
+        updatedAt: timestamp,
+      };
     case 'UPDATE_TIME_SIGNATURE':
-      return { 
-        ...state, 
-        header: { 
-          ...state.header, 
-          timeSignature: { beatsPerMeasure: action.beatsPerMeasure, beatValue: action.beatValue } 
-        }, 
-        updatedAt: timestamp 
+      return {
+        ...state,
+        header: {
+          ...state.header,
+          timeSignature: {
+            beatsPerMeasure: action.beatsPerMeasure,
+            beatValue: action.beatValue,
+          },
+        },
+        updatedAt: timestamp,
       };
     case 'UPDATE_TAGS':
       return { ...state, tags: action.tags, updatedAt: timestamp };
     case 'UPDATE_METRONOME':
-      return { 
-        ...state, 
-        header: { 
-          ...state.header, 
-          metronomeEnabled: action.enabled !== undefined ? action.enabled : state.header.metronomeEnabled,
-          metronomeVolume: action.volume !== undefined ? action.volume : state.header.metronomeVolume
-        }, 
-        updatedAt: timestamp 
+      return {
+        ...state,
+        header: {
+          ...state.header,
+          metronomeEnabled:
+            action.enabled !== undefined ? action.enabled : state.header.metronomeEnabled,
+          metronomeVolume:
+            action.volume !== undefined ? action.volume : state.header.metronomeVolume,
+        },
+        updatedAt: timestamp,
       };
     case 'ADD_SECTION': {
       const newSection: SongSection = {
@@ -60,26 +82,30 @@ function songReducer(state: SongChart, action: SongAction): SongChart {
         notes: [],
         subSections: [],
       };
-      return { ...state, sections: [...state.sections, newSection], updatedAt: timestamp };
+      return {
+        ...state,
+        sections: [...state.sections, newSection],
+        updatedAt: timestamp,
+      };
     }
     case 'REMOVE_SECTION':
-      return { 
-        ...state, 
-        sections: state.sections.filter(s => s.id !== action.sectionId), 
-        updatedAt: timestamp 
+      return {
+        ...state,
+        sections: state.sections.filter((s) => s.id !== action.sectionId),
+        updatedAt: timestamp,
       };
     case 'UPDATE_SECTION':
       return {
         ...state,
-        sections: state.sections.map(s => 
-          s.id === action.sectionId ? { ...s, ...action.updates } : s
+        sections: state.sections.map((s) =>
+          s.id === action.sectionId ? { ...s, ...action.updates } : s,
         ),
-        updatedAt: timestamp
+        updatedAt: timestamp,
       };
     case 'ADD_SUBSECTION':
       return {
         ...state,
-        sections: state.sections.map(s => {
+        sections: state.sections.map((s) => {
           if (s.id !== action.sectionId) return s;
           const newSub: SongSubSection = {
             id: crypto.randomUUID(),
@@ -89,33 +115,33 @@ function songReducer(state: SongChart, action: SongAction): SongChart {
           };
           return { ...s, subSections: [...(s.subSections || []), newSub] };
         }),
-        updatedAt: timestamp
+        updatedAt: timestamp,
       };
     case 'REMOVE_SUBSECTION':
       return {
         ...state,
-        sections: state.sections.map(s => {
+        sections: state.sections.map((s) => {
           if (s.id !== action.sectionId) return s;
           return {
             ...s,
-            subSections: (s.subSections || []).filter(sub => sub.id !== action.subSectionId)
+            subSections: (s.subSections || []).filter((sub) => sub.id !== action.subSectionId),
           };
         }),
-        updatedAt: timestamp
+        updatedAt: timestamp,
       };
     case 'UPDATE_SUBSECTION':
       return {
         ...state,
-        sections: state.sections.map(s => {
+        sections: state.sections.map((s) => {
           if (s.id !== action.sectionId) return s;
           return {
             ...s,
-            subSections: (s.subSections || []).map(sub => 
-              sub.id === action.subSectionId ? { ...sub, ...action.updates } : sub
-            )
+            subSections: (s.subSections || []).map((sub) =>
+              sub.id === action.subSectionId ? { ...sub, ...action.updates } : sub,
+            ),
           };
         }),
-        updatedAt: timestamp
+        updatedAt: timestamp,
       };
     case 'TOGGLE_PUBLIC':
       return { ...state, isPublic: !state.isPublic, updatedAt: timestamp };
@@ -154,7 +180,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
         }
       }
     }, 2000),
-    []
+    [],
   );
 
   const isInitialRender = useRef(true);
@@ -164,7 +190,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
       isInitialRender.current = false;
       return;
     }
-    
+
     setIsSaving(true);
     debouncedSave(state);
   }, [state, debouncedSave]);
@@ -185,7 +211,12 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
           className="flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded-lg font-bold hover:bg-zinc-800 transition-all text-sm shadow-lg shadow-zinc-200"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+            />
           </svg>
           PRINT
         </button>
@@ -203,8 +234,8 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             <button
               onClick={() => dispatch({ type: 'TOGGLE_PUBLIC' })}
               className={`text-[10px] font-bold px-2 py-1 rounded transition-colors no-print ${
-                state.isPublic 
-                  ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                state.isPublic
+                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
                   : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
               }`}
             >
@@ -224,71 +255,96 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
 
         <div className="flex gap-8 mb-6">
           <div className="flex items-center">
-            <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest mr-2">BPM</span>
+            <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest mr-2">
+              BPM
+            </span>
             <input
               type="number"
               value={state.header.bpm || ''}
-              onChange={(e) => dispatch({ type: 'UPDATE_BPM', bpm: parseInt(e.target.value) || 0 })}
+              onChange={(e) =>
+                dispatch({
+                  type: 'UPDATE_BPM',
+                  bpm: parseInt(e.target.value, 10) || 0,
+                })
+              }
               className="w-16 text-lg font-bold text-zinc-700 bg-zinc-50 border border-zinc-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               placeholder="0"
             />
           </div>
           <div className="flex items-center">
-            <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest mr-2">Time</span>
+            <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest mr-2">
+              Time
+            </span>
             <div className="flex items-center gap-1 bg-zinc-50 border border-zinc-200 rounded px-2 py-1">
               <input
                 type="number"
                 value={state.header.timeSignature.beatsPerMeasure}
-                onChange={(e) => dispatch({ type: 'UPDATE_TIME_SIGNATURE', beatsPerMeasure: parseInt(e.target.value) || 4, beatValue: state.header.timeSignature.beatValue })}
+                onChange={(e) =>
+                  dispatch({
+                    type: 'UPDATE_TIME_SIGNATURE',
+                    beatsPerMeasure: parseInt(e.target.value, 10) || 4,
+                    beatValue: state.header.timeSignature.beatValue,
+                  })
+                }
                 className="w-8 text-lg font-bold text-zinc-700 bg-transparent border-none p-0 focus:ring-0 text-center"
               />
               <span className="text-zinc-400">/</span>
               <input
                 type="number"
                 value={state.header.timeSignature.beatValue}
-                onChange={(e) => dispatch({ type: 'UPDATE_TIME_SIGNATURE', beatsPerMeasure: state.header.timeSignature.beatsPerMeasure, beatValue: parseInt(e.target.value) || 4 })}
+                onChange={(e) =>
+                  dispatch({
+                    type: 'UPDATE_TIME_SIGNATURE',
+                    beatsPerMeasure: state.header.timeSignature.beatsPerMeasure,
+                    beatValue: parseInt(e.target.value, 10) || 4,
+                  })
+                }
                 className="w-8 text-lg font-bold text-zinc-700 bg-transparent border-none p-0 focus:ring-0 text-center"
               />
             </div>
           </div>
         </div>
 
-          <div className="flex flex-wrap gap-2 no-print">
-            {state.isPublic && (
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText(`${window.location.origin}/public/songs/${state.id}`);
-                  alert('Public link copied to clipboard!');
-                }}
-                className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest mr-4"
-              >
-                COPY PUBLIC LINK
-              </button>
-            )}
-            {state.isPublic && (
-              <a 
-                href={`/public/songs/${state.id}`} 
-                target="_blank" 
-                className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-widest mr-4"
-              >
-                VIEW PUBLIC
-              </a>
-            )}
+        <div className="flex flex-wrap gap-2 no-print">
+          {state.isPublic && (
             <button
-              onClick={async () => {
-                try {
-                  const duplicated = await supabaseService.duplicateSongChart(state.id);
-                  window.location.href = `/songs/${duplicated.id}`;
-                } catch (error) {
-                  alert('Failed to duplicate song chart.');
-                }
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/public/songs/${state.id}`);
+                alert('Public link copied to clipboard!');
               }}
-              className="text-[10px] font-bold text-zinc-500 hover:text-blue-600 uppercase tracking-widest mr-4"
+              className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest mr-4"
             >
-              DUPLICATE
+              COPY PUBLIC LINK
             </button>
-            {state.tags.map((tag, idx) => (
-            <span key={idx} className="bg-zinc-100 text-zinc-600 px-2 py-1 rounded text-xs font-medium">
+          )}
+          {state.isPublic && (
+            <a
+              href={`/public/songs/${state.id}`}
+              target="_blank"
+              className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-widest mr-4"
+              rel="noopener"
+            >
+              VIEW PUBLIC
+            </a>
+          )}
+          <button
+            onClick={async () => {
+              try {
+                const duplicated = await supabaseService.duplicateSongChart(state.id);
+                window.location.href = `/songs/${duplicated.id}`;
+              } catch (_error) {
+                alert('Failed to duplicate song chart.');
+              }
+            }}
+            className="text-[10px] font-bold text-zinc-500 hover:text-blue-600 uppercase tracking-widest mr-4"
+          >
+            DUPLICATE
+          </button>
+          {state.tags.map((tag, idx) => (
+            <span
+              key={idx}
+              className="bg-zinc-100 text-zinc-600 px-2 py-1 rounded text-xs font-medium"
+            >
               #{tag}
             </span>
           ))}
@@ -300,7 +356,10 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
               if (e.key === 'Enter') {
                 const input = e.currentTarget;
                 if (input.value.trim()) {
-                  dispatch({ type: 'UPDATE_TAGS', tags: [...state.tags, input.value.trim()] });
+                  dispatch({
+                    type: 'UPDATE_TAGS',
+                    tags: [...state.tags, input.value.trim()],
+                  });
                   input.value = '';
                 }
               }
@@ -318,7 +377,12 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
               title="Remove Section"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
             </button>
 
@@ -326,7 +390,13 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
               <input
                 type="text"
                 value={section.name}
-                onChange={(e) => dispatch({ type: 'UPDATE_SECTION', sectionId: section.id, updates: { name: e.target.value } })}
+                onChange={(e) =>
+                  dispatch({
+                    type: 'UPDATE_SECTION',
+                    sectionId: section.id,
+                    updates: { name: e.target.value },
+                  })
+                }
                 className="text-xl font-bold uppercase text-zinc-800 bg-zinc-100 px-3 py-1 rounded border-none focus:ring-2 focus:ring-blue-500/20"
                 placeholder="Section Name"
               />
@@ -335,7 +405,13 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                 <input
                   type="number"
                   value={section.measuresCount}
-                  onChange={(e) => dispatch({ type: 'UPDATE_SECTION', sectionId: section.id, updates: { measuresCount: parseInt(e.target.value) || 0 } })}
+                  onChange={(e) =>
+                    dispatch({
+                      type: 'UPDATE_SECTION',
+                      sectionId: section.id,
+                      updates: { measuresCount: parseInt(e.target.value, 10) || 0 },
+                    })
+                  }
                   className="w-8 text-center bg-transparent border-none p-0 focus:ring-0 font-bold text-zinc-600"
                 />
                 <span>M)</span>
@@ -345,25 +421,41 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             <div className="ml-4 space-y-6">
               <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">Groove Grid</h4>
+                  <h4 className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+                    Groove Grid
+                  </h4>
                   {!section.grid && (
                     <button
-                      onClick={() => dispatch({ 
-                        type: 'UPDATE_SECTION', 
-                        sectionId: section.id, 
-                        updates: { 
-                          grid: { 
-                            timeSignature: state.header.timeSignature, 
-                            resolution: 16, 
-                            measures: 1, 
-                            instruments: [
-                              { instrumentId: 'kick', label: 'Kick', notes: Array(16).fill('none') },
-                              { instrumentId: 'snare', label: 'Snare', notes: Array(16).fill('none') },
-                              { instrumentId: 'hihat', label: 'Hi-Hat', notes: Array(16).fill('none') },
-                            ] 
-                          } 
-                        } 
-                      })}
+                      onClick={() =>
+                        dispatch({
+                          type: 'UPDATE_SECTION',
+                          sectionId: section.id,
+                          updates: {
+                            grid: {
+                              timeSignature: state.header.timeSignature,
+                              resolution: 16,
+                              measures: 1,
+                              instruments: [
+                                {
+                                  instrumentId: 'kick',
+                                  label: 'Kick',
+                                  notes: Array(16).fill('none'),
+                                },
+                                {
+                                  instrumentId: 'snare',
+                                  label: 'Snare',
+                                  notes: Array(16).fill('none'),
+                                },
+                                {
+                                  instrumentId: 'hihat',
+                                  label: 'Hi-Hat',
+                                  notes: Array(16).fill('none'),
+                                },
+                              ],
+                            },
+                          },
+                        })
+                      }
                       className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest no-print"
                     >
                       + ADD GRID
@@ -373,22 +465,38 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                 {section.grid && (
                   <GrooveGridEditor
                     initialGrid={section.grid}
-                    onChange={(grid) => dispatch({ type: 'UPDATE_SECTION', sectionId: section.id, updates: { grid } })}
+                    onChange={(grid) =>
+                      dispatch({
+                        type: 'UPDATE_SECTION',
+                        sectionId: section.id,
+                        updates: { grid },
+                      })
+                    }
                     bpm={state.header.bpm}
                     onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
                     metronomeEnabled={state.header.metronomeEnabled}
                     onMetronomeToggle={(enabled) => dispatch({ type: 'UPDATE_METRONOME', enabled })}
                     metronomeVolume={state.header.metronomeVolume}
-                    onMetronomeVolumeChange={(volume) => dispatch({ type: 'UPDATE_METRONOME', volume })}
+                    onMetronomeVolumeChange={(volume) =>
+                      dispatch({ type: 'UPDATE_METRONOME', volume })
+                    }
                   />
                 )}
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">Notes</h4>
+                <h4 className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
+                  Notes
+                </h4>
                 <textarea
                   value={section.notes?.join('\n') || ''}
-                  onChange={(e) => dispatch({ type: 'UPDATE_SECTION', sectionId: section.id, updates: { notes: e.target.value.split('\n') } })}
+                  onChange={(e) =>
+                    dispatch({
+                      type: 'UPDATE_SECTION',
+                      sectionId: section.id,
+                      updates: { notes: e.target.value.split('\n') },
+                    })
+                  }
                   placeholder="Bullet points (one per line)..."
                   className="w-full h-24 text-sm text-zinc-700 bg-transparent border border-zinc-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-zinc-200 resize-none transition-all"
                 />
@@ -399,18 +507,41 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                 {(section.subSections || []).map((sub) => (
                   <div key={sub.id} className="border-l-4 border-zinc-200 pl-4 relative group/sub">
                     <button
-                      onClick={() => dispatch({ type: 'REMOVE_SUBSECTION', sectionId: section.id, subSectionId: sub.id })}
+                      onClick={() =>
+                        dispatch({
+                          type: 'REMOVE_SUBSECTION',
+                          sectionId: section.id,
+                          subSectionId: sub.id,
+                        })
+                      }
                       className="absolute -right-8 top-0 opacity-0 group-hover/sub:opacity-100 p-1 text-zinc-300 hover:text-red-500 transition-all no-print"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                     <div className="flex items-center gap-3 mb-2">
                       <input
                         type="text"
                         value={sub.name}
-                        onChange={(e) => dispatch({ type: 'UPDATE_SUBSECTION', sectionId: section.id, subSectionId: sub.id, updates: { name: e.target.value } })}
+                        onChange={(e) =>
+                          dispatch({
+                            type: 'UPDATE_SUBSECTION',
+                            sectionId: section.id,
+                            subSectionId: sub.id,
+                            updates: { name: e.target.value },
+                          })
+                        }
                         className="text-lg font-semibold text-zinc-700 bg-transparent border-none p-0 focus:ring-0"
                         placeholder="Subsection Name"
                       />
@@ -419,7 +550,16 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                         <input
                           type="number"
                           value={sub.measuresCount}
-                          onChange={(e) => dispatch({ type: 'UPDATE_SUBSECTION', sectionId: section.id, subSectionId: sub.id, updates: { measuresCount: parseInt(e.target.value) || 0 } })}
+                          onChange={(e) =>
+                            dispatch({
+                              type: 'UPDATE_SUBSECTION',
+                              sectionId: section.id,
+                              subSectionId: sub.id,
+                              updates: {
+                                measuresCount: parseInt(e.target.value, 10) || 0,
+                              },
+                            })
+                          }
                           className="w-6 text-center bg-transparent border-none p-0 focus:ring-0 font-bold text-zinc-500"
                         />
                         <span>M)</span>
@@ -427,15 +567,26 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                     </div>
                     {sub.grid && (
                       <div className="mb-3">
-                        <GrooveGridEditor 
-                          initialGrid={sub.grid} 
-                          onChange={(grid) => dispatch({ type: 'UPDATE_SUBSECTION', sectionId: section.id, subSectionId: sub.id, updates: { grid } })}
+                        <GrooveGridEditor
+                          initialGrid={sub.grid}
+                          onChange={(grid) =>
+                            dispatch({
+                              type: 'UPDATE_SUBSECTION',
+                              sectionId: section.id,
+                              subSectionId: sub.id,
+                              updates: { grid },
+                            })
+                          }
                           bpm={state.header.bpm}
                           onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
                           metronomeEnabled={state.header.metronomeEnabled}
-                          onMetronomeToggle={(enabled) => dispatch({ type: 'UPDATE_METRONOME', enabled })}
+                          onMetronomeToggle={(enabled) =>
+                            dispatch({ type: 'UPDATE_METRONOME', enabled })
+                          }
                           metronomeVolume={state.header.metronomeVolume}
-                          onMetronomeVolumeChange={(volume) => dispatch({ type: 'UPDATE_METRONOME', volume })}
+                          onMetronomeVolumeChange={(volume) =>
+                            dispatch({ type: 'UPDATE_METRONOME', volume })
+                          }
                         />
                       </div>
                     )}

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { WifiOff } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function OfflineStatus() {
   const [isOffline, setIsOffline] = useState(() => {
@@ -13,6 +13,9 @@ export default function OfflineStatus() {
   });
 
   useEffect(() => {
+    // Re-check initial state on mount to handle hydration mismatches
+    setIsOffline(!navigator.onLine);
+
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
 
@@ -28,7 +31,7 @@ export default function OfflineStatus() {
   if (!isOffline) return null;
 
   return (
-    <div 
+    <div
       className="fixed bottom-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-50 animate-bounce motion-reduce:animate-none"
       role="alert"
     >

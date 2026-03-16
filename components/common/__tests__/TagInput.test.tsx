@@ -1,7 +1,6 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { TagInput } from '../TagInput';
-import React from 'react';
 
 describe('TagInput', () => {
   const defaultProps = {
@@ -25,7 +24,7 @@ describe('TagInput', () => {
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'metal' } });
     fireEvent.keyDown(input, { key: 'Enter' });
-    
+
     expect(defaultProps.onChange).toHaveBeenCalledWith(['funk', 'linear', 'metal']);
   });
 
@@ -34,7 +33,7 @@ describe('TagInput', () => {
     // Get the first remove button specifically by its aria-label
     const removeButton = screen.getByLabelText(/Remove funk tag/i);
     fireEvent.click(removeButton);
-    
+
     expect(defaultProps.onChange).toHaveBeenCalledWith(['linear']);
   });
 
@@ -42,7 +41,7 @@ describe('TagInput', () => {
     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'j' } });
-    
+
     expect(screen.getByText(/jazz/i)).toBeInTheDocument();
     // 'rock' should not be visible as it doesn't contain 'j'
     expect(screen.queryByText(/rock/i)).toBeNull();
@@ -52,10 +51,10 @@ describe('TagInput', () => {
     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'j' } });
-    
+
     const suggestionBtn = screen.getByRole('button', { name: /jazz/i });
     fireEvent.mouseDown(suggestionBtn);
-    
+
     expect(defaultProps.onChange).toHaveBeenCalledWith(['funk', 'linear', 'jazz']);
   });
 
@@ -63,18 +62,18 @@ describe('TagInput', () => {
     render(<TagInput {...defaultProps} placeholder="Add tag..." />);
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'j' } });
-    
+
     const suggestionBtn = screen.getByRole('button', { name: /jazz/i });
-    
+
     // Test Enter key
     fireEvent.keyDown(suggestionBtn, { key: 'Enter' });
     expect(defaultProps.onChange).toHaveBeenCalledWith(['funk', 'linear', 'jazz']);
-    
+
     // Reset for Space test
     vi.clearAllMocks();
     fireEvent.change(input, { target: { value: 'j' } });
     const suggestionBtnSpace = screen.getByRole('button', { name: /jazz/i });
-    
+
     // Test Space key
     fireEvent.keyDown(suggestionBtnSpace, { key: ' ' });
     expect(defaultProps.onChange).toHaveBeenCalledWith(['funk', 'linear', 'jazz']);
@@ -85,7 +84,7 @@ describe('TagInput', () => {
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'FUNK' } });
     fireEvent.keyDown(input, { key: 'Enter' });
-    
+
     expect(defaultProps.onChange).not.toHaveBeenCalled();
   });
 
@@ -93,14 +92,14 @@ describe('TagInput', () => {
     const propsWithUpper = {
       ...defaultProps,
       tags: ['FUNK'],
-      suggestions: ['funk', 'JAZZ']
+      suggestions: ['funk', 'JAZZ'],
     };
     render(<TagInput {...propsWithUpper} />);
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'j' } });
-    
+
     expect(screen.getByText(/JAZZ/i)).toBeInTheDocument();
-    
+
     // Suggestions should not include 'funk' because it's already in tags (case-insensitive)
     const suggestionsList = screen.getByText(/Suggestions/i).parentElement?.parentElement;
     expect(suggestionsList?.textContent).not.toContain('funk');
@@ -109,7 +108,7 @@ describe('TagInput', () => {
   it('all buttons have type="button" to prevent form submission', () => {
     render(<TagInput {...defaultProps} />);
     const buttons = screen.getAllByRole('button');
-    buttons.forEach(button => {
+    buttons.forEach((button) => {
       expect(button.getAttribute('type')).toBe('button');
     });
   });
@@ -118,18 +117,18 @@ describe('TagInput', () => {
     vi.useFakeTimers();
     render(<TagInput {...defaultProps} />);
     const input = screen.getByRole('textbox');
-    
+
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: 'j' } });
     expect(screen.getByText(/jazz/i)).toBeDefined();
-    
+
     fireEvent.blur(input);
-    
+
     // Explicitly advance timers and wait for re-render
     await act(async () => {
       vi.advanceTimersByTime(200);
     });
-    
+
     expect(screen.queryByText(/jazz/i)).toBeNull();
     vi.useRealTimers();
   });

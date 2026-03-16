@@ -1,17 +1,13 @@
 'use client';
 
-import { supabaseService } from '@/lib/services/supabase-service';
-import { notFound } from 'next/navigation';
-import { SongChartView } from '@/components/chart/SongChartView';
-import { SongChart } from '@/lib/types/groove';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { SongChartView } from '@/components/chart/SongChartView';
+import { supabaseService } from '@/lib/services/supabase-service';
+import type { SongChart } from '@/lib/types/groove';
 
-export default function PublicSongPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function PublicSongPage({ params }: { params: Promise<{ id: string }> }) {
   const [song, setSong] = useState<SongChart | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +16,7 @@ export default function PublicSongPage({
       const { id } = await params;
       try {
         const data = await supabaseService.getSongChart(id);
-        
+
         if (!data || !data.isPublic) {
           setLoading(false);
           return;
@@ -40,7 +36,9 @@ export default function PublicSongPage({
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-        <div className="animate-pulse text-zinc-400 font-mono tracking-widest uppercase">Loading Chart...</div>
+        <div className="animate-pulse text-zinc-400 font-mono tracking-widest uppercase">
+          Loading Chart...
+        </div>
       </div>
     );
   }
@@ -54,8 +52,8 @@ export default function PublicSongPage({
       <div className="max-w-4xl mx-auto bg-white shadow-xl shadow-zinc-200 rounded-2xl overflow-hidden print:shadow-none print:rounded-none">
         <div className="bg-zinc-900 text-white px-8 py-4 flex justify-between items-center no-print">
           <h2 className="text-xs font-mono uppercase tracking-[0.2em]">DrumCharter Public View</h2>
-          <button 
-            onClick={() => window.print()} 
+          <button
+            onClick={() => window.print()}
             className="text-xs font-bold border border-white/20 px-3 py-1 rounded hover:bg-white/10 transition-all"
           >
             PRINTER FRIENDLY
@@ -65,7 +63,10 @@ export default function PublicSongPage({
       </div>
       <footer className="max-w-4xl mx-auto mt-8 text-center no-print">
         <p className="text-sm text-zinc-400">
-          Create your own charts at <Link href="/" className="text-blue-600 font-bold hover:underline">DrumCharter.com</Link>
+          Create your own charts at{' '}
+          <Link href="/" className="text-blue-600 font-bold hover:underline">
+            DrumCharter.com
+          </Link>
         </p>
       </footer>
     </main>

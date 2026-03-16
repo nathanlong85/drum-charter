@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useReducer, useEffect, useCallback, useState, useRef } from 'react';
-import { Notebook, NotebookSection, GrooveGrid } from '@/lib/types/groove';
-import { supabaseService } from '@/lib/services/supabase-service';
-import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { debounce } from 'lodash';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { supabaseService } from '@/lib/services/supabase-service';
+import type { GrooveGrid, Notebook, NotebookSection } from '@/lib/types/groove';
+import { formatDateTime } from '@/lib/utils/format';
 
 type NotebookAction =
   | { type: 'SET_NOTEBOOK'; notebook: Notebook }
@@ -23,11 +24,23 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
     case 'SET_NOTEBOOK':
       return action.notebook;
     case 'UPDATE_TITLE':
-      return { ...state, title: action.title, updatedAt: new Date().toISOString() };
+      return {
+        ...state,
+        title: action.title,
+        updatedAt: new Date().toISOString(),
+      };
     case 'UPDATE_TAGS':
-      return { ...state, tags: action.tags, updatedAt: new Date().toISOString() };
+      return {
+        ...state,
+        tags: action.tags,
+        updatedAt: new Date().toISOString(),
+      };
     case 'UPDATE_PUBLIC':
-      return { ...state, isPublic: action.isPublic, updatedAt: new Date().toISOString() };
+      return {
+        ...state,
+        isPublic: action.isPublic,
+        updatedAt: new Date().toISOString(),
+      };
     case 'ADD_SECTION': {
       const newSection: NotebookSection = {
         id: crypto.randomUUID(),
@@ -50,7 +63,7 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
       return {
         ...state,
         sections: state.sections.map((s) =>
-          s.id === action.sectionId ? { ...s, name: action.name } : s
+          s.id === action.sectionId ? { ...s, name: action.name } : s,
         ),
         updatedAt: new Date().toISOString(),
       };
@@ -58,7 +71,7 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
       return {
         ...state,
         sections: state.sections.map((s) =>
-          s.id === action.sectionId ? { ...s, grid: action.grid } : s
+          s.id === action.sectionId ? { ...s, grid: action.grid } : s,
         ),
         updatedAt: new Date().toISOString(),
       };
@@ -66,7 +79,7 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
       return {
         ...state,
         sections: state.sections.map((s) =>
-          s.id === action.sectionId ? { ...s, notes: action.notes } : s
+          s.id === action.sectionId ? { ...s, notes: action.notes } : s,
         ),
         updatedAt: new Date().toISOString(),
       };
@@ -74,7 +87,7 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
       return {
         ...state,
         sections: state.sections.map((s) =>
-          s.id === action.sectionId ? { ...s, bpm: action.bpm } : s
+          s.id === action.sectionId ? { ...s, bpm: action.bpm } : s,
         ),
         updatedAt: new Date().toISOString(),
       };
@@ -113,7 +126,7 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
         }
       }
     }, 2000),
-    []
+    [],
   );
 
   // CodeRabbit: Use ref to skip initial render save
@@ -124,7 +137,7 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
       isInitialRender.current = false;
       return;
     }
-    
+
     setIsSaving(true);
     debouncedSave(state);
   }, [state, debouncedSave]);
@@ -155,17 +168,26 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
                   type="checkbox"
                   id="isPublic"
                   checked={state.isPublic}
-                  onChange={(e) => dispatch({ type: 'UPDATE_PUBLIC', isPublic: e.target.checked })}
+                  onChange={(e) =>
+                    dispatch({
+                      type: 'UPDATE_PUBLIC',
+                      isPublic: e.target.checked,
+                    })
+                  }
                   className="rounded border-zinc-300 text-blue-600 focus:ring-blue-500 h-4 w-4"
                 />
-                <label htmlFor="isPublic" className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest cursor-pointer">
+                <label
+                  htmlFor="isPublic"
+                  className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest cursor-pointer"
+                >
                   Public
                 </label>
                 {state.isPublic && (
-                  <a 
-                    href={`/public/notebooks/${state.id}`} 
-                    target="_blank" 
+                  <a
+                    href={`/public/notebooks/${state.id}`}
+                    target="_blank"
                     className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-widest ml-1"
+                    rel="noopener"
                   >
                     View
                   </a>
@@ -176,7 +198,7 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
                   try {
                     const duplicated = await supabaseService.duplicateNotebook(state.id);
                     window.location.href = `/notebooks/${duplicated.id}`;
-                  } catch (error) {
+                  } catch (_error) {
                     alert('Failed to duplicate notebook.');
                   }
                 }}
@@ -187,7 +209,9 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
             </div>
             <div className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
               {isSaving ? (
-                <span className="text-blue-500 animate-pulse bg-blue-50 px-2 py-1 rounded">SAVING...</span>
+                <span className="text-blue-500 animate-pulse bg-blue-50 px-2 py-1 rounded">
+                  SAVING...
+                </span>
               ) : (
                 <span className="text-emerald-500 bg-emerald-50 px-2 py-1 rounded">SAVED</span>
               )}
@@ -199,10 +223,13 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
           <input
             type="text"
             value={state.tags.join(', ')}
-            onChange={(e) => 
-              dispatch({ 
-                type: 'UPDATE_TAGS', 
-                tags: e.target.value.split(',').map(t => t.trim()).filter(t => t !== '') 
+            onChange={(e) =>
+              dispatch({
+                type: 'UPDATE_TAGS',
+                tags: e.target.value
+                  .split(',')
+                  .map((t) => t.trim())
+                  .filter((t) => t !== ''),
               })
             }
             className="text-sm font-medium text-zinc-600 bg-zinc-50 px-2 py-1 rounded border-none focus:ring-1 focus:ring-zinc-200"
@@ -218,8 +245,12 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
               <input
                 type="text"
                 value={section.name}
-                onChange={(e) => 
-                  dispatch({ type: 'UPDATE_SECTION_NAME', sectionId: section.id, name: e.target.value })
+                onChange={(e) =>
+                  dispatch({
+                    type: 'UPDATE_SECTION_NAME',
+                    sectionId: section.id,
+                    name: e.target.value,
+                  })
                 }
                 className="text-xl font-bold uppercase text-zinc-800 bg-zinc-100 px-3 py-1 rounded border-none focus:ring-2 focus:ring-blue-500 w-full max-w-md"
                 placeholder="Section Name"
@@ -230,7 +261,12 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
                 title="Remove Section"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
                 </svg>
               </button>
             </div>
@@ -238,20 +274,32 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
             <div className="ml-4 space-y-6">
               {!section.grid ? (
                 <button
-                  onClick={() => 
-                    dispatch({ 
-                      type: 'UPDATE_SECTION_GRID', 
-                      sectionId: section.id, 
+                  onClick={() =>
+                    dispatch({
+                      type: 'UPDATE_SECTION_GRID',
+                      sectionId: section.id,
                       grid: {
                         timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
                         resolution: 16,
                         measures: 1,
                         instruments: [
-                          { instrumentId: 'hh', label: 'Hi-Hat', notes: Array(16).fill('none') },
-                          { instrumentId: 'sn', label: 'Snare', notes: Array(16).fill('none') },
-                          { instrumentId: 'bd', label: 'Bass', notes: Array(16).fill('none') },
-                        ]
-                      }
+                          {
+                            instrumentId: 'hh',
+                            label: 'Hi-Hat',
+                            notes: Array(16).fill('none'),
+                          },
+                          {
+                            instrumentId: 'sn',
+                            label: 'Snare',
+                            notes: Array(16).fill('none'),
+                          },
+                          {
+                            instrumentId: 'bd',
+                            label: 'Bass',
+                            notes: Array(16).fill('none'),
+                          },
+                        ],
+                      },
                     })
                   }
                   className="text-sm font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 px-4 py-2 rounded-md transition-colors"
@@ -262,16 +310,30 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
                 <div className="mb-4">
                   <GrooveGridEditor
                     initialGrid={section.grid}
-                    onChange={(grid) => 
-                      dispatch({ type: 'UPDATE_SECTION_GRID', sectionId: section.id, grid })
+                    onChange={(grid) =>
+                      dispatch({
+                        type: 'UPDATE_SECTION_GRID',
+                        sectionId: section.id,
+                        grid,
+                      })
                     }
                     bpm={section.bpm}
-                    onBpmChange={(bpm) => 
-                      dispatch({ type: 'UPDATE_SECTION_BPM', sectionId: section.id, bpm })
+                    onBpmChange={(bpm) =>
+                      dispatch({
+                        type: 'UPDATE_SECTION_BPM',
+                        sectionId: section.id,
+                        bpm,
+                      })
                     }
                   />
                   <button
-                    onClick={() => dispatch({ type: 'UPDATE_SECTION_GRID', sectionId: section.id, grid: undefined as any })}
+                    onClick={() =>
+                      dispatch({
+                        type: 'UPDATE_SECTION_GRID',
+                        sectionId: section.id,
+                        grid: undefined as any,
+                      })
+                    }
                     className="mt-2 text-xs text-zinc-400 hover:text-red-500"
                   >
                     Remove Grid
@@ -282,11 +344,11 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
               <div>
                 <textarea
                   value={section.notes?.join('\n')}
-                  onChange={(e) => 
-                    dispatch({ 
-                      type: 'UPDATE_SECTION_NOTES', 
-                      sectionId: section.id, 
-                      notes: e.target.value.split('\n') 
+                  onChange={(e) =>
+                    dispatch({
+                      type: 'UPDATE_SECTION_NOTES',
+                      sectionId: section.id,
+                      notes: e.target.value.split('\n'),
                     })
                   }
                   className="w-full text-zinc-700 bg-zinc-50 p-4 rounded-lg border-none focus:ring-1 focus:ring-zinc-200 min-h-[100px] text-sm"
@@ -302,8 +364,18 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
           className="w-full py-8 border-2 border-dashed border-zinc-200 rounded-lg text-zinc-400 font-semibold hover:border-blue-400 hover:bg-blue-50 hover:text-blue-600 transition-all group"
         >
           <div className="flex flex-col items-center">
-            <svg className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            <svg
+              className="w-8 h-8 mb-2 group-hover:scale-110 transition-transform"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add New Section
           </div>
@@ -311,9 +383,7 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
       </div>
 
       <footer className="mt-24 pt-8 border-t border-zinc-100 text-center">
-        <p className="text-zinc-400 text-sm">
-          Last updated {new Date(state.updatedAt).toLocaleString()}
-        </p>
+        <p className="text-zinc-400 text-sm">Last updated {formatDateTime(state.updatedAt)}</p>
       </footer>
     </div>
   );

@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
-import { GrooveDemo } from '@/components/demo/GrooveDemo';
 import { AuthStatus } from '@/components/auth/AuthStatus';
+import { GrooveDemo } from '@/components/demo/GrooveDemo';
 
 export default function Home() {
   return (
@@ -29,24 +28,24 @@ export default function Home() {
             Drum Charts That <span className="text-blue-600">Work Like You Do.</span>
           </h1>
           <p className="text-xl text-zinc-600 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Create interactive song charts, practice routines, and groove libraries in minutes. 
-            No more rigid templates. Just the rhythms you need.
+            Create interactive song charts, practice routines, and groove libraries in minutes. No
+            more rigid templates. Just the rhythms you need.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <a 
-              href="/login" 
+            <a
+              href="/login"
               className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200 hover:-translate-y-0.5"
             >
               Start Creating (Guest Mode)
             </a>
-            <a 
-              href="/library" 
+            <a
+              href="/library"
               className="px-8 py-4 bg-white text-zinc-900 border-2 border-zinc-200 font-bold rounded-xl hover:border-zinc-300 transition-all"
             >
               View My Library
             </a>
           </div>
-          
+
           {/* Live Demo Container */}
           <div className="relative">
             <div className="absolute -inset-4 bg-blue-600/5 blur-3xl rounded-full -z-10" />
@@ -63,12 +62,18 @@ export default function Home() {
             <div className="space-y-4">
               <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                  />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-zinc-900">Song Charts</h3>
               <p className="text-zinc-600">
-                Structure performance-ready documents with BPM, sections, and integrated groove grids.
+                Structure performance-ready documents with BPM, sections, and integrated groove
+                grids.
               </p>
             </div>
 
@@ -76,7 +81,12 @@ export default function Home() {
             <div className="space-y-4">
               <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-zinc-900">Practice Notebooks</h3>
@@ -89,7 +99,12 @@ export default function Home() {
             <div className="space-y-4">
               <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                  />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-zinc-900">Groove Snippets</h3>

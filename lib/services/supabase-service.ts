@@ -1,12 +1,20 @@
-import { createClient } from '@/lib/supabase/client'
-import { SongChart, GrooveSnippet, Notebook, TimeSignature, SongSection, NotebookSection, GrooveGrid } from '../types/groove'
-import { Database } from '../supabase/database.types'
+import { createClient } from '@/lib/supabase/client';
+import type { Database } from '../supabase/database.types';
+import type {
+  GrooveGrid,
+  GrooveSnippet,
+  Notebook,
+  NotebookSection,
+  SongChart,
+  SongSection,
+  TimeSignature,
+} from '../types/groove';
 
-type DbSongChart = Database['public']['Tables']['song_charts']['Row']
-type DbNotebook = Database['public']['Tables']['notebooks']['Row']
-type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row']
+type DbSongChart = Database['public']['Tables']['song_charts']['Row'];
+type DbNotebook = Database['public']['Tables']['notebooks']['Row'];
+type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row'];
 
-const supabase = createClient()
+const supabase = createClient();
 
 export const SNIPPET_RETRY_DELAY_MS = 1500;
 
@@ -14,7 +22,7 @@ export const supabaseService = {
   // --- Song Charts ---
   async saveSongChart(chart: SongChart): Promise<DbSongChart> {
     if (!chart.userId) {
-      throw new Error('User ID is required to save a song chart')
+      throw new Error('User ID is required to save a song chart');
     }
 
     const { data, error } = await supabase
@@ -23,8 +31,10 @@ export const supabaseService = {
         id: chart.id,
         title: chart.header.title,
         bpm: chart.header.bpm || null,
-        time_signature: chart.header.timeSignature as unknown as Database['public']['Tables']['song_charts']['Insert']['time_signature'],
-        sections: chart.sections as unknown as Database['public']['Tables']['song_charts']['Insert']['sections'],
+        time_signature: chart.header
+          .timeSignature as unknown as Database['public']['Tables']['song_charts']['Insert']['time_signature'],
+        sections:
+          chart.sections as unknown as Database['public']['Tables']['song_charts']['Insert']['sections'],
         tags: chart.tags,
         is_public: chart.isPublic,
         metronome_enabled: chart.header.metronomeEnabled,
@@ -33,29 +43,25 @@ export const supabaseService = {
         user_id: chart.userId,
       })
       .select()
-      .single()
+      .single();
 
     if (error) {
       console.error(`Supabase error in saveSongChart:`, {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       });
       throw error;
     }
-    return data
+    return data;
   },
 
   async getSongChart(id: string): Promise<SongChart> {
-    const { data, error } = await supabase
-      .from('song_charts')
-      .select('*')
-      .eq('id', id)
-      .single()
+    const { data, error } = await supabase.from('song_charts').select('*').eq('id', id).single();
 
-    if (error) throw error
-    
+    if (error) throw error;
+
     // Map DB row to SongChart interface
     return {
       id: data.id,
@@ -70,25 +76,25 @@ export const supabaseService = {
       tags: data.tags || [],
       userId: data.user_id,
       isPublic: !!data.is_public,
-      createdAt: data.created_at || '',
-      updatedAt: data.updated_at || '',
-    }
+      createdAt: data.created_at || null,
+      updatedAt: data.updated_at || null,
+    };
   },
 
   async listSongCharts() {
     const { data, error } = await supabase
       .from('song_charts')
       .select('id, title, bpm, created_at')
-      .order('updated_at', { ascending: false })
+      .order('updated_at', { ascending: false });
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   },
 
   // --- Notebooks ---
   async saveNotebook(notebook: Notebook): Promise<DbNotebook> {
     if (!notebook.userId) {
-      throw new Error('User ID is required to save a notebook')
+      throw new Error('User ID is required to save a notebook');
     }
 
     const { data, error } = await supabase
@@ -96,36 +102,33 @@ export const supabaseService = {
       .upsert({
         id: notebook.id,
         title: notebook.title,
-        sections: notebook.sections as unknown as Database['public']['Tables']['notebooks']['Insert']['sections'],
+        sections:
+          notebook.sections as unknown as Database['public']['Tables']['notebooks']['Insert']['sections'],
         tags: notebook.tags,
         is_public: notebook.isPublic,
         updated_at: new Date().toISOString(),
         user_id: notebook.userId,
       })
       .select()
-      .single()
+      .single();
 
     if (error) {
       console.error(`Supabase error in saveNotebook:`, {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       });
       throw error;
     }
-    return data
+    return data;
   },
 
   async getNotebook(id: string): Promise<Notebook> {
-    const { data, error } = await supabase
-      .from('notebooks')
-      .select('*')
-      .eq('id', id)
-      .single()
+    const { data, error } = await supabase.from('notebooks').select('*').eq('id', id).single();
 
-    if (error) throw error
-    
+    if (error) throw error;
+
     return {
       id: data.id,
       title: data.title,
@@ -133,64 +136,55 @@ export const supabaseService = {
       tags: data.tags || [],
       userId: data.user_id,
       isPublic: !!data.is_public,
-      createdAt: data.created_at || '',
-      updatedAt: data.updated_at || '',
-    }
+      createdAt: data.created_at || null,
+      updatedAt: data.updated_at || null,
+    };
   },
 
   async listNotebooks() {
     const { data, error } = await supabase
       .from('notebooks')
       .select('id, title, created_at')
-      .order('updated_at', { ascending: false })
+      .order('updated_at', { ascending: false });
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   },
 
   async deleteSongChart(id: string) {
-    const { error } = await supabase
-      .from('song_charts')
-      .delete()
-      .eq('id', id)
+    const { error } = await supabase.from('song_charts').delete().eq('id', id);
 
-    if (error) throw error
+    if (error) throw error;
   },
 
   async deleteNotebook(id: string) {
-    const { error } = await supabase
-      .from('notebooks')
-      .delete()
-      .eq('id', id)
+    const { error } = await supabase.from('notebooks').delete().eq('id', id);
 
-    if (error) throw error
+    if (error) throw error;
   },
 
   async deleteGrooveSnippet(id: string) {
-    const { error } = await supabase
-      .from('groove_snippets')
-      .delete()
-      .eq('id', id)
+    const { error } = await supabase.from('groove_snippets').delete().eq('id', id);
 
-    if (error) throw error
+    if (error) throw error;
   },
 
   async duplicateSongChart(id: string): Promise<DbSongChart> {
-    const original = await this.getSongChart(id)
-    const { data: userData, error: userError } = await supabase.auth.getUser()
+    const original = await this.getSongChart(id);
+    const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError || !userData.user) {
-      throw new Error('Authenticated user required to duplicate a song chart')
+      throw new Error('Authenticated user required to duplicate a song chart');
     }
-    
-    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original
-    
+
+    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original;
+
     // Construct new object without ID or audit fields to satisfy TypeScript
     // and rely on saveSongChart/Supabase to handle ID generation and user_id.
     const duplicate: SongChart = {
       ...rest,
       userId: userData.user.id,
-      createdAt: '',
-      updatedAt: '',
+      createdAt: null,
+      updatedAt: null,
       header: {
         ...rest.header,
         title: `${rest.header.title} (Copy)`,
@@ -202,19 +196,19 @@ export const supabaseService = {
   },
 
   async duplicateNotebook(id: string): Promise<DbNotebook> {
-    const original = await this.getNotebook(id)
-    const { data: userData, error: userError } = await supabase.auth.getUser()
+    const original = await this.getNotebook(id);
+    const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError || !userData.user) {
-      throw new Error('Authenticated user required to duplicate a notebook')
+      throw new Error('Authenticated user required to duplicate a notebook');
     }
-    
-    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original
-    
+
+    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original;
+
     const duplicate: Notebook = {
       ...rest,
       userId: userData.user.id,
-      createdAt: '',
-      updatedAt: '',
+      createdAt: null,
+      updatedAt: null,
       title: `${rest.title} (Copy)`,
       isPublic: false,
     } as Notebook;
@@ -223,19 +217,19 @@ export const supabaseService = {
   },
 
   async duplicateGrooveSnippet(id: string): Promise<DbGrooveSnippet> {
-    const original = await this.getGrooveSnippet(id)
-    const { data: userData, error: userError } = await supabase.auth.getUser()
+    const original = await this.getGrooveSnippet(id);
+    const { data: userData, error: userError } = await supabase.auth.getUser();
     if (userError || !userData.user) {
-      throw new Error('Authenticated user required to duplicate a groove snippet')
+      throw new Error('Authenticated user required to duplicate a groove snippet');
     }
-    
-    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original
-    
+
+    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original;
+
     const duplicate: GrooveSnippet = {
       ...rest,
       userId: userData.user.id,
-      createdAt: '',
-      updatedAt: '',
+      createdAt: null,
+      updatedAt: null,
       title: `${rest.title} (Copy)`,
       isPublic: false,
     } as GrooveSnippet;
@@ -246,7 +240,7 @@ export const supabaseService = {
   // --- Groove Snippets ---
   async saveGrooveSnippet(snippet: GrooveSnippet): Promise<DbGrooveSnippet> {
     if (!snippet.userId) {
-      throw new Error('User ID is required to save a groove snippet')
+      throw new Error('User ID is required to save a groove snippet');
     }
 
     const { data, error } = await supabase
@@ -266,28 +260,28 @@ export const supabaseService = {
         user_id: snippet.userId,
       })
       .select()
-      .single()
+      .single();
 
     if (error) {
       console.error(`Supabase error in saveGrooveSnippet:`, {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       });
       throw error;
     }
-    return data
+    return data;
   },
 
   async listGrooveSnippets() {
     const { data, error } = await supabase
       .from('groove_snippets')
       .select('*')
-      .order('updated_at', { ascending: false })
+      .order('updated_at', { ascending: false });
 
-    if (error) throw error
-    return data
+    if (error) throw error;
+    return data;
   },
 
   async getGrooveSnippet(id: string): Promise<GrooveSnippet> {
@@ -295,16 +289,16 @@ export const supabaseService = {
       .from('groove_snippets')
       .select('*')
       .eq('id', id)
-      .maybeSingle()
+      .maybeSingle();
 
     if (error) {
       console.error(`Supabase error in getGrooveSnippet:`, {
         message: error.message,
         details: error.details,
         hint: error.hint,
-        code: error.code
+        code: error.code,
       });
-      throw error
+      throw error;
     }
 
     let finalData = data;
@@ -312,19 +306,19 @@ export const supabaseService = {
     if (!finalData) {
       // Try one more time after a short delay to handle local Supabase sync issues
       console.warn(`[supabaseService] Snippet not found initially: ${id}. Retrying...`);
-      await new Promise(resolve => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
+      await new Promise((resolve) => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
       const retryResult = await supabase
         .from('groove_snippets')
         .select('*')
         .eq('id', id)
         .maybeSingle();
-      
+
       if (retryResult.error) {
         console.error(`Supabase retry error in getGrooveSnippet:`, {
           message: retryResult.error.message,
           details: retryResult.error.details,
           hint: retryResult.error.hint,
-          code: retryResult.error.code
+          code: retryResult.error.code,
         });
         throw retryResult.error;
       }
@@ -337,18 +331,18 @@ export const supabaseService = {
       finalData = retryResult.data;
       console.log(`[supabaseService] Snippet found after retry: ${id}`);
     }
-    
+
     const gridData = finalData.grid_data as unknown as GrooveGrid;
-    
+
     return {
       id: finalData.id,
       title: finalData.title,
       tags: finalData.tags || [],
       userId: finalData.user_id,
       isPublic: !!finalData.is_public,
-      createdAt: finalData.created_at || '',
-      updatedAt: finalData.updated_at || '',
-      ...gridData
-    }
+      createdAt: finalData.created_at || null,
+      updatedAt: finalData.updated_at || null,
+      ...gridData,
+    };
   },
-}
+};

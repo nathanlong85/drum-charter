@@ -4,20 +4,34 @@
  */
 export type DrumSymbol =
   // Standard (Required) hits
-  | 'standard' | 'standard_opt'
-  | 'ghost' | 'ghost_opt'
-  | 'accent' | 'accent_opt'
-  | 'buzz' | 'buzz_opt'
-  | 'cross_stick' | 'cross_stick_opt'
-  | 'cymbal_bell' | 'cymbal_bell_opt'
-  | 'cymbal_choke' | 'cymbal_choke_opt'
-  | 'double' | 'double_opt'
-  | 'flam' | 'flam_opt'
-  | 'hi_hat_closed' | 'hi_hat_closed_opt'
-  | 'hi_hat_loose' | 'hi_hat_loose_opt'
-  | 'hi_hat_open' | 'hi_hat_open_opt'
-  | 'hi_hat_pedal_chick' | 'hi_hat_pedal_chick_opt'
-  | 'rim_shot' | 'rim_shot_opt'
+  | 'standard'
+  | 'standard_opt'
+  | 'ghost'
+  | 'ghost_opt'
+  | 'accent'
+  | 'accent_opt'
+  | 'buzz'
+  | 'buzz_opt'
+  | 'cross_stick'
+  | 'cross_stick_opt'
+  | 'cymbal_bell'
+  | 'cymbal_bell_opt'
+  | 'cymbal_choke'
+  | 'cymbal_choke_opt'
+  | 'double'
+  | 'double_opt'
+  | 'flam'
+  | 'flam_opt'
+  | 'hi_hat_closed'
+  | 'hi_hat_closed_opt'
+  | 'hi_hat_loose'
+  | 'hi_hat_loose_opt'
+  | 'hi_hat_open'
+  | 'hi_hat_open_opt'
+  | 'hi_hat_pedal_chick'
+  | 'hi_hat_pedal_chick_opt'
+  | 'rim_shot'
+  | 'rim_shot_opt'
   | 'none';
 
 /**
@@ -75,8 +89,8 @@ export interface GrooveSnippet extends GrooveGrid {
   bpm?: number;
   userId?: string;
   isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 /**
@@ -100,8 +114,8 @@ export interface Notebook {
   tags: string[];
   userId?: string;
   isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 /**
@@ -143,8 +157,8 @@ export interface SongChart {
   tags: string[];
   userId?: string;
   isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: string | null;
+  updatedAt: string | null;
 }
 
 /**
@@ -155,5 +169,5 @@ export function calculateTotalNotes(
 ): number {
   const { timeSignature, resolution, measures } = grid;
   // Formula: (beatsPerMeasure * (resolution / beatValue)) * measures
-  return (timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue)) * measures;
+  return timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures;
 }

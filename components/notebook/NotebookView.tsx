@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import { Notebook, NotebookSection } from '@/lib/types/groove';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import type { Notebook } from '@/lib/types/groove';
+import { formatDateTime } from '@/lib/utils/format';
 
 interface NotebookViewProps {
   notebook: Notebook;
@@ -24,7 +24,10 @@ export function NotebookView({ notebook }: NotebookViewProps) {
         </div>
         <div className="flex gap-2 items-center flex-wrap">
           {notebook.tags.map((tag, idx) => (
-            <span key={idx} className="bg-zinc-100 text-zinc-600 px-2 py-1 rounded text-xs font-medium">
+            <span
+              key={idx}
+              className="bg-zinc-100 text-zinc-600 px-2 py-1 rounded text-xs font-medium"
+            >
               #{tag}
             </span>
           ))}
@@ -61,9 +64,7 @@ export function NotebookView({ notebook }: NotebookViewProps) {
       </div>
 
       <footer className="mt-24 pt-8 border-t border-zinc-100 text-center">
-        <p className="text-zinc-400 text-sm">
-          Last updated {new Date(notebook.updatedAt).toLocaleString()}
-        </p>
+        <p className="text-zinc-400 text-sm">Last updated {formatDateTime(notebook.updatedAt)}</p>
       </footer>
     </div>
   );

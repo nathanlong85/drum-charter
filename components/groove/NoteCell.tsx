@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
-import { DrumSymbol } from '@/lib/types/groove';
+import type React from 'react';
+import type { DrumSymbol } from '@/lib/types/groove';
 
 interface NoteCellProps {
   symbol: DrumSymbol;
@@ -56,7 +56,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   const iconPath = symbolToIcon[symbol];
 
   // Visual feedback for velocity (opacity)
-  // If velocity is provided, we use it. 
+  // If velocity is provided, we use it.
   // If not, we infer a default opacity based on symbol type.
   const getOpacity = () => {
     if (velocity !== undefined && velocity > 0) {
@@ -93,8 +93,8 @@ export const NoteCell: React.FC<NoteCellProps> = ({
       )}
       {/* Velocity indicator (mini bar if explicit velocity exists) */}
       {velocity !== undefined && velocity > 0 && (
-        <div 
-          className="absolute bottom-0 left-0 h-0.5 bg-blue-500 transition-all" 
+        <div
+          className="absolute bottom-0 left-0 h-0.5 bg-blue-500 transition-all"
           style={{ width: `${velocity * 100}%` }}
         />
       )}

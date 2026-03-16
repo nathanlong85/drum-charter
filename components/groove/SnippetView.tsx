@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import { GrooveSnippet } from '@/lib/types/groove';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import type { GrooveSnippet } from '@/lib/types/groove';
+import { formatDateTime } from '@/lib/utils/format';
 
 interface SnippetViewProps {
   snippet: GrooveSnippet;
@@ -29,7 +29,10 @@ export function SnippetView({ snippet }: SnippetViewProps) {
 
         <div className="flex flex-wrap gap-2">
           {snippet.tags.map((tag, idx) => (
-            <span key={idx} className="bg-zinc-100 text-zinc-600 px-2 py-1 rounded text-xs font-medium">
+            <span
+              key={idx}
+              className="bg-zinc-100 text-zinc-600 px-2 py-1 rounded text-xs font-medium"
+            >
               #{tag}
             </span>
           ))}
@@ -55,7 +58,7 @@ export function SnippetView({ snippet }: SnippetViewProps) {
           DrumCharter Public View
         </p>
         <p className="text-zinc-400 text-xs mt-2">
-          Last updated {new Date(snippet.updatedAt).toLocaleString()}
+          Last updated {formatDateTime(snippet.updatedAt)}
         </p>
       </footer>
     </div>

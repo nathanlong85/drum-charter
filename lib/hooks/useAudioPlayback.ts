@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { GrooveGrid, DrumSymbol } from '@/lib/types/groove';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
 
 interface UseAudioPlaybackProps {
   grid: GrooveGrid;
@@ -16,29 +16,29 @@ export function getVelocityForSymbol(symbol: DrumSymbol): number {
   // Accents: 1.1 (pops over the mix)
   // Standard: 0.7 (baseline)
   // Ghost: 0.2 (subtle)
-  
+
   if (symbol === 'accent') return 1.1;
   if (symbol === 'ghost') return 0.2;
   if (symbol === 'standard') return 0.7;
   if (symbol === 'none') return 0;
-  
+
   // Handle _opt variants and other symbols
   if (symbol.includes('accent')) return 1.1;
   if (symbol.includes('ghost')) return 0.2;
   return 0.7; // Default for everything else
 }
 
-export function useAudioPlayback({ 
-  grid, 
-  bpm, 
+export function useAudioPlayback({
+  grid,
+  bpm,
   onStepChange,
   initialMetronomeEnabled = false,
-  initialMetronomeVolume = 0.5
+  initialMetronomeVolume = 0.5,
 }: UseAudioPlaybackProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [metronomeEnabled, setMetronomeEnabled] = useState(initialMetronomeEnabled);
   const [metronomeVolume, setMetronomeVolume] = useState(initialMetronomeVolume);
-  
+
   const audioContextRef = useRef<AudioContext | null>(null);
   const samplesRef = useRef<Map<DrumSymbol | string, AudioBuffer>>(new Map());
   const nextNoteTimeRef = useRef(0);
@@ -56,26 +56,26 @@ export function useAudioPlayback({
       audioContextRef.current = context;
 
       const sampleMap: Record<string, string> = {
-        'kick': '/audio/samples/drum-kit/default/kick.wav',
-        'snare': '/audio/samples/drum-kit/default/snare.wav',
-        'snare_cross_stick': '/audio/samples/drum-kit/default/snare_cross_stick.wav',
-        'snare_flam': '/audio/samples/drum-kit/default/snare_flam.wav',
-        'snare_buzz': '/audio/samples/drum-kit/default/snare_buzz.wav',
-        'snare_rim_shot': '/audio/samples/drum-kit/default/snare_rimshot.wav',
-        'hi_hat_closed': '/audio/samples/drum-kit/default/hihat_closed.wav',
-        'hi_hat_open': '/audio/samples/drum-kit/default/hihat_open.wav',
-        'hi_hat_loose': '/audio/samples/drum-kit/default/hihat_loose.wav',
-        'hi_hat_pedal': '/audio/samples/drum-kit/default/hihat_pedal.wav',
-        'ride': '/audio/samples/drum-kit/default/ride.wav',
-        'ride_bell': '/audio/samples/drum-kit/default/ride_bell.wav',
-        'crash': '/audio/samples/drum-kit/default/crash.wav',
-        'crash_bell': '/audio/samples/drum-kit/default/crash_bell.wav',
-        'tom_high': '/audio/samples/drum-kit/default/tom_high.wav',
-        'tom_medium': '/audio/samples/drum-kit/default/tom_medium.wav',
-        'tom_floor': '/audio/samples/drum-kit/default/tom_floor.wav',
-        'standard': '/audio/samples/drum-kit/default/snare.wav', // Fallback
-        'click_high': '/audio/samples/metronome/click_high.wav',
-        'click_low': '/audio/samples/metronome/click_low.wav',
+        kick: '/audio/samples/drum-kit/default/kick.wav',
+        snare: '/audio/samples/drum-kit/default/snare.wav',
+        snare_cross_stick: '/audio/samples/drum-kit/default/snare_cross_stick.wav',
+        snare_flam: '/audio/samples/drum-kit/default/snare_flam.wav',
+        snare_buzz: '/audio/samples/drum-kit/default/snare_buzz.wav',
+        snare_rim_shot: '/audio/samples/drum-kit/default/snare_rimshot.wav',
+        hi_hat_closed: '/audio/samples/drum-kit/default/hihat_closed.wav',
+        hi_hat_open: '/audio/samples/drum-kit/default/hihat_open.wav',
+        hi_hat_loose: '/audio/samples/drum-kit/default/hihat_loose.wav',
+        hi_hat_pedal: '/audio/samples/drum-kit/default/hihat_pedal.wav',
+        ride: '/audio/samples/drum-kit/default/ride.wav',
+        ride_bell: '/audio/samples/drum-kit/default/ride_bell.wav',
+        crash: '/audio/samples/drum-kit/default/crash.wav',
+        crash_bell: '/audio/samples/drum-kit/default/crash_bell.wav',
+        tom_high: '/audio/samples/drum-kit/default/tom_high.wav',
+        tom_medium: '/audio/samples/drum-kit/default/tom_medium.wav',
+        tom_floor: '/audio/samples/drum-kit/default/tom_floor.wav',
+        standard: '/audio/samples/drum-kit/default/snare.wav', // Fallback
+        click_high: '/audio/samples/metronome/click_high.wav',
+        click_low: '/audio/samples/metronome/click_low.wav',
       };
 
       for (const [symbol, url] of Object.entries(sampleMap)) {
@@ -105,98 +105,108 @@ export function useAudioPlayback({
 
     const source = audioContextRef.current.createBufferSource();
     const gainNode = audioContextRef.current.createGain();
-    
+
     source.buffer = samplesRef.current.get(sampleKey as DrumSymbol)!;
-    
+
     // Set volume based on velocity (0-1+ range)
     // Using a steeper exponential curve (2.0) for more natural volume transitions
     // Accents can go slightly above 1.0 (e.g. 1.1)
     // Clamping to 1.5 to prevent extreme clipping as per CodeRabbit recommendation
-    const gainValue = Math.min(Math.pow(velocity, 2.0), 1.5);
+    const gainValue = Math.min(velocity ** 2.0, 1.5);
     gainNode.gain.setValueAtTime(gainValue, time);
-    
+
     source.connect(gainNode);
     gainNode.connect(audioContextRef.current.destination);
-    
+
     source.start(time);
   }, []);
 
-  const getVelocityForSymbolInHook = useCallback((symbol: DrumSymbol): number => {
+  const _getVelocityForSymbolInHook = useCallback((symbol: DrumSymbol): number => {
     return getVelocityForSymbol(symbol);
   }, []);
 
-  const scheduleNote = useCallback((step: number, time: number) => {
-    // 1. Schedule Metronome if enabled
-    if (metronomeEnabled) {
-      const stepsPerBeat = grid.resolution / grid.timeSignature.beatValue;
-      const isBeat = step % stepsPerBeat === 0;
+  const scheduleNote = useCallback(
+    (step: number, time: number) => {
+      // 1. Schedule Metronome if enabled
+      if (metronomeEnabled) {
+        const stepsPerBeat = grid.resolution / grid.timeSignature.beatValue;
+        const isBeat = step % stepsPerBeat === 0;
 
-      if (isBeat) {
-        const beatInMeasure = Math.floor(step / stepsPerBeat) % grid.timeSignature.beatsPerMeasure;
-        const isFirstBeat = beatInMeasure === 0;
-        const sampleKey = isFirstBeat ? 'click_high' : 'click_low';
-        playSample(sampleKey, time, metronomeVolume);
-      }
-    }
-
-    // 2. Check each instrument at this step
-    grid.instruments.forEach((inst) => {
-      const symbol = inst.notes[step];
-      if (symbol && symbol !== 'none') {
-        const instId = inst.instrumentId.toLowerCase();
-        
-        // Determine velocity: explicit value from inst.velocities, or derived from symbol
-        let velocity = getVelocityForSymbol(symbol);
-        if (inst.velocities && inst.velocities[step] !== undefined && inst.velocities[step] !== 0) {
-          velocity = inst.velocities[step];
-        }
-
-        // 1. Try symbol-specific sound first (e.g., if "rim_shot" is a global sample)
-        if (samplesRef.current.has(symbol)) {
-          playSample(symbol, time, velocity);
-          return;
-        }
-
-        // 2. Try instrument + symbol combination (e.g., snare_rim_shot)
-        const combinedKey = `${instId}_${symbol}`;
-        if (samplesRef.current.has(combinedKey as DrumSymbol)) {
-          playSample(combinedKey, time, velocity);
-          return;
-        }
-
-        // 3. Fallback to instrument default
-        if (instId.includes('kick') || instId.includes('bass')) {
-          playSample('kick', time, velocity);
-        } else if (instId.includes('snare')) {
-          playSample('snare', time, velocity);
-        } else if (instId.includes('hi_hat') || instId.includes('hat')) {
-          playSample('hi_hat_closed', time, velocity);
-        } else if (instId.includes('ride')) {
-          playSample('ride', time, velocity);
-        } else if (instId.includes('crash')) {
-          playSample('crash', time, velocity);
-        } else if (instId.includes('tom')) {
-          if (instId.includes('high')) playSample('tom_high', time, velocity);
-          else if (instId.includes('mid')) playSample('tom_medium', time, velocity);
-          else if (instId.includes('floor')) playSample('tom_floor', time, velocity);
-          else playSample('tom_medium', time, velocity);
+        if (isBeat) {
+          const beatInMeasure =
+            Math.floor(step / stepsPerBeat) % grid.timeSignature.beatsPerMeasure;
+          const isFirstBeat = beatInMeasure === 0;
+          const sampleKey = isFirstBeat ? 'click_high' : 'click_low';
+          playSample(sampleKey, time, metronomeVolume);
         }
       }
-    });
 
-    if (onStepChange) {
-      // Sync UI with audio (rough estimation for now)
-      onStepChange(step);
-    }
-  }, [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample]);
+      // 2. Check each instrument at this step
+      grid.instruments.forEach((inst) => {
+        const symbol = inst.notes[step];
+        if (symbol && symbol !== 'none') {
+          const instId = inst.instrumentId.toLowerCase();
+
+          // Determine velocity: explicit value from inst.velocities, or derived from symbol
+          let velocity = getVelocityForSymbol(symbol);
+          if (
+            inst.velocities &&
+            inst.velocities[step] !== undefined &&
+            inst.velocities[step] !== 0
+          ) {
+            velocity = inst.velocities[step];
+          }
+
+          // 1. Try symbol-specific sound first (e.g., if "rim_shot" is a global sample)
+          if (samplesRef.current.has(symbol)) {
+            playSample(symbol, time, velocity);
+            return;
+          }
+
+          // 2. Try instrument + symbol combination (e.g., snare_rim_shot)
+          const combinedKey = `${instId}_${symbol}`;
+          if (samplesRef.current.has(combinedKey as DrumSymbol)) {
+            playSample(combinedKey, time, velocity);
+            return;
+          }
+
+          // 3. Fallback to instrument default
+          if (instId.includes('kick') || instId.includes('bass')) {
+            playSample('kick', time, velocity);
+          } else if (instId.includes('snare')) {
+            playSample('snare', time, velocity);
+          } else if (instId.includes('hi_hat') || instId.includes('hat')) {
+            playSample('hi_hat_closed', time, velocity);
+          } else if (instId.includes('ride')) {
+            playSample('ride', time, velocity);
+          } else if (instId.includes('crash')) {
+            playSample('crash', time, velocity);
+          } else if (instId.includes('tom')) {
+            if (instId.includes('high')) playSample('tom_high', time, velocity);
+            else if (instId.includes('mid')) playSample('tom_medium', time, velocity);
+            else if (instId.includes('floor')) playSample('tom_floor', time, velocity);
+            else playSample('tom_medium', time, velocity);
+          }
+        }
+      });
+
+      if (onStepChange) {
+        // Sync UI with audio (rough estimation for now)
+        onStepChange(step);
+      }
+    },
+    [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample],
+  );
 
   const nextNote = useCallback(() => {
     const secondsPerBeat = 60.0 / bpm;
     const { resolution, timeSignature, measures } = grid;
     const secondsPerStep = secondsPerBeat / (resolution / timeSignature.beatValue);
-    
+
     nextNoteTimeRef.current += secondsPerStep;
-    currentStepRef.current = (currentStepRef.current + 1) % (timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures);
+    currentStepRef.current =
+      (currentStepRef.current + 1) %
+      (timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures);
   }, [bpm, grid]);
 
   const scheduler = useCallback(() => {
@@ -217,7 +227,7 @@ export function useAudioPlayback({
       setIsPlaying(false);
     } else {
       if (!audioContextRef.current) return;
-      
+
       if (audioContextRef.current.state === 'suspended') {
         audioContextRef.current.resume();
       }
@@ -229,12 +239,12 @@ export function useAudioPlayback({
     }
   };
 
-  return { 
-    isPlaying, 
-    togglePlayback, 
-    metronomeEnabled, 
-    setMetronomeEnabled, 
-    metronomeVolume, 
-    setMetronomeVolume 
+  return {
+    isPlaying,
+    togglePlayback,
+    metronomeEnabled,
+    setMetronomeEnabled,
+    metronomeVolume,
+    setMetronomeVolume,
   };
 }

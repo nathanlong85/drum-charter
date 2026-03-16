@@ -1,7 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import LibraryDashboard from '@/components/library/LibraryDashboard';
 import { AuthStatus } from '@/components/auth/AuthStatus';
+import LibraryDashboard from '@/components/library/LibraryDashboard';
+import { createClient } from '@/lib/supabase/server';
 
 export default async function LibraryPage() {
   const supabase = await createClient();

@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
+import type React from 'react';
+import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
 import { NoteCell } from './NoteCell';
 
 interface InstrumentRowProps {
@@ -36,7 +36,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
           const isBeat = i % notesPerBeat === 0;
           const isMeasureBoundary = (i + 1) % totalNotesPerMeasure === 0;
           const velocity = velocities ? velocities[i] : undefined;
-          
+
           return (
             <NoteCell
               key={i}

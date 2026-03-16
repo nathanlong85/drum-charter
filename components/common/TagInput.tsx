@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { X, Tag as TagIcon, Plus } from 'lucide-react';
+import { Plus, Tag as TagIcon, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 interface TagInputProps {
   tags: string[];
@@ -11,12 +11,12 @@ interface TagInputProps {
   id?: string;
 }
 
-export function TagInput({ 
-  tags, 
-  onChange, 
-  suggestions = [], 
-  placeholder = "Add tag...",
-  id
+export function TagInput({
+  tags,
+  onChange,
+  suggestions = [],
+  placeholder = 'Add tag...',
+  id,
 }: TagInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [isFocused, setIsFocused] = useState(false);
@@ -24,8 +24,9 @@ export function TagInput({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const filteredSuggestions = suggestions.filter(
-    s => !tags.some(t => t.trim().toLowerCase() === s.trim().toLowerCase()) && 
-    s.toLowerCase().includes(inputValue.trim().toLowerCase())
+    (s) =>
+      !tags.some((t) => t.trim().toLowerCase() === s.trim().toLowerCase()) &&
+      s.toLowerCase().includes(inputValue.trim().toLowerCase()),
   );
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function TagInput({
 
   const addTag = (tag: string) => {
     const trimmed = tag.trim().toLowerCase();
-    if (trimmed && !tags.some(t => t.trim().toLowerCase() === trimmed)) {
+    if (trimmed && !tags.some((t) => t.trim().toLowerCase() === trimmed)) {
       onChange([...tags, trimmed]);
     }
     setInputValue('');
@@ -48,25 +49,25 @@ export function TagInput({
   };
 
   const removeTag = (tagToRemove: string) => {
-    onChange(tags.filter(t => t !== tagToRemove));
+    onChange(tags.filter((t) => t !== tagToRemove));
   };
 
   return (
     <div ref={containerRef} className="relative w-full">
-      <div 
+      <div
         className={`flex flex-wrap gap-2 p-2 border-2 rounded-lg transition-all ${
           isFocused ? 'border-zinc-800 bg-white' : 'border-zinc-100 bg-zinc-50'
         }`}
       >
         <TagIcon className="w-4 h-4 text-zinc-400 mt-1 ml-1" />
-        
+
         {tags.map((tag) => (
-          <span 
-            key={tag} 
+          <span
+            key={tag}
             className="flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"
           >
             {tag}
-            <button 
+            <button
               type="button"
               onClick={() => removeTag(tag)}
               className="hover:text-red-400 transition-colors"
@@ -92,7 +93,7 @@ export function TagInput({
           onBlur={(e) => {
             setIsFocused(false);
             // Only hide suggestions if the focus is moving outside the container
-            const currentTarget = e.currentTarget;
+            const _currentTarget = e.currentTarget;
             setTimeout(() => {
               if (!containerRef.current?.contains(document.activeElement)) {
                 setShowSuggestions(false);
@@ -107,16 +108,18 @@ export function TagInput({
               removeTag(tags[tags.length - 1]);
             }
           }}
-          placeholder={tags.length === 0 ? placeholder : "Add tag..."}
+          placeholder={tags.length === 0 ? placeholder : 'Add tag...'}
           className="flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 min-w-[120px] placeholder-zinc-400 font-medium"
-          aria-label={tags.length === 0 ? placeholder : "Add tag"}
+          aria-label={tags.length === 0 ? placeholder : 'Add tag'}
         />
       </div>
 
       {showSuggestions && filteredSuggestions.length > 0 && (
         <div className="absolute z-10 w-full mt-1 bg-white border-2 border-zinc-800 rounded-lg shadow-xl overflow-hidden">
           <div className="p-2 border-b border-zinc-100 bg-zinc-50 flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Suggestions</span>
+            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">
+              Suggestions
+            </span>
           </div>
           <div className="max-h-48 overflow-y-auto">
             {filteredSuggestions.map((suggestion) => (

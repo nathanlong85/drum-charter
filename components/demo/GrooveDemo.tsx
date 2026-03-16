@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useReducer } from 'react';
-import { GrooveGrid } from '@/lib/types/groove';
+import { useReducer } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { grooveReducer } from '@/lib/state/groove-reducer';
+import type { GrooveGrid } from '@/lib/types/groove';
 
 const INITIAL_DEMO_GRID: GrooveGrid = {
   timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
@@ -19,16 +19,44 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
       instrumentId: 'sn',
       label: 'Snare',
       notes: [
-        'none', 'none', 'none', 'none', 'standard', 'none', 'none', 'none', 
-        'none', 'none', 'none', 'none', 'standard', 'none', 'none', 'none'
+        'none',
+        'none',
+        'none',
+        'none',
+        'standard',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'standard',
+        'none',
+        'none',
+        'none',
       ],
     },
     {
       instrumentId: 'bd',
       label: 'Bass',
       notes: [
-        'standard', 'none', 'none', 'none', 'none', 'none', 'none', 'none', 
-        'standard', 'none', 'none', 'none', 'none', 'none', 'none', 'none'
+        'standard',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'standard',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
       ],
     },
   ],
@@ -46,9 +74,11 @@ export function GrooveDemo() {
         </span>
       </div>
       <div className="overflow-x-auto">
-        <GrooveGridEditor 
-          initialGrid={grid} 
-          onChange={(updatedGrid) => dispatch({ type: 'SET_GRID', payload: updatedGrid.instruments })} 
+        <GrooveGridEditor
+          initialGrid={grid}
+          onChange={(updatedGrid) =>
+            dispatch({ type: 'SET_GRID', payload: updatedGrid.instruments })
+          }
         />
       </div>
       <p className="mt-4 text-sm text-zinc-500 italic text-center">

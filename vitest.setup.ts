@@ -31,9 +31,9 @@ class MockAudioContext {
   destination = {};
 }
 
-// @ts-ignore
+// @ts-expect-error
 window.AudioContext = MockAudioContext;
-// @ts-ignore
+// @ts-expect-error
 window.webkitAudioContext = MockAudioContext;
 
 // Mock fetch for all tests

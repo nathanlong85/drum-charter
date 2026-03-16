@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { LibraryCard } from './LibraryCard';
 import { supabaseService } from '@/lib/services/supabase-service';
-import { Notebook, GrooveSnippet, SongChart } from '@/lib/types/groove';
 import { createClient } from '@/lib/supabase/client';
+import type { GrooveSnippet, Notebook, SongChart } from '@/lib/types/groove';
+import { LibraryCard } from './LibraryCard';
 
 const supabase = createClient();
 
@@ -28,18 +28,26 @@ export default function LibraryDashboard({
   const [notebooks, setNotebooks] = useState(initialNotebooks);
   const [snippets, setSnippets] = useState(initialSnippets);
 
-  const allAvailableTags = Array.from(new Set([
-    ...songs.flatMap(s => (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean)),
-    ...notebooks.flatMap(n => (n.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean)),
-    ...snippets.flatMap(s => (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean))
-  ])).sort();
+  const allAvailableTags = Array.from(
+    new Set([
+      ...songs.flatMap((s) =>
+        (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
+      ),
+      ...notebooks.flatMap((n) =>
+        (n.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
+      ),
+      ...snippets.flatMap((s) =>
+        (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
+      ),
+    ]),
+  ).sort();
 
   const toggleTag = (tag: string) => {
     const normalizedTag = tag.trim().toLowerCase();
-    setSelectedTags(prev => {
-      const normalizedPrev = prev.map(t => t.trim().toLowerCase());
-      return normalizedPrev.includes(normalizedTag) 
-        ? normalizedPrev.filter(t => t !== normalizedTag) 
+    setSelectedTags((prev) => {
+      const normalizedPrev = prev.map((t) => t.trim().toLowerCase());
+      return normalizedPrev.includes(normalizedTag)
+        ? normalizedPrev.filter((t) => t !== normalizedTag)
         : [...normalizedPrev, normalizedTag];
     });
   };
@@ -77,7 +85,7 @@ export default function LibraryDashboard({
         duplicated = await supabaseService.duplicateGrooveSnippet(id);
         setSnippets([duplicated, ...snippets]);
       }
-      
+
       // Optional: redirect to the new item
       // window.location.href = `/${type}s/${duplicated.id}`;
     } catch (error) {
@@ -91,16 +99,17 @@ export default function LibraryDashboard({
       const normalizedItemTags = (item.tags || [])
         .map((t: string) => t.trim().toLowerCase())
         .filter(Boolean);
-        
-      const titleMatch = (item.title || '').toLowerCase().includes(searchQuery.trim().toLowerCase());
+
+      const titleMatch = (item.title || '')
+        .toLowerCase()
+        .includes(searchQuery.trim().toLowerCase());
       const queryTagMatch = normalizedItemTags.some((tag: string) =>
-        tag.includes(searchQuery.trim().toLowerCase())
+        tag.includes(searchQuery.trim().toLowerCase()),
       );
-      
-      const selectedTagsMatch = selectedTags.length === 0 || 
-        selectedTags.every(tag => 
-          normalizedItemTags.includes(tag.trim().toLowerCase())
-        );
+
+      const selectedTagsMatch =
+        selectedTags.length === 0 ||
+        selectedTags.every((tag) => normalizedItemTags.includes(tag.trim().toLowerCase()));
 
       return (titleMatch || queryTagMatch) && selectedTagsMatch;
     });
@@ -112,16 +121,21 @@ export default function LibraryDashboard({
     { id: 'snippet', label: 'Snippets', count: snippets.length },
   ];
 
-  const currentItems = 
-    activeTab === 'song' ? filterItems(songs) :
-    activeTab === 'notebook' ? filterItems(notebooks) :
-    filterItems(snippets);
+  const currentItems =
+    activeTab === 'song'
+      ? filterItems(songs)
+      : activeTab === 'notebook'
+        ? filterItems(notebooks)
+        : filterItems(snippets);
 
   const handleCreateNew = async () => {
     try {
       // Get current user to avoid RLS violation 42501
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
       if (authError || !user) {
         console.error('Authentication required to create items:', authError);
         alert('Please log in or continue as a guest to create items.');
@@ -145,7 +159,7 @@ export default function LibraryDashboard({
           isPublic: false,
         };
         const saved = await supabaseService.saveSongChart(newSong as SongChart);
-        if (saved && saved.id) {
+        if (saved?.id) {
           console.log('Created song:', saved.id);
           // Wait briefly for local sync before redirecting
           setTimeout(() => {
@@ -163,7 +177,7 @@ export default function LibraryDashboard({
           isPublic: false,
         };
         const saved = await supabaseService.saveNotebook(newNotebook as Notebook);
-        if (saved && saved.id) {
+        if (saved?.id) {
           console.log('Created notebook:', saved.id);
           // Wait briefly for local sync before redirecting
           setTimeout(() => {
@@ -182,13 +196,25 @@ export default function LibraryDashboard({
           resolution: 16,
           measures: 1,
           instruments: [
-            { instrumentId: 'kick', label: 'Kick', notes: Array(16).fill('none') },
-            { instrumentId: 'snare', label: 'Snare', notes: Array(16).fill('none') },
-            { instrumentId: 'hihat', label: 'Hi-Hat', notes: Array(16).fill('none') },
+            {
+              instrumentId: 'kick',
+              label: 'Kick',
+              notes: Array(16).fill('none'),
+            },
+            {
+              instrumentId: 'snare',
+              label: 'Snare',
+              notes: Array(16).fill('none'),
+            },
+            {
+              instrumentId: 'hihat',
+              label: 'Hi-Hat',
+              notes: Array(16).fill('none'),
+            },
           ],
         };
         const saved = await supabaseService.saveGrooveSnippet(newSnippet as GrooveSnippet);
-        if (saved && saved.id) {
+        if (saved?.id) {
           console.log('Created snippet:', saved.id);
           // Wait briefly for local sync before redirecting
           setTimeout(() => {
@@ -204,7 +230,7 @@ export default function LibraryDashboard({
         details: error.details,
         hint: error.hint,
         code: error.code,
-        fullError: error
+        fullError: error,
       });
       alert('Failed to create new item. Check console for details.');
     }
@@ -234,11 +260,7 @@ export default function LibraryDashboard({
           </div>
 
           <div className="relative w-full md:w-64">
-            <form 
-              role="search" 
-              aria-label="Library search"
-              onSubmit={(e) => e.preventDefault()}
-            >
+            <form role="search" aria-label="Library search" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="text"
                 placeholder="Search by title or tag..."
@@ -266,8 +288,10 @@ export default function LibraryDashboard({
 
         {allAvailableTags.length > 0 && (
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mr-2">Filter by Tags:</span>
-            {allAvailableTags.map(tag => {
+            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mr-2">
+              Filter by Tags:
+            </span>
+            {allAvailableTags.map((tag) => {
               const isActive = selectedTags.includes(tag);
               return (
                 <button
@@ -303,8 +327,18 @@ export default function LibraryDashboard({
           className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-zinc-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all group"
         >
           <div className="w-12 h-12 bg-zinc-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-blue-100">
-            <svg className="w-6 h-6 text-zinc-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            <svg
+              className="w-6 h-6 text-zinc-400 group-hover:text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 4v16m8-8H4"
+              />
             </svg>
           </div>
           <span className="text-sm font-semibold text-zinc-500 group-hover:text-blue-600">
