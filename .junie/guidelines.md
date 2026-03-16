@@ -53,7 +53,10 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - **Source of Truth**: Always check `.junie/CLI_REFERENCE.md` before running ANY non-trivial CLI command (Supabase, Git, Playwright).
 - **Verification First**: If a command is not in the reference, research the official documentation first, then add the verified command to the reference BEFORE executing it.
 - **Dry Run**: For high-risk commands (migrations, history rewrites), print the command I intend to run and wait for explicit approval on that exact string.
-- **Timeout Management**: Proactively use the `timeout` parameter (up to 3600s) in `bash` tool calls for any command known to be slow (e.g., CodeRabbit, Playwright, full test suites). Refer to `.junie/CLI_REFERENCE.md` for recommended values.
+- **Timeout Management**: Proactively use the `timeout` parameter (up to 3600s) in `bash` tool calls for any command known to be slow (e.g., CodeRabbit, Playwright, full test suites).
+  - **Rule**: ALWAYS use an explicit high timeout (e.g., 300-3600s) for slow commands. Refer to `.junie/CLI_REFERENCE.md` for the "Slow Commands & Timeout Management" table and recommended values.
+  - **Duration-Based Slow Commands**: Any command with a literal duration value > 60s (e.g., `sleep 61`) is automatically classified as a "Slow Command" and must use an explicit timeout.
+    - **Maximum Timeout**: The maximum supported timeout is 3600s. Use it for full E2E suites and CodeRabbit scans to prevent premature termination.
 
 ---
 

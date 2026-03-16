@@ -32,7 +32,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev --port 3001',
+    command: 'ENABLE_SW=true pnpm dev --port 3001 --webpack',
     url: 'http://localhost:3001',
     reuseExistingServer: true,
     timeout: 120000,

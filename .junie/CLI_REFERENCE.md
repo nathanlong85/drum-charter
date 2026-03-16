@@ -116,3 +116,4 @@ Playwright tests) frequently exceed this.
 | Playwright (Single) | 180s | `npx playwright test <FILE> --project=chromium` |
 | Vitest (Full) | 120s | `npx vitest run` |
 | Supabase Start | 180s | Initial Docker image pulls can be slow. |
+| Sleep (>60s) | [Duration] + 10s | e.g., `sleep 70` needs `timeout: 80` |
