@@ -13,6 +13,12 @@ test.describe('Offline Support (PWA)', () => {
     // Verify online initially
     await expect(page.getByText('You are offline')).not.toBeVisible();
 
+    // Test cached asset: Metronome audio should be cached
+    // Use a direct fetch in the browser context to verify service worker caching
+    await page.evaluate(async () => {
+      await fetch('/audio/samples/metronome/click_high.wav');
+    });
+
     // Go offline
     await page.context().setOffline(true);
     
@@ -29,10 +35,8 @@ test.describe('Offline Support (PWA)', () => {
     // Offline indicator should still be there
     await expect(page.getByText('You are offline')).toBeVisible();
 
-    // Test cached asset: Metronome audio should be cached
-    // Use a direct fetch in the browser context to verify service worker caching
     const isCached = await page.evaluate(async () => {
-      const response = await fetch('/audio/metronome-click.wav');
+      const response = await fetch('/audio/samples/metronome/click_high.wav');
       return response.ok;
     });
     expect(isCached).toBeTruthy();

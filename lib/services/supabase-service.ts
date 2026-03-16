@@ -182,13 +182,12 @@ export const supabaseService = {
       throw new Error('Authenticated user required to duplicate a song chart')
     }
     
-    const { id: _, userId, createdAt, updatedAt, ...rest } = original
+    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original
     
     // Construct new object without ID or audit fields to satisfy TypeScript
     // and rely on saveSongChart/Supabase to handle ID generation and user_id.
     const duplicate: SongChart = {
       ...rest,
-      id: undefined as unknown as string, // saveSongChart handles this if missing in DB insert
       userId: userData.user.id,
       createdAt: '',
       updatedAt: '',
@@ -197,7 +196,7 @@ export const supabaseService = {
         title: `${rest.header.title} (Copy)`,
       },
       isPublic: false,
-    };
+    } as SongChart;
 
     return this.saveSongChart(duplicate);
   },
@@ -209,17 +208,16 @@ export const supabaseService = {
       throw new Error('Authenticated user required to duplicate a notebook')
     }
     
-    const { id: _, userId, createdAt, updatedAt, ...rest } = original
+    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original
     
     const duplicate: Notebook = {
       ...rest,
-      id: undefined as unknown as string,
       userId: userData.user.id,
       createdAt: '',
       updatedAt: '',
       title: `${rest.title} (Copy)`,
       isPublic: false,
-    };
+    } as Notebook;
 
     return this.saveNotebook(duplicate);
   },
@@ -231,17 +229,16 @@ export const supabaseService = {
       throw new Error('Authenticated user required to duplicate a groove snippet')
     }
     
-    const { id: _, userId, createdAt, updatedAt, ...rest } = original
+    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original
     
     const duplicate: GrooveSnippet = {
       ...rest,
-      id: undefined as unknown as string,
       userId: userData.user.id,
       createdAt: '',
       updatedAt: '',
       title: `${rest.title} (Copy)`,
       isPublic: false,
-    };
+    } as GrooveSnippet;
 
     return this.saveGrooveSnippet(duplicate);
   },

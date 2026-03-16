@@ -53,6 +53,7 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - **Source of Truth**: Always check `.junie/CLI_REFERENCE.md` before running ANY non-trivial CLI command (Supabase, Git, Playwright).
 - **Verification First**: If a command is not in the reference, research the official documentation first, then add the verified command to the reference BEFORE executing it.
 - **Dry Run**: For high-risk commands (migrations, history rewrites), print the command I intend to run and wait for explicit approval on that exact string.
+- **Timeout Management**: Proactively use the `timeout` parameter (up to 3600s) in `bash` tool calls for any command known to be slow (e.g., CodeRabbit, Playwright, full test suites). Refer to `.junie/CLI_REFERENCE.md` for recommended values.
 
 ---
 

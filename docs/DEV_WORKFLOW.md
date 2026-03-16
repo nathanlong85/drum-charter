@@ -23,7 +23,7 @@ git checkout -b feature/your-feature-name
 ### Step 2.2: Implementation & Testing
 - Implement changes using the **Karpathy Guidelines** (Simplicity First, Surgical Changes).
 - Write or update unit/E2E tests for every change.
-- Verify changes locally:
+- Verify changes locally (using high timeouts where necessary per CLI reference):
   - Unit: `npx vitest run`
   - E2E: `npx playwright test --project=chromium`
 

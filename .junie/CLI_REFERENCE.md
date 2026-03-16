@@ -57,3 +57,26 @@ Commands for running automated browser tests against the local development envir
 - **Command**: `npx playwright test <PATH_TO_SPEC> --project=chromium --timeout 180000 --workers 1`
 - **Prerequisites**: Local Supabase (`supabase start`) and Next.js (`pnpm dev`) must be running.
 - **Pitfalls**: Default timeouts may be too short for heavy database operations; use `--timeout` to increase stability.
+
+---
+
+## Slow Commands & Timeout Management
+Junie's terminal environment has a default 60-second timeout for `bash` commands. Some tools (e.g., full test suites, CodeRabbit scans, complex Playwright tests) frequently exceed this.
+
+### 1. The `timeout` Parameter
+- **Usage**: When Junie executes a `bash` command, she can pass a `timeout` parameter (in seconds).
+- **Maximum**: 3600 (1 hour).
+- **Rule**: ALWAYS use an explicit high timeout (e.g., 300+) for the following "Slow Commands":
+    - `npx playwright test ...`
+    - `coderabbit review ...`
+    - `npx vitest run` (in large modules)
+    - `pnpm install` (initial or major updates)
+
+### 2. Verified Slow Command Patterns
+| Tool | Recommended Timeout | Notes |
+| :--- | :--- | :--- |
+| CodeRabbit Review | 300s | `coderabbit review --base main --prompt-only --plain` |
+| Playwright (Full) | 600s | `npx playwright test --project=chromium` |
+| Playwright (Single) | 180s | `npx playwright test <FILE> --project=chromium` |
+| Vitest (Full) | 120s | `npx vitest run` |
+| Supabase Start | 180s | Initial Docker image pulls can be slow. |
