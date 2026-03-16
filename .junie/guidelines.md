@@ -25,17 +25,19 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - The user's question is the single highest priority at that moment.
 - Do not provide overwhelming context or unrelated technical updates when the user is focused on a specific issue.
 
-### 4. CodeRabbit Review & Polling Protocol
+### 4. CodeRabbit Review Protocol
 - **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
-- **Robust Polling**: Due to 60s terminal timeouts, use a "Check-and-Report" approach:
-    1. Perform one immediate check for CodeRabbit feedback.
-    2. If no feedback is found, inform the user you are in "Polling Mode" and precisely when you will perform the next check (e.g., in 2-5 minutes).
-    3. **Countdown Updates**: During the polling period, provide a status update every 30 seconds (e.g., "Next CodeRabbit Comment Check: 2:00", "1:30", etc.).
-    4. Clearly report polling status: `Last Check: [time]`, `Next Check: [time]`.
+- **Manual Check**: I will only check for CodeRabbit feedback when you explicitly ask me to (e.g., "Check CodeRabbit," "Is the review done?").
+- **Review Status Check**:
+    - If CodeRabbit is still performing a review (PR status is "Pending" or "In Progress"), I will notify you and **do nothing else**. I will wait for your next instruction to check again.
+    - If the review is complete, I will proceed with the structured feedback review.
 - **Structured Feedback Review**: Treat the PR review as a state machine:
     1. **Check PR Review Status**: Is it `CHANGES_REQUESTED`, `PENDING`, or `APPROVED`?
     2. **Filter Unresolved/Active**: Fetch all review comments and filter for `isResolved: false` AND `isOutdated: false`.
     3. **No "False Completeness"**: Only report "All addressed" when that filtered list is empty AND the PR status is no longer `CHANGES_REQUESTED`.
+- **Finding Blockers**: If the PR is not "Approved" and no override is given, I must scan the PR to find specific comments blocking the approval.
+- **Prioritize Project Standards**: Always prioritize our own standards, preferences, and project plans over CodeRabbit suggestions. If there is a conflict, I will flag it for your decision.
+- **Handling Disagreements**: If I disagree with a CodeRabbit comment or cannot address it, I will inform you and wait for your final call.
 - **No "Stale" Implementation**: Before starting any new work in a feature branch, you MUST check the PR for any pending CodeRabbit or human feedback and address it first.
 - **Reporting**: Summarize findings and ask for approval before applying fixes.
 

@@ -40,11 +40,14 @@ We leverage automated and human feedback before any code is merged into `main`.
 ### Step 3.1: Push & Open PR
 Push your branch to GitHub and open a Pull Request. Always include a detailed Markdown description.
 
-### Step 3.2: CodeRabbit Review & Polling Protocol
-- **Automatic Review**: CodeRabbit will automatically scan the PR within 1–3 minutes.
-- **Polling Loop (Junie)**: Junie will wait 3-5 minutes after a push and then use the `GitHub` MCP `pull_request_read` to check for new review comments.
-- **Addressing Feedback**: Review the bot's comments, provide a summary of findings, and ask for explicit approval before applying fixes. This ensures no stale implementation is ever merged.
-- **Repetition**: This process repeats until CodeRabbit is satisfied.
+### Step 3.2: CodeRabbit Review Protocol
+- **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
+- **Manual Check**: Junie will only check for CodeRabbit feedback when you explicitly ask (e.g., "Check CodeRabbit," "Is the review done?").
+- **Review Status Check**:
+    - If the review is still "Pending" or "In Progress," Junie will notify you and **do nothing else**, waiting for your next instruction to check again.
+    - If complete, Junie will perform a structured review of all unresolved (`isResolved: false`) and current (`isOutdated: false`) comments.
+- **No "False Completeness"**: Junie will only report "All addressed" when there are zero active comments AND the PR status is no longer `CHANGES_REQUESTED`.
+- **Approval Before Fixes**: Junie will summarize all findings and seek your explicit approval before applying any fixes.
 
 ### Step 3.3: Human Quality Gate
 - **Discussion**: Nate (the human) will review the code and provide qualitative feedback.

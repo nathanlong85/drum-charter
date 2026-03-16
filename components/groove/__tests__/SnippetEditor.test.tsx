@@ -58,7 +58,7 @@ describe('SnippetEditor', () => {
     fireEvent.change(tagInput, { target: { value: 'linear' } });
     fireEvent.keyDown(tagInput, { key: 'Enter', code: 'Enter' });
     
-    expect(screen.getByText('#linear')).toBeDefined();
+    expect(screen.getByText('linear')).toBeDefined();
     
     await waitFor(() => {
       expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(

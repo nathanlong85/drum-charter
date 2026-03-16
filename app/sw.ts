@@ -18,6 +18,7 @@ const serwist = new Serwist({
       matcher: ({ request, url }) => {
         // Only match if it's a Supabase REST v1 URL AND not an authenticated request.
         // This ensures authenticated requests bypass this specific cache handler entirely.
+        // We explicitly check for the Authorization header.
         return (
           /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/.test(url.href) &&
           !request.headers.has("Authorization")
@@ -40,6 +41,7 @@ const serwist = new Serwist({
             },
             cachedResponseWillBeUsed: async ({ cachedResponse, request }) => {
               // Safety fallback: only use cache if no Authorization header.
+              // This is the critical "read" check to prevent serving anonymous data to auth'd users.
               if (request.headers.has("Authorization")) {
                 return undefined;
               }
@@ -56,6 +58,7 @@ const serwist = new Serwist({
         sameOrigin &&
         request.method === "GET" &&
         request.destination === "audio" &&
+        url.pathname.startsWith("/audio/") &&
         /\.(?:wav|mp3|ogg)$/i.test(url.pathname),
       handler: new CacheFirst({
         cacheName: "audio-samples",

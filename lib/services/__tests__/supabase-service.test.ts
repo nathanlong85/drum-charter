@@ -11,6 +11,9 @@ vi.mock('@/lib/supabase/client', () => ({
     eq: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
+    auth: {
+      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'user-1' } }, error: null }),
+    },
   }),
 }));
 
