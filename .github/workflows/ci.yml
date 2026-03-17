@@ -89,7 +89,7 @@ jobs:
           version: 2.81.2 # Pinned for deterministic runs
 
       - name: Start Supabase local instance
-        run: supabase start --exclude-containers studio,inbucket,realtime,edge-runtime,postgrest
+        run: supabase start --exclude studio,mailpit,realtime,edge-runtime,postgrest
 
       - name: Run E2E tests
         run: pnpm test:e2e
