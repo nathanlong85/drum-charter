@@ -1,5 +1,5 @@
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { SongChartView } from '@/components/chart/SongChartView';
 import PrintButton from '@/components/common/PrintButton';
 import { supabaseService } from '@/lib/services/supabase-service';

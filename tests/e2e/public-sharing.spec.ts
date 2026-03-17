@@ -15,7 +15,10 @@ test.describe('Public Sharing Workflows', () => {
     await page.waitForURL(/\/library/);
 
     // 2. Create a new notebook
-    await page.getByRole('button', { name: /Notebooks/i }).first().click();
+    await page
+      .getByRole('button', { name: /Notebooks/i })
+      .first()
+      .click();
     const createPromise = page.waitForResponse((resp) => resp.url().includes('/rest/v1/notebooks'));
     await page.getByRole('button', { name: /New Notebook/i }).click();
     const response = await createPromise;
@@ -45,9 +48,12 @@ test.describe('Public Sharing Workflows', () => {
     await page.waitForURL(/\/library/);
 
     // 2. Create a new snippet
-    await page.getByRole('button', { name: /Snippets/i }).first().click();
-    const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/groove_snippets'),
+    await page
+      .getByRole('button', { name: /Snippets/i })
+      .first()
+      .click();
+    const createPromise = page.waitForResponse((resp) =>
+      resp.url().includes('/rest/v1/groove_snippets'),
     );
     await page.getByRole('button', { name: /New Snippet/i }).click();
     const response = await createPromise;

@@ -1,5 +1,5 @@
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import PrintButton from '@/components/common/PrintButton';
 import { NotebookView } from '@/components/notebook/NotebookView';
 import { supabaseService } from '@/lib/services/supabase-service';
