@@ -85,13 +85,26 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       return;
     }
 
-    if (
-      initialGrid &&
-      JSON.stringify(initialGrid.instruments) !== JSON.stringify(state.instruments)
-    ) {
-      dispatch({ type: 'SET_GRID', payload: initialGrid.instruments });
+    if (initialGrid) {
+      const isDifferent =
+        JSON.stringify(initialGrid.instruments) !== JSON.stringify(state.instruments) ||
+        initialGrid.measures !== state.measures ||
+        initialGrid.resolution !== state.resolution ||
+        initialGrid.timeSignature.beatsPerMeasure !== state.timeSignature.beatsPerMeasure ||
+        initialGrid.timeSignature.beatValue !== state.timeSignature.beatValue;
+
+      if (isDifferent) {
+        dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
+      }
     }
-  }, [initialGrid, state.instruments]);
+  }, [
+    initialGrid,
+    state.instruments,
+    state.measures,
+    state.resolution,
+    state.timeSignature.beatValue,
+    state.timeSignature.beatsPerMeasure,
+  ]);
 
   const wrappedDispatch = (action: GrooveAction) => {
     dispatch(action);

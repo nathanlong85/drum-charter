@@ -15,11 +15,7 @@ test.describe('Guest Access & Library Flow', () => {
       { timeout: 30000 },
     );
     await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    try {
-      await authPromise;
-    } catch (_e) {
-      console.log('Auth response timeout, continuing...');
-    }
+    await authPromise;
 
     // Should redirect to library
     await page.waitForURL(/\/library/, { timeout: 30000 });
@@ -43,9 +39,7 @@ test.describe('Guest Access & Library Flow', () => {
       { timeout: 30000 },
     );
     await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    try {
-      await authPromise;
-    } catch (_e) {}
+    await authPromise;
 
     // Explicitly wait for the redirect and the page to be ready
     await page.waitForURL(/\/library/, { timeout: 30000 });
@@ -65,9 +59,7 @@ test.describe('Guest Access & Library Flow', () => {
     const newNotebookBtn = page.getByRole('button', { name: /New Notebook/i });
     await expect(newNotebookBtn).toBeVisible();
     await newNotebookBtn.click();
-    try {
-      await createPromise;
-    } catch (_e) {}
+    await createPromise;
 
     // Should redirect to notebook editor
     await page.waitForURL(/\/notebooks\/.+/, { timeout: 30000 });
@@ -89,9 +81,7 @@ test.describe('Guest Access & Library Flow', () => {
       { timeout: 30000 },
     );
     await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    try {
-      await authPromise;
-    } catch (_e) {}
+    await authPromise;
 
     await page.waitForURL(/\/library/, { timeout: 30000 });
     await expect(page.getByText('My Library')).toBeVisible();

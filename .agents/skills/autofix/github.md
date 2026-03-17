@@ -118,6 +118,7 @@ gh pr create --title '<title>' --body '<body>'
 - Don't abort for comment posting failures
 
 **Getting repo info:**
+
 ```bash
 gh repo view --json owner,name,nameWithOwner
 ```

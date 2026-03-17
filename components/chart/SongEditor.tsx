@@ -261,12 +261,13 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             <input
               type="number"
               value={state.header.bpm || ''}
-              onChange={(e) =>
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
                 dispatch({
                   type: 'UPDATE_BPM',
-                  bpm: parseInt(e.target.value, 10) || 0,
-                })
-              }
+                  bpm: Number.isNaN(val) ? 0 : Math.max(0, Math.min(val, 999)),
+                });
+              }}
               className="w-16 text-lg font-bold text-zinc-700 bg-zinc-50 border border-zinc-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
               placeholder="0"
             />
@@ -279,26 +280,28 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
               <input
                 type="number"
                 value={state.header.timeSignature.beatsPerMeasure}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
                   dispatch({
                     type: 'UPDATE_TIME_SIGNATURE',
-                    beatsPerMeasure: parseInt(e.target.value, 10) || 4,
+                    beatsPerMeasure: Number.isNaN(val) ? 4 : Math.max(1, Math.min(val, 32)),
                     beatValue: state.header.timeSignature.beatValue,
-                  })
-                }
+                  });
+                }}
                 className="w-8 text-lg font-bold text-zinc-700 bg-transparent border-none p-0 focus:ring-0 text-center"
               />
               <span className="text-zinc-400">/</span>
               <input
                 type="number"
                 value={state.header.timeSignature.beatValue}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
                   dispatch({
                     type: 'UPDATE_TIME_SIGNATURE',
                     beatsPerMeasure: state.header.timeSignature.beatsPerMeasure,
-                    beatValue: parseInt(e.target.value, 10) || 4,
-                  })
-                }
+                    beatValue: Number.isNaN(val) ? 4 : Math.max(1, Math.min(val, 32)),
+                  });
+                }}
                 className="w-8 text-lg font-bold text-zinc-700 bg-transparent border-none p-0 focus:ring-0 text-center"
               />
             </div>
@@ -308,9 +311,17 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
         <div className="flex flex-wrap gap-2 no-print">
           {state.isPublic && (
             <button
-              onClick={() => {
-                navigator.clipboard.writeText(`${window.location.origin}/public/songs/${state.id}`);
-                alert('Public link copied to clipboard!');
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(
+                    `${window.location.origin}/public/songs/${state.id}`,
+                  );
+                  alert('Public link copied to clipboard!');
+                } catch (_err) {
+                  alert(
+                    `Failed to copy link. Here it is: ${window.location.origin}/public/songs/${state.id}`,
+                  );
+                }
               }}
               className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest mr-4"
             >

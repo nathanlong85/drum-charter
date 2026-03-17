@@ -24,10 +24,13 @@ export type GrooveAction =
   | { type: 'SET_RESOLUTION'; resolution: 4 | 8 | 16 }
   | { type: 'SET_MEASURES'; measures: number }
   | { type: 'SET_TIME_SIGNATURE'; beatsPerMeasure: number; beatValue: number }
-  | { type: 'SET_GRID'; payload: InstrumentGrid[] };
+  | { type: 'SET_GRID'; payload: InstrumentGrid[] }
+  | { type: 'SET_FULL_GRID'; grid: GrooveGrid };
 
 export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGrid {
   switch (action.type) {
+    case 'SET_FULL_GRID':
+      return { ...action.grid };
     case 'SET_GRID':
       return {
         ...state,

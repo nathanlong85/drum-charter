@@ -18,8 +18,8 @@ export default async function SongPage({ params }: SongPageProps) {
   try {
     rawChart = await supabaseService.getSongChart(id, supabase);
   } catch (error: any) {
-    // Only trigger notFound for "no rows" PostgREST error (PGRST116)
-    if (error?.code === 'PGRST116') {
+    // Trigger notFound for "no rows" PostgREST error (PGRST116) or thrown "not found" message
+    if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
       notFound();
     }
 

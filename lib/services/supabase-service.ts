@@ -15,7 +15,59 @@ type DbSongChart = Database['public']['Tables']['song_charts']['Row'];
 type DbNotebook = Database['public']['Tables']['notebooks']['Row'];
 type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row'];
 
-const SNIPPET_RETRY_DELAY_MS = 3000;
+const _SNIPPET_RETRY_DELAY_MS = 3000;
+
+/**
+ * Shared retry helper for fetching data from Supabase.
+ * Bails early on 404/401/403 errors and only retries on transient network or server issues.
+ */
+async function fetchWithRetry<T>(
+  fetchFn: () => PromiseLike<{ data: T | null; error: any }>,
+  id: string,
+  typeName: string,
+  maxAttempts = 3,
+  delayMs = 3000,
+): Promise<T | null> {
+  let attempts = 0;
+  let { data, error } = await fetchFn();
+
+  if (error) {
+    // Bail immediately on definitive client errors
+    // PGRST116: no rows found
+    // 22P02: invalid input syntax for type uuid (common in tests/fake IDs)
+    if (['PGRST116', '22P02', '401', '403', '404'].includes(error.code) || error.status === 404) {
+      return null;
+    }
+    // For other errors, we might want to retry if they are transient
+    console.warn(`[supabaseService] Initial fetch error for ${typeName} ${id}:`, error);
+  }
+
+  while (!data && attempts < maxAttempts) {
+    attempts++;
+    console.warn(
+      `[supabaseService] ${typeName} not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`,
+    );
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+    const retryResult = await fetchFn();
+    data = retryResult.data;
+    error = retryResult.error;
+
+    if (error) {
+      if (['PGRST116', '401', '403', '404'].includes(error.code) || error.status === 404) {
+        return null;
+      }
+      console.error(`[supabaseService] Retry error for ${typeName} ${id}:`, error);
+    }
+
+    if (data) {
+      console.log(`[supabaseService] ${typeName} found after retry: ${id}`);
+      return data;
+    }
+  }
+
+  return data;
+}
 
 export const supabaseService = {
   // --- Song Charts ---
@@ -33,7 +85,7 @@ export const supabaseService = {
       .upsert({
         id: chart.id,
         title: chart.header.title,
-        bpm: chart.header.bpm || null,
+        bpm: chart.header.bpm ?? null,
         time_signature: chart.header
           .timeSignature as unknown as Database['public']['Tables']['song_charts']['Insert']['time_signature'],
         sections:
@@ -62,72 +114,33 @@ export const supabaseService = {
 
   async getSongChart(id: string, supabaseParam?: SupabaseClient<Database>): Promise<SongChart> {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase
-      .from('song_charts')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
 
-    if (error) {
-      console.error(`Supabase error in getSongChart:`, {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-      });
-      throw error;
-    }
+    const data = await fetchWithRetry<DbSongChart>(
+      () => supabase.from('song_charts').select('*').eq('id', id).maybeSingle(),
+      id,
+      'Song chart',
+    );
 
-    let finalData = data;
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (!finalData && attempts < maxAttempts) {
-      attempts++;
-      // Try one more time after a short delay to handle local Supabase sync issues
-      console.warn(
-        `[supabaseService] Song not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`,
-      );
-      await new Promise((resolve) => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
-      const retryResult = await supabase.from('song_charts').select('*').eq('id', id).maybeSingle();
-
-      if (retryResult.error) {
-        console.error(`Supabase retry error in getSongChart:`, {
-          message: retryResult.error.message,
-          details: retryResult.error.details,
-          hint: retryResult.error.hint,
-          code: retryResult.error.code,
-        });
-        throw retryResult.error;
-      }
-
-      finalData = retryResult.data;
-      if (finalData) {
-        console.log(`[supabaseService] Song found after retry: ${id}`);
-      }
-    }
-
-    if (!finalData) {
-      console.error(`Song chart not found after ${maxAttempts} retries: ${id}`);
+    if (!data) {
       throw new Error('Song chart not found');
     }
 
     // Map DB row to SongChart interface
     return {
-      id: finalData.id,
+      id: data.id,
       header: {
-        title: finalData.title,
-        bpm: finalData.bpm || undefined,
-        timeSignature: finalData.time_signature as unknown as TimeSignature,
-        metronomeEnabled: !!finalData.metronome_enabled,
-        metronomeVolume: finalData.metronome_volume ?? 0.5,
+        title: data.title,
+        bpm: data.bpm || undefined,
+        timeSignature: data.time_signature as unknown as TimeSignature,
+        metronomeEnabled: !!data.metronome_enabled,
+        metronomeVolume: data.metronome_volume ?? 0.5,
       },
-      sections: finalData.sections as unknown as SongSection[],
-      tags: finalData.tags || [],
-      userId: finalData.user_id,
-      isPublic: !!finalData.is_public,
-      createdAt: finalData.created_at || null,
-      updatedAt: finalData.updated_at || null,
+      sections: data.sections as unknown as SongSection[],
+      tags: data.tags || [],
+      userId: data.user_id,
+      isPublic: !!data.is_public,
+      createdAt: data.created_at || null,
+      updatedAt: data.updated_at || null,
     };
   },
 
@@ -181,61 +194,26 @@ export const supabaseService = {
 
   async getNotebook(id: string, supabaseParam?: SupabaseClient<Database>): Promise<Notebook> {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase.from('notebooks').select('*').eq('id', id).maybeSingle();
 
-    if (error) {
-      console.error(`Supabase error in getNotebook:`, {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-      });
-      throw error;
-    }
+    const data = await fetchWithRetry<DbNotebook>(
+      () => supabase.from('notebooks').select('*').eq('id', id).maybeSingle(),
+      id,
+      'Notebook',
+    );
 
-    let finalData = data;
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (!finalData && attempts < maxAttempts) {
-      attempts++;
-      // Try one more time after a short delay to handle local Supabase sync issues
-      console.warn(
-        `[supabaseService] Notebook not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`,
-      );
-      await new Promise((resolve) => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
-      const retryResult = await supabase.from('notebooks').select('*').eq('id', id).maybeSingle();
-
-      if (retryResult.error) {
-        console.error(`Supabase retry error in getNotebook:`, {
-          message: retryResult.error.message,
-          details: retryResult.error.details,
-          hint: retryResult.error.hint,
-          code: retryResult.error.code,
-        });
-        throw retryResult.error;
-      }
-
-      finalData = retryResult.data;
-      if (finalData) {
-        console.log(`[supabaseService] Notebook found after retry: ${id}`);
-      }
-    }
-
-    if (!finalData) {
-      console.error(`Notebook not found after ${maxAttempts} retries: ${id}`);
+    if (!data) {
       throw new Error('Notebook not found');
     }
 
     return {
-      id: finalData.id,
-      title: finalData.title,
-      sections: finalData.sections as unknown as NotebookSection[],
-      tags: finalData.tags || [],
-      userId: finalData.user_id,
-      isPublic: !!finalData.is_public,
-      createdAt: finalData.created_at || null,
-      updatedAt: finalData.updated_at || null,
+      id: data.id,
+      title: data.title,
+      sections: data.sections as unknown as NotebookSection[],
+      tags: data.tags || [],
+      userId: data.user_id,
+      isPublic: !!data.is_public,
+      createdAt: data.created_at || null,
+      updatedAt: data.updated_at || null,
     };
   },
 
@@ -408,70 +386,27 @@ export const supabaseService = {
     supabaseParam?: SupabaseClient<Database>,
   ): Promise<GrooveSnippet> {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase
-      .from('groove_snippets')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
 
-    if (error) {
-      console.error(`Supabase error in getGrooveSnippet:`, {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-      });
-      throw error;
+    const data = await fetchWithRetry<DbGrooveSnippet>(
+      () => supabase.from('groove_snippets').select('*').eq('id', id).maybeSingle(),
+      id,
+      'Groove snippet',
+    );
+
+    if (!data) {
+      throw new Error('Groove snippet not found');
     }
 
-    let finalData = data;
-    let attempts = 0;
-    const maxAttempts = 3;
-
-    while (!finalData && attempts < maxAttempts) {
-      attempts++;
-      // Try one more time after a short delay to handle local Supabase sync issues
-      console.warn(
-        `[supabaseService] Snippet not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`,
-      );
-      await new Promise((resolve) => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
-      const retryResult = await supabase
-        .from('groove_snippets')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
-
-      if (retryResult.error) {
-        console.error(`Supabase retry error in getGrooveSnippet:`, {
-          message: retryResult.error.message,
-          details: retryResult.error.details,
-          hint: retryResult.error.hint,
-          code: retryResult.error.code,
-        });
-        throw retryResult.error;
-      }
-
-      finalData = retryResult.data;
-      if (finalData) {
-        console.log(`[supabaseService] Snippet found after retry: ${id}`);
-      }
-    }
-
-    if (!finalData) {
-      console.error(`Groove snippet not found after ${maxAttempts} retries: ${id}`);
-      throw new Error('Snippet not found');
-    }
-
-    const gridData = finalData.grid_data as unknown as GrooveGrid;
+    const gridData = data.grid_data as unknown as GrooveGrid;
 
     return {
-      id: finalData.id,
-      title: finalData.title,
-      tags: finalData.tags || [],
-      userId: finalData.user_id,
-      isPublic: !!finalData.is_public,
-      createdAt: finalData.created_at || null,
-      updatedAt: finalData.updated_at || null,
+      id: data.id,
+      title: data.title,
+      tags: data.tags || [],
+      userId: data.user_id,
+      isPublic: !!data.is_public,
+      createdAt: data.created_at || null,
+      updatedAt: data.updated_at || null,
       ...gridData,
     };
   },

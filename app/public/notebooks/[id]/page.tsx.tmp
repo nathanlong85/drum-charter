@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
-import PrintButton from '@/components/common/PrintButton';
-import { NotebookView } from '@/components/notebook/NotebookView';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
+import { NotebookView } from '@/components/notebook/NotebookView';
 import type { Notebook } from '@/lib/types/groove';
 
 interface PublicNotebookPageProps {
@@ -33,6 +32,16 @@ export default async function PublicNotebookPage({ params }: PublicNotebookPageP
       <div className="max-w-4xl mx-auto bg-white shadow-xl shadow-zinc-200 rounded-2xl overflow-hidden print:shadow-none print:rounded-none">
         <div className="bg-zinc-900 text-white px-8 py-4 flex justify-between items-center no-print">
           <h2 className="text-xs font-mono uppercase tracking-[0.2em]">DrumCharter Public View</h2>
+          <button
+            onClick={() => {
+              /* In Server Component we can't easily have a direct window.print handler.
+                 We'll wrap the interactive parts in a small client component if needed, 
+                 but for now let's just use a simple client wrapper for the action. */
+            }}
+            className="text-xs font-bold border border-white/20 px-3 py-1 rounded hover:bg-white/10 transition-all hidden"
+          >
+            PRINTER FRIENDLY
+          </button>
           <PrintButton />
         </div>
         <NotebookView notebook={notebook} />
@@ -46,5 +55,19 @@ export default async function PublicNotebookPage({ params }: PublicNotebookPageP
         </p>
       </footer>
     </main>
+  );
+}
+
+function PrintButton() {
+  return (
+    <button
+      onClick={() => {
+        // This won't work in a server component, so we need a client component.
+        // I'll create one below or just make this part a client component.
+      }}
+      className="hidden"
+    >
+      Print
+    </button>
   );
 }

@@ -104,16 +104,9 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [x] Move dev server and Playwright to Port 3001 `✓`
 - [x] Fix "Error creating new item" in Library and add creation flow unit tests `✓`
 - [x] Rebrand to DrumCharter and landing page redesign `✓`
+- [x] [E2E] Stabilization (timeouts, persistence anchors) `✓`
 - [x] Implement Anonymous Sign-In (Guest Mode) `✓`
 - [x] Groove Grid Core (Resolutions, Measures, Symbols) `✓`
-
-### 🟡 In Progress
-- [ ] [Feature] Multi-layer Velocity Support (#3)
-
-### 🔵 Backlog (GitHub Issues)
-- [ ] [Feature] Dark Mode Support (#4)
-- [ ] [Feature] Snippet Tagging & Metadata UI (#6)
-- [x] [E2E] Stabilization (timeouts, persistence anchors) `✓`
 
 ---
 
