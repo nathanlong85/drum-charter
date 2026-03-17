@@ -26,7 +26,7 @@ async function fetchWithRetry<T>(
   id: string,
   typeName: string,
   maxAttempts = 3,
-  delayMs = 3000,
+  delayMs = _SNIPPET_RETRY_DELAY_MS,
 ): Promise<T | null> {
   let attempts = 0;
   let { data, error } = await fetchFn();

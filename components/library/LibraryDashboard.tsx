@@ -146,7 +146,8 @@ export default function LibraryDashboard({
       console.log('Creating new item...', { activeTab, userId });
 
       if (activeTab === 'song') {
-        const newSong: Partial<SongChart> = {
+        const newSong: SongChart = {
+          id: crypto.randomUUID(),
           userId,
           header: {
             title: 'Untitled Song',
@@ -157,8 +158,10 @@ export default function LibraryDashboard({
           sections: [],
           tags: [],
           isPublic: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
-        const saved = await supabaseService.saveSongChart(newSong as SongChart);
+        const saved = await supabaseService.saveSongChart(newSong);
         if (saved?.id) {
           console.log('Created song:', saved.id);
           // Wait briefly for local sync before redirecting
@@ -169,14 +172,17 @@ export default function LibraryDashboard({
           throw new Error('Song creation failed - no ID returned');
         }
       } else if (activeTab === 'notebook') {
-        const newNotebook: Partial<Notebook> = {
+        const newNotebook: Notebook = {
+          id: crypto.randomUUID(),
           userId,
           title: 'Untitled Notebook',
           sections: [],
           tags: [],
           isPublic: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
-        const saved = await supabaseService.saveNotebook(newNotebook as Notebook);
+        const saved = await supabaseService.saveNotebook(newNotebook);
         if (saved?.id) {
           console.log('Created notebook:', saved.id);
           // Wait briefly for local sync before redirecting
@@ -187,7 +193,8 @@ export default function LibraryDashboard({
           throw new Error('Notebook creation failed - no ID returned');
         }
       } else if (activeTab === 'snippet') {
-        const newSnippet: Partial<GrooveSnippet> = {
+        const newSnippet: GrooveSnippet = {
+          id: crypto.randomUUID(),
           userId,
           title: 'Untitled Snippet',
           tags: [],
@@ -212,8 +219,10 @@ export default function LibraryDashboard({
               notes: Array(16).fill('none'),
             },
           ],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
-        const saved = await supabaseService.saveGrooveSnippet(newSnippet as GrooveSnippet);
+        const saved = await supabaseService.saveGrooveSnippet(newSnippet);
         if (saved?.id) {
           console.log('Created snippet:', saved.id);
           // Wait briefly for local sync before redirecting
