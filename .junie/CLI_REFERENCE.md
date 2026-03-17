@@ -131,6 +131,58 @@ Commands for running AI-powered code reviews using the CodeRabbit CLI. Use the `
 
 ---
 
+## GitHub Operations
+
+Commands for interacting with GitHub Actions, Projects, and Metadata.
+
+### 1. GitHub Actions (Logs & Status)
+
+- **Goal**: Monitor CI runs and fetch detailed logs for debugging.
+- **List Runs**: `gh run list --branch <BRANCH> --limit <N>`
+- **View Status**: `gh run view <RUN_ID> --json jobs --jq '.jobs[] | {name: .name, status: .status, conclusion: .conclusion}'`
+- **Fetch Logs**: `gh run view <RUN_ID> --log` (Only for completed runs)
+- **Wait Policy**: For in-progress runs, poll every 20-30 seconds using the "View Status" command.
+
+### 2. GitHub Projects (V2)
+
+- **Goal**: Interact with Project V2 boards via GraphQL.
+- **List Projects**:
+```bash
+gh api graphql -f query='
+  query($org: String!) {
+    organization(login: $org) {
+      projectsV2(first: 20) {
+        nodes { id title number }
+      }
+    }
+  }' -f org="<ORG_NAME>"
+```
+- **List Items in Project**:
+```bash
+gh api graphql -f query='
+  query($id: ID!) {
+    node(id: $id) {
+      ... on ProjectV2 {
+        items(first: 100) {
+          nodes {
+            id
+            content { ... on DraftIssue { title } ... on Issue { title number } ... on PullRequest { title number } }
+          }
+        }
+      }
+    }
+  }' -f id="<PROJECT_ID>"
+```
+- **Pitfalls**: Always use `ProjectV2` queries. Legacy Project queries will fail.
+
+### 3. Pull Requests & Issues
+
+- **View PR/Issue**: `gh pr view <PR_NUMBER>` or `gh issue view <ISSUE_NUMBER>`
+- **List Comments**: `gh pr view <PR_NUMBER> --comments`
+- **Check Checks**: `gh pr status` (Shows status of checks for the current branch)
+
+---
+
 ## Slow Commands & Timeout Management
 
 Some tools frequently exceed the 60s default. Use the agent-level `timeout`
