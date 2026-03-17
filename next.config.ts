@@ -1,12 +1,5 @@
 import path from 'node:path';
-import withSerwistInit from '@serwist/next';
-
-const withSerwist = withSerwistInit({
-  swSrc: 'app/sw.ts',
-  swDest: 'public/sw.js',
-  disable: process.env.NODE_ENV === 'development',
-  reloadOnOnline: true,
-});
+import { withSerwist } from '@serwist/turbopack';
 
 export default withSerwist({
   // Your Next.js config here

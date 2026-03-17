@@ -1,8 +1,8 @@
 /// <reference lib="webworker" />
 
 import { ExpirationPlugin } from '@serwist/expiration';
-import { defaultCache } from '@serwist/next/worker';
 import { CacheFirst, StaleWhileRevalidate } from '@serwist/strategies';
+import { defaultCache } from '@serwist/turbopack/worker';
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist';
 import { Serwist } from 'serwist';
 
