@@ -96,23 +96,25 @@ test.describe('Guest Access & Library Flow', () => {
     await page.waitForURL(/\/library/, { timeout: 30000 });
     await expect(page.getByText('My Library')).toBeVisible();
 
-    // Switch to Snippets tab
-    await page
-      .getByRole('button', { name: /Snippets/i })
-      .first()
-      .click();
+    // Switch to Snippets tab and wait for it to be active
+    const snippetTab = page.getByRole('button', { name: /Snippets/i }).first();
+    await snippetTab.click();
+    await expect(snippetTab).toHaveClass(/bg-white text-blue-600/);
 
     // Create new snippet
     const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/groove_snippets'),
+      (resp) => resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
+    console.log('Clicking New Snippet button...');
     await page.getByRole('button', { name: /New Snippet/i }).click();
-    try {
-      await createPromise;
-    } catch (_e) {}
+    console.log('Waiting for snippet creation response...');
+    await createPromise;
 
-    await page.waitForURL(/\/snippets\/.+/, { timeout: 30000 });
+    // Wait for redirect - LibraryDashboard has a 500ms delay before redirecting
+    console.log('Waiting for redirect to snippet editor...');
+    await page.waitForURL(/\/snippets\/.+/, { timeout: 60000 });
+    console.log('URL after snippet creation:', page.url());
     await expect(page).toHaveURL(/\/snippets\/.+/);
 
     const titleInput = page.getByPlaceholder(/Snippet Title/i);
@@ -130,7 +132,7 @@ test.describe('Guest Access & Library Flow', () => {
     await page.reload({ waitUntil: 'networkidle' });
 
     // Check if title persisted
-    await expect(page.getByDisplayValue(uniqueTitle)).toBeVisible({
+    await expect(page.locator(`input[value="${uniqueTitle}"]`)).toBeVisible({
       timeout: 20000,
     });
   });
@@ -141,11 +143,26 @@ test.describe('Guest Access & Library Flow', () => {
     await page.click('button:has-text("Continue as Guest")');
     await page.waitForURL('/library');
 
+    // Switch to Notebooks tab and wait for it to be active
+    const notebookTab = page.getByRole('button', { name: /Notebooks/i }).first();
+    await notebookTab.click();
+    await expect(notebookTab).toHaveClass(/bg-white text-blue-600/);
+
     // Create new notebook
+    const createPromise = page.waitForResponse(
+      (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
+      { timeout: 30000 },
+    );
+    console.log('Clicking New Notebook button...');
     await page.click('button:has-text("NEW")');
     await page.click('button:has-text("Notebook")');
+    console.log('Waiting for notebook creation response...');
+    await createPromise;
 
-    // Should redirect to notebook editor
+    // Wait for redirect - LibraryDashboard has a 500ms delay before redirecting
+    console.log('Waiting for redirect to notebook editor...');
+    await page.waitForURL(/\/notebooks\/.+/, { timeout: 60000 });
+    console.log('URL after notebook creation:', page.url());
     await expect(page).toHaveURL(/\/notebooks\/.+/);
 
     // Check for "Guest Mode" indicator

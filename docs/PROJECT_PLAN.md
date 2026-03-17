@@ -113,7 +113,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ### 🔵 Backlog (GitHub Issues)
 - [ ] [Feature] Dark Mode Support (#4)
 - [ ] [Feature] Snippet Tagging & Metadata UI (#6)
-- [ ] [E2E] Stabilization (timeouts, persistence anchors)
+- [x] [E2E] Stabilization (timeouts, persistence anchors) `✓`
 
 ---
 

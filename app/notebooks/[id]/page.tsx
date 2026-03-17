@@ -1,5 +1,8 @@
+import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
+import { AuthStatus } from '@/components/auth/AuthStatus';
 import NotebookEditor from '@/components/notebook/NotebookEditor';
+import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
 import type { Notebook, NotebookSection } from '@/lib/types/groove';
 
@@ -19,45 +22,38 @@ export default async function NotebookPage({ params }: NotebookPageProps) {
     redirect('/login');
   }
 
-  const { data: notebook, error } = await supabase
-    .from('notebooks')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error || !notebook) {
-    console.error('Error fetching notebook:', error);
-    notFound();
-  }
-
-  // Ensure user owns the notebook
-  if (notebook.user_id !== user.id) {
-    redirect('/library');
-  }
-
-  // Transform database record to Notebook type if necessary
-  // The database might have snake_case fields
-  if (!notebook.created_at || !notebook.updated_at) {
-    console.warn(`Notebook ${id} is missing timestamps:`, {
-      created_at: notebook.created_at,
-      updated_at: notebook.updated_at,
-    });
-  }
-
-  const formattedNotebook: Notebook = {
-    id: notebook.id,
-    title: notebook.title,
-    sections: (notebook.sections as unknown as NotebookSection[]) || [],
-    tags: notebook.tags || [],
-    userId: notebook.user_id,
-    isPublic: notebook.is_public ?? false,
-    createdAt: notebook.created_at || null,
-    updatedAt: notebook.updated_at || null,
-  };
+  const formattedNotebook = await supabaseService.getNotebook(id, supabase);
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-12 px-6">
-      <NotebookEditor initialNotebook={formattedNotebook} />
+    <main className="min-h-screen bg-zinc-50">
+      <nav className="bg-white border-b border-zinc-200 py-4 px-8 mb-8">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-6">
+            <Link
+              href="/library"
+              className="text-sm font-bold text-zinc-500 hover:text-zinc-900 flex items-center gap-2 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              BACK TO LIBRARY
+            </Link>
+            <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest hidden sm:block">
+              DrumCharter / Notebook / {id.slice(0, 8)}
+            </div>
+          </div>
+          <AuthStatus />
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto px-6">
+        <NotebookEditor initialNotebook={formattedNotebook} />
+      </div>
     </main>
   );
 }
