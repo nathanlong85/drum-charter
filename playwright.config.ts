@@ -26,13 +26,23 @@ export default defineConfig({
     navigationTimeout: 60000,
   },
   projects: [
+    // Setup project
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+    },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // Use prepared auth state.
+        storageState: 'playwright/.auth/user.json',
+      },
+      dependencies: ['setup'],
     },
   ],
   webServer: {
-    command: 'pnpm build && pnpm start --port 3001',
+    command: 'unset NO_COLOR && pnpm build && pnpm start --port 3001',
     url: 'http://localhost:3001',
     reuseExistingServer: false,
     timeout: 300000,

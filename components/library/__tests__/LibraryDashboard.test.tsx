@@ -80,10 +80,12 @@ describe('LibraryDashboard Creation Flow', () => {
     const mockSavedItem = { id: 'new-song-id' };
     (supabaseService.saveSongChart as any).mockResolvedValueOnce(mockSavedItem);
 
-    // Mock window.location
-    const originalLocation = window.location;
-    delete (window as any).location;
-    window.location = { href: '' } as any;
+    // Mock window.location.assign
+    const assignMock = vi.fn();
+    vi.stubGlobal('location', {
+      ...window.location,
+      assign: assignMock,
+    });
 
     render(<LibraryDashboard initialSongs={[]} initialNotebooks={[]} initialSnippets={[]} />);
 
@@ -97,10 +99,10 @@ describe('LibraryDashboard Creation Flow', () => {
           userId: 'test-user-id',
         }),
       );
-      expect(window.location.href).toBe('/songs/new-song-id');
+      expect(assignMock).toHaveBeenCalledWith('/songs/new-song-id');
     });
 
-    window.location = originalLocation;
+    vi.unstubAllGlobals();
   });
 
   it('handles unauthenticated users', async () => {

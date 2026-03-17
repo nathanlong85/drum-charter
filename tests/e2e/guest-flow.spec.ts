@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe('Guest Access & Library Flow', () => {
   test('should allow a user to sign in as guest and see the library', async ({ page }) => {
     // Start at landing page
@@ -53,7 +55,7 @@ test.describe('Guest Access & Library Flow', () => {
 
     // Click "New Notebook" and wait for creation response
     const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/notebooks'),
+      (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
     const newNotebookBtn = page.getByRole('button', { name: /New Notebook/i });
@@ -61,8 +63,8 @@ test.describe('Guest Access & Library Flow', () => {
     await newNotebookBtn.click();
     await createPromise;
 
-    // Should redirect to notebook editor
-    await page.waitForURL(/\/notebooks\/.+/, { timeout: 30000 });
+    // Wait for redirect
+    await page.waitForURL(/\/notebooks\/.+/, { timeout: 10000 });
     await expect(page).toHaveURL(/\/notebooks\/.+/);
 
     // Should be able to edit title
@@ -102,9 +104,9 @@ test.describe('Guest Access & Library Flow', () => {
     console.log('Waiting for snippet creation response...');
     await createPromise;
 
-    // Wait for redirect - LibraryDashboard has a 500ms delay before redirecting
+    // Wait for redirect
     console.log('Waiting for redirect to snippet editor...');
-    await page.waitForURL(/\/snippets\/.+/, { timeout: 60000 });
+    await page.waitForURL(/\/snippets\/.+/, { timeout: 10000 });
     console.log('URL after snippet creation:', page.url());
     await expect(page).toHaveURL(/\/snippets\/.+/);
 
@@ -150,9 +152,9 @@ test.describe('Guest Access & Library Flow', () => {
     console.log('Waiting for notebook creation response...');
     await createPromise;
 
-    // Wait for redirect - LibraryDashboard has a 500ms delay before redirecting
+    // Wait for redirect
     console.log('Waiting for redirect to notebook editor...');
-    await page.waitForURL(/\/notebooks\/.+/, { timeout: 60000 });
+    await page.waitForURL(/\/notebooks\/.+/, { timeout: 10000 });
     console.log('URL after notebook creation:', page.url());
     await expect(page).toHaveURL(/\/notebooks\/.+/);
 

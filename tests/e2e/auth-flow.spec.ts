@@ -1,16 +1,18 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Authentication and Core Flow', () => {
-  // Skipping these tests temporarily until local Supabase Auth is stabilized
-  // in the E2E environment (Task 2)
-  test.skip('User can see library and navigate to existing items', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/library');
+  });
+
+  test('User can see library and navigate to existing items', async ({ page }) => {
     await expect(page.getByText(/My Library/i)).toBeVisible();
     await expect(page.getByText(/Songs/i)).toBeVisible();
     await expect(page.getByText(/Notebooks/i)).toBeVisible();
     await expect(page.getByText(/Snippets/i)).toBeVisible();
   });
 
-  test.skip('User can create and edit a new snippet with persistence', async ({ page }) => {
+  test('User can create and edit a new snippet with persistence', async ({ page }) => {
     // Switch to Snippets tab
     await page.click('button:has-text("Snippets")');
 
@@ -36,12 +38,12 @@ test.describe('Authentication and Core Flow', () => {
     await page.reload({ waitUntil: 'networkidle' });
 
     // Check if title persisted
-    await expect(page.getByDisplayValue(uniqueTitle)).toBeVisible({
+    await expect(page.locator(`input[value="${uniqueTitle}"]`)).toBeVisible({
       timeout: 20000,
     });
   });
 
-  test.skip('User can create and edit a new notebook', async ({ page }) => {
+  test('User can create and edit a new notebook', async ({ page }) => {
     // Switch to Notebooks tab
     await page.click('button:has-text("Notebooks")');
 

@@ -4,23 +4,41 @@
 -- if identities are required, we need all fields.
 
 INSERT INTO auth.users (
+    instance_id,
     id,
+    aud,
+    role,
     email,
     encrypted_password,
     email_confirmed_at,
+    recovery_sent_at,
+    last_sign_in_at,
     raw_app_meta_data,
     raw_user_meta_data,
-    aud,
-    role
+    created_at,
+    updated_at,
+    confirmation_token,
+    email_change,
+    email_change_token_new,
+    recovery_token
 ) VALUES (
+    '00000000-0000-0000-0000-000000000000',
     'd739833a-1f81-4b1f-9993-90d56c071644',
+    'authenticated',
+    'authenticated',
     'test@example.com',
     crypt('password123', gen_salt('bf')),
-    now(),
+    current_timestamp,
+    current_timestamp,
+    current_timestamp,
     '{"provider":"email","providers":["email"]}',
     '{"name":"Test User"}',
-    'authenticated',
-    'authenticated'
+    current_timestamp,
+    current_timestamp,
+    '',
+    '',
+    '',
+    ''
 );
 
 -- Identity is usually required for login

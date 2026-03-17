@@ -164,10 +164,7 @@ export default function LibraryDashboard({
         const saved = await supabaseService.saveSongChart(newSong);
         if (saved?.id) {
           console.log('Created song:', saved.id);
-          // Wait briefly for local sync before redirecting
-          setTimeout(() => {
-            window.location.href = `/songs/${saved.id}`;
-          }, 500);
+          window.location.assign(`/songs/${saved.id}`);
         } else {
           throw new Error('Song creation failed - no ID returned');
         }
@@ -185,10 +182,7 @@ export default function LibraryDashboard({
         const saved = await supabaseService.saveNotebook(newNotebook);
         if (saved?.id) {
           console.log('Created notebook:', saved.id);
-          // Wait briefly for local sync before redirecting
-          setTimeout(() => {
-            window.location.href = `/notebooks/${saved.id}`;
-          }, 500);
+          window.location.assign(`/notebooks/${saved.id}`);
         } else {
           throw new Error('Notebook creation failed - no ID returned');
         }
@@ -225,10 +219,7 @@ export default function LibraryDashboard({
         const saved = await supabaseService.saveGrooveSnippet(newSnippet);
         if (saved?.id) {
           console.log('Created snippet:', saved.id);
-          // Wait briefly for local sync before redirecting
-          setTimeout(() => {
-            window.location.href = `/snippets/${saved.id}`;
-          }, 500);
+          window.location.assign(`/snippets/${saved.id}`);
         } else {
           throw new Error('Snippet creation failed - no ID returned');
         }
