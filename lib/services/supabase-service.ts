@@ -19,7 +19,10 @@ const SNIPPET_RETRY_DELAY_MS = 3000;
 
 export const supabaseService = {
   // --- Song Charts ---
-  async saveSongChart(chart: SongChart, supabaseParam?: SupabaseClient<Database>): Promise<DbSongChart> {
+  async saveSongChart(
+    chart: SongChart,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<DbSongChart> {
     const supabase = supabaseParam || createBrowserClient();
     if (!chart.userId) {
       throw new Error('User ID is required to save a song chart');
@@ -59,7 +62,11 @@ export const supabaseService = {
 
   async getSongChart(id: string, supabaseParam?: SupabaseClient<Database>): Promise<SongChart> {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase.from('song_charts').select('*').eq('id', id).maybeSingle();
+    const { data, error } = await supabase
+      .from('song_charts')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
 
     if (error) {
       console.error(`Supabase error in getSongChart:`, {
@@ -78,7 +85,9 @@ export const supabaseService = {
     while (!finalData && attempts < maxAttempts) {
       attempts++;
       // Try one more time after a short delay to handle local Supabase sync issues
-      console.warn(`[supabaseService] Song not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`);
+      console.warn(
+        `[supabaseService] Song not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`,
+      );
       await new Promise((resolve) => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
       const retryResult = await supabase.from('song_charts').select('*').eq('id', id).maybeSingle();
 
@@ -134,7 +143,10 @@ export const supabaseService = {
   },
 
   // --- Notebooks ---
-  async saveNotebook(notebook: Notebook, supabaseParam?: SupabaseClient<Database>): Promise<DbNotebook> {
+  async saveNotebook(
+    notebook: Notebook,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<DbNotebook> {
     const supabase = supabaseParam || createBrowserClient();
     if (!notebook.userId) {
       throw new Error('User ID is required to save a notebook');
@@ -188,7 +200,9 @@ export const supabaseService = {
     while (!finalData && attempts < maxAttempts) {
       attempts++;
       // Try one more time after a short delay to handle local Supabase sync issues
-      console.warn(`[supabaseService] Notebook not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`);
+      console.warn(
+        `[supabaseService] Notebook not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`,
+      );
       await new Promise((resolve) => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
       const retryResult = await supabase.from('notebooks').select('*').eq('id', id).maybeSingle();
 
@@ -257,7 +271,10 @@ export const supabaseService = {
     if (error) throw error;
   },
 
-  async duplicateSongChart(id: string, supabaseParam?: SupabaseClient<Database>): Promise<DbSongChart> {
+  async duplicateSongChart(
+    id: string,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<DbSongChart> {
     const supabase = supabaseParam || createBrowserClient();
     const original = await this.getSongChart(id, supabase);
     const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -284,7 +301,10 @@ export const supabaseService = {
     return this.saveSongChart(duplicate);
   },
 
-  async duplicateNotebook(id: string, supabaseParam?: SupabaseClient<Database>): Promise<DbNotebook> {
+  async duplicateNotebook(
+    id: string,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<DbNotebook> {
     const supabase = supabaseParam || createBrowserClient();
     const original = await this.getNotebook(id, supabase);
     const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -306,7 +326,10 @@ export const supabaseService = {
     return this.saveNotebook(duplicate);
   },
 
-  async duplicateGrooveSnippet(id: string, supabaseParam?: SupabaseClient<Database>): Promise<DbGrooveSnippet> {
+  async duplicateGrooveSnippet(
+    id: string,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<DbGrooveSnippet> {
     const supabase = supabaseParam || createBrowserClient();
     const original = await this.getGrooveSnippet(id, supabase);
     const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -329,7 +352,10 @@ export const supabaseService = {
   },
 
   // --- Groove Snippets ---
-  async saveGrooveSnippet(snippet: GrooveSnippet, supabaseParam?: SupabaseClient<Database>): Promise<DbGrooveSnippet> {
+  async saveGrooveSnippet(
+    snippet: GrooveSnippet,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<DbGrooveSnippet> {
     const supabase = supabaseParam || createBrowserClient();
     if (!snippet.userId) {
       throw new Error('User ID is required to save a groove snippet');
@@ -377,7 +403,10 @@ export const supabaseService = {
     return data;
   },
 
-  async getGrooveSnippet(id: string, supabaseParam?: SupabaseClient<Database>): Promise<GrooveSnippet> {
+  async getGrooveSnippet(
+    id: string,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<GrooveSnippet> {
     const supabase = supabaseParam || createBrowserClient();
     const { data, error } = await supabase
       .from('groove_snippets')
@@ -402,7 +431,9 @@ export const supabaseService = {
     while (!finalData && attempts < maxAttempts) {
       attempts++;
       // Try one more time after a short delay to handle local Supabase sync issues
-      console.warn(`[supabaseService] Snippet not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`);
+      console.warn(
+        `[supabaseService] Snippet not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`,
+      );
       await new Promise((resolve) => setTimeout(resolve, SNIPPET_RETRY_DELAY_MS));
       const retryResult = await supabase
         .from('groove_snippets')

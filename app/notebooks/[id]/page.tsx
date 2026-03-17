@@ -1,10 +1,9 @@
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { AuthStatus } from '@/components/auth/AuthStatus';
 import NotebookEditor from '@/components/notebook/NotebookEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
-import type { Notebook, NotebookSection } from '@/lib/types/groove';
 
 interface NotebookPageProps {
   params: Promise<{ id: string }>;

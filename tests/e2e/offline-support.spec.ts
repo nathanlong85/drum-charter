@@ -11,13 +11,17 @@ test.describe('Offline Support (PWA)', () => {
     // Wait for the service worker to be ready (critical for offline support)
     // and wait for it to take control of the page.
     await page.evaluate(async () => {
-      const registration = await navigator.serviceWorker.ready;
+      const _registration = await navigator.serviceWorker.ready;
       if (navigator.serviceWorker.controller) return true;
-      
+
       return new Promise((resolve) => {
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          resolve(true);
-        }, { once: true });
+        navigator.serviceWorker.addEventListener(
+          'controllerchange',
+          () => {
+            resolve(true);
+          },
+          { once: true },
+        );
       });
     });
 
@@ -46,7 +50,9 @@ test.describe('Offline Support (PWA)', () => {
     await expect(page.locator('main')).toBeVisible();
 
     // Offline indicator should still be there
-    await expect(page.getByRole('alert').filter({ hasText: 'You are offline' }).first()).toBeVisible();
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'You are offline' }).first(),
+    ).toBeVisible();
 
     const isCached = await page.evaluate(async () => {
       const response = await fetch('/audio/samples/metronome/click_high.wav');

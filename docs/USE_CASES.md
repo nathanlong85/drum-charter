@@ -36,7 +36,7 @@ Single-measure patterns that can be tagged and searched.
 
 ### Use Case: Fill Repository
 - **Scenario**: Collecting useful drum fills to use across multiple songs or routines.
-- **Workflow**: Save individual fills as Snippets with tags like `#linear`, `#triplet`, or `#rock`. 
+- **Workflow**: Save individual fills as Snippets with tags like `#linear`, `#triplet`, or `#rock`.
 - **Integration**: Eventually, these snippets can be "pasted" or referenced inside Song Charts and Notebooks.
 
 ## 4. Song Charts: Performance-Ready Documents

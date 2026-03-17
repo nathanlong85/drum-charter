@@ -103,7 +103,8 @@ test.describe('Guest Access & Library Flow', () => {
 
     // Create new snippet
     const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
+      (resp) =>
+        resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
     console.log('Clicking New Snippet button...');

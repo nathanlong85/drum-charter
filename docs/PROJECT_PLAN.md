@@ -20,7 +20,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 4
-- **Testing**: 
+- **Testing**:
   - **Unit/Logic**: Vitest
   - **Component/Integration**: React Testing Library
   - **E2E**: Playwright

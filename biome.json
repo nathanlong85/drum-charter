@@ -7,7 +7,16 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**/*", "!app/globals.css", "!.markdownlint-cli2.jsonc"]
+    "includes": [
+      "**/*",
+      "!app/globals.css",
+      "!.markdownlint-cli2.jsonc",
+      "!.agents",
+      "!node_modules",
+      "!.next",
+      "!public/sw.js",
+      "!playwright-report"
+    ]
   },
   "formatter": {
     "enabled": true,

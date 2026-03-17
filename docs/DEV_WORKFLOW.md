@@ -14,6 +14,7 @@ We use a strict branching and PR-based feedback loop.
 
 ### Step 2.1: Branching
 Always create a new branch from `main` for any new task:
+
 ```bash
 git checkout main
 git pull origin main
@@ -34,6 +35,7 @@ Run `coderabbit review --base main --prompt-only --plain` (Timeout: 300s) to cat
 
 ### Step 2.4: Committing
 Attribute all commits to the user only:
+
 ```bash
 git add .
 git commit -m "feat/fix: descriptive message"
@@ -49,8 +51,8 @@ Push your branch to GitHub and open a Pull Request. Always include a detailed Ma
 - **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
 - **Manual Check**: Junie will only check for CodeRabbit feedback when you explicitly ask (e.g., "Check CodeRabbit," "Is the review done?").
 - **Review Status Check**:
-    - If the review is still "Pending" or "In Progress," Junie will notify you and **do nothing else**, waiting for your next instruction to check again.
-    - If complete, Junie will perform a structured review of all unresolved (`isResolved: false`) and current (`isOutdated: false`) comments.
+  - If the review is still "Pending" or "In Progress," Junie will notify you and **do nothing else**, waiting for your next instruction to check again.
+  - If complete, Junie will perform a structured review of all unresolved (`isResolved: false`) and current (`isOutdated: false`) comments.
 - **No "False Completeness"**: Junie will only report "All addressed" when there are zero active comments AND the PR status is no longer `CHANGES_REQUESTED`.
 - **Approval Before Fixes**: Junie will summarize all findings and seek your explicit approval before applying any fixes.
 
