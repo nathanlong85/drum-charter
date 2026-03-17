@@ -11,6 +11,30 @@ execution and ensure consistent environments.
   syntax, execute it, and then add it to this file.
 - **Environment Context**: Commands below are optimized for the current project
   structure and local development environment.
+- **Option Safety**: Only use CLI options that are explicitly known to exist for
+  a command. If unsure, consult the command's `--help` or official documentation
+  first. Do NOT assume an option (like `--timeout`) exists for a tool unless
+  verified.
+- **Suppress Noise**: When running tests or CLI commands that emit redundant
+  environment warnings (e.g., Node's `NO_COLOR` vs `FORCE_COLOR` conflict),
+  proactively suppress them by unsetting `NO_COLOR` (e.g.,
+  `unset NO_COLOR && npx playwright test`).
+
+---
+
+## The `timeout` Parameter (Agent Level)
+
+Junie's terminal environment has a default 60-second timeout for `bash`
+commands. This is an **agent-level parameter** passed to the `bash` tool,
+NOT a CLI option for the commands themselves.
+
+- **Usage**: When Junie executes a `bash` command, she must pass the `timeout`
+  parameter (in seconds) in the tool call, NOT as part of the command string.
+- **Example (Correct)**: `bash({ command: "pnpm install", timeout: 300 })`
+- **Example (Incorrect)**: `bash({ command: "pnpm install --timeout 300" })`
+- **Example (Incorrect)**: `bash({ command: "coderabbit review --timeout 300" })`
+- **Maximum**: 3600 (1 hour).
+- **Rule**: ALWAYS use an explicit high `timeout` parameter for "Slow Commands".
 
 ---
 
@@ -89,29 +113,34 @@ environment.
 
 ---
 
+## CodeRabbit (Local Code Review)
+
+Commands for running AI-powered code reviews using the CodeRabbit CLI. Use the `code-review` agent skill as the primary guide for this workflow.
+
+### 1. Run Structured Local Review Loop
+
+- **Goal**: Address code quality issues in a 3-loop state machine using the local `coderabbit` CLI.
+- **Protocol**:
+    - **Loop 1**: Address **ALL** findings (Critical, Major, Minor, Trivial).
+    - **Loop 2**: Address ONLY **Critical** and **Major** findings.
+    - **Loop 3**: Address ONLY **Critical** and **Major** findings.
+- **Command**: `coderabbit review --base main --prompt-only`
+- **Recommended Timeout**: 3600s (Agent-level `timeout` parameter)
+- **Prerequisites**: Must be logged in (`coderabbit auth login`). Current branch must have changes relative to `main`.
+- **Pitfalls**: Ensure `main` is up-to-date before running the review to avoid stale diffs. Do NOT use `--timeout` as a CLI flag; it is an agent-level `bash` tool parameter.
+
+---
+
 ## Slow Commands & Timeout Management
 
-Junie's terminal environment has a default 60-second timeout for `bash`
-commands. Some tools (e.g., full test suites, CodeRabbit scans, complex
-Playwright tests) frequently exceed this.
+Some tools frequently exceed the 60s default. Use the agent-level `timeout`
+parameter for these.
 
-### 1. The `timeout` Parameter
-
-- **Usage**: When Junie executes a `bash` command, she can pass a `timeout`
-  parameter (in seconds).
-- **Maximum**: 3600 (1 hour).
-- **Rule**: ALWAYS use an explicit high timeout (e.g., 300+) for the following
-  "Slow Commands":
-  - `npx playwright test ...`
-  - `coderabbit review ...`
-  - `npx vitest run` (in large modules)
-  - `pnpm install` (initial or major updates)
-
-### 2. Verified Slow Command Patterns
+### 1. Verified Slow Command Patterns
 
 | Tool | Recommended Timeout | Notes |
 | :--- | :--- | :--- |
-| CodeRabbit Review | 300s | `coderabbit review --base main --prompt-only --plain` |
+| CodeRabbit Review | 3600s | `coderabbit review --base main --prompt-only` |
 | Playwright (Full) | 600s | `npx playwright test --project=chromium` |
 | Playwright (Single) | 180s | `npx playwright test <FILE> --project=chromium` |
 | Vitest (Full) | 120s | `npx vitest run` |

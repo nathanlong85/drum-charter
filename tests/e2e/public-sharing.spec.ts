@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe('Public Sharing Workflows', () => {
   test('Should handle private or missing songs with 404', async ({ page }) => {
     // Navigate to a likely non-existent or private ID
