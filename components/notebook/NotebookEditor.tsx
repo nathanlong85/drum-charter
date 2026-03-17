@@ -15,7 +15,7 @@ type NotebookAction =
   | { type: 'ADD_SECTION' }
   | { type: 'REMOVE_SECTION'; sectionId: string }
   | { type: 'UPDATE_SECTION_NAME'; sectionId: string; name: string }
-  | { type: 'UPDATE_SECTION_GRID'; sectionId: string; grid: GrooveGrid }
+  | { type: 'UPDATE_SECTION_GRID'; sectionId: string; grid?: GrooveGrid }
   | { type: 'UPDATE_SECTION_NOTES'; sectionId: string; notes: string[] }
   | { type: 'UPDATE_SECTION_BPM'; sectionId: string; bpm: number };
 
@@ -331,7 +331,7 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
                       dispatch({
                         type: 'UPDATE_SECTION_GRID',
                         sectionId: section.id,
-                        grid: undefined as any,
+                        grid: undefined,
                       })
                     }
                     className="mt-2 text-xs text-zinc-400 hover:text-red-500"

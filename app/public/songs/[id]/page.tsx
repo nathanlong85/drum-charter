@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { SongChartView } from '@/components/chart/SongChartView';
 import PrintButton from '@/components/common/PrintButton';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -16,8 +17,14 @@ export default async function PublicSongPage({ params }: PublicSongPageProps) {
   let song: SongChart;
   try {
     song = await supabaseService.getSongChart(id, supabase);
-  } catch (error: any) {
-    if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
+  } catch (error: unknown) {
+    // Trigger notFound for "no rows" PostgREST error (PGRST116) or thrown "not found" message
+    if (
+      error &&
+      typeof error === 'object' &&
+      ((error as { code?: string }).code === 'PGRST116' ||
+        (error as { message?: string }).message?.includes('not found'))
+    ) {
       notFound();
     }
     console.error('Error loading public song:', error);
@@ -40,9 +47,9 @@ export default async function PublicSongPage({ params }: PublicSongPageProps) {
       <footer className="max-w-4xl mx-auto mt-8 text-center no-print">
         <p className="text-sm text-zinc-400">
           Create your own charts at{' '}
-          <a href="/" className="text-blue-600 font-bold hover:underline">
+          <Link href="/" className="text-blue-600 font-bold hover:underline">
             DrumCharter.com
-          </a>
+          </Link>
         </p>
       </footer>
     </main>

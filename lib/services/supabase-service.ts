@@ -22,7 +22,7 @@ const _SNIPPET_RETRY_DELAY_MS = 3000;
  * Bails early on 404/401/403 errors and only retries on transient network or server issues.
  */
 async function fetchWithRetry<T>(
-  fetchFn: () => PromiseLike<{ data: T | null; error: any }>,
+  fetchFn: () => PromiseLike<{ data: T | null; error: unknown }>,
   id: string,
   typeName: string,
   maxAttempts = 3,
@@ -31,14 +31,17 @@ async function fetchWithRetry<T>(
   let attempts = 0;
   let { data, error } = await fetchFn();
 
+  const isBailableError = (err: any): boolean => {
+    if (!err) return false;
+    const code = err.code;
+    const status = err.status;
+    return ['PGRST116', '22P02', '401', '403', '404'].includes(code) || status === 404;
+  };
+
   if (error) {
-    // Bail immediately on definitive client errors
-    // PGRST116: no rows found
-    // 22P02: invalid input syntax for type uuid (common in tests/fake IDs)
-    if (['PGRST116', '22P02', '401', '403', '404'].includes(error.code) || error.status === 404) {
+    if (isBailableError(error)) {
       return null;
     }
-    // For other errors, we might want to retry if they are transient
     console.warn(`[supabaseService] Initial fetch error for ${typeName} ${id}:`, error);
   }
 
@@ -54,7 +57,7 @@ async function fetchWithRetry<T>(
     error = retryResult.error;
 
     if (error) {
-      if (['PGRST116', '401', '403', '404'].includes(error.code) || error.status === 404) {
+      if (isBailableError(error)) {
         return null;
       }
       console.error(`[supabaseService] Retry error for ${typeName} ${id}:`, error);

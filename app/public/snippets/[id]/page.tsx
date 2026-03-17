@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { SnippetView } from '@/components/groove/SnippetView';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
@@ -15,8 +16,13 @@ export default async function PublicSnippetPage({ params }: PublicSnippetPagePro
   let snippet: GrooveSnippet;
   try {
     snippet = await supabaseService.getGrooveSnippet(id, supabase);
-  } catch (error: any) {
-    if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      ((error as { code?: string }).code === 'PGRST116' ||
+        (error as { message?: string }).message?.includes('not found'))
+    ) {
       notFound();
     }
     console.error('Error loading public snippet:', error);
@@ -38,9 +44,9 @@ export default async function PublicSnippetPage({ params }: PublicSnippetPagePro
       <footer className="max-w-4xl mx-auto mt-8 text-center no-print">
         <p className="text-sm text-zinc-400">
           Capture your own groove snippets at{' '}
-          <a href="/" className="text-blue-600 font-bold hover:underline">
+          <Link href="/" className="text-blue-600 font-bold hover:underline">
             DrumCharter.com
-          </a>
+          </Link>
         </p>
       </footer>
     </main>

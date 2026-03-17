@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import PrintButton from '@/components/common/PrintButton';
 import { NotebookView } from '@/components/notebook/NotebookView';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -16,8 +17,13 @@ export default async function PublicNotebookPage({ params }: PublicNotebookPageP
   let notebook: Notebook;
   try {
     notebook = await supabaseService.getNotebook(id, supabase);
-  } catch (error: any) {
-    if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      ((error as { code?: string }).code === 'PGRST116' ||
+        (error as { message?: string }).message?.includes('not found'))
+    ) {
       notFound();
     }
     console.error('Error loading public notebook:', error);
@@ -40,9 +46,9 @@ export default async function PublicNotebookPage({ params }: PublicNotebookPageP
       <footer className="max-w-4xl mx-auto mt-8 text-center no-print">
         <p className="text-sm text-zinc-400">
           Create your own practice notebooks at{' '}
-          <a href="/" className="text-blue-600 font-bold hover:underline">
+          <Link href="/" className="text-blue-600 font-bold hover:underline">
             DrumCharter.com
-          </a>
+          </Link>
         </p>
       </footer>
     </main>

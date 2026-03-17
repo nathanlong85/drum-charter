@@ -31,10 +31,10 @@ class MockAudioContext {
   destination = {};
 }
 
-// @ts-expect-error
-window.AudioContext = MockAudioContext;
-// @ts-expect-error
-window.webkitAudioContext = MockAudioContext;
+// @ts-expect-error - The test environment lacks a real AudioContext and we are assigning a mock implementation.
+window.AudioContext = MockAudioContext as any;
+// @ts-expect-error - The test environment lacks a real webkitAudioContext and we are assigning a mock implementation.
+window.webkitAudioContext = MockAudioContext as any;
 
 // Mock fetch for all tests
 global.fetch = vi.fn().mockResolvedValue({
