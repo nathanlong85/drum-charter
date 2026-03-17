@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import OfflineStatus from '@/components/common/OfflineStatus';
+import ServiceWorkerRegistration from '@/components/common/ServiceWorkerRegistration';
 import './globals.css';
 import './print.css';
 
@@ -42,6 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ServiceWorkerRegistration />
         {children}
         <OfflineStatus />
       </body>
