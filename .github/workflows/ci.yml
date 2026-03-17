@@ -15,15 +15,15 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
       
       - name: Install pnpm
-        uses: pnpm/action-setup@a3252b78c4a0491d9d968535035f8c87ed69c73e # v4.0.0
+        uses: pnpm/action-setup@v4
         with:
           version: 10
 
       - name: Set up Node.js
-        uses: actions/setup-node@1d99cf73d75073f497935625973d5300ac7a1e12 # v4.2.0
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
@@ -41,15 +41,15 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
       
       - name: Install pnpm
-        uses: pnpm/action-setup@a3252b78c4a0491d9d968535035f8c87ed69c73e # v4.0.0
+        uses: pnpm/action-setup@v4
         with:
           version: 10
 
       - name: Set up Node.js
-        uses: actions/setup-node@1d99cf73d75073f497935625973d5300ac7a1e12 # v4.2.0
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
@@ -64,15 +64,15 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@v4
       
       - name: Install pnpm
-        uses: pnpm/action-setup@a3252b78c4a0491d9d968535035f8c87ed69c73e # v4.0.0
+        uses: pnpm/action-setup@v4
         with:
           version: 10
 
       - name: Set up Node.js
-        uses: actions/setup-node@1d99cf73d75073f497935625973d5300ac7a1e12 # v4.2.0
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
@@ -84,7 +84,7 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@066042467d018671607f23a51b2c4e207166133f # v1.6.0
+        uses: supabase/setup-cli@v1
         with:
           version: v2.81.2 # Pinned for deterministic runs
 
