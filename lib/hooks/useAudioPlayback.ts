@@ -149,11 +149,7 @@ export function useAudioPlayback({
 
           // Determine velocity: explicit value from inst.velocities, or derived from symbol
           let velocity = _getVelocityForSymbolInHook(symbol);
-          if (
-            inst.velocities &&
-            inst.velocities[step] !== undefined &&
-            inst.velocities[step] !== 0
-          ) {
+          if (inst.velocities && inst.velocities[step] !== undefined) {
             velocity = inst.velocities[step];
           }
 

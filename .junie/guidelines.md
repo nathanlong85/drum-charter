@@ -33,14 +33,18 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - **Review Status Check**:
     - If CodeRabbit is still performing a review (PR status is "Pending" or "In Progress"), I will notify you and **do nothing else**. I will wait for your next instruction to check again.
     - If the review is complete, I will proceed with the structured feedback review.
-- **Structured Feedback Review**: Treat the PR review as a state machine:
-    1. **Check PR Review Status**: Is it `CHANGES_REQUESTED`, `PENDING`, or `APPROVED`?
-    2. **Filter Unresolved/Active**: Fetch all review comments and filter for `isResolved: false` AND `isOutdated: false`.
-    3. **No "False Completeness"**: Only report "All addressed" when that filtered list is empty AND the PR status is no longer `CHANGES_REQUESTED`.
-- **Finding Blockers**: If the PR is not "Approved" and no override is given, I must scan the PR to find specific comments blocking the approval.
-- **Prioritize Project Standards**: Always prioritize our own standards, preferences, and project plans over CodeRabbit suggestions. If there is a conflict, I will flag it for your decision.
-- **Handling Disagreements**: If I disagree with a CodeRabbit comment or cannot address it, I will inform you and wait for your final call.
-- **No "Stale" Implementation**: Before starting any new work in a feature branch, you MUST check the PR for any pending CodeRabbit or human feedback and address it first.
+- **Structured Feedback Review**: Treat the PR review as a three-loop state machine:
+    1. **Loop 1 (Initial)**: Address ALL unresolved comments regardless of severity (`Critical`, `Major`, `Minor`, `Trivial/Nitpick`).
+    2. **Loop 2**: Address ONLY `Critical` and `Major` severity comments.
+    3. **Loop 3 (Final)**: Address ONLY `Critical` and `Major` severity comments.
+    4. **Termination**: If Loop 3 contains zero `Critical` or `Major` comments, the review cycle is considered complete.
+- **No "False Completeness"**: Only report "All addressed" when the current loop's required severities are empty AND the PR status is no longer `CHANGES_REQUESTED`.
+- **Finding Blockers**: If the PR is not "Approved" and no override is given, I must scan the PR to find specific comments blocking the approval based on the current loop's severity rules.
+- **Disagreement & Flagging Protocol**: I must proactively flag a CodeRabbit suggestion for your final decision if it:
+    - Conflicts with our project's specific architectural goals or standards.
+    - Contradicts a previously established user preference or known requirement.
+    - Introduces unnecessary complexity or "code smells" that I (as Junie) disagree with.
+- **No "Stale" Implementation"**: Before starting any new work in a feature branch, you MUST check the PR for any pending CodeRabbit or human feedback and address it first.
 - **Reporting**: Summarize findings and ask for approval before applying fixes.
 
 ### 5. Technical & Mode Rules

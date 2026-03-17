@@ -54,9 +54,6 @@ export function SnippetView({ snippet }: SnippetViewProps) {
       </div>
 
       <footer className="mt-16 pt-8 border-t border-zinc-100 text-center">
-        <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.2em]">
-          DrumCharter Public View
-        </p>
         <p className="text-zinc-400 text-xs mt-2">
           Last updated {formatDateTime(snippet.updatedAt)}
         </p>

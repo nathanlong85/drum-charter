@@ -265,7 +265,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                 const val = parseInt(e.target.value, 10);
                 dispatch({
                   type: 'UPDATE_BPM',
-                  bpm: Number.isNaN(val) ? 0 : Math.max(0, Math.min(val, 999)),
+                  bpm: Number.isNaN(val) ? 120 : Math.max(1, Math.min(val, 999)),
                 });
               }}
               className="w-16 text-lg font-bold text-zinc-700 bg-zinc-50 border border-zinc-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"

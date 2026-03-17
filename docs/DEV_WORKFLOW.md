@@ -32,7 +32,7 @@ git checkout -b feature/your-feature-name
   - E2E: `npx playwright test --project=chromium`
 
 ### Step 2.3: Local Code Review
-Run `coderabbit review --base main --prompt-only --plain` (Timeout: 300s) to catch issues early and ensure all CodeRabbit standards are met before pushing.
+Run `coderabbit review --base main --no-color` (Timeout: 300s) to catch issues early and ensure all CodeRabbit standards are met before pushing.
 
 ### Step 2.4: Committing
 Attribute all commits to the user only:
@@ -51,10 +51,12 @@ Push your branch to GitHub and open a Pull Request. Always include a detailed Ma
 ### Step 3.2: CodeRabbit Review Protocol
 - **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
 - **Manual Check**: Junie will only check for CodeRabbit feedback when you explicitly ask (e.g., "Check CodeRabbit," "Is the review done?").
-- **Review Status Check**:
-  - If the review is still "Pending" or "In Progress," Junie will notify you and **do nothing else**, waiting for your next instruction to check again.
-  - If complete, Junie will perform a structured review of all unresolved (`isResolved: false`) and current (`isOutdated: false`) comments.
-- **No "False Completeness"**: Junie will only report "All addressed" when there are zero active comments AND the PR status is no longer `CHANGES_REQUESTED`.
+- **Three-Loop Feedback Guardrails**:
+  - **Loop 1**: Address all severities (`Critical` to `Trivial/Nitpick`).
+  - **Loops 2-3**: Address only `Critical` and `Major` severities.
+  - **Termination**: The task is complete if Loop 3 returns zero `Critical`/`Major` items.
+- **Disagreement Protocol**: Junie will flag any suggestions that conflict with project goals or established preferences for human decision.
+- **No "False Completeness"**: Junie will only report "All addressed" when the current loop's required severities are empty AND the PR status is no longer `CHANGES_REQUESTED`.
 - **Approval Before Fixes**: Junie will summarize all findings and seek your explicit approval before applying any fixes.
 
 ### Step 3.3: Human Quality Gate

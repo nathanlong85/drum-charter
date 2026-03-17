@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { AuthStatus } from '@/components/auth/AuthStatus';
 import SnippetEditor from '@/components/groove/SnippetEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -15,6 +15,10 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
 
   console.log(`[SnippetPage] Loading snippet: ${id} (User: ${user?.id || 'Anonymous'})`);
 

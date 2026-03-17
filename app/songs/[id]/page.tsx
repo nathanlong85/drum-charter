@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { AuthStatus } from '@/components/auth/AuthStatus';
 import SongEditor from '@/components/chart/SongEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -13,6 +13,14 @@ interface SongPageProps {
 export default async function SongPage({ params }: SongPageProps) {
   const { id } = await params;
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
 
   let rawChart: SongChart;
   try {

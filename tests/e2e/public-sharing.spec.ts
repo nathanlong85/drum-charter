@@ -22,17 +22,20 @@ test.describe('Public Sharing Workflows', () => {
     const createPromise = page.waitForResponse((resp) => resp.url().includes('/rest/v1/notebooks'));
     await page.getByRole('button', { name: /New Notebook/i }).click();
     const response = await createPromise;
-    const body = await response.json();
-    const notebookId = body[0].id;
-
-    // 3. Make it public
-    await page.waitForURL(new RegExp(`/notebooks/${notebookId}`));
+    expect(response.ok()).toBe(true);
+    await page.waitForURL(/\/notebooks\/.+/);
+    const notebookId = page.url().split('/').pop();
     await page.getByLabel(/Public/i).check();
     await expect(page.locator('text=SAVED')).toBeVisible();
+    // Increase buffer for local Supabase propagation to public views
+    await page.waitForTimeout(3000);
 
     // 4. View public page
     await page.goto(`http://localhost:3001/public/notebooks/${notebookId}`);
-    await expect(page.getByText(/DrumCharter Public View/i)).toBeVisible();
+    // Wait for the specific heading that confirms the public view is loaded
+    await expect(page.getByText(/DrumCharter Public View/i).first()).toBeVisible({
+      timeout: 20000,
+    });
     await expect(page.getByText(/Untitled Notebook/i)).toBeVisible();
   });
 
@@ -57,17 +60,20 @@ test.describe('Public Sharing Workflows', () => {
     );
     await page.getByRole('button', { name: /New Snippet/i }).click();
     const response = await createPromise;
-    const body = await response.json();
-    const snippetId = body[0].id;
-
-    // 3. Make it public
-    await page.waitForURL(new RegExp(`/snippets/${snippetId}`));
+    expect(response.ok()).toBe(true);
+    await page.waitForURL(/\/snippets\/.+/);
+    const snippetId = page.url().split('/').pop();
     await page.getByLabel(/Public/i).check();
     await expect(page.locator('text=SAVED')).toBeVisible();
+    // Increase buffer for local Supabase propagation to public views
+    await page.waitForTimeout(3000);
 
     // 4. View public page
     await page.goto(`http://localhost:3001/public/snippets/${snippetId}`);
-    await expect(page.getByText(/DrumCharter Public View/i)).toBeVisible();
+    // Wait for the specific heading that confirms the public view is loaded
+    await expect(page.getByText(/DrumCharter Public View/i).first()).toBeVisible({
+      timeout: 20000,
+    });
     await expect(page.getByText(/Untitled Snippet/i)).toBeVisible();
   });
 

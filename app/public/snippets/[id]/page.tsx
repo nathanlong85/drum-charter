@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import PrintButton from '@/components/common/PrintButton';
 import { SnippetView } from '@/components/groove/SnippetView';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
@@ -38,6 +39,7 @@ export default async function PublicSnippetPage({ params }: PublicSnippetPagePro
       <div className="max-w-4xl mx-auto bg-white shadow-xl shadow-zinc-200 rounded-2xl overflow-hidden print:shadow-none print:rounded-none">
         <div className="bg-zinc-900 text-white px-8 py-4 flex justify-between items-center no-print">
           <h2 className="text-xs font-mono uppercase tracking-[0.2em]">DrumCharter Public View</h2>
+          <PrintButton />
         </div>
         <SnippetView snippet={snippet} />
       </div>
