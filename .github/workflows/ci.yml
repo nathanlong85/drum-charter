@@ -85,7 +85,7 @@ jobs:
           version: latest
 
       - name: Start Supabase local instance
-        run: supabase start
+        run: supabase start --exclude-containers studio,inbucket,realtime,edge-runtime,postgrest
 
       - name: Run E2E tests
         run: pnpm test:e2e
