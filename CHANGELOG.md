@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - **E2E Tests**: Sets up a local Supabase instance and runs the Playwright test suite.
 - **Improved Workspace Configuration**: Added a `pnpm-workspace.yaml` with the required `packages` field to ensure compatibility with `pnpm` v10 and GitHub Actions.
 - **Optimized CI Performance**: Reduced `supabase start` time in CI by excluding non-essential containers (Studio, Inbucket, Realtime, Edge Runtime, PostgREST).
+- **Hardened CI Pipeline**: Implemented security best practices for GitHub Actions:
+    - Added top-level `permissions` block to scope `GITHUB_TOKEN` to least privilege (`contents: read`, `pull-requests: write`).
+    - Pinned all GitHub Actions (Checkout, Setup-node, Setup-pnpm, Setup-cli) to full commit SHAs for immutability.
+    - Pinned Supabase CLI version to `v2.81.2` for deterministic and reproducible E2E runs.
 - **Fixed CI Dependencies**: Resolved `MODULE_NOT_FOUND` error in Playwright tests by adding `dotenv` as a devDependency.
 
 ## [0.1.9-alpha] - 2026-03-13
