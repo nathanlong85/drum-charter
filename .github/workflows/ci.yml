@@ -86,7 +86,7 @@ jobs:
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: v2.81.2 # Pinned for deterministic runs
+          version: 2.81.2 # Pinned for deterministic runs
 
       - name: Start Supabase local instance
         run: supabase start --exclude-containers studio,inbucket,realtime,edge-runtime,postgrest
