@@ -24,8 +24,13 @@ export default async function NotebookPage({ params }: NotebookPageProps) {
   let formattedNotebook;
   try {
     formattedNotebook = await supabaseService.getNotebook(id, supabase);
-  } catch (error: any) {
-    if (error?.code === 'PGRST116' || error?.message?.includes('not found')) {
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      ((error as { code?: string }).code === 'PGRST116' ||
+        (error as { message?: string }).message?.includes('not found'))
+    ) {
       notFound();
     }
     console.error('Error loading notebook:', error);

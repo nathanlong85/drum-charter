@@ -21,11 +21,6 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
   try {
     const rawSnippet = await supabaseService.getGrooveSnippet(id, supabase);
 
-    if (!rawSnippet) {
-      console.error(`[SnippetPage] Snippet not found in DB: ${id}`);
-      notFound();
-    }
-
     console.log(
       `[SnippetPage] Snippet found: ${rawSnippet.title} (Owner: ${rawSnippet.userId}, Public: ${rawSnippet.isPublic})`,
     );
@@ -62,8 +57,16 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
         </main>
       </div>
     );
-  } catch (error) {
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      ((error as { code?: string }).code === 'PGRST116' ||
+        (error as { message?: string }).message?.includes('not found'))
+    ) {
+      notFound();
+    }
     console.error('Error loading snippet:', error);
-    notFound();
+    throw error;
   }
 }
