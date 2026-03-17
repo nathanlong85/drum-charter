@@ -32,6 +32,7 @@ NOT a CLI option for the commands themselves.
   parameter (in seconds) in the tool call, NOT as part of the command string.
 - **Example (Correct)**: `bash({ command: "pnpm install", timeout: 300 })`
 - **Example (Incorrect)**: `bash({ command: "pnpm install --timeout 300" })`
+- **Example (Incorrect)**: `bash({ command: "coderabbit review --timeout 300" })`
 - **Maximum**: 3600 (1 hour).
 - **Rule**: ALWAYS use an explicit high `timeout` parameter for "Slow Commands".
 
@@ -112,6 +113,24 @@ environment.
 
 ---
 
+## CodeRabbit (Local Code Review)
+
+Commands for running AI-powered code reviews using the CodeRabbit CLI. Use the `code-review` agent skill as the primary guide for this workflow.
+
+### 1. Run Structured Local Review Loop
+
+- **Goal**: Address code quality issues in a 3-loop state machine using the local `coderabbit` CLI.
+- **Protocol**:
+    - **Loop 1**: Address **ALL** findings (Critical, Major, Minor, Trivial).
+    - **Loop 2**: Address ONLY **Critical** and **Major** findings.
+    - **Loop 3**: Address ONLY **Critical** and **Major** findings.
+- **Command**: `coderabbit review --base main --prompt-only`
+- **Recommended Timeout**: 3600s (Agent-level `timeout` parameter)
+- **Prerequisites**: Must be logged in (`coderabbit auth login`). Current branch must have changes relative to `main`.
+- **Pitfalls**: Ensure `main` is up-to-date before running the review to avoid stale diffs. Do NOT use `--timeout` as a CLI flag; it is an agent-level `bash` tool parameter.
+
+---
+
 ## Slow Commands & Timeout Management
 
 Some tools frequently exceed the 60s default. Use the agent-level `timeout`
@@ -121,7 +140,7 @@ parameter for these.
 
 | Tool | Recommended Timeout | Notes |
 | :--- | :--- | :--- |
-| CodeRabbit Review | 300s | `coderabbit review --base main --prompt-only --plain` |
+| CodeRabbit Review | 3600s | `coderabbit review --base main --prompt-only` |
 | Playwright (Full) | 600s | `npx playwright test --project=chromium` |
 | Playwright (Single) | 180s | `npx playwright test <FILE> --project=chromium` |
 | Vitest (Full) | 120s | `npx vitest run` |

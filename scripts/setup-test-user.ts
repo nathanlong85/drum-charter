@@ -58,4 +58,7 @@ async function createTestUser() {
   }
 }
 
-createTestUser()
+createTestUser().catch((error) => {
+  console.error('Unhandled error in createTestUser:', error)
+  process.exit(1)
+})
