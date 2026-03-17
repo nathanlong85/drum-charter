@@ -43,9 +43,9 @@
       "a11y": {
         "noStaticElementInteractions": "off",
         "useButtonType": "off",
-        "useAltText": "off",
+        "useAltText": "error",
         "useKeyWithClickEvents": "off",
-        "useAnchorContent": "off",
+        "useAnchorContent": "error",
         "noSvgWithoutTitle": "off",
         "useSemanticElements": "off"
       },

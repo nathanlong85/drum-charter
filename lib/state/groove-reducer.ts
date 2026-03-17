@@ -101,7 +101,7 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
           if (inst.instrumentId !== action.instrumentId) return inst;
           const newVelocities = inst.velocities
             ? [...inst.velocities]
-            : Array(inst.notes.length).fill(0.7);
+            : Array(inst.notes.length).fill(0);
           newVelocities[action.noteIndex] = action.velocity;
           return { ...inst, velocities: newVelocities };
         }),

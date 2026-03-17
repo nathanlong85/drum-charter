@@ -90,10 +90,9 @@ export function TagInput({
             setIsFocused(true);
             setShowSuggestions(true);
           }}
-          onBlur={(e) => {
+          onBlur={(_e) => {
             setIsFocused(false);
             // Only hide suggestions if the focus is moving outside the container
-            const _currentTarget = e.currentTarget;
             setTimeout(() => {
               if (!containerRef.current?.contains(document.activeElement)) {
                 setShowSuggestions(false);

@@ -24,6 +24,7 @@ git checkout -b feature/your-feature-name
 ### Step 2.2: Implementation & Testing
 - Implement changes using the **Karpathy Guidelines** (Simplicity First, Surgical Changes).
 - Write or update unit/E2E tests for every change.
+- **Verification Rule**: No task is complete until **all tests are passing** and **all linting is clean**.
 - Verify changes locally (using high timeouts where necessary per CLI reference):
   - Lint: `npm run lint` & `npm run lint:md`
   - Lint Fix: `npm run lint:fix` (Uses Biome)

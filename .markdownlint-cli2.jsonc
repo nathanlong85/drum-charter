@@ -1,7 +1,9 @@
 {
   "config": {
     "MD013": false, // Disable line length checks
-    "MD024": false  // Allow duplicate headings (common in CHANGELOGs)
+    "MD024": {
+      "siblings_only": true
+    }
   },
   "ignores": [
     "node_modules/**"

@@ -39,10 +39,10 @@ I would like to build a web app (and maybe some day a mobile app) that is tailor
    			- Edit
     				- Other users can read and make edits, possibly with the concept of an edit history
     				- Other users could still create their own copy and make edits to that
-- There should be excellent printing support. Charts should be printable on standard US Letter sized paper
+- There should be excellent printing support. Charts should be printable on standard US Letter-sized paper
 - We should be able to export to PDF
 - As mentioned earlier, I'd like to have support for "groove snippets". This could also be referred to as a "pattern library" or "beat library" or "groove library"
- 	- Easily accessible grooves that can be imported into songs, charts, practice exercises, etc
+ 	- Easily accessible grooves that can be imported into songs, charts, practice exercises, etc.
  	- It would be nice to be able to play a groove snippet to preview it
  	- They should be searchable by tag, title, etc.
  	- They should be filterable by time signature, music style, tags, etc.
@@ -58,7 +58,7 @@ I would like to build a web app (and maybe some day a mobile app) that is tailor
  	- Testing
  	- Code quality and linting
  	- Code organization
- 	- Project organization (directory structure, etc)
+ 	- Project organization (directory structure, etc.)
 - I prefer readability over terseness
 - I'll provide my current song template, as well as an example song chart
 - I'll provide my spreadsheet of drum symbols

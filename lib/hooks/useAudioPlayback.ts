@@ -148,7 +148,7 @@ export function useAudioPlayback({
           const instId = inst.instrumentId.toLowerCase();
 
           // Determine velocity: explicit value from inst.velocities, or derived from symbol
-          let velocity = getVelocityForSymbol(symbol);
+          let velocity = _getVelocityForSymbolInHook(symbol);
           if (
             inst.velocities &&
             inst.velocities[step] !== undefined &&
@@ -195,7 +195,14 @@ export function useAudioPlayback({
         onStepChange(step);
       }
     },
-    [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample],
+    [
+      grid,
+      metronomeEnabled,
+      metronomeVolume,
+      onStepChange,
+      playSample,
+      _getVelocityForSymbolInHook,
+    ],
   );
 
   const nextNote = useCallback(() => {

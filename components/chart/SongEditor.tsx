@@ -322,7 +322,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
               href={`/public/songs/${state.id}`}
               target="_blank"
               className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-widest mr-4"
-              rel="noopener"
+              rel="noopener noreferrer"
             >
               VIEW PUBLIC
             </a>

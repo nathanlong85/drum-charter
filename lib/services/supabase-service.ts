@@ -298,7 +298,7 @@ export const supabaseService = {
       isPublic: false,
     } as SongChart;
 
-    return this.saveSongChart(duplicate);
+    return this.saveSongChart(duplicate, supabase);
   },
 
   async duplicateNotebook(
@@ -323,7 +323,7 @@ export const supabaseService = {
       isPublic: false,
     } as Notebook;
 
-    return this.saveNotebook(duplicate);
+    return this.saveNotebook(duplicate, supabase);
   },
 
   async duplicateGrooveSnippet(
@@ -348,7 +348,7 @@ export const supabaseService = {
       isPublic: false,
     } as GrooveSnippet;
 
-    return this.saveGrooveSnippet(duplicate);
+    return this.saveGrooveSnippet(duplicate, supabase);
   },
 
   // --- Groove Snippets ---

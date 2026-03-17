@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { AuthStatus } from '@/components/auth/AuthStatus';
 import NotebookEditor from '@/components/notebook/NotebookEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -21,7 +21,16 @@ export default async function NotebookPage({ params }: NotebookPageProps) {
     redirect('/login');
   }
 
-  const formattedNotebook = await supabaseService.getNotebook(id, supabase);
+  let formattedNotebook;
+  try {
+    formattedNotebook = await supabaseService.getNotebook(id, supabase);
+  } catch (error: any) {
+    if (error?.code === 'PGRST116') {
+      notFound();
+    }
+    console.error('Error loading notebook:', error);
+    throw error;
+  }
 
   return (
     <main className="min-h-screen bg-zinc-50">
