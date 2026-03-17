@@ -158,8 +158,8 @@ export default function LibraryDashboard({
           sections: [],
           tags: [],
           isPublic: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: null,
+          updatedAt: null,
         };
         const saved = await supabaseService.saveSongChart(newSong);
         if (saved?.id) {
@@ -179,8 +179,8 @@ export default function LibraryDashboard({
           sections: [],
           tags: [],
           isPublic: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: null,
+          updatedAt: null,
         };
         const saved = await supabaseService.saveNotebook(newNotebook);
         if (saved?.id) {
@@ -219,8 +219,8 @@ export default function LibraryDashboard({
               notes: Array(16).fill('none'),
             },
           ],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: null,
+          updatedAt: null,
         };
         const saved = await supabaseService.saveGrooveSnippet(newSnippet);
         if (saved?.id) {

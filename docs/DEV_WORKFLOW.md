@@ -32,7 +32,7 @@ git checkout -b feature/your-feature-name
   - E2E: `npx playwright test --project=chromium`
 
 ### Step 2.3: Local Code Review
-Run `coderabbit review --base main --no-color` (Timeout: 300s) to catch issues early and ensure all CodeRabbit standards are met before pushing.
+Run `coderabbit review --base main --no-color` (Expected runtime: ~300s) to catch issues early and ensure all CodeRabbit standards are met before pushing.
 
 ### Step 2.4: Committing
 Attribute all commits to the user only:
