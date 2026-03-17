@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.10-alpha] - 2026-03-17
+
+### Added
+- **GitHub Actions CI Pipeline**: Implemented a comprehensive CI workflow (`.github/workflows/ci.yml`) that runs on every push and PR to `main`.
+- **Automated Quality Checks**: The CI pipeline includes:
+    - **Linting**: Runs Biome for code and Markdownlint for documentation.
+    - **Unit Tests**: Executes the full Vitest suite.
+    - **E2E Tests**: Sets up a local Supabase instance and runs the Playwright test suite.
+- **Improved Workspace Configuration**: Added a `pnpm-workspace.yaml` with the required `packages` field to ensure compatibility with `pnpm` v10 and GitHub Actions.
+
 ## [0.1.9-alpha] - 2026-03-13
 
 ### Added
