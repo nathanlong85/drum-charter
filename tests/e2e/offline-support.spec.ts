@@ -8,7 +8,7 @@ test.describe('Offline Support (PWA)', () => {
   }) => {
     // Skip this test for now due to Serwist + Turbopack incompatibility
     test.skip();
-    
+
     // Ensure we start in a clean state
     await page.context().setOffline(false);
     await page.goto('/');

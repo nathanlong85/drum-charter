@@ -9,7 +9,7 @@ setup('authenticate', async ({ page }) => {
   // Fill in credentials from seed.sql
   await page.getByLabel('Email').fill('test@example.com');
   await page.getByLabel('Password').fill('password123');
-  
+
   // Click sign in and wait for navigation to library
   await page.getByRole('button', { name: 'Sign In' }).click();
 
