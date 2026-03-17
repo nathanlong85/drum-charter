@@ -24,7 +24,7 @@ test.describe('Public Sharing Workflows', () => {
     const response = await createPromise;
     expect(response.ok()).toBe(true);
     await page.waitForURL(/\/notebooks\/.+/);
-    const notebookId = page.url().split('/').pop();
+    const notebookId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     await page.getByLabel(/Public/i).check();
     await expect(page.locator('text=SAVED')).toBeVisible();
     // Increase buffer for local Supabase propagation to public views
@@ -62,7 +62,7 @@ test.describe('Public Sharing Workflows', () => {
     const response = await createPromise;
     expect(response.ok()).toBe(true);
     await page.waitForURL(/\/snippets\/.+/);
-    const snippetId = page.url().split('/').pop();
+    const snippetId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     await page.getByLabel(/Public/i).check();
     await expect(page.locator('text=SAVED')).toBeVisible();
     // Increase buffer for local Supabase propagation to public views

@@ -13,9 +13,6 @@ export default function OfflineStatus() {
   });
 
   useEffect(() => {
-    // Re-check initial state on mount to handle hydration mismatches
-    setIsOffline(!navigator.onLine);
-
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
 
