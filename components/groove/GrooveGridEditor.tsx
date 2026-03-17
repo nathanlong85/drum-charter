@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useReducer, useState, useEffect } from 'react';
-import { GrooveGrid, DrumSymbol, BeatResolution } from '@/lib/types/groove';
-import { grooveReducer, GrooveAction } from '@/lib/state/groove-reducer';
+import { Bell, BellOff, Minus, Play, Plus, Square, Volume2 } from 'lucide-react';
+import React, { useEffect, useReducer, useState } from 'react';
+import { useAudioPlayback } from '@/lib/hooks/useAudioPlayback';
+import { type GrooveAction, grooveReducer } from '@/lib/state/groove-reducer';
+import type { BeatResolution, DrumSymbol, GrooveGrid } from '@/lib/types/groove';
 import { InstrumentRow } from './InstrumentRow';
 import { SymbolPicker } from './SymbolPicker';
-import { Settings, Plus, Minus, Play, Square, Bell, BellOff, Volume2 } from 'lucide-react';
-import { useAudioPlayback } from '@/lib/hooks/useAudioPlayback';
 
 interface GrooveGridEditorProps {
   initialGrid: GrooveGrid;
@@ -30,21 +30,26 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   onMetronomeVolumeChange,
 }) => {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
-  const [pickerPos, setPickerPos] = useState<{ top: number; left: number; instrumentId: string; noteIndex: number } | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
+  const [pickerPos, setPickerPos] = useState<{
+    top: number;
+    left: number;
+    instrumentId: string;
+    noteIndex: number;
+  } | null>(null);
+  const [_showSettings, _setShowSettings] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [localBpm, setLocalBpm] = useState(120);
 
   const bpm = parentBpm !== undefined ? parentBpm : localBpm;
   const [showMetronomeSettings, setShowMetronomeSettings] = useState(false);
 
-  const { 
-    isPlaying, 
-    togglePlayback, 
-    metronomeEnabled, 
+  const {
+    isPlaying,
+    togglePlayback,
+    metronomeEnabled,
     setMetronomeEnabled,
     metronomeVolume,
-    setMetronomeVolume
+    setMetronomeVolume,
   } = useAudioPlayback({
     grid: state,
     bpm,
@@ -80,10 +85,26 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       return;
     }
 
-    if (initialGrid && JSON.stringify(initialGrid.instruments) !== JSON.stringify(state.instruments)) {
-      dispatch({ type: 'SET_GRID', payload: initialGrid.instruments });
+    if (initialGrid) {
+      const isDifferent =
+        JSON.stringify(initialGrid.instruments) !== JSON.stringify(state.instruments) ||
+        initialGrid.measures !== state.measures ||
+        initialGrid.resolution !== state.resolution ||
+        initialGrid.timeSignature.beatsPerMeasure !== state.timeSignature.beatsPerMeasure ||
+        initialGrid.timeSignature.beatValue !== state.timeSignature.beatValue;
+
+      if (isDifferent) {
+        dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
+      }
     }
-  }, [initialGrid, state.instruments]);
+  }, [
+    initialGrid,
+    state.instruments,
+    state.measures,
+    state.resolution,
+    state.timeSignature.beatValue,
+    state.timeSignature.beatsPerMeasure,
+  ]);
 
   const wrappedDispatch = (action: GrooveAction) => {
     dispatch(action);
@@ -107,12 +128,22 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   };
 
   const handleVelocityChange = (instrumentId: string, noteIndex: number, velocity: number) => {
-    wrappedDispatch({ type: 'SET_VELOCITY', instrumentId, noteIndex, velocity });
+    wrappedDispatch({
+      type: 'SET_VELOCITY',
+      instrumentId,
+      noteIndex,
+      velocity,
+    });
   };
 
   const handleSymbolSelect = (symbol: DrumSymbol) => {
     if (!pickerPos) return;
-    wrappedDispatch({ type: 'SET_SYMBOL', instrumentId: pickerPos.instrumentId, noteIndex: pickerPos.noteIndex, symbol });
+    wrappedDispatch({
+      type: 'SET_SYMBOL',
+      instrumentId: pickerPos.instrumentId,
+      noteIndex: pickerPos.noteIndex,
+      symbol,
+    });
   };
 
   const getVelocityForSymbol = (symbol: DrumSymbol): number => {
@@ -134,10 +165,10 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   };
 
   const updateTimeSignature = (beats: number, value: number) => {
-    wrappedDispatch({ 
-      type: 'SET_TIME_SIGNATURE', 
-      beatsPerMeasure: Math.max(1, beats), 
-      beatValue: value 
+    wrappedDispatch({
+      type: 'SET_TIME_SIGNATURE',
+      beatsPerMeasure: Math.max(1, beats),
+      beatValue: value,
     });
   };
 
@@ -146,14 +177,14 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     if (!state) return null;
     const { timeSignature, resolution, measures } = state;
     const notesPerBeat = resolution / timeSignature.beatValue;
-    const totalNotes = (timeSignature.beatsPerMeasure * notesPerBeat) * measures;
-    
+    const totalNotes = timeSignature.beatsPerMeasure * notesPerBeat * measures;
+
     const headers = [];
     for (let i = 0; i < totalNotes; i++) {
       let label = '';
       const beatIndex = Math.floor(i / notesPerBeat) % timeSignature.beatsPerMeasure;
       const subIndex = i % notesPerBeat;
-      
+
       if (subIndex === 0) {
         label = (beatIndex + 1).toString();
       } else if (resolution === 16) {
@@ -167,8 +198,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       const isMeasureBoundary = (i + 1) % (timeSignature.beatsPerMeasure * notesPerBeat) === 0;
 
       headers.push(
-        <div 
-          key={i} 
+        <div
+          key={i}
           className={`w-8 h-8 flex items-center justify-center text-xs font-bold border-r border-gray-300 bg-gray-100 select-none
             ${subIndex === 0 ? 'text-blue-600' : 'text-gray-500'}
             ${isMeasureBoundary ? 'border-r-2 border-r-gray-800' : ''}
@@ -176,7 +207,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           `}
         >
           {label}
-        </div>
+        </div>,
       );
     }
 
@@ -195,8 +226,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           <button
             onClick={togglePlayback}
             className={`flex items-center gap-2 px-4 py-1.5 rounded font-bold transition-colors ${
-              isPlaying 
-                ? 'bg-red-600 text-white hover:bg-red-700' 
+              isPlaying
+                ? 'bg-red-600 text-white hover:bg-red-700'
                 : 'bg-green-600 text-white hover:bg-green-700'
             }`}
           >
@@ -215,11 +246,11 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
 
           <div className="flex items-center gap-2 ml-2">
             <span className="text-gray-600 font-medium">BPM:</span>
-            <input 
-              type="number" 
+            <input
+              type="number"
               value={bpm}
               onChange={(e) => {
-                const newBpm = parseInt(e.target.value) || 60;
+                const newBpm = parseInt(e.target.value, 10) || 60;
                 if (onBpmChange) {
                   onBpmChange(newBpm);
                 } else {
@@ -241,15 +272,15 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
               onMetronomeToggle?.(newState);
             }}
             className={`p-1.5 rounded transition-colors ${
-              metronomeEnabled 
-                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
+              metronomeEnabled
+                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                 : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
             }`}
-            title={metronomeEnabled ? "Disable Metronome" : "Enable Metronome"}
+            title={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
           >
             {metronomeEnabled ? <Bell size={18} /> : <BellOff size={18} />}
           </button>
-          
+
           <button
             onClick={() => setShowMetronomeSettings(!showMetronomeSettings)}
             className={`p-1.5 rounded transition-colors hover:bg-gray-200 text-gray-600 ${
@@ -264,11 +295,11 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
             <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-300 rounded shadow-lg p-3 min-w-[120px]">
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-bold text-gray-500 uppercase">Click Volume</span>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="1" 
-                  step="0.05" 
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
                   value={metronomeVolume}
                   onChange={(e) => {
                     const newVal = parseFloat(e.target.value);
@@ -282,7 +313,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                   <span>Loud</span>
                 </div>
               </div>
-              <button 
+              <button
                 className="w-full mt-2 text-[10px] text-blue-600 hover:underline text-center"
                 onClick={() => setShowMetronomeSettings(false)}
               >
@@ -295,7 +326,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         <div className="flex items-center gap-2">
           <span className="text-gray-600 font-medium">Measures:</span>
           <div className="flex items-center border border-gray-300 rounded overflow-hidden bg-white">
-            <button 
+            <button
               onClick={() => updateMeasures(-1)}
               className="px-2 py-1 hover:bg-gray-100 border-r border-gray-300"
               title="Decrease measures"
@@ -303,7 +334,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
               <Minus size={14} />
             </button>
             <span className="px-3 py-1 font-bold min-w-[2rem] text-center">{state.measures}</span>
-            <button 
+            <button
               onClick={() => updateMeasures(1)}
               className="px-2 py-1 hover:bg-gray-100"
               title="Increase measures"
@@ -333,21 +364,33 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         <div className="flex items-center gap-2">
           <span className="text-gray-600 font-medium">Time Sig:</span>
           <div className="flex items-center gap-1">
-            <input 
-              type="number" 
+            <input
+              type="number"
               value={state.timeSignature.beatsPerMeasure}
-              onChange={(e) => updateTimeSignature(parseInt(e.target.value) || 1, state.timeSignature.beatValue)}
+              onChange={(e) =>
+                updateTimeSignature(
+                  parseInt(e.target.value, 10) || 1,
+                  state.timeSignature.beatValue,
+                )
+              }
               className="w-12 px-2 py-1 border border-gray-300 rounded text-center font-bold"
               min="1"
             />
             <span className="text-gray-400">/</span>
             <select
               value={state.timeSignature.beatValue}
-              onChange={(e) => updateTimeSignature(state.timeSignature.beatsPerMeasure, parseInt(e.target.value))}
+              onChange={(e) =>
+                updateTimeSignature(
+                  state.timeSignature.beatsPerMeasure,
+                  parseInt(e.target.value, 10),
+                )
+              }
               className="px-2 py-1 border border-gray-300 rounded bg-white font-bold"
             >
-              {[2, 4, 8, 16].map(v => (
-                <option key={v} value={v}>{v}</option>
+              {[2, 4, 8, 16].map((v) => (
+                <option key={v} value={v}>
+                  {v}
+                </option>
               ))}
             </select>
           </div>
@@ -375,10 +418,17 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           <SymbolPicker
             position={{ top: pickerPos.top, left: pickerPos.left }}
             onSelect={handleSymbolSelect}
-            onVelocityChange={(vel) => handleVelocityChange(pickerPos.instrumentId, pickerPos.noteIndex, vel)}
+            onVelocityChange={(vel) =>
+              handleVelocityChange(pickerPos.instrumentId, pickerPos.noteIndex, vel)
+            }
             currentVelocity={
-              state.instruments.find(i => i.instrumentId === pickerPos.instrumentId)?.velocities?.[pickerPos.noteIndex] ?? 
-              getVelocityForSymbol(state.instruments.find(i => i.instrumentId === pickerPos.instrumentId)?.notes[pickerPos.noteIndex] ?? 'none')
+              state.instruments.find((i) => i.instrumentId === pickerPos.instrumentId)
+                ?.velocities?.[pickerPos.noteIndex] ??
+              getVelocityForSymbol(
+                state.instruments.find((i) => i.instrumentId === pickerPos.instrumentId)?.notes[
+                  pickerPos.noteIndex
+                ] ?? 'none',
+              )
             }
             onClose={() => setPickerPos(null)}
           />

@@ -1,33 +1,84 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.describe('Public Sharing Workflows', () => {
-  test('Should allow viewing a public song', async ({ page }) => {
-    // We'll use a known public song or a mock
-    // For this test, we navigate to the public URL
-    // Note: This requires the dev server on 3001
-    await page.goto('http://localhost:3001/public/songs/test-song-id');
-    // If it's a 404 because the ID doesn't exist, that's expected in a fresh DB
-    // but we want to verify the PAGE renders and handles the notFound()
-    const title = await page.title();
-    expect(title).toBe('DrumCharter');
-  });
-
-  test('Should handle private songs with 404', async ({ page }) => {
+  test('Should handle private or missing songs with 404', async ({ page }) => {
     // Navigate to a likely non-existent or private ID
     await page.goto('http://localhost:3001/public/songs/private-id-123');
-    // Next.js notFound() renders a default 404 page in dev
+    // Next.js notFound() renders a default 404 page
     await expect(page.getByText('404')).toBeVisible();
   });
 
   test('Should allow viewing a public notebook', async ({ page }) => {
+    // 1. Sign in as guest
+    await page.goto('http://localhost:3001/login');
+    await page.getByRole('button', { name: /Continue as Guest/i }).click();
+    await page.waitForURL(/\/library/);
+
+    // 2. Create a new notebook
+    await page
+      .getByRole('button', { name: /Notebooks/i })
+      .first()
+      .click();
+    const createPromise = page.waitForResponse((resp) => resp.url().includes('/rest/v1/notebooks'));
+    await page.getByRole('button', { name: /New Notebook/i }).click();
+    const response = await createPromise;
+    expect(response.ok()).toBe(true);
+    await page.waitForURL(/\/notebooks\/.+/);
+    const notebookId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
+    await page.getByLabel(/Public/i).check();
+    await expect(page.locator('text=SAVED')).toBeVisible();
+    // Increase buffer for local Supabase propagation to public views
+    await page.waitForTimeout(3000);
+
+    // 4. View public page
+    await page.goto(`http://localhost:3001/public/notebooks/${notebookId}`);
+    // Wait for the specific heading that confirms the public view is loaded
+    await expect(page.getByText(/DrumCharter Public View/i).first()).toBeVisible({
+      timeout: 20000,
+    });
+    await expect(page.getByText(/Untitled Notebook/i)).toBeVisible();
+  });
+
+  test('Should handle private or missing notebooks with 404', async ({ page }) => {
     await page.goto('http://localhost:3001/public/notebooks/test-notebook-id');
-    const title = await page.title();
-    expect(title).toBe('DrumCharter');
+    await expect(page.getByText('404')).toBeVisible();
   });
 
   test('Should allow viewing a public snippet', async ({ page }) => {
+    // 1. Sign in as guest
+    await page.goto('http://localhost:3001/login');
+    await page.getByRole('button', { name: /Continue as Guest/i }).click();
+    await page.waitForURL(/\/library/);
+
+    // 2. Create a new snippet
+    await page
+      .getByRole('button', { name: /Snippets/i })
+      .first()
+      .click();
+    const createPromise = page.waitForResponse((resp) =>
+      resp.url().includes('/rest/v1/groove_snippets'),
+    );
+    await page.getByRole('button', { name: /New Snippet/i }).click();
+    const response = await createPromise;
+    expect(response.ok()).toBe(true);
+    await page.waitForURL(/\/snippets\/.+/);
+    const snippetId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
+    await page.getByLabel(/Public/i).check();
+    await expect(page.locator('text=SAVED')).toBeVisible();
+    // Increase buffer for local Supabase propagation to public views
+    await page.waitForTimeout(3000);
+
+    // 4. View public page
+    await page.goto(`http://localhost:3001/public/snippets/${snippetId}`);
+    // Wait for the specific heading that confirms the public view is loaded
+    await expect(page.getByText(/DrumCharter Public View/i).first()).toBeVisible({
+      timeout: 20000,
+    });
+    await expect(page.getByText(/Untitled Snippet/i)).toBeVisible();
+  });
+
+  test('Should handle private or missing snippets with 404', async ({ page }) => {
     await page.goto('http://localhost:3001/public/snippets/test-snippet-id');
-    const title = await page.title();
-    expect(title).toBe('DrumCharter');
+    await expect(page.getByText('404')).toBeVisible();
   });
 });

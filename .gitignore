@@ -36,6 +36,17 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# pwa
+/public/sw.js
+/public/sw.js.map
+/public/workbox-*.js
+/public/workbox-*.js.map
+/public/worker-*.js
+/public/worker-*.js.map
+/public/fallback-*.js
+/public/fallback-*.js.map
+/public/swe-worker-*.js
+
 # env files (can opt-in for committing if needed)
 .env*
 
@@ -47,3 +58,4 @@ yarn-error.log*
 next-env.d.ts
 table_stats.json
 coderabbit_full_review.txt
+.output.txt

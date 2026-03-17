@@ -31,10 +31,8 @@ class MockAudioContext {
   destination = {};
 }
 
-// @ts-ignore
-window.AudioContext = MockAudioContext;
-// @ts-ignore
-window.webkitAudioContext = MockAudioContext;
+(window as any).AudioContext = MockAudioContext;
+(window as any).webkitAudioContext = MockAudioContext;
 
 // Mock fetch for all tests
 global.fetch = vi.fn().mockResolvedValue({

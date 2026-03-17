@@ -1,5 +1,14 @@
 # DrumCharter Project Guidelines & Collaborative Protocols
 
+## 📊 MESS-UP TALLY (PROTOCOL VIOLATIONS)
+- **🔴 PROTOCOL #1 (Answer-First Rule)**: 3
+- **🔴 PROTOCOL #2 (Stop-and-Wait)**: 10
+- **🔴 PROTOCOL #3 (Drop and Listen)**: 2
+- **🔴 PROTOCOL #2.1 (No "Silent Implementation")**: 3
+- **🔴 Commit Identity Rule Violation**: 2
+- **🔴 Protocol #2 (Stop-and-Wait) - Unauthorized Test Run**: 1
+*(Note: Only show this section in responses when the tally changes.)*
+
 ## 🔴 STRICT PAIR PROGRAMMING PROTOCOL
 These rules are the **Highest Priority** and must be strictly followed at all times. They take precedence over all other technical or project goals.
 
@@ -18,13 +27,28 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - The user's question is the single highest priority at that moment.
 - Do not provide overwhelming context or unrelated technical updates when the user is focused on a specific issue.
 
-### 4. CodeRabbit Polling Protocol
+### 4. CodeRabbit Review Protocol
 - **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
-- **Mandatory Polling**: I must wait 3-5 minutes for CodeRabbit to finish its review. I will use the `GitHub` MCP `pull_request_read` with `get_review_comments` or `get_check_runs` to check for the bot's feedback.
-- **No "Stale" Implementation**: Before starting any new work in a feature branch, I must check the PR for any pending CodeRabbit or human feedback and address it first.
-- **Reporting**: I will summarize CodeRabbit's findings and ask for your approval before applying any fixes.
+- **Manual Check**: I will only check for CodeRabbit feedback when you explicitly ask me to (e.g., "Check CodeRabbit," "Is the review done?").
+- **Review Status Check**:
+    - If CodeRabbit is still performing a review (PR status is "Pending" or "In Progress"), I will notify you and **do nothing else**. I will wait for your next instruction to check again.
+    - If the review is complete, I will proceed with the structured feedback review.
+- **Structured Feedback Review**: Treat the PR review as a three-loop state machine:
+    1. **Loop 1 (Initial)**: Address ALL unresolved comments regardless of severity (`Critical`, `Major`, `Minor`, `Trivial/Nitpick`).
+    2. **Loop 2**: Address ONLY `Critical` and `Major` severity comments.
+    3. **Loop 3 (Final)**: Address ONLY `Critical` and `Major` severity comments.
+    4. **Termination**: If Loop 3 contains zero `Critical` or `Major` comments, the review cycle is considered complete.
+- **No "False Completeness"**: Only report "All addressed" when the current loop's required severities are empty AND the PR status is no longer `CHANGES_REQUESTED`.
+- **Finding Blockers**: If the PR is not "Approved" and no override is given, I must scan the PR to find specific comments blocking the approval based on the current loop's severity rules.
+- **Disagreement & Flagging Protocol**: I must proactively flag a CodeRabbit suggestion for your final decision if it:
+    - Conflicts with our project's specific architectural goals or standards.
+    - Contradicts a previously established user preference or known requirement.
+    - Introduces unnecessary complexity or "code smells" that I (as Junie) disagree with.
+- **No "Stale" Implementation"**: Before starting any new work in a feature branch, you MUST check the PR for any pending CodeRabbit or human feedback and address it first.
+- **Reporting**: Summarize findings and ask for approval before applying fixes.
 
 ### 5. Technical & Mode Rules
+- **Definition of Done**: Before I am allowed to present any task as complete, **all tests must be passing** and **all linting must come back clean**.
 - **100% Test Coverage**: All new features and core logic must have corresponding unit (Vitest) and/or E2E (Playwright) tests.
 - **Local-First Dev**: Always use the local Supabase Docker instance (`http://localhost:54321`) for development and testing.
 - **Commit Identity**: All commits must be made exclusively on behalf of `Nathan Long <nathanlong85@gmail.com>`. No co-author trailers.
@@ -36,6 +60,11 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - **Source of Truth**: Always check `.junie/CLI_REFERENCE.md` before running ANY non-trivial CLI command (Supabase, Git, Playwright).
 - **Verification First**: If a command is not in the reference, research the official documentation first, then add the verified command to the reference BEFORE executing it.
 - **Dry Run**: For high-risk commands (migrations, history rewrites), print the command I intend to run and wait for explicit approval on that exact string.
+- **Timeout Management**: Proactively use the `timeout` parameter (up to 3600s) in `bash` tool calls for any command known to be slow (e.g., CodeRabbit, Playwright, full test suites).
+  - **Rule**: ALWAYS use an explicit high timeout (e.g., 300-3600s) for slow commands. Refer to `.junie/CLI_REFERENCE.md` for the "Slow Commands & Timeout Management" table and recommended values.
+  - **Duration-Based Slow Commands**: Any command with a literal duration value > 60s (e.g., `sleep 61`) is automatically classified as a "Slow Command" and must use an explicit timeout.
+    - **Maximum Timeout**: The maximum supported timeout is 3600s. Use it for full E2E suites and CodeRabbit scans to prevent premature termination.
+- **Suppress Noise**: When running tests or CLI commands that emit redundant environment warnings (e.g., Node's `NO_COLOR` vs `FORCE_COLOR` conflict), I must proactively suppress them (e.g., by unsetting `NO_COLOR`) to keep the output clean.
 
 ---
 

@@ -1,51 +1,36 @@
-'use client';
-
-import { supabaseService } from '@/lib/services/supabase-service';
-import { notFound } from 'next/navigation';
-import { SnippetView } from '@/components/groove/SnippetView';
-import { GrooveSnippet } from '@/lib/types/groove';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import PrintButton from '@/components/common/PrintButton';
+import { SnippetView } from '@/components/groove/SnippetView';
+import { supabaseService } from '@/lib/services/supabase-service';
+import { createClient } from '@/lib/supabase/server';
+import type { GrooveSnippet } from '@/lib/types/groove';
 
-export default function PublicSnippetPage({
-  params,
-}: {
+interface PublicSnippetPageProps {
   params: Promise<{ id: string }>;
-}) {
-  const [snippet, setSnippet] = useState<GrooveSnippet | null>(null);
-  const [loading, setLoading] = useState(true);
+}
 
-  useEffect(() => {
-    const fetchSnippet = async () => {
-      const { id } = await params;
-      try {
-        const data = await supabaseService.getGrooveSnippet(id);
-        
-        if (!data || !data.isPublic) {
-          setLoading(false);
-          return;
-        }
+export default async function PublicSnippetPage({ params }: PublicSnippetPageProps) {
+  const { id } = await params;
+  const supabase = await createClient();
 
-        setSnippet(data);
-      } catch (error) {
-        console.error('Error fetching public snippet:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSnippet();
-  }, [params]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 font-mono text-zinc-400 uppercase tracking-widest animate-pulse">
-        Loading Snippet...
-      </div>
-    );
+  let snippet: GrooveSnippet;
+  try {
+    snippet = await supabaseService.getGrooveSnippet(id, supabase);
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      ((error as { code?: string }).code === 'PGRST116' ||
+        (error as { message?: string }).message?.includes('not found'))
+    ) {
+      notFound();
+    }
+    console.error('Error loading public snippet:', error);
+    throw error;
   }
 
-  if (!snippet) {
+  if (!snippet.isPublic) {
     notFound();
   }
 
@@ -54,18 +39,16 @@ export default function PublicSnippetPage({
       <div className="max-w-4xl mx-auto bg-white shadow-xl shadow-zinc-200 rounded-2xl overflow-hidden print:shadow-none print:rounded-none">
         <div className="bg-zinc-900 text-white px-8 py-4 flex justify-between items-center no-print">
           <h2 className="text-xs font-mono uppercase tracking-[0.2em]">DrumCharter Public View</h2>
-          <button 
-            onClick={() => window.print()} 
-            className="text-xs font-bold border border-white/20 px-3 py-1 rounded hover:bg-white/10 transition-all"
-          >
-            PRINTER FRIENDLY
-          </button>
+          <PrintButton />
         </div>
         <SnippetView snippet={snippet} />
       </div>
       <footer className="max-w-4xl mx-auto mt-8 text-center no-print">
         <p className="text-sm text-zinc-400">
-          Capture your own groove snippets at <Link href="/" className="text-blue-600 font-bold hover:underline">DrumCharter.com</Link>
+          Capture your own groove snippets at{' '}
+          <Link href="/" className="text-blue-600 font-bold hover:underline">
+            DrumCharter.com
+          </Link>
         </p>
       </footer>
     </main>

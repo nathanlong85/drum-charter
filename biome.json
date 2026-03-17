@@ -1,0 +1,71 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.7/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**/*",
+      "!app/globals.css",
+      "!.markdownlint-cli2.jsonc",
+      "!.agents",
+      "!node_modules",
+      "!.next",
+      "!public/sw.js",
+      "!playwright-report"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noImportantStyles": "off"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "off",
+        "useButtonType": "off",
+        "useAltText": "error",
+        "useKeyWithClickEvents": "off",
+        "useAnchorContent": "error",
+        "noSvgWithoutTitle": "off",
+        "useSemanticElements": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off",
+        "noImplicitAnyLet": "off",
+        "useIterableCallbackReturn": "off"
+      }
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}

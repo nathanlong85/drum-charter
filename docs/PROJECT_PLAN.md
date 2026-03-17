@@ -20,7 +20,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 4
-- **Testing**: 
+- **Testing**:
   - **Unit/Logic**: Vitest
   - **Component/Integration**: React Testing Library
   - **E2E**: Playwright
@@ -68,6 +68,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## Status Board (Kanban)
 
 ### 🟢 Done
+- [x] [Feature] Offline Support (PWA) (#5) `✓`
 - [x] [Feature] Audio Playback: Metronome Support (#2) `✓`
 - [x] GitHub Formalization (Issues, Kanban, Templates) `✓`
 - [x] Local-First Development Environment (Supabase Docker) `✓`
@@ -103,17 +104,9 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [x] Move dev server and Playwright to Port 3001 `✓`
 - [x] Fix "Error creating new item" in Library and add creation flow unit tests `✓`
 - [x] Rebrand to DrumCharter and landing page redesign `✓`
+- [x] [E2E] Stabilization (timeouts, persistence anchors) `✓`
 - [x] Implement Anonymous Sign-In (Guest Mode) `✓`
 - [x] Groove Grid Core (Resolutions, Measures, Symbols) `✓`
-
-### 🟡 In Progress
-- [ ] [Feature] Multi-layer Velocity Support (#3)
-
-### 🔵 Backlog (GitHub Issues)
-- [ ] [Feature] Dark Mode Support (#4)
-- [ ] [Feature] Offline Support (PWA) (#5)
-- [ ] [Feature] Snippet Tagging & Metadata UI (#6)
-- [ ] [E2E] Stabilization (timeouts, persistence anchors)
 
 ---
 

@@ -14,6 +14,7 @@ We use a strict branching and PR-based feedback loop.
 
 ### Step 2.1: Branching
 Always create a new branch from `main` for any new task:
+
 ```bash
 git checkout main
 git pull origin main
@@ -23,12 +24,19 @@ git checkout -b feature/your-feature-name
 ### Step 2.2: Implementation & Testing
 - Implement changes using the **Karpathy Guidelines** (Simplicity First, Surgical Changes).
 - Write or update unit/E2E tests for every change.
-- Verify changes locally:
+- **Verification Rule**: No task is complete until **all tests are passing** and **all linting is clean**.
+- Verify changes locally (using high timeouts where necessary per CLI reference):
+  - Lint: `npm run lint` & `npm run lint:md`
+  - Lint Fix: `npm run lint:fix` (Uses Biome)
   - Unit: `npx vitest run`
   - E2E: `npx playwright test --project=chromium`
 
-### Step 2.3: Committing
+### Step 2.3: Local Code Review
+Run `coderabbit review --base main --no-color` (Expected runtime: ~300s) to catch issues early and ensure all CodeRabbit standards are met before pushing.
+
+### Step 2.4: Committing
 Attribute all commits to the user only:
+
 ```bash
 git add .
 git commit -m "feat/fix: descriptive message"
@@ -40,11 +48,16 @@ We leverage automated and human feedback before any code is merged into `main`.
 ### Step 3.1: Push & Open PR
 Push your branch to GitHub and open a Pull Request. Always include a detailed Markdown description.
 
-### Step 3.2: CodeRabbit Review & Polling Protocol
-- **Automatic Review**: CodeRabbit will automatically scan the PR within 1–3 minutes.
-- **Polling Loop (Junie)**: Junie will wait 3-5 minutes after a push and then use the `GitHub` MCP `pull_request_read` to check for new review comments.
-- **Addressing Feedback**: Review the bot's comments, provide a summary of findings, and ask for explicit approval before applying fixes. This ensures no stale implementation is ever merged.
-- **Repetition**: This process repeats until CodeRabbit is satisfied.
+### Step 3.2: CodeRabbit Review Protocol
+- **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
+- **Manual Check**: Junie will only check for CodeRabbit feedback when you explicitly ask (e.g., "Check CodeRabbit," "Is the review done?").
+- **Three-Loop Feedback Guardrails**:
+  - **Loop 1**: Address all severities (`Critical` to `Trivial/Nitpick`).
+  - **Loops 2-3**: Address only `Critical` and `Major` severities.
+  - **Termination**: The task is complete if Loop 3 returns zero `Critical`/`Major` items.
+- **Disagreement Protocol**: Junie will flag any suggestions that conflict with project goals or established preferences for human decision.
+- **No "False Completeness"**: Junie will only report "All addressed" when the current loop's required severities are empty AND the PR status is no longer `CHANGES_REQUESTED`.
+- **Approval Before Fixes**: Junie will summarize all findings and seek your explicit approval before applying any fixes.
 
 ### Step 3.3: Human Quality Gate
 - **Discussion**: Nate (the human) will review the code and provide qualitative feedback.

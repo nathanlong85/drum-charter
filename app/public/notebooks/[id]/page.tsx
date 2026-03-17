@@ -1,50 +1,36 @@
-'use client';
-
-import { supabaseService } from '@/lib/services/supabase-service';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import PrintButton from '@/components/common/PrintButton';
 import { NotebookView } from '@/components/notebook/NotebookView';
-import { Notebook } from '@/lib/types/groove';
-import { useEffect, useState } from 'react';
+import { supabaseService } from '@/lib/services/supabase-service';
+import { createClient } from '@/lib/supabase/server';
+import type { Notebook } from '@/lib/types/groove';
 
-export default function PublicNotebookPage({
-  params,
-}: {
+interface PublicNotebookPageProps {
   params: Promise<{ id: string }>;
-}) {
-  const [notebook, setNotebook] = useState<Notebook | null>(null);
-  const [loading, setLoading] = useState(true);
+}
 
-  useEffect(() => {
-    const fetchNotebook = async () => {
-      const { id } = await params;
-      try {
-        const data = await supabaseService.getNotebook(id);
-        
-        if (!data || !data.isPublic) {
-          setLoading(false);
-          return;
-        }
+export default async function PublicNotebookPage({ params }: PublicNotebookPageProps) {
+  const { id } = await params;
+  const supabase = await createClient();
 
-        setNotebook(data);
-      } catch (error) {
-        console.error('Error fetching public notebook:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNotebook();
-  }, [params]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 font-mono text-zinc-400 uppercase tracking-widest animate-pulse">
-        Loading Notebook...
-      </div>
-    );
+  let notebook: Notebook;
+  try {
+    notebook = await supabaseService.getNotebook(id, supabase);
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      ((error as { code?: string }).code === 'PGRST116' ||
+        (error as { message?: string }).message?.includes('not found'))
+    ) {
+      notFound();
+    }
+    console.error('Error loading public notebook:', error);
+    throw error;
   }
 
-  if (!notebook) {
+  if (!notebook.isPublic) {
     notFound();
   }
 
@@ -53,18 +39,16 @@ export default function PublicNotebookPage({
       <div className="max-w-4xl mx-auto bg-white shadow-xl shadow-zinc-200 rounded-2xl overflow-hidden print:shadow-none print:rounded-none">
         <div className="bg-zinc-900 text-white px-8 py-4 flex justify-between items-center no-print">
           <h2 className="text-xs font-mono uppercase tracking-[0.2em]">DrumCharter Public View</h2>
-          <button 
-            onClick={() => window.print()} 
-            className="text-xs font-bold border border-white/20 px-3 py-1 rounded hover:bg-white/10 transition-all"
-          >
-            PRINTER FRIENDLY
-          </button>
+          <PrintButton />
         </div>
         <NotebookView notebook={notebook} />
       </div>
       <footer className="max-w-4xl mx-auto mt-8 text-center no-print">
         <p className="text-sm text-zinc-400">
-          Create your own practice notebooks at <a href="/" className="text-blue-600 font-bold hover:underline">DrumCharter.com</a>
+          Create your own practice notebooks at{' '}
+          <Link href="/" className="text-blue-600 font-bold hover:underline">
+            DrumCharter.com
+          </Link>
         </p>
       </footer>
     </main>

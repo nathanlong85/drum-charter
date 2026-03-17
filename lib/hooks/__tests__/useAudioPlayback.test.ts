@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useAudioPlayback, getVelocityForSymbol } from '../useAudioPlayback';
-import { GrooveGrid, DrumSymbol } from '@/lib/types/groove';
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
+import { getVelocityForSymbol, useAudioPlayback } from '../useAudioPlayback';
 
 // Mock AudioContext
 const mockSetValueAtTime = vi.fn();
@@ -11,9 +11,11 @@ const mockStart = vi.fn();
 let currentAudioTime = 0;
 
 class MockAudioContext {
-  get currentTime() { return currentAudioTime; }
-  state = 'running';
-  decodeAudioData = vi.fn().mockResolvedValue({});
+  get currentTime() {
+    return currentAudioTime;
+  }
+  state = 'running' as const;
+  decodeAudioData = vi.fn().mockResolvedValue({} as AudioBuffer);
   createBufferSource = vi.fn().mockReturnValue({
     buffer: null,
     connect: mockConnect,
@@ -25,19 +27,20 @@ class MockAudioContext {
     },
     connect: mockConnect,
   });
-  destination = {};
-  resume = vi.fn();
-  close = vi.fn();
+  destination = {} as AudioDestinationNode;
+  resume = vi.fn().mockResolvedValue(undefined);
+  close = vi.fn().mockResolvedValue(undefined);
 }
 
-global.AudioContext = vi.fn().mockImplementation(function() {
-  return new MockAudioContext();
-});
-global.fetch = vi.fn().mockResolvedValue({
-  ok: true,
-  status: 200,
-  arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
-});
+vi.stubGlobal('AudioContext', MockAudioContext);
+vi.stubGlobal(
+  'fetch',
+  vi.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
+    arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
+  }),
+);
 
 describe('useAudioPlayback', () => {
   const mockGrid: GrooveGrid = {
@@ -49,8 +52,8 @@ describe('useAudioPlayback', () => {
         instrumentId: 'kick',
         label: 'Kick',
         notes: new Array(16).fill('none'),
-      }
-    ]
+      },
+    ],
   };
 
   beforeEach(() => {
@@ -83,7 +86,7 @@ describe('useAudioPlayback', () => {
 
   it('toggles isPlaying state', () => {
     const { result } = renderHook(() => useAudioPlayback({ grid: mockGrid, bpm: 120 }));
-    
+
     act(() => {
       result.current.togglePlayback();
     });
@@ -97,11 +100,13 @@ describe('useAudioPlayback', () => {
 
   it('calls onStepChange when playing', () => {
     const onStepChange = vi.fn();
-    const { result } = renderHook(() => useAudioPlayback({ 
-      grid: mockGrid, 
-      bpm: 120,
-      onStepChange
-    }));
+    const { result } = renderHook(() =>
+      useAudioPlayback({
+        grid: mockGrid,
+        bpm: 120,
+        onStepChange,
+      }),
+    );
 
     act(() => {
       result.current.togglePlayback();
@@ -123,15 +128,17 @@ describe('useAudioPlayback', () => {
           instrumentId: 'kick',
           label: 'Kick',
           notes: ['standard', 'none', 'none', 'none'],
-          velocities: [0.5, 0, 0, 0]
-        }
-      ]
+          velocities: [0.5, 0, 0, 0],
+        },
+      ],
     };
 
-    const { result } = renderHook(() => useAudioPlayback({ 
-      grid: gridWithVel, 
-      bpm: 120 
-    }));
+    const { result } = renderHook(() =>
+      useAudioPlayback({
+        grid: gridWithVel,
+        bpm: 120,
+      }),
+    );
 
     // Wait for samples to "load"
     await act(async () => {
@@ -148,10 +155,7 @@ describe('useAudioPlayback', () => {
 
     // Check if setValueAtTime was called with the calculated gain
     // 0.5 ^ 2.0 = 0.25
-    expect(mockSetValueAtTime).toHaveBeenCalledWith(
-      expect.closeTo(0.25, 5), 
-      expect.any(Number)
-    );
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(expect.closeTo(0.25, 5), expect.any(Number));
   });
 
   it('maps symbols to correct velocity levels across multiple steps', async () => {
@@ -164,14 +168,16 @@ describe('useAudioPlayback', () => {
           instrumentId: 'kick',
           label: 'Kick',
           notes: ['accent', 'standard', 'ghost', 'none'],
-        }
-      ]
+        },
+      ],
     };
 
-    const { result } = renderHook(() => useAudioPlayback({ 
-      grid: gridWithSymbols, 
-      bpm: 120 
-    }));
+    const { result } = renderHook(() =>
+      useAudioPlayback({
+        grid: gridWithSymbols,
+        bpm: 120,
+      }),
+    );
 
     // Wait for samples
     await act(async () => {
@@ -179,28 +185,22 @@ describe('useAudioPlayback', () => {
     });
 
     act(() => {
-      result.current.togglePlayback(); 
+      result.current.togglePlayback();
     });
-    
+
     // Step 0: Accent -> 1.1 ^ 2.0 = 1.21
     // The scheduler runs immediately on togglePlayback
-    expect(mockSetValueAtTime).toHaveBeenCalledWith(
-      expect.closeTo(1.21, 5),
-      expect.any(Number)
-    );
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(expect.closeTo(1.21, 5), expect.any(Number));
 
     // Step 1: Standard -> 0.7 ^ 2.0 = 0.49
     act(() => {
       // Advance audio clock and timers
       // At 120bpm, 16th note is 0.125s
-      currentAudioTime += 0.15; 
+      currentAudioTime += 0.15;
       vi.advanceTimersByTime(150);
     });
 
-    expect(mockSetValueAtTime).toHaveBeenCalledWith(
-      expect.closeTo(0.49, 5),
-      expect.any(Number)
-    );
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(expect.closeTo(0.49, 5), expect.any(Number));
 
     // Step 2: Ghost -> 0.2 ^ 2.0 = 0.04
     act(() => {
@@ -208,10 +208,7 @@ describe('useAudioPlayback', () => {
       vi.advanceTimersByTime(150);
     });
 
-    expect(mockSetValueAtTime).toHaveBeenCalledWith(
-      expect.closeTo(0.04, 5),
-      expect.any(Number)
-    );
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(expect.closeTo(0.04, 5), expect.any(Number));
 
     // Step 3: None -> 0
     act(() => {
@@ -227,12 +224,14 @@ describe('useAudioPlayback', () => {
   });
 
   it('handles metronome toggling and volume', () => {
-    const { result } = renderHook(() => useAudioPlayback({ 
-      grid: mockGrid, 
-      bpm: 120,
-      initialMetronomeEnabled: true,
-      initialMetronomeVolume: 0.8
-    }));
+    const { result } = renderHook(() =>
+      useAudioPlayback({
+        grid: mockGrid,
+        bpm: 120,
+        initialMetronomeEnabled: true,
+        initialMetronomeVolume: 0.8,
+      }),
+    );
 
     expect(result.current.metronomeEnabled).toBe(true);
     expect(result.current.metronomeVolume).toBe(0.8);
@@ -250,11 +249,13 @@ describe('useAudioPlayback', () => {
 
   it('schedules metronome clicks correctly', async () => {
     // 4/4 grid at 16th resolution = 4 steps per beat
-    const { result } = renderHook(() => useAudioPlayback({ 
-      grid: mockGrid, 
-      bpm: 120,
-      initialMetronomeEnabled: true 
-    }));
+    const { result } = renderHook(() =>
+      useAudioPlayback({
+        grid: mockGrid,
+        bpm: 120,
+        initialMetronomeEnabled: true,
+      }),
+    );
 
     // Wait for samples
     await act(async () => {
@@ -281,11 +282,13 @@ describe('useAudioPlayback', () => {
       timeSignature: { beatsPerMeasure: 3, beatValue: 4 },
     };
 
-    const { result } = renderHook(() => useAudioPlayback({ 
-      grid: grid34, 
-      bpm: 60, // 1 beat = 1s, 1 step = 0.25s
-      initialMetronomeEnabled: true 
-    }));
+    const { result } = renderHook(() =>
+      useAudioPlayback({
+        grid: grid34,
+        bpm: 60, // 1 beat = 1s, 1 step = 0.25s
+        initialMetronomeEnabled: true,
+      }),
+    );
 
     // Wait for samples
     await act(async () => {

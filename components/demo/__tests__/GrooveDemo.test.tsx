@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { GrooveDemo } from '../GrooveDemo';
-import { describe, it, expect, vi } from 'vitest';
 
 // Mock the GrooveGridEditor since it's already tested unit-wise
 // and we want to verify GrooveDemo renders it correctly.
@@ -15,7 +15,7 @@ vi.mock('@/components/groove/GrooveGridEditor', () => ({
 describe('GrooveDemo', () => {
   it('renders without crashing', () => {
     render(<GrooveDemo />);
-    
+
     expect(screen.getByText('Try it yourself:')).toBeInTheDocument();
     expect(screen.getByText('Live Editor Demo')).toBeInTheDocument();
     expect(screen.getByTestId('mock-grid-editor')).toBeInTheDocument();

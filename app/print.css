@@ -1,8 +1,10 @@
 @layer base {
   @media print {
     /* Hide navigation, buttons, and settings */
-    header, nav, footer,
-    button, 
+    header,
+    nav,
+    footer,
+    button,
     .no-print,
     [role="button"],
     input[type="checkbox"],

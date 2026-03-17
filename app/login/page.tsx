@@ -1,9 +1,9 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setMessage('');
-    
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -58,7 +58,7 @@ export default function LoginPage() {
   const handleGuestSignIn = async () => {
     setGuestLoading(true);
     setMessage('');
-    
+
     const { error } = await supabase.auth.signInAnonymously();
 
     if (error) {
@@ -120,7 +120,9 @@ export default function LoginPage() {
             <div className="w-full border-t border-zinc-200"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-zinc-500 uppercase tracking-wider text-[10px] font-bold">Or</span>
+            <span className="px-2 bg-white text-zinc-500 uppercase tracking-wider text-[10px] font-bold">
+              Or
+            </span>
           </div>
         </div>
         <button
@@ -131,13 +133,16 @@ export default function LoginPage() {
         >
           {guestLoading ? 'Starting session...' : 'Continue as Guest'}
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            />
           </svg>
         </button>
         {message && (
-          <p className="mt-4 p-4 bg-zinc-100 text-zinc-900 text-center rounded">
-            {message}
-          </p>
+          <p className="mt-4 p-4 bg-zinc-100 text-zinc-900 text-center rounded">{message}</p>
         )}
       </form>
       <div className="mt-8 text-center">

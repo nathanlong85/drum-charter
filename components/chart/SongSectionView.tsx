@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { SongSection, GrooveGrid } from '@/lib/types/groove';
+import type React from 'react';
+import type { GrooveGrid, SongSection } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../groove/GrooveGridEditor';
 
 interface SongSectionViewProps {
@@ -9,10 +9,7 @@ interface SongSectionViewProps {
   onGridChange?: (grid: GrooveGrid) => void;
 }
 
-export const SongSectionView: React.FC<SongSectionViewProps> = ({
-  section,
-  onGridChange,
-}) => {
+export const SongSectionView: React.FC<SongSectionViewProps> = ({ section, onGridChange }) => {
   return (
     <div className="mb-8 last:mb-0 print:mb-6">
       <div className="flex items-center gap-4 mb-2">
@@ -25,10 +22,7 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({
       <div className="ml-4">
         {section.grid && (
           <div className="mb-4">
-            <GrooveGridEditor 
-              initialGrid={section.grid} 
-              onChange={onGridChange}
-            />
+            <GrooveGridEditor initialGrid={section.grid} onChange={onGridChange} />
           </div>
         )}
 
@@ -45,9 +39,10 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({
             {section.subSections.map((sub) => (
               <div key={sub.id} className="border-l-4 border-gray-200 pl-4">
                 <h3 className="text-lg font-semibold text-gray-700 mb-2 print:text-base">
-                  {sub.name} <span className="text-gray-400 font-normal">({sub.measuresCount}M)</span>
+                  {sub.name}{' '}
+                  <span className="text-gray-400 font-normal">({sub.measuresCount}M)</span>
                 </h3>
-                
+
                 {sub.grid && (
                   <div className="mb-3">
                     <GrooveGridEditor initialGrid={sub.grid} />

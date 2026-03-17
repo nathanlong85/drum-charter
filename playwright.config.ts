@@ -1,6 +1,6 @@
+import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
-import path from 'path';
 
 /**
  * Read environment variables from file.
@@ -32,9 +32,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev --port 3001',
+    command: 'pnpm build && pnpm start --port 3001',
     url: 'http://localhost:3001',
-    reuseExistingServer: true,
-    timeout: 120000,
+    reuseExistingServer: false,
+    timeout: 300000,
   },
 });

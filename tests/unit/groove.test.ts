@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { calculateTotalNotes, GrooveGrid } from '@/lib/types/groove';
+import { describe, expect, it } from 'vitest';
+import { calculateTotalNotes, type GrooveGrid } from '@/lib/types/groove';
 
 describe('calculateTotalNotes', () => {
   it('calculates total notes for 4/4 at 16th resolution', () => {
@@ -30,7 +30,7 @@ describe('calculateTotalNotes', () => {
   });
 
   it('calculates total notes for 6/8 at 16th resolution', () => {
-    // 6/8 means 6 beats of 8th notes. 
+    // 6/8 means 6 beats of 8th notes.
     // In 6/8, if resolution is 16, we expect 12 notes per measure.
     // (6 * (16 / 8)) * 1 = 12
     const grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'> = {
