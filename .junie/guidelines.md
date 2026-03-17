@@ -1,10 +1,12 @@
 # DrumCharter Project Guidelines & Collaborative Protocols
 
 ## 📊 MESS-UP TALLY (PROTOCOL VIOLATIONS)
-- **🔴 PROTOCOL #1 (Answer-First Rule)**: 2
-- **🔴 PROTOCOL #2 (Stop-and-Wait)**: 7
+- **🔴 PROTOCOL #1 (Answer-First Rule)**: 3
+- **🔴 PROTOCOL #2 (Stop-and-Wait)**: 10
 - **🔴 PROTOCOL #3 (Drop and Listen)**: 2
-- **🔴 PROTOCOL #2.1 (No "Silent Implementation")**: 2
+- **🔴 PROTOCOL #2.1 (No "Silent Implementation")**: 3
+- **🔴 Commit Identity Rule Violation**: 2
+- **🔴 Protocol #2 (Stop-and-Wait) - Unauthorized Test Run**: 1
 *(Note: Only show this section in responses when the tally changes.)*
 
 ## 🔴 STRICT PAIR PROGRAMMING PROTOCOL
@@ -42,6 +44,7 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - **Reporting**: Summarize findings and ask for approval before applying fixes.
 
 ### 5. Technical & Mode Rules
+- **Definition of Done**: Before I am allowed to present any task as complete, **all tests must be passing** and **all linting must come back clean**.
 - **100% Test Coverage**: All new features and core logic must have corresponding unit (Vitest) and/or E2E (Playwright) tests.
 - **Local-First Dev**: Always use the local Supabase Docker instance (`http://localhost:54321`) for development and testing.
 - **Commit Identity**: All commits must be made exclusively on behalf of `Nathan Long <nathanlong85@gmail.com>`. No co-author trailers.
@@ -57,6 +60,7 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
   - **Rule**: ALWAYS use an explicit high timeout (e.g., 300-3600s) for slow commands. Refer to `.junie/CLI_REFERENCE.md` for the "Slow Commands & Timeout Management" table and recommended values.
   - **Duration-Based Slow Commands**: Any command with a literal duration value > 60s (e.g., `sleep 61`) is automatically classified as a "Slow Command" and must use an explicit timeout.
     - **Maximum Timeout**: The maximum supported timeout is 3600s. Use it for full E2E suites and CodeRabbit scans to prevent premature termination.
+- **Suppress Noise**: When running tests or CLI commands that emit redundant environment warnings (e.g., Node's `NO_COLOR` vs `FORCE_COLOR` conflict), I must proactively suppress them (e.g., by unsetting `NO_COLOR`) to keep the output clean.
 
 ---
 
