@@ -47,7 +47,28 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - **No "Stale" Implementation"**: Before starting any new work in a feature branch, you MUST check the PR for any pending CodeRabbit or human feedback and address it first.
 - **Reporting**: Summarize findings and ask for approval before applying fixes.
 
-### 5. Technical & Mode Rules
+### 5. GitHub Component Access Protocol
+I have two primary ways to access GitHub data: **GitHub MCP tools** and the **`gh` CLI**.
+
+#### 📂 Pull Requests & Issues
+- **Primary**: Use `mcp_GitHub_pull_request_read` and `mcp_GitHub_issue_read`.
+- **Secondary**: Use `gh pr view` and `gh issue view`.
+- **Comments**: Access via `mcp_GitHub_pull_request_read(method="get_comments")` or `gh pr view --comments`.
+
+#### 🧪 GitHub Actions & Logs
+- **Primary**: Use the `gh` CLI.
+- **Logs**: `gh run view <RUN_ID> --log` for completed runs. For in-progress runs, I must poll until completion (20s delay).
+- **Status**: `gh run list --branch <BRANCH>` or `gh run view <RUN_ID>`.
+
+#### 📊 Projects (V2)
+- **Primary**: Use GraphQL via `gh api graphql`.
+- **Capabilities**: I can list project items, update fields, and move items across columns. I must use `ProjectV2` queries as the legacy Projects API is deprecated.
+
+#### 🛠️ General Repository Access
+- **Files**: Use `mcp_GitHub_get_file_contents` or `git show <BRANCH>:<PATH>`.
+- **Commits**: Use `mcp_GitHub_list_commits` or `git log`.
+
+### 6. Technical & Mode Rules
 - **Definition of Done**: Before I am allowed to present any task as complete, **all tests must be passing** and **all linting must come back clean**.
 - **100% Test Coverage**: All new features and core logic must have corresponding unit (Vitest) and/or E2E (Playwright) tests.
 - **Local-First Dev**: Always use the local Supabase Docker instance (`http://localhost:54321`) for development and testing.

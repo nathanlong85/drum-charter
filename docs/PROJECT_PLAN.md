@@ -68,6 +68,9 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## Status Board (Kanban)
 
 ### 🟢 Done
+- [x] [Chore] GitHub Actions CI Pipeline (Linting, Unit Tests, E2E) (#20) `✓`
+- [x] [Chore] CI Security Hardening (SHA pinning, least-privilege permissions, pinned Supabase CLI) (#20) `✓`
+- [x] [Fix] Resolve Playwright CI failure (missing `dotenv`) and optimize Supabase startup (#20) `✓`
 - [x] [Feature] Offline Support (PWA) (#5) `✓`
 - [x] [Feature] Audio Playback: Metronome Support (#2) `✓`
 - [x] GitHub Formalization (Issues, Kanban, Templates) `✓`
