@@ -45,11 +45,11 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 - **Review Status Check**:
     - If CodeRabbit is still performing a review (PR status is "Pending" or "In Progress"), notify the user and **do nothing else**. Wait for the next instruction to check again.
     - If the review is complete, proceed with the structured feedback review.
-- **Structured Feedback Review**: Treat the PR review as a three-loop state machine:
+- **Structured Feedback Review**: Treat the PR review as a three-loop state machine. **During these loops, you do NOT need to stop and ask for approval for individual steps (pushing, committing, editing, or starting the next loop) unless the loop itself is finished or a critical conflict arises.**
     1. **Loop 1 (Initial)**: Address ALL unresolved comments regardless of severity.
     2. **Loop 2**: Address ONLY `Critical` and `Major` severity comments.
     3. **Loop 3 (Final)**: Address ONLY `Critical` and `Major` severity comments.
-    4. **Termination**: If Loop 3 contains zero `Critical` or `Major` comments, the review cycle is complete.
+    4. **Termination**: If Loop 3 contains zero `Critical` or `Major` comments, the review cycle is complete. Push the final verified state and notify the user.
 - **Disagreement & Flagging Protocol**: Proactively flag a CodeRabbit suggestion for final decision if it:
     - Conflicts with project's specific architectural goals/standards.
     - Contradicts previously established user preference or known requirement.
