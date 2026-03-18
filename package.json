@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome check .",
-    "lint:md": "markdownlint --ignore node_modules .",
+    "lint:md": "markdownlint --ignore node_modules --ignore playwright-report --ignore test-results .",
     "lint:fix": "biome check . --write --unsafe",
     "test": "vitest",
     "test:ui": "vitest --ui",
