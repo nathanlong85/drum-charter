@@ -142,11 +142,13 @@ Commands for interacting with GitHub Actions, Projects, and Metadata.
 - **View Status**: `gh run view <RUN_ID> --json jobs --jq '.jobs[] | {name: .name, status: .status, conclusion: .conclusion}'`
 - **Fetch Logs**: `gh run view <RUN_ID> --log` (Only for completed runs)
 - **Wait Policy**: For in-progress runs, poll every 20-30 seconds using the "View Status" command.
+- **Job Selection**: If a run has multiple jobs, fetch the specific job ID first: `gh run view <RUN_ID> --json jobs --jq '.jobs[] | {name: .name, id: .databaseId}'` then `gh run view --job <JOB_ID> --log`.
+- **Command (Direct Log)**: `gh run view <RUN_ID> --log`
 
 ### 2. GitHub Projects (V2)
 
 - **Goal**: Interact with Project V2 boards via GraphQL.
-- **List Projects**:
+- **List Projects (Organization)**:
 ```bash
 gh api graphql -f query='
   query($org: String!) {
@@ -156,6 +158,17 @@ gh api graphql -f query='
       }
     }
   }' -f org="<ORG_NAME>"
+```
+- **List Projects (User)**:
+```bash
+gh api graphql -f query='
+  query($user: String!) {
+    user(login: $user) {
+      projectsV2(first: 20) {
+        nodes { id title number }
+      }
+    }
+  }' -f user="nathanlong85"
 ```
 - **List Items in Project**:
 ```bash
@@ -173,7 +186,16 @@ gh api graphql -f query='
     }
   }' -f id="<PROJECT_ID>"
 ```
-- **Pitfalls**: Always use `ProjectV2` queries. Legacy Project queries will fail.
+- **Update Project Item Field**:
+```bash
+gh api graphql -f query='
+  mutation($project: ID!, $item: ID!, $field: ID!, $value: String!) {
+    updateProjectV2ItemFieldValue(input: { projectId: $project, itemId: $item, fieldId: $field, value: { text: $value } }) {
+      projectV2Item { id }
+    }
+  }' -f project="<PROJECT_ID>" -f item="<ITEM_ID>" -f field="<FIELD_ID>" -f value="<NEW_VALUE>"
+```
+- **Pitfalls**: Always use `ProjectV2` queries. Legacy Project queries will fail. Field types (text, number, date, singleSelect) require different input structures in the GraphQL mutation.
 
 ### 3. Pull Requests & Issues
 
