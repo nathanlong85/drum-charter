@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForSave } from './test-utils';
 
 test.describe('Library Management & Guest Flow', () => {
   test.beforeEach(async ({ page }) => {
@@ -7,20 +8,6 @@ test.describe('Library Management & Guest Flow', () => {
     await page.click('text=Continue as Guest');
     await expect(page).toHaveURL('/library');
   });
-
-  const waitForSave = async (page: any) => {
-    // Both Song and Snippet editors show "SAVING..."
-    // SongEditor only shows "SAVING..." then disappears
-    // SnippetEditor shows "SAVED" after "SAVING..."
-    // So we wait for "SAVING..." to appear (optional) and then wait for it to be gone
-    // or for "SAVED" to appear.
-    try {
-      await expect(page.locator('text=SAVING...')).toBeVisible({ timeout: 2000 });
-    } catch {
-      // Might have already finished saving or not started yet
-    }
-    await expect(page.locator('text=SAVING...')).not.toBeVisible({ timeout: 10000 });
-  };
 
   test('should create and search for a new song', async ({ page }) => {
     const songTitle = `Test Song ${Date.now()}`;

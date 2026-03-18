@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForSave } from './test-utils';
 
 test.describe('Groove Snippet Editor', () => {
   test.beforeEach(async ({ page }) => {
@@ -6,21 +7,12 @@ test.describe('Groove Snippet Editor', () => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
     await expect(page).toHaveURL('/library');
-
+    
     // Navigate to Snippets tab and create new snippet
     await page.getByTestId('tab-snippet').click();
     await page.click('text=New Snippet');
     await expect(page).toHaveURL(/\/snippets\//);
   });
-
-  const waitForSave = async (page: any) => {
-    try {
-      await expect(page.locator('text=SAVING...')).toBeVisible({ timeout: 2000 });
-    } catch {
-      // Already finished or not started
-    }
-    await expect(page.locator('text=SAVING...')).not.toBeVisible({ timeout: 10000 });
-  };
 
   test('should manage snippet metadata and public toggle', async ({ page }) => {
     // Change Title

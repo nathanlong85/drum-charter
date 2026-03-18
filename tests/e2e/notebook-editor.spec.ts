@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForSave } from './test-utils';
 
 test.describe('Notebook Editor', () => {
   test.beforeEach(async ({ page }) => {
@@ -6,21 +7,12 @@ test.describe('Notebook Editor', () => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
     await expect(page).toHaveURL('/library');
-
+    
     // Navigate to Notebooks tab and create new notebook
     await page.getByTestId('tab-notebook').click();
     await page.click('text=New Notebook');
     await expect(page).toHaveURL(/\/notebooks\//);
   });
-
-  const waitForSave = async (page: any) => {
-    try {
-      await expect(page.locator('text=SAVING...')).toBeVisible({ timeout: 2000 });
-    } catch {
-      // Already finished or not started
-    }
-    await expect(page.locator('text=SAVING...')).not.toBeVisible({ timeout: 10000 });
-  };
 
   test('should manage multiple sections with text and grids', async ({ page }) => {
     // Update Notebook Title

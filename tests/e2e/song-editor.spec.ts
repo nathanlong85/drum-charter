@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForSave } from './test-utils';
 
 test.describe('Song Chart Editor', () => {
   test.beforeEach(async ({ page }) => {
@@ -6,20 +7,11 @@ test.describe('Song Chart Editor', () => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
     await expect(page).toHaveURL('/library');
-
+    
     // Create new song
     await page.click('text=New Song');
     await expect(page).toHaveURL(/\/songs\//);
   });
-
-  const waitForSave = async (page: any) => {
-    try {
-      await expect(page.locator('text=SAVING...')).toBeVisible({ timeout: 2000 });
-    } catch {
-      // Already finished or not started
-    }
-    await expect(page.locator('text=SAVING...')).not.toBeVisible({ timeout: 10000 });
-  };
 
   test('should manage song metadata and persistence', async ({ page }) => {
     // Change Title
