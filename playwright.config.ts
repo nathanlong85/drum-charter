@@ -14,15 +14,15 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
   workers: 1,
-  timeout: 120000,
+  timeout: process.env.CI ? 10 * 1000 : 5 * 1000,
   expect: {
-    timeout: 5000,
+    timeout: process.env.CI ? 10 * 1000 : 5 * 1000,
   },
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:3001',
     trace: 'on-first-retry',
-    actionTimeout: 5000,
+    actionTimeout: process.env.CI ? 10 * 1000 : 5 * 1000,
     navigationTimeout: 60000,
   },
   projects: [

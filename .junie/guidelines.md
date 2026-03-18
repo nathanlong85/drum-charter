@@ -41,6 +41,7 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 ### 4. CodeRabbit Review Protocol
 - **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
 - **Manual Check**: Only check for CodeRabbit feedback when explicitly asked (e.g., "Check CodeRabbit," "Is the review done?").
+- **Local Review Loop**: Always use the `code-review` agent skill (running `cr review --prompt-only --base main --plain`) locally with a high timeout (3600s) to perform the review loops.
 - **Review Status Check**:
     - If CodeRabbit is still performing a review (PR status is "Pending" or "In Progress"), notify the user and **do nothing else**. Wait for the next instruction to check again.
     - If the review is complete, proceed with the structured feedback review.
@@ -92,7 +93,7 @@ Accessing GitHub data must follow these specific primary and secondary methods.
 - **Source of Truth**: Always check `.junie/CLI_REFERENCE.md` before running ANY non-trivial CLI command.
 - **Verification First**: If a command is not in the reference, research official docs first, then add the verified command to the reference BEFORE executing it.
 - **Dry Run**: For high-risk commands (migrations, history rewrites), print the command and wait for explicit approval on that exact string.
-- **Timeout Management**: ALWAYS use explicit high timeout (300-3600s) for slow commands (CodeRabbit, Playwright, full suites).
+- **Timeout Management**: ALWAYS use explicit high timeout (300-3600s) for slow commands (CodeRabbit, Playwright, full suites). Specifically, always use `timeout: 3600` for `cr review`.
 - **Suppress Noise**: Proactively suppress redundant environment warnings (e.g., unset `NO_COLOR`).
 
 ---

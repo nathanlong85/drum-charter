@@ -7,7 +7,7 @@ test.describe('Notebook Editor', () => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
     await expect(page).toHaveURL('/library');
-    
+
     // Navigate to Notebooks tab and create new notebook
     await page.getByTestId('tab-notebook').click();
     await page.click('text=New Notebook');

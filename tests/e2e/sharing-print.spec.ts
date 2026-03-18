@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForSave } from './test-utils';
 
 test.describe('Sharing & Public View', () => {
   test('should view a public snippet as a guest', async ({ page }) => {
@@ -19,10 +20,7 @@ test.describe('Sharing & Public View', () => {
     await publicCheckbox.check();
 
     // Wait for save
-    await expect(page.locator('text=SAVING...'))
-      .toBeVisible({ timeout: 2000 })
-      .catch(() => {});
-    await expect(page.locator('text=SAVING...')).not.toBeVisible({ timeout: 10000 });
+    await waitForSave(page);
 
     // Get the public URL
     const viewLink = page.locator('text=View');

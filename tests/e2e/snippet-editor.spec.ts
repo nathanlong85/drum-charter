@@ -7,7 +7,7 @@ test.describe('Groove Snippet Editor', () => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
     await expect(page).toHaveURL('/library');
-    
+
     // Navigate to Snippets tab and create new snippet
     await page.getByTestId('tab-snippet').click();
     await page.click('text=New Snippet');

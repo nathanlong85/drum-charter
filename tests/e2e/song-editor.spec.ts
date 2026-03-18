@@ -7,7 +7,7 @@ test.describe('Song Chart Editor', () => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
     await expect(page).toHaveURL('/library');
-    
+
     // Create new song
     await page.click('text=New Song');
     await expect(page).toHaveURL(/\/songs\//);
