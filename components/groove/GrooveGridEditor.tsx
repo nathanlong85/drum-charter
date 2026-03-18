@@ -2,6 +2,26 @@
 
 import { Bell, BellOff, Minus, Play, Plus, Square, Volume2 } from 'lucide-react';
 import React, { useEffect, useReducer, useState } from 'react';
+
+// Shared Tailwind utility classes for consistent styling
+const toolbarContainerClass =
+  'flex items-center bg-gray-50 dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-800 text-sm no-print';
+const controlGroupClass =
+  'flex items-center gap-2 pr-4 border-r border-gray-300 dark:border-gray-700';
+const subGroupClass =
+  'flex items-center gap-1 border-r border-gray-300 dark:border-gray-700 pr-4 relative';
+const lastGroupClass = 'flex items-center gap-2';
+const mutedLabelClass = 'text-gray-600 dark:text-gray-400 font-medium';
+const borderedInputClass =
+  'w-16 px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded text-center font-bold';
+const iconButtonClass = 'p-1.5 rounded transition-colors';
+const panelClass =
+  'absolute top-full left-0 mt-2 z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg p-3 min-w-[120px]';
+const controlBoxClass =
+  'flex items-center border border-gray-300 dark:border-gray-700 rounded overflow-hidden bg-white dark:bg-gray-800';
+const controlBtnClass =
+  'px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300';
+
 import { useAudioPlayback } from '@/lib/hooks/useAudioPlayback';
 import { type GrooveAction, grooveReducer } from '@/lib/state/groove-reducer';
 import type { BeatResolution, DrumSymbol, GrooveGrid } from '@/lib/types/groove';
@@ -221,11 +241,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
 
   return (
     <div className="flex flex-col gap-2 print:gap-1 no-print-break" data-testid="groove-editor">
-      <div
-        className="flex items-center gap-4 bg-gray-50 dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-800 text-sm no-print"
-        data-testid="groove-toolbar"
-      >
-        <div className="flex items-center gap-2 pr-4 border-r border-gray-300 dark:border-gray-700">
+      <div className={`${toolbarContainerClass} gap-4`} data-testid="groove-toolbar">
+        <div className={controlGroupClass}>
           <button
             onClick={togglePlayback}
             className={`flex items-center gap-2 px-4 py-1.5 rounded font-bold transition-colors ${
@@ -248,7 +265,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           </button>
 
           <div className="flex items-center gap-2 ml-2">
-            <span className="text-gray-600 dark:text-gray-400 font-medium">BPM:</span>
+            <span className={mutedLabelClass}>BPM:</span>
             <input
               type="number"
               value={bpm}
@@ -260,42 +277,44 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                   setLocalBpm(newBpm);
                 }
               }}
-              className="w-16 px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded text-center font-bold"
+              className={borderedInputClass}
               min="40"
               max="300"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-700 pr-4 relative">
+        <div className={subGroupClass}>
           <button
             onClick={() => {
               const newState = !metronomeEnabled;
               setMetronomeEnabled(newState);
               onMetronomeToggle?.(newState);
             }}
-            className={`p-1.5 rounded transition-colors ${
+            className={`${iconButtonClass} ${
               metronomeEnabled
                 ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
                 : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
             title={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
+            aria-label={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
           >
             {metronomeEnabled ? <Bell size={18} /> : <BellOff size={18} />}
           </button>
 
           <button
             onClick={() => setShowMetronomeSettings(!showMetronomeSettings)}
-            className={`p-1.5 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${
+            className={`${iconButtonClass} hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${
               showMetronomeSettings ? 'bg-gray-200 dark:bg-gray-700' : ''
             }`}
             title="Metronome Settings"
+            aria-label="Metronome Settings"
           >
             <Volume2 size={18} />
           </button>
 
           {showMetronomeSettings && (
-            <div className="absolute top-full left-0 mt-2 z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg p-3 min-w-[120px]">
+            <div className={panelClass}>
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
                   Click Volume
@@ -328,12 +347,12 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-gray-600 dark:text-gray-400 font-medium">Measures:</span>
-          <div className="flex items-center border border-gray-300 dark:border-gray-700 rounded overflow-hidden bg-white dark:bg-gray-800">
+        <div className={lastGroupClass}>
+          <span className={mutedLabelClass}>Measures:</span>
+          <div className={controlBoxClass}>
             <button
               onClick={() => updateMeasures(-1)}
-              className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 border-r border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+              className={`${controlBtnClass} border-r border-gray-300 dark:border-gray-700`}
               title="Decrease measures"
             >
               <Minus size={14} />
@@ -343,7 +362,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
             </span>
             <button
               onClick={() => updateMeasures(1)}
-              className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+              className={controlBtnClass}
               title="Increase measures"
             >
               <Plus size={14} />
@@ -351,9 +370,9 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-gray-600 dark:text-gray-400 font-medium">Resolution:</span>
-          <div className="flex border border-gray-300 dark:border-gray-700 rounded overflow-hidden bg-white dark:bg-gray-800">
+        <div className={lastGroupClass}>
+          <span className={mutedLabelClass}>Resolution:</span>
+          <div className={controlBoxClass}>
             {[4, 8, 16].map((res) => (
               <button
                 key={res}
@@ -370,8 +389,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-gray-600 dark:text-gray-400 font-medium">Time Sig:</span>
+        <div className={lastGroupClass}>
+          <span className={mutedLabelClass}>Time Sig:</span>
           <div className="flex items-center gap-1">
             <input
               type="number"
@@ -382,7 +401,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                   state.timeSignature.beatValue,
                 )
               }
-              className="w-12 px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded text-center font-bold"
+              className={`${borderedInputClass} w-12`}
               min="1"
             />
             <span className="text-gray-400 dark:text-gray-500">/</span>
