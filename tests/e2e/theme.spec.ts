@@ -29,7 +29,7 @@ test.describe('Dark Mode Support', () => {
     await page.waitForURL(/\/library/);
     
     // Create a new snippet to get to the editor
-    await page.getByRole('button', { name: /New Snippet/i }).click();
+    await page.getByRole('button', { name: 'New Snippet' }).click();
     await page.waitForURL(/\/snippets\/.+/);
 
     // Initial check (Light Mode)
@@ -65,7 +65,7 @@ test.describe('Dark Mode Support', () => {
     await page.waitForURL(/\/library/);
     
     // The selector needs to be more specific to the toolbar in the editor
-    await page.getByRole('button', { name: /New Snippet/i }).click();
+    await page.getByRole('button', { name: 'New Snippet' }).click();
     await page.waitForURL(/\/snippets\/.+/);
 
     // Check GrooveGridEditor toolbar background
