@@ -74,6 +74,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     <div
       onClick={onClick}
       onContextMenu={onContextMenu}
+      data-testid="note-cell"
       className={`
         w-8 h-8 flex items-center justify-center border-r border-gray-300 dark:border-gray-700 cursor-pointer
         hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors relative

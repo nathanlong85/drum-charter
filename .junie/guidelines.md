@@ -41,14 +41,15 @@ These rules are the **Highest Priority** and must be strictly followed at all ti
 ### 4. CodeRabbit Review Protocol
 - **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
 - **Manual Check**: Only check for CodeRabbit feedback when explicitly asked (e.g., "Check CodeRabbit," "Is the review done?").
+- **Local Review Loop**: Always use the `code-review` agent skill (running `cr review --prompt-only --base main --plain`) locally with a high timeout (3600s) to perform the review loops.
 - **Review Status Check**:
     - If CodeRabbit is still performing a review (PR status is "Pending" or "In Progress"), notify the user and **do nothing else**. Wait for the next instruction to check again.
     - If the review is complete, proceed with the structured feedback review.
-- **Structured Feedback Review**: Treat the PR review as a three-loop state machine:
+- **Structured Feedback Review**: Treat the PR review as a three-loop state machine. **During these loops, you do NOT need to stop and ask for approval for individual steps (pushing, committing, editing, or starting the next loop) unless the loop itself is finished or a critical conflict arises.**
     1. **Loop 1 (Initial)**: Address ALL unresolved comments regardless of severity.
     2. **Loop 2**: Address ONLY `Critical` and `Major` severity comments.
     3. **Loop 3 (Final)**: Address ONLY `Critical` and `Major` severity comments.
-    4. **Termination**: If Loop 3 contains zero `Critical` or `Major` comments, the review cycle is complete.
+    4. **Termination**: If Loop 3 contains zero `Critical` or `Major` comments, the review cycle is complete. Push the final verified state and notify the user.
 - **Disagreement & Flagging Protocol**: Proactively flag a CodeRabbit suggestion for final decision if it:
     - Conflicts with project's specific architectural goals/standards.
     - Contradicts previously established user preference or known requirement.
@@ -92,7 +93,7 @@ Accessing GitHub data must follow these specific primary and secondary methods.
 - **Source of Truth**: Always check `.junie/CLI_REFERENCE.md` before running ANY non-trivial CLI command.
 - **Verification First**: If a command is not in the reference, research official docs first, then add the verified command to the reference BEFORE executing it.
 - **Dry Run**: For high-risk commands (migrations, history rewrites), print the command and wait for explicit approval on that exact string.
-- **Timeout Management**: ALWAYS use explicit high timeout (300-3600s) for slow commands (CodeRabbit, Playwright, full suites).
+- **Timeout Management**: ALWAYS use explicit high timeout (300-3600s) for slow commands (CodeRabbit, Playwright, full suites). Specifically, always use `timeout: 3600` for `cr review`.
 - **Suppress Noise**: Proactively suppress redundant environment warnings (e.g., unset `NO_COLOR`).
 
 ---

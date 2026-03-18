@@ -27,7 +27,10 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   const totalNotesPerMeasure = timeSignature.beatsPerMeasure * notesPerBeat;
 
   return (
-    <div className="flex border-b border-gray-300 dark:border-gray-700">
+    <div
+      className="flex border-b border-gray-300 dark:border-gray-700"
+      data-testid={`instrument-row-${label.toLowerCase().replace(/\s+/g, '-')}`}
+    >
       <div className="w-24 h-8 flex items-center px-2 bg-gray-50 dark:bg-gray-900 font-medium text-sm text-gray-700 dark:text-gray-300 border-r border-gray-400 dark:border-gray-600 select-none">
         {label}
       </div>

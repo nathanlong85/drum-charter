@@ -100,6 +100,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
               }}
               className="w-10 h-10 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
               title={sym.replace(/_/g, ' ')}
+              aria-label={sym.replace(/_/g, ' ')}
             >
               {sym === 'none' ? (
                 <span className="text-xs text-gray-400 dark:text-gray-500">∅</span>

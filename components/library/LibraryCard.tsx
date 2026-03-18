@@ -22,7 +22,10 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
   };
 
   return (
-    <div className="group relative bg-white border border-zinc-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-all hover:border-blue-200">
+    <div
+      data-testid="library-card"
+      className="group relative bg-white border border-zinc-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-all hover:border-blue-200"
+    >
       <div className="flex justify-between items-start mb-3">
         <span
           className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${typeLabels[item.type].color}`}

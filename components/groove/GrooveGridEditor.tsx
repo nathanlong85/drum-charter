@@ -220,6 +220,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       headers.push(
         <div
           key={i}
+          data-testid={activeStep === i ? 'active-step' : `step-${i}`}
           className={`w-8 h-8 flex items-center justify-center text-xs font-bold border-r border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 select-none
             ${subIndex === 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}
             ${isMeasureBoundary ? 'border-r-2 border-r-gray-800 dark:border-r-gray-200' : ''}
@@ -314,11 +315,22 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           </button>
 
           {showMetronomeSettings && (
-            <div className={panelClass}>
+            <div className={panelClass} data-testid="metronome-settings-panel">
               <div className="flex flex-col gap-2">
                 <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
                   Click Volume
                 </span>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-bold">
+                    Level
+                  </span>
+                  <span
+                    className="text-[10px] font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded"
+                    data-testid="metronome-volume-value"
+                  >
+                    {Math.round(metronomeVolume * 100)}%
+                  </span>
+                </div>
                 <input
                   type="range"
                   min="0"
@@ -331,10 +343,36 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                     onMetronomeVolumeChange?.(newVal);
                   }}
                   className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-blue-400"
+                  data-testid="metronome-volume-slider"
                 />
-                <div className="flex justify-between text-[10px] text-gray-400 dark:text-gray-500">
-                  <span>Soft</span>
-                  <span>Loud</span>
+                <div className="flex justify-between mt-1">
+                  <button
+                    onClick={() => {
+                      setMetronomeVolume(0.3);
+                      onMetronomeVolumeChange?.(0.3);
+                    }}
+                    className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300"
+                  >
+                    Ghost
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMetronomeVolume(0.7);
+                      onMetronomeVolumeChange?.(0.7);
+                    }}
+                    className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300"
+                  >
+                    Std
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMetronomeVolume(1.0);
+                      onMetronomeVolumeChange?.(1.0);
+                    }}
+                    className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300"
+                  >
+                    Accent
+                  </button>
                 </div>
               </div>
               <button
@@ -425,7 +463,10 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         </div>
       </div>
 
-      <div className="inline-block border border-gray-400 dark:border-gray-600 shadow-sm rounded-sm bg-white dark:bg-gray-950 overflow-x-auto max-w-full print:border-none print:shadow-none print:overflow-visible dark:print:bg-white dark:print:border-none">
+      <div
+        className="inline-block border border-gray-400 dark:border-gray-600 shadow-sm rounded-sm bg-white dark:bg-gray-950 overflow-x-auto max-w-full print:border-none print:shadow-none print:overflow-visible dark:print:bg-white dark:print:border-none"
+        data-testid="groove-grid"
+      >
         {renderHeader()}
         <div className="flex flex-col">
           {state?.instruments.map((inst) => (
