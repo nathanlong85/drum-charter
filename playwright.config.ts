@@ -16,13 +16,13 @@ export default defineConfig({
   workers: 1,
   timeout: 120000,
   expect: {
-    timeout: 30000,
+    timeout: 5000,
   },
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:3001',
     trace: 'on-first-retry',
-    actionTimeout: 30000,
+    actionTimeout: 5000,
     navigationTimeout: 60000,
   },
   projects: [

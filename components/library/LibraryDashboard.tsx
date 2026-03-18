@@ -245,6 +245,7 @@ export default function LibraryDashboard({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as ItemType)}
+                data-testid={`tab-${tab.id}`}
                 className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                   activeTab === tab.id
                     ? 'bg-white text-blue-600 shadow-sm'
