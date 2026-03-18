@@ -28,6 +28,9 @@ test.describe('Dark Mode Support', () => {
     await page.getByRole('button', { name: /Continue as Guest/i }).click();
     await page.waitForURL(/\/library/);
     
+    // Switch to Snippets tab
+    await page.getByRole('button', { name: 'Snippets' }).click();
+    
     // Create a new snippet to get to the editor
     await page.getByRole('button', { name: 'New Snippet' }).click();
     await page.waitForURL(/\/snippets\/.+/);
@@ -63,6 +66,9 @@ test.describe('Dark Mode Support', () => {
     await page.goto('/login');
     await page.getByRole('button', { name: /Continue as Guest/i }).click();
     await page.waitForURL(/\/library/);
+    
+    // Switch to Snippets tab
+    await page.getByRole('button', { name: 'Snippets' }).click();
     
     // The selector needs to be more specific to the toolbar in the editor
     await page.getByRole('button', { name: 'New Snippet' }).click();
