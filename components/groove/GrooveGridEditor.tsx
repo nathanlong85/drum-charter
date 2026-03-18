@@ -360,7 +360,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                 onClick={() => updateResolution(res as BeatResolution)}
                 className={`px-3 py-1 border-r last:border-r-0 border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 ${
                   state.resolution === res
-                    ? 'bg-blue-600 dark:bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-500'
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-700'
                     : ''
                 }`}
               >
@@ -385,7 +385,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
               className="w-12 px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded text-center font-bold"
               min="1"
             />
-            <span className="text-gray-400">/</span>
+            <span className="text-gray-400 dark:text-gray-500">/</span>
             <select
               value={state.timeSignature.beatValue}
               onChange={(e) =>
@@ -406,7 +406,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         </div>
       </div>
 
-      <div className="inline-block border border-gray-400 shadow-sm rounded-sm bg-white overflow-x-auto max-w-full print:border-none print:shadow-none print:overflow-visible">
+      <div className="inline-block border border-gray-400 dark:border-gray-600 shadow-sm rounded-sm bg-white dark:bg-gray-950 overflow-x-auto max-w-full print:border-none print:shadow-none print:overflow-visible dark:print:bg-white dark:print:border-none">
         {renderHeader()}
         <div className="flex flex-col">
           {state?.instruments.map((inst) => (
