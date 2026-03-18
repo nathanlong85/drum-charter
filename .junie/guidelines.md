@@ -70,7 +70,7 @@ I have two primary ways to access GitHub data: **GitHub MCP tools** and the **`g
 
 ### 6. Technical & Mode Rules
 - **Definition of Done**: Before I am allowed to present any task as complete, **all tests must be passing** and **all linting must come back clean**.
-- **100% Test Coverage**: All new features and core logic must have corresponding unit (Vitest) and/or E2E (Playwright) tests.
+- **100% Test Coverage**: All new features and core logic must have corresponding unit (Vitest) and/or E2E (Playwright) tests. I must evaluate the need for both E2E and unit tests for every single change.
 - **Local-First Dev**: Always use the local Supabase Docker instance (`http://localhost:54321`) for development and testing.
 - **Commit Identity**: All commits must be made exclusively on behalf of `Nathan Long <nathanlong85@gmail.com>`. No co-author trailers.
 - **PR Merging**: Merging a PR into `main` is a human-only task. I will never merge a PR myself.

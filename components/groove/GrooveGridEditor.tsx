@@ -200,10 +200,10 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       headers.push(
         <div
           key={i}
-          className={`w-8 h-8 flex items-center justify-center text-xs font-bold border-r border-gray-300 bg-gray-100 select-none
-            ${subIndex === 0 ? 'text-blue-600' : 'text-gray-500'}
-            ${isMeasureBoundary ? 'border-r-2 border-r-gray-800' : ''}
-            ${activeStep === i ? 'bg-yellow-200' : ''}
+          className={`w-8 h-8 flex items-center justify-center text-xs font-bold border-r border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 select-none
+            ${subIndex === 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}
+            ${isMeasureBoundary ? 'border-r-2 border-r-gray-800 dark:border-r-gray-200' : ''}
+            ${activeStep === i ? 'bg-yellow-200 dark:bg-yellow-900' : ''}
           `}
         >
           {label}
@@ -212,8 +212,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     }
 
     return (
-      <div className="flex border-b-2 border-gray-400">
-        <div className="w-24 h-8 bg-gray-200 border-r border-gray-400" />
+      <div className="flex border-b-2 border-gray-400 dark:border-gray-600">
+        <div className="w-24 h-8 bg-gray-200 dark:bg-gray-800 border-r border-gray-400 dark:border-gray-600" />
         <div className="flex">{headers}</div>
       </div>
     );
@@ -221,8 +221,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
 
   return (
     <div className="flex flex-col gap-2 print:gap-1 no-print-break">
-      <div className="flex items-center gap-4 bg-gray-50 p-2 rounded border border-gray-200 text-sm no-print">
-        <div className="flex items-center gap-2 pr-4 border-r border-gray-300">
+      <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-800 text-sm no-print">
+        <div className="flex items-center gap-2 pr-4 border-r border-gray-300 dark:border-gray-700">
           <button
             onClick={togglePlayback}
             className={`flex items-center gap-2 px-4 py-1.5 rounded font-bold transition-colors ${
@@ -245,7 +245,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           </button>
 
           <div className="flex items-center gap-2 ml-2">
-            <span className="text-gray-600 font-medium">BPM:</span>
+            <span className="text-gray-600 dark:text-gray-400 font-medium">BPM:</span>
             <input
               type="number"
               value={bpm}
@@ -257,14 +257,14 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                   setLocalBpm(newBpm);
                 }
               }}
-              className="w-16 px-2 py-1 border border-gray-300 rounded text-center font-bold"
+              className="w-16 px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded text-center font-bold"
               min="40"
               max="300"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-1 border-r border-gray-300 pr-4 relative">
+        <div className="flex items-center gap-1 border-r border-gray-300 dark:border-gray-700 pr-4 relative">
           <button
             onClick={() => {
               const newState = !metronomeEnabled;
@@ -273,8 +273,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
             }}
             className={`p-1.5 rounded transition-colors ${
               metronomeEnabled
-                ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
             }`}
             title={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
           >
@@ -283,8 +283,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
 
           <button
             onClick={() => setShowMetronomeSettings(!showMetronomeSettings)}
-            className={`p-1.5 rounded transition-colors hover:bg-gray-200 text-gray-600 ${
-              showMetronomeSettings ? 'bg-gray-200' : ''
+            className={`p-1.5 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${
+              showMetronomeSettings ? 'bg-gray-200 dark:bg-gray-700' : ''
             }`}
             title="Metronome Settings"
           >
@@ -292,9 +292,11 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           </button>
 
           {showMetronomeSettings && (
-            <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-300 rounded shadow-lg p-3 min-w-[120px]">
+            <div className="absolute top-full left-0 mt-2 z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg p-3 min-w-[120px]">
               <div className="flex flex-col gap-2">
-                <span className="text-xs font-bold text-gray-500 uppercase">Click Volume</span>
+                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
+                  Click Volume
+                </span>
                 <input
                   type="range"
                   min="0"
@@ -306,15 +308,15 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                     setMetronomeVolume(newVal);
                     onMetronomeVolumeChange?.(newVal);
                   }}
-                  className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-blue-400"
                 />
-                <div className="flex justify-between text-[10px] text-gray-400">
+                <div className="flex justify-between text-[10px] text-gray-400 dark:text-gray-500">
                   <span>Soft</span>
                   <span>Loud</span>
                 </div>
               </div>
               <button
-                className="w-full mt-2 text-[10px] text-blue-600 hover:underline text-center"
+                className="w-full mt-2 text-[10px] text-blue-600 dark:text-blue-400 hover:underline text-center"
                 onClick={() => setShowMetronomeSettings(false)}
               >
                 Close

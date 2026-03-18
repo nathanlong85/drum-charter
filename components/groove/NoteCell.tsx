@@ -75,10 +75,10 @@ export const NoteCell: React.FC<NoteCellProps> = ({
       onClick={onClick}
       onContextMenu={onContextMenu}
       className={`
-        w-8 h-8 flex items-center justify-center border-r border-gray-300 cursor-pointer
-        hover:bg-blue-50 transition-colors relative
-        ${isBeat ? 'bg-gray-50' : ''}
-        ${isMeasureBoundary ? 'border-r-2 border-r-gray-800' : ''}
+        w-8 h-8 flex items-center justify-center border-r border-gray-300 dark:border-gray-700 cursor-pointer
+        hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors relative
+        ${isBeat ? 'bg-gray-50 dark:bg-gray-900' : ''}
+        ${isMeasureBoundary ? 'border-r-2 border-r-gray-800 dark:border-r-gray-200' : ''}
       `}
     >
       {iconPath && (
@@ -88,7 +88,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
           width={24}
           height={24}
           style={{ opacity }}
-          className="select-none pointer-events-none transition-opacity"
+          className="select-none pointer-events-none transition-opacity dark:invert"
         />
       )}
       {/* Velocity indicator (mini bar if explicit velocity exists) */}

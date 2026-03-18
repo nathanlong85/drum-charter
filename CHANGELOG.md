@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.11-alpha] - 2026-03-17
+
+### Added
+- **Dark Mode Support**: Implemented comprehensive dark mode across the entire application using Tailwind 4 and CSS variables.
+- **Theme-Aware Components**: Updated `GrooveGridEditor`, `NoteCell`, `InstrumentRow`, and `SymbolPicker` to automatically adapt to the user's system preference.
+- **Automatic Symbol Contrast**: Implemented CSS inversion logic for drum symbols to ensure high visibility on both light and dark backgrounds.
+- **Enhanced Global Styles**: Refined `app/globals.css` with a robust set of theme variables (`muted`, `border`, `input`, `ring`) for consistent UI scaling.
+- **Home Page Modernization**: Updated the landing page and hero section with theme-aware transitions and high-contrast typography.
+
 ## [0.1.10-alpha] - 2026-03-17
 
 ### Added

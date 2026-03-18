@@ -87,7 +87,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
       <div
-        className="fixed z-50 bg-white border border-gray-300 shadow-xl rounded p-3 flex flex-col gap-3"
+        className="fixed z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 shadow-xl rounded p-3 flex flex-col gap-3"
         style={{ top: position.top, left: position.left }}
       >
         <div className="grid grid-cols-6 gap-1">
@@ -98,20 +98,26 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
                 onSelect(sym);
                 // Don't close immediately to allow velocity adjustment
               }}
-              className="w-10 h-10 flex items-center justify-center hover:bg-blue-100 rounded transition-colors border border-transparent hover:border-blue-200"
+              className="w-10 h-10 flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition-colors border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
               title={sym.replace(/_/g, ' ')}
             >
               {sym === 'none' ? (
-                <span className="text-xs text-gray-400">∅</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">∅</span>
               ) : (
-                <Image src={symbolToIcon[sym]!} alt={sym} width={28} height={28} />
+                <Image
+                  src={symbolToIcon[sym]!}
+                  alt={sym}
+                  width={28}
+                  height={28}
+                  className="dark:invert"
+                />
               )}
             </button>
           ))}
         </div>
 
-        <div className="border-t border-gray-200 pt-3 flex flex-col gap-1">
-          <div className="flex justify-between text-xs text-gray-500 mb-1">
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex flex-col gap-1">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
             <span>Velocity</span>
             <span className="font-mono">{Math.round(currentVelocity * 100)}%</span>
           </div>
@@ -122,24 +128,24 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
             step="0.05"
             value={currentVelocity}
             onChange={(e) => onVelocityChange(parseFloat(e.target.value))}
-            className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-blue-400"
           />
           <div className="flex justify-between mt-1">
             <button
               onClick={() => onVelocityChange(0.3)}
-              className="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
+              className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300"
             >
               Ghost
             </button>
             <button
               onClick={() => onVelocityChange(0.7)}
-              className="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
+              className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300"
             >
               Std
             </button>
             <button
               onClick={() => onVelocityChange(1.0)}
-              className="text-[10px] px-1.5 py-0.5 bg-gray-100 hover:bg-gray-200 rounded text-gray-600"
+              className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300"
             >
               Accent
             </button>
