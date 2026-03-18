@@ -88,7 +88,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
           width={24}
           height={24}
           style={{ opacity }}
-          className="select-none pointer-events-none transition-opacity dark:invert"
+          className={`select-none pointer-events-none transition-opacity ${isBeat ? 'dark:invert' : ''}`}
         />
       )}
       {/* Velocity indicator (mini bar if explicit velocity exists) */}

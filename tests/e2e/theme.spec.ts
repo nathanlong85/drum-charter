@@ -31,8 +31,8 @@ test.describe('Dark Mode Support', () => {
     // Initial check (Light Mode)
     const body = page.locator('body');
     let bgColor = await body.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-    // Light mode background is usually white (rgb(255, 255, 255))
-    expect(['rgb(255, 255, 255)', 'rgba(0, 0, 0, 0)']).toContain(bgColor);
+    // Light mode background is white (rgb(255, 255, 255))
+    expect(bgColor).toBe('rgb(255, 255, 255)');
 
     // Switch to Dark Mode
     await page.emulateMedia({ colorScheme: 'dark' });
@@ -60,13 +60,31 @@ test.describe('Dark Mode Support', () => {
     await page.waitForURL(/\/snippets\/.+/);
 
     // Check GrooveGridEditor toolbar background
-    // It's the flex container that has bg-gray-50 or bg-zinc-50 and dark:bg-zinc-900 or dark:bg-gray-900
-    // We'll search for the toolbar container that has the BPM input
-    const toolbar = page.locator('div.flex.items-center.gap-4').filter({ hasText: 'BPM' }).first();
+    const toolbar = page.locator('[data-testid="groove-toolbar"]').first();
     await expect(toolbar).toBeVisible();
 
-    // Instead of checking exact color, we'll verify it doesn't have the light background
+    // Check for dark-mode background color
     const bgColor = await toolbar.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-    expect(bgColor).not.toBe('rgb(249, 250, 251)'); // bg-gray-50
+    // In some browsers/environments, this might resolve to a lab() color or rgb()
+    // We'll check that it's a dark color (very low lightness)
+    if (bgColor.startsWith('rgb')) {
+      const match = bgColor.match(/\d+/g);
+      if (match) {
+        const [r, g, b] = match.map(Number);
+        expect(r).toBeLessThan(30);
+        expect(g).toBeLessThan(35);
+        expect(b).toBeLessThan(50);
+      }
+    } else if (bgColor.startsWith('lab')) {
+      // lab(8.11897 0.811279 -12.254) -> Lightness is ~8%
+      const match = bgColor.match(/[\d.]+/);
+      if (match) {
+        const lightness = Number(match[0]);
+        expect(lightness).toBeLessThan(15);
+      }
+    } else {
+      // Fallback for other formats
+      expect(bgColor).not.toBe('rgb(255, 255, 255)');
+    }
   });
 });

@@ -220,8 +220,11 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 print:gap-1 no-print-break">
-      <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-800 text-sm no-print">
+    <div className="flex flex-col gap-2 print:gap-1 no-print-break" data-testid="groove-editor">
+      <div
+        className="flex items-center gap-4 bg-gray-50 dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-800 text-sm no-print"
+        data-testid="groove-toolbar"
+      >
         <div className="flex items-center gap-2 pr-4 border-r border-gray-300 dark:border-gray-700">
           <button
             onClick={togglePlayback}
@@ -326,19 +329,21 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-gray-600 font-medium">Measures:</span>
-          <div className="flex items-center border border-gray-300 rounded overflow-hidden bg-white">
+          <span className="text-gray-600 dark:text-gray-400 font-medium">Measures:</span>
+          <div className="flex items-center border border-gray-300 dark:border-gray-700 rounded overflow-hidden bg-white dark:bg-gray-800">
             <button
               onClick={() => updateMeasures(-1)}
-              className="px-2 py-1 hover:bg-gray-100 border-r border-gray-300"
+              className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 border-r border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300"
               title="Decrease measures"
             >
               <Minus size={14} />
             </button>
-            <span className="px-3 py-1 font-bold min-w-[2rem] text-center">{state.measures}</span>
+            <span className="px-3 py-1 font-bold min-w-[2rem] text-center text-gray-900 dark:text-gray-100">
+              {state.measures}
+            </span>
             <button
               onClick={() => updateMeasures(1)}
-              className="px-2 py-1 hover:bg-gray-100"
+              className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
               title="Increase measures"
             >
               <Plus size={14} />
@@ -347,14 +352,16 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-gray-600 font-medium">Resolution:</span>
-          <div className="flex border border-gray-300 rounded overflow-hidden bg-white">
+          <span className="text-gray-600 dark:text-gray-400 font-medium">Resolution:</span>
+          <div className="flex border border-gray-300 dark:border-gray-700 rounded overflow-hidden bg-white dark:bg-gray-800">
             {[4, 8, 16].map((res) => (
               <button
                 key={res}
                 onClick={() => updateResolution(res as BeatResolution)}
-                className={`px-3 py-1 border-r last:border-r-0 border-gray-300 hover:bg-gray-100 ${
-                  state.resolution === res ? 'bg-blue-600 text-white hover:bg-blue-700' : ''
+                className={`px-3 py-1 border-r last:border-r-0 border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 ${
+                  state.resolution === res
+                    ? 'bg-blue-600 dark:bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-500'
+                    : ''
                 }`}
               >
                 {res}
@@ -364,7 +371,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-gray-600 font-medium">Time Sig:</span>
+          <span className="text-gray-600 dark:text-gray-400 font-medium">Time Sig:</span>
           <div className="flex items-center gap-1">
             <input
               type="number"
@@ -375,7 +382,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                   state.timeSignature.beatValue,
                 )
               }
-              className="w-12 px-2 py-1 border border-gray-300 rounded text-center font-bold"
+              className="w-12 px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded text-center font-bold"
               min="1"
             />
             <span className="text-gray-400">/</span>
@@ -387,7 +394,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                   parseInt(e.target.value, 10),
                 )
               }
-              className="px-2 py-1 border border-gray-300 rounded bg-white font-bold"
+              className="px-2 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-bold"
             >
               {[2, 4, 8, 16].map((v) => (
                 <option key={v} value={v}>

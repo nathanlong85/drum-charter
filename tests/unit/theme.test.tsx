@@ -11,13 +11,32 @@ vi.mock('@/components/groove/InstrumentRow', () => ({
 
 describe('Theme Class Verification', () => {
   describe('NoteCell', () => {
-    it('applies dark:invert class to the symbol image', () => {
+    it('applies dark:invert class to the symbol image when isBeat is true', () => {
       render(
-        <NoteCell symbol="standard" onClick={() => {}} onContextMenu={(e) => e.preventDefault()} />,
+        <NoteCell
+          symbol="standard"
+          onClick={() => {}}
+          onContextMenu={(e) => e.preventDefault()}
+          isBeat={true}
+        />,
       );
 
       const img = screen.getByAltText('standard');
       expect(img.className).toContain('dark:invert');
+    });
+
+    it('does not apply dark:invert class when isBeat is false', () => {
+      render(
+        <NoteCell
+          symbol="standard"
+          onClick={() => {}}
+          onContextMenu={(e) => e.preventDefault()}
+          isBeat={false}
+        />,
+      );
+
+      const img = screen.getByAltText('standard');
+      expect(img.className).not.toContain('dark:invert');
     });
 
     it('applies theme-aware border and background classes', () => {
@@ -59,12 +78,11 @@ describe('Theme Class Verification', () => {
     };
 
     it('applies dark mode classes to the toolbar container', () => {
-      const { container } = render(<GrooveGridEditor initialGrid={mockGrid} />);
+      render(<GrooveGridEditor initialGrid={mockGrid} />);
 
-      // Look for the toolbar container - it's the first div inside the main container
-      const toolbar = container.querySelector('div.flex.items-center.gap-4');
-      expect(toolbar?.className).toContain('dark:bg-gray-900');
-      expect(toolbar?.className).toContain('dark:border-gray-800');
+      const toolbar = screen.getByTestId('groove-toolbar');
+      expect(toolbar.className).toContain('dark:bg-gray-900');
+      expect(toolbar.className).toContain('dark:border-gray-800');
     });
 
     it('applies dark mode classes to numeric inputs', () => {
