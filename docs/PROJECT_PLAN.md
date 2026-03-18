@@ -67,6 +67,9 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ## Status Board (Kanban)
 
+### 🔵 In Progress
+- [ ] [Chore] Expand E2E test coverage for all core UI flows (#22)
+
 ### 🟢 Done
 - [x] [Feature] Dark Mode Support (#4) `✓`
 - [x] [Chore] GitHub Actions CI Pipeline (Linting, Unit Tests, E2E) (#20) `✓`
