@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { NoteCell } from '@/components/groove/NoteCell';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { NoteCell } from '@/components/groove/NoteCell';
 import type { GrooveGrid } from '@/lib/types/groove';
 
 // Mock child components or hooks if necessary
@@ -13,13 +13,9 @@ describe('Theme Class Verification', () => {
   describe('NoteCell', () => {
     it('applies dark:invert class to the symbol image', () => {
       render(
-        <NoteCell
-          symbol="standard"
-          onClick={() => {}}
-          onContextMenu={(e) => e.preventDefault()}
-        />
+        <NoteCell symbol="standard" onClick={() => {}} onContextMenu={(e) => e.preventDefault()} />,
       );
-      
+
       const img = screen.getByAltText('standard');
       expect(img.className).toContain('dark:invert');
     });
@@ -31,9 +27,9 @@ describe('Theme Class Verification', () => {
           onClick={() => {}}
           onContextMenu={(e) => e.preventDefault()}
           isBeat={true}
-        />
+        />,
       );
-      
+
       const cell = container.firstChild as HTMLElement;
       expect(cell.className).toContain('dark:border-gray-700');
       expect(cell.className).toContain('dark:hover:bg-blue-900');
@@ -63,12 +59,8 @@ describe('Theme Class Verification', () => {
     };
 
     it('applies dark mode classes to the toolbar container', () => {
-      const { container } = render(
-        <GrooveGridEditor
-          initialGrid={mockGrid}
-        />
-      );
-      
+      const { container } = render(<GrooveGridEditor initialGrid={mockGrid} />);
+
       // Look for the toolbar container - it's the first div inside the main container
       const toolbar = container.querySelector('div.flex.items-center.gap-4');
       expect(toolbar?.className).toContain('dark:bg-gray-900');
@@ -76,12 +68,8 @@ describe('Theme Class Verification', () => {
     });
 
     it('applies dark mode classes to numeric inputs', () => {
-      render(
-        <GrooveGridEditor
-          initialGrid={mockGrid}
-        />
-      );
-      
+      render(<GrooveGridEditor initialGrid={mockGrid} />);
+
       const bpmInput = screen.getByDisplayValue('120');
       expect(bpmInput.className).toContain('dark:bg-gray-800');
       expect(bpmInput.className).toContain('dark:border-gray-700');
