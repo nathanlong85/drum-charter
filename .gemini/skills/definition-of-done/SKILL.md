@@ -15,7 +15,7 @@ When you think you've finished a task (feature, bug fix, or documentation update
 Execute the bundled verification script. This script runs Biome linting, Markdown linting, Vitest unit tests, and Playwright E2E tests.
 
 ```bash
-./.agents/skills/definition-of-done/scripts/verify_done.sh
+./.gemini/skills/definition-of-done/scripts/verify_done.sh
 ```
 
 ### 2. Manual Checks

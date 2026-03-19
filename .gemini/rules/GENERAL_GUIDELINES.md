@@ -13,7 +13,7 @@ Whether or not a PR will be created, the following requirements must be met for 
   - Use integration tests where appropriate.
   - Use unit tests where appropriate.
 - The entire test suite must pass.
-- The local CodeRabbit feedback loop must have been fully run
+- The local CodeRabbit feedback loop must have been fully run.
 
 **If creating a PR to present work to the user**: The above requirements must be met before the PR is created.
 **If directly presenting work to the user (no PR)**: The above requirements must be met before the work is presented.
@@ -43,7 +43,7 @@ When the user asks "why" questions or asks for help understanding something, the
 
 
 ### Avoid redundant method comments
-Don't add comments that simply restate what the method name already makes clear. For example, `generate_new_token!` doesn't need a comment saying "Generate a new token and set the token_digest". YARD documentation attributes (`@param`, `@return`, etc.) should still be included, but omit the redundant description line when the method name is self-documenting.
+Don't add comments that simply restate what the method name already makes clear. For example, `generate_new_token!` doesn't need a comment saying "Generate a new token and set the token_digest". JSDoc or TSDoc documentation attributes (`@param`, `@return`, etc.) should still be included, but omit the redundant description line when the method name is self-documenting.
 
 ### Next.js: ALWAYS read docs before coding
 Before any Next.js work, find and read the relevant docs. Your training data is outdated — the docs are the source of truth.

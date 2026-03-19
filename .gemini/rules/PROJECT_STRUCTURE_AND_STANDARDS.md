@@ -9,7 +9,7 @@
 - **DRY & Modular**: Write clean, reusable code; avoid duplication.
 - **Type Safety**: Prioritize TypeScript; ensure end-to-end type safety from DB to UI.
 - **Performance**: Mindful of bundle sizes, re-renders, and DB query efficiency.
-- **Documentation**: Maintain high-quality KDoc, READMEs, CHANGELOGs as part of the process.
+- **Documentation**: Maintain high-quality TSDoc, READMEs, CHANGELOGs as part of the process.
 
 ### Local Development Environment
 - **Local-First Dev**: Always use the local Supabase Docker instance (`http://localhost:54321`) for development and testing.
