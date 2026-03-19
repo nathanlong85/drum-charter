@@ -11,9 +11,4 @@ const withSerwist = withSerwistInit({
 
 export default withSerwist({
   // Your Next.js config here
-  experimental: {
-    turbopack: {
-      root: path.join(__dirname),
-    },
-  },
 });
