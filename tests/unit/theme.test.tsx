@@ -58,9 +58,6 @@ describe('Theme Class Verification', () => {
 
   describe('GrooveGridEditor', () => {
     const mockGrid: GrooveGrid = {
-      id: '1',
-      title: 'Test Groove',
-      bpm: 120,
       timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
       resolution: 16,
       measures: 1,
@@ -72,9 +69,6 @@ describe('Theme Class Verification', () => {
           velocities: Array(16).fill(0),
         },
       ],
-      created_at: '',
-      updated_at: '',
-      user_id: '',
     };
 
     it('applies dark mode classes to the toolbar container', () => {

@@ -38,15 +38,14 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # pwa
-/public/sw.js
-/public/sw.js.map
+/public/sw*
+/public/swe-worker*
 /public/workbox-*.js
 /public/workbox-*.js.map
 /public/worker-*.js
 /public/worker-*.js.map
 /public/fallback-*.js
 /public/fallback-*.js.map
-/public/swe-worker-*.js
 
 # env files (can opt-in for committing if needed)
 .env*

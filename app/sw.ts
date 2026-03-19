@@ -1,13 +1,18 @@
 /// <reference lib="webworker" />
 
 import { ExpirationPlugin } from '@serwist/expiration';
-import { CacheFirst, StaleWhileRevalidate } from '@serwist/strategies';
-import { defaultCache } from '@serwist/turbopack/worker';
+import { defaultCache } from '@serwist/next/worker';
+import { CacheFirst, NetworkFirst, StaleWhileRevalidate } from '@serwist/strategies';
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist';
 import { Serwist } from 'serwist';
 
-declare const self: ServiceWorkerGlobalScope &
-  SerwistGlobalConfig & { __SW_MANIFEST: (PrecacheEntry | string)[] | undefined };
+declare global {
+  interface WorkerGlobalScope extends SerwistGlobalConfig {
+    __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
+  }
+}
+
+declare const self: ServiceWorkerGlobalScope;
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST || [],
@@ -15,6 +20,19 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [
+    {
+      // Navigation requests (HTML pages) - Network First with Cache Fallback
+      matcher: ({ request }) => request.mode === 'navigate',
+      handler: new NetworkFirst({
+        cacheName: 'pages-cache',
+        plugins: [
+          new ExpirationPlugin({
+            maxEntries: 50,
+            maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          }),
+        ],
+      }),
+    },
     {
       // Supabase REST API caching with Authorization header check
       matcher: ({ request, url }) => {

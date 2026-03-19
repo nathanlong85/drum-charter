@@ -7,7 +7,10 @@ test.describe('Offline Support (PWA)', () => {
     page,
   }) => {
     // Ensure we start in a clean state
-    test.skip();
+    test.skip(
+      process.env.RUN_OFFLINE_E2E !== 'true',
+      'Set RUN_OFFLINE_E2E=true to run offline PWA assertions',
+    );
     await page.context().setOffline(false);
     await page.goto('/');
 

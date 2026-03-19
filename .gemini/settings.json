@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "next-devtools-mcp": {
+      "command": "npx",
+      "args": ["@vercel/next-devtools-mcp"]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": ["@supabase/mcp-server"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@microsoft/playwright-mcp"]
+    },
+    "tailwind": {
+      "command": "npx",
+      "args": ["tailwindcss-mcp-server"]
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp",
+      "headers": {
+        "Authorization": "Bearer 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"
+      }
+    }
+  }
+}

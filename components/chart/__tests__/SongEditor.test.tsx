@@ -23,6 +23,8 @@ const mockSong: SongChart = {
     title: 'Test Song',
     bpm: 120,
     timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+    metronomeEnabled: false,
+    metronomeVolume: 0.5,
   },
   sections: [
     {
