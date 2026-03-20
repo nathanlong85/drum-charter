@@ -45,7 +45,34 @@ interface DrumInstrument {
 }
 ```
 
-## 4. Audio Logic
+## 4. UI Interaction State (Selection & Copy/Paste)
+
+To support multi-cell operations, the editor state needs to track selection.
+
+```typescript
+interface GridSelection {
+  start: { row: number; col: number } | null;
+  end: { row: number; col: number } | null;
+  isDragging: boolean;
+}
+```
+
+- **Drag-to-Select**: On `MouseDown`, set `start`. On `MouseMove`, update `end`. On `MouseUp`, finalize selection.
+- **Visuals**: A blue overlay semi-transparently covers selected cells.
+- **Copy**: Serialize the selected sub-grid to a standard JSON format in the clipboard.
+- **Paste**: On `Paste`, merge the clipboard JSON into the current grid starting at the target cell.
+
+## 5. Keyboard Modifiers
+
+| Key Combo | Action |
+| :--- | :--- |
+| **Shift + Click** | Toggle "Optional" state of current cell. |
+| **Alt + Click** | Open `SymbolPicker` directly (skipping toggle). |
+| **Delete** | Clear symbol from current (or selected) cells. |
+| **Cmd/Ctrl + C** | Copy selected range to clipboard. |
+| **Cmd/Ctrl + V** | Paste range from clipboard. |
+
+## 6. Audio Logic
 
 Samples are determined by the combination of `presetVariety` and `DrumSymbol`.
 

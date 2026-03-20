@@ -42,6 +42,19 @@ This document outlines the core user journeys and system interactions for DrumCh
 - **Persistence**: Any change triggers a **2s debounced** call to `supabaseService.save[ItemType]`.
 - **State**: `isSaving` state is indicated in the editor header.
 
+### Workflow: Advanced Grid Editing (Multi-cell & Shortcuts)
+- **Multi-select**: Click and drag across note cells to create a selection box. Selected cells are visually highlighted.
+- **Bulk Action**: Pressing `Delete` clears all symbols from selected cells. Selecting a symbol from the picker applies it to all selected cells.
+- **Clipboard**: `Ctrl+C` copies selected cells to a JSON string in the clipboard. `Ctrl+V` pastes starting at the currently focused cell.
+- **Shortcuts**: `Shift+Click` on a cell toggles the "Optional" (ghost note) version of the current symbol.
+
+### Workflow: Live Mode & Setlists
+- **Enter Live Mode**: Click "Live Mode" (Expand icon) in a Song Chart or Setlist view.
+- **Display**: UI switches to a high-contrast, fullscreen layout. Sidebar and editor controls are hidden.
+- **Navigation**: `Page Down` / `Space` / `Right Arrow` advances to the next section or song. `Page Up` / `Backspace` / `Left Arrow` goes back.
+- **Foot Switch Support**: The system listens for these standard keyboard events (emulated by most Bluetooth page turners) to trigger navigation.
+- **Setlist Transition**: At the end of a song in a setlist, the next song's chart is automatically loaded into the Live Mode view.
+
 ### Workflow: Instrument Customization (Drum-Aware)
 - **Trigger**: Click "Add Instrument" or the settings icon on an existing instrument row.
 - **Action**: Opens a dialog to select a **Category** (e.g., Kick), a **Preset Variety** (e.g., High Tom), and an optional **Custom Name**.

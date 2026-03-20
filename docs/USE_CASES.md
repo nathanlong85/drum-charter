@@ -46,7 +46,19 @@ Structured documents for full songs with specific metadata.
 - **Scenario**: Preparing a chart for a specific performance.
 - **Workflow**: Create a Song Chart with BPM, Time Signature, and a full sequence of sections (Intro, Verse, Chorus, etc.). This chart is optimized for printing and use on a tablet during a gig.
 
-## 5. Guest Access: Low-Friction Entry
+## 5. Live Mode & Setlists: The Stage Experience
+Optimizing the app for real-time performance.
+
+### Use Case: The Solo Gig
+- **Scenario**: A drummer playing a 3-hour wedding gig using an iPad for charts.
+- **Workflow**: The drummer creates a "Wedding Set 1" Setlist. They enter "Live Mode," which provides a high-contrast, distraction-free view. They use a Bluetooth foot switch to "turn the page" (scroll or advance sections) without taking their hands off the sticks.
+- **Benefit**: No more fumbling with paper or small buttons on stage.
+
+### Use Case: Rehearsal Efficiency
+- **Scenario**: A band is running through their set and needs to quickly jump between songs.
+- **Workflow**: The drummer opens the Setlist. As they finish one song, they click "Next" (or it auto-advances), and the next chart is immediately ready with the correct BPM and metronome settings.
+
+## 6. Guest Access: Low-Friction Entry
 Allowing users to try the app and save data without an upfront commitment.
 
 ### Use Case: Instant Trial
