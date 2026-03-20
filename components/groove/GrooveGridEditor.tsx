@@ -39,7 +39,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   const [pickerPos, setPickerPos] = useState<{
     top: number;
     left: number;
-    instrumentId: string;
+    id: string;
     noteIndex: number;
   } | null>(null);
   const [_showSettings, _setShowSettings] = useState(false);
@@ -118,24 +118,24 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     onChange?.(grooveReducer(state, action));
   };
 
-  const handleNoteClick = (instrumentId: string, noteIndex: number) => {
-    wrappedDispatch({ type: 'TOGGLE_NOTE', instrumentId, noteIndex });
+  const handleNoteClick = (id: string, noteIndex: number) => {
+    wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
   };
 
-  const handleNoteContextMenu = (instrumentId: string, noteIndex: number, e: React.MouseEvent) => {
+  const handleNoteContextMenu = (id: string, noteIndex: number, e: React.MouseEvent) => {
     e.preventDefault();
     setPickerPos({
       top: e.clientY,
       left: e.clientX,
-      instrumentId,
+      id,
       noteIndex,
     });
   };
 
-  const handleVelocityChange = (instrumentId: string, noteIndex: number, velocity: number) => {
+  const handleVelocityChange = (id: string, noteIndex: number, velocity: number) => {
     wrappedDispatch({
       type: 'SET_VELOCITY',
-      instrumentId,
+      id,
       noteIndex,
       velocity,
     });
@@ -145,7 +145,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     if (!pickerPos) return;
     wrappedDispatch({
       type: 'SET_SYMBOL',
-      instrumentId: pickerPos.instrumentId,
+      id: pickerPos.id,
       noteIndex: pickerPos.noteIndex,
       symbol,
     });
@@ -255,14 +255,11 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         <div className="flex flex-col">
           {state?.instruments.map((inst) => (
             <InstrumentRow
-              key={inst.instrumentId}
-              instrumentId={inst.instrumentId}
-              label={inst.label}
-              notes={inst.notes}
-              velocities={inst.velocities}
+              key={inst.id}
+              instrument={inst}
               grid={state}
-              onNoteClick={(idx) => handleNoteClick(inst.instrumentId, idx)}
-              onNoteContextMenu={(idx, e) => handleNoteContextMenu(inst.instrumentId, idx, e)}
+              onNoteClick={(idx) => handleNoteClick(inst.id, idx)}
+              onNoteContextMenu={(idx, e) => handleNoteContextMenu(inst.id, idx, e)}
             />
           ))}
         </div>
@@ -271,16 +268,14 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           <SymbolPicker
             position={{ top: pickerPos.top, left: pickerPos.left }}
             onSelect={handleSymbolSelect}
-            onVelocityChange={(vel) =>
-              handleVelocityChange(pickerPos.instrumentId, pickerPos.noteIndex, vel)
-            }
+            onVelocityChange={(vel) => handleVelocityChange(pickerPos.id, pickerPos.noteIndex, vel)}
             currentVelocity={
-              state.instruments.find((i) => i.instrumentId === pickerPos.instrumentId)
-                ?.velocities?.[pickerPos.noteIndex] ??
+              state.instruments.find((i) => i.id === pickerPos.id)?.velocities?.[
+                pickerPos.noteIndex
+              ] ??
               getVelocityForSymbol(
-                state.instruments.find((i) => i.instrumentId === pickerPos.instrumentId)?.notes[
-                  pickerPos.noteIndex
-                ] ?? 'none',
+                state.instruments.find((i) => i.id === pickerPos.id)?.notes[pickerPos.noteIndex] ??
+                  'none',
               )
             }
             onClose={() => setPickerPos(null)}

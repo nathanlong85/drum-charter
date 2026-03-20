@@ -11,13 +11,18 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
   measures: 1,
   instruments: [
     {
-      instrumentId: 'hh',
-      label: 'Hi-Hat',
+      id: 'hh',
+      category: 'hi-hat',
+      presetVariety: 'Hi-Hat',
+      customName: 'Hi-Hat',
       notes: Array(16).fill('hi_hat_closed'),
+      velocities: Array(16).fill(0.7),
     },
     {
-      instrumentId: 'sn',
-      label: 'Snare',
+      id: 'sn',
+      category: 'snare',
+      presetVariety: 'Snare',
+      customName: 'Snare',
       notes: [
         'none',
         'none',
@@ -36,10 +41,13 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
         'none',
         'none',
       ],
+      velocities: Array(16).fill(0),
     },
     {
-      instrumentId: 'bd',
-      label: 'Bass',
+      id: 'bd',
+      category: 'kick',
+      presetVariety: 'Kick',
+      customName: 'Bass',
       notes: [
         'standard',
         'none',
@@ -58,6 +66,7 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
         'none',
         'none',
       ],
+      velocities: Array(16).fill(0),
     },
   ],
 };

@@ -145,7 +145,8 @@ export function useAudioPlayback({
       grid.instruments.forEach((inst) => {
         const symbol = inst.notes[step];
         if (symbol && symbol !== 'none') {
-          const instId = inst.instrumentId.toLowerCase();
+          const category = inst.category.toLowerCase();
+          const variety = inst.presetVariety.toLowerCase().replace(/\s+/g, '_');
 
           // Determine velocity: explicit value from inst.velocities, or derived from symbol
           let velocity = _getVelocityForSymbolInHook(symbol);
@@ -159,28 +160,34 @@ export function useAudioPlayback({
             return;
           }
 
-          // 2. Try instrument + symbol combination (e.g., snare_rim_shot)
-          const combinedKey = `${instId}_${symbol}`;
+          // 2. Try variety + symbol combination (e.g., snare_rim_shot)
+          const combinedKey = `${variety}_${symbol}`;
           if (samplesRef.current.has(combinedKey as DrumSymbol)) {
             playSample(combinedKey, time, velocity);
             return;
           }
 
-          // 3. Fallback to instrument default
-          if (instId.includes('kick') || instId.includes('bass')) {
+          // 3. Fallback to variety default
+          if (samplesRef.current.has(variety as DrumSymbol)) {
+            playSample(variety, time, velocity);
+            return;
+          }
+
+          // 4. Fallback to category default
+          if (category.includes('kick') || category.includes('bass')) {
             playSample('kick', time, velocity);
-          } else if (instId.includes('snare')) {
+          } else if (category.includes('snare')) {
             playSample('snare', time, velocity);
-          } else if (instId.includes('hi_hat') || instId.includes('hat')) {
+          } else if (category.includes('hi-hat') || category.includes('hat')) {
             playSample('hi_hat_closed', time, velocity);
-          } else if (instId.includes('ride')) {
+          } else if (category.includes('ride')) {
             playSample('ride', time, velocity);
-          } else if (instId.includes('crash')) {
+          } else if (category.includes('crash')) {
             playSample('crash', time, velocity);
-          } else if (instId.includes('tom')) {
-            if (instId.includes('high')) playSample('tom_high', time, velocity);
-            else if (instId.includes('mid')) playSample('tom_medium', time, velocity);
-            else if (instId.includes('floor')) playSample('tom_floor', time, velocity);
+          } else if (category.includes('tom')) {
+            if (variety.includes('high')) playSample('tom_high', time, velocity);
+            else if (variety.includes('mid')) playSample('tom_medium', time, velocity);
+            else if (variety.includes('floor')) playSample('tom_floor', time, velocity);
             else playSample('tom_medium', time, velocity);
           }
         }

@@ -49,9 +49,12 @@ describe('useAudioPlayback', () => {
     timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
     instruments: [
       {
-        instrumentId: 'kick',
-        label: 'Kick',
+        id: 'kick',
+        category: 'kick',
+        presetVariety: 'Kick',
+        customName: 'Kick',
         notes: new Array(16).fill('none'),
+        velocities: new Array(16).fill(0),
       },
     ],
   };
@@ -125,8 +128,10 @@ describe('useAudioPlayback', () => {
       ...mockGrid,
       instruments: [
         {
-          instrumentId: 'kick',
-          label: 'Kick',
+          id: 'kick',
+          category: 'kick',
+          presetVariety: 'Kick',
+          customName: 'Kick',
           notes: ['standard', 'none', 'none', 'none'],
           velocities: [0.5, 0, 0, 0],
         },
@@ -165,9 +170,12 @@ describe('useAudioPlayback', () => {
       ...mockGrid,
       instruments: [
         {
-          instrumentId: 'kick',
-          label: 'Kick',
+          id: 'kick',
+          category: 'kick',
+          presetVariety: 'Kick',
+          customName: 'Kick',
           notes: ['accent', 'standard', 'ghost', 'none'],
+          velocities: [1.1, 0.7, 0.2, 0],
         },
       ],
     };

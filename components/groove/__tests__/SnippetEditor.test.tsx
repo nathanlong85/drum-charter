@@ -18,7 +18,16 @@ const mockSnippet: GrooveSnippet = {
   timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
   resolution: 16,
   measures: 1,
-  instruments: [{ instrumentId: 'hh', label: 'Hi-Hat', notes: Array(16).fill('none') }],
+  instruments: [
+    {
+      id: 'hh',
+      category: 'hi-hat',
+      presetVariety: 'Hi-Hat',
+      customName: 'Hi-Hat',
+      notes: Array(16).fill('none'),
+      velocities: Array(16).fill(0),
+    },
+  ],
   tags: ['funk'],
   isPublic: false,
   createdAt: new Date().toISOString(),
