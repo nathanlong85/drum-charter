@@ -10,7 +10,7 @@ All development and testing must happen in an isolated local environment.
 - **Database Schema**: Synchronized via managed migrations in `supabase/migrations/`.
 
 ## 2. Feature & Bugfix Workflow
-We use a strict branching and PR-based feedback loop.
+We use a strict branching and PR-based feedback loop for all code changes.
 
 ### Step 2.1: Branching
 Always create a new branch from `main` for any new task:
@@ -42,7 +42,16 @@ git add .
 git commit -m "feat/fix: descriptive message"
 ```
 
-## 3. Pull Request & Code Review
+## 3. Documentation & Rule Updates (Fast-Track)
+For non-code changes (e.g., updates to `.gemini/rules/*.md`, `docs/*.md`, or `CHANGELOG.md`), a simplified workflow is used to maintain speed without sacrificing quality.
+
+1. **Edit**: Changes are made locally (on a feature branch or `main` as directed).
+2. **Lint**: Run `npm run lint:md` to ensure formatting is correct.
+3. **Review**: Present the `git diff` of the changes for human review.
+4. **Commit**: Only commit once the human gives explicit approval (e.g., "looks good" or "approve").
+5. **Push**: NEVER push to the remote repository until explicitly instructed (e.g., "Now push this to main").
+
+## 4. Pull Request & Code Review
 We leverage automated and human feedback before any code is merged into `main`.
 
 ### Step 3.1: Push & Open PR
