@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
-import { getVelocityForSymbol, useAudioPlayback } from '../useAudioPlayback';
+import { type DrumSymbol, type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
+import { useAudioPlayback } from '../useAudioPlayback';
 
 // Mock AudioContext
 const mockSetValueAtTime = vi.fn();
@@ -68,11 +68,11 @@ describe('useAudioPlayback', () => {
 
   describe('getVelocityForSymbol', () => {
     const testCases: { symbol: DrumSymbol; expected: number }[] = [
-      { symbol: 'accent', expected: 1.1 },
+      { symbol: 'accent', expected: 1.2 },
       { symbol: 'standard', expected: 0.7 },
       { symbol: 'ghost', expected: 0.2 },
       { symbol: 'none', expected: 0 },
-      { symbol: 'accent_opt', expected: 1.1 },
+      { symbol: 'accent_opt', expected: 1.2 },
       { symbol: 'ghost_opt', expected: 0.2 },
       { symbol: 'hi_hat_closed_opt', expected: 0.7 },
     ];
@@ -175,7 +175,7 @@ describe('useAudioPlayback', () => {
           presetVariety: 'Kick',
           customName: 'Kick',
           notes: ['accent', 'standard', 'ghost', 'none'],
-          velocities: [1.1, 0.7, 0.2, 0],
+          velocities: [1.2, 0.7, 0.2, 0],
         },
       ],
     };
@@ -196,9 +196,9 @@ describe('useAudioPlayback', () => {
       result.current.togglePlayback();
     });
 
-    // Step 0: Accent -> 1.1 ^ 2.0 = 1.21
+    // Step 0: Accent -> 1.2 ^ 2.0 = 1.44
     // The scheduler runs immediately on togglePlayback
-    expect(mockSetValueAtTime).toHaveBeenCalledWith(expect.closeTo(1.21, 5), expect.any(Number));
+    expect(mockSetValueAtTime).toHaveBeenCalledWith(expect.closeTo(1.44, 5), expect.any(Number));
 
     // Step 1: Standard -> 0.7 ^ 2.0 = 0.49
     act(() => {

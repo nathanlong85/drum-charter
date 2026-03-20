@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
+import { type DrumSymbol, type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
 
 interface UseAudioPlaybackProps {
   grid: GrooveGrid;
@@ -9,23 +9,6 @@ interface UseAudioPlaybackProps {
   onStepChange?: (step: number) => void;
   initialMetronomeEnabled?: boolean;
   initialMetronomeVolume?: number;
-}
-
-export function getVelocityForSymbol(symbol: DrumSymbol): number {
-  // Mapping for Multi-layer Velocity Support (#3)
-  // Accents: 1.1 (pops over the mix)
-  // Standard: 0.7 (baseline)
-  // Ghost: 0.2 (subtle)
-
-  if (symbol === 'accent') return 1.1;
-  if (symbol === 'ghost') return 0.2;
-  if (symbol === 'standard') return 0.7;
-  if (symbol === 'none') return 0;
-
-  // Handle _opt variants and other symbols
-  if (symbol.includes('accent')) return 1.1;
-  if (symbol.includes('ghost')) return 0.2;
-  return 0.7; // Default for everything else
 }
 
 export function useAudioPlayback({

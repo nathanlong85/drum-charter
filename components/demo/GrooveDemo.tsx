@@ -3,7 +3,7 @@
 import { useReducer } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { grooveReducer } from '@/lib/state/groove-reducer';
-import type { GrooveGrid } from '@/lib/types/groove';
+import { type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
 
 const INITIAL_DEMO_GRID: GrooveGrid = {
   timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
@@ -16,7 +16,7 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
       presetVariety: 'Hi-Hat',
       customName: 'Hi-Hat',
       notes: Array(16).fill('hi_hat_closed'),
-      velocities: Array(16).fill(0.7),
+      velocities: Array(16).fill(getVelocityForSymbol('hi_hat_closed')),
     },
     {
       id: 'sn',
@@ -41,7 +41,7 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
         'none',
         'none',
       ],
-      velocities: Array(16).fill(0),
+      velocities: [0, 0, 0, 0, 0.7, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 0, 0],
     },
     {
       id: 'bd',
@@ -66,7 +66,7 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
         'none',
         'none',
       ],
-      velocities: Array(16).fill(0),
+      velocities: [0.7, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 0, 0, 0, 0, 0, 0],
     },
   ],
 };

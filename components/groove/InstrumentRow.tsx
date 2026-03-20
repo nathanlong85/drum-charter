@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import type { DrumInstrument, GrooveGrid } from '@/lib/types/groove';
+import { type DrumInstrument, type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
 import { NoteCell } from './NoteCell';
 
 interface InstrumentRowProps {
@@ -35,7 +35,10 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
         {instrument.notes.map((symbol, i) => {
           const isBeat = i % notesPerBeat === 0;
           const isMeasureBoundary = (i + 1) % totalNotesPerMeasure === 0;
-          const velocity = instrument.velocities[i];
+          const velocity =
+            instrument.velocities && instrument.velocities[i] !== undefined
+              ? instrument.velocities[i]
+              : getVelocityForSymbol(symbol);
 
           return (
             <NoteCell

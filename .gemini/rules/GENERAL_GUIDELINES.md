@@ -16,7 +16,7 @@ Whether a PR is created, these requirements must be met for work to be "Done":
   - Use unit tests where appropriate.
 - The entire test suite must pass.
 - The local CodeRabbit feedback loop must have been fully run.
-- **Final Pre-Push Check**: Always run the project's full verification suite (e.g., `verify_done.sh`) immediately before pushing to ensure no regressions or formatting issues were introduced by last-minute edits.
+- **Final Pre-Push Check**: Always run the `definition-of-done` skill (which executes `./.agents/skills/definition-of-done/scripts/verify_done.sh`) immediately before pushing to ensure no regressions or formatting issues were introduced by last-minute edits.
 
 **If creating a PR**: These requirements must be met before the PR is created.
 **If directly presenting work (no PR)**: These requirements must be met before work is presented.
