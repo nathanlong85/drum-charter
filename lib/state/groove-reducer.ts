@@ -56,7 +56,9 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
           newNotes[action.noteIndex] = nextSymbol;
 
           // Automatically set velocity based on symbol
-          const newVelocities = [...inst.velocities];
+          const newVelocities = inst.velocities
+            ? [...inst.velocities]
+            : Array(inst.notes.length).fill(0);
           newVelocities[action.noteIndex] = getVelocityForSymbol(nextSymbol);
 
           return { ...inst, notes: newNotes, velocities: newVelocities };
@@ -72,7 +74,9 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
           const newNotes = [...inst.notes];
           newNotes[action.noteIndex] = action.symbol;
 
-          const newVelocities = [...inst.velocities];
+          const newVelocities = inst.velocities
+            ? [...inst.velocities]
+            : Array(inst.notes.length).fill(0);
           newVelocities[action.noteIndex] = getVelocityForSymbol(action.symbol);
 
           return { ...inst, notes: newNotes, velocities: newVelocities };
@@ -85,7 +89,9 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
         ...state,
         instruments: state.instruments.map((inst) => {
           if (inst.id !== action.id) return inst;
-          const newVelocities = [...inst.velocities];
+          const newVelocities = inst.velocities
+            ? [...inst.velocities]
+            : Array(inst.notes.length).fill(0);
           newVelocities[action.noteIndex] = action.velocity;
           return { ...inst, velocities: newVelocities };
         }),
@@ -128,7 +134,11 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
           const newVelocities = Array(newTotalNotes).fill(0);
           for (let i = 0; i < Math.min(inst.notes.length, newTotalNotes); i++) {
             newNotes[i] = inst.notes[i];
-            newVelocities[i] = inst.velocities[i];
+            if (inst.velocities) {
+              newVelocities[i] = inst.velocities[i];
+            } else {
+              newVelocities[i] = getVelocityForSymbol(inst.notes[i]);
+            }
           }
           return { ...inst, notes: newNotes, velocities: newVelocities };
         }),
@@ -146,7 +156,11 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
           const newVelocities = Array(newTotalNotes).fill(0);
           for (let i = 0; i < Math.min(inst.notes.length, newTotalNotes); i++) {
             newNotes[i] = inst.notes[i];
-            newVelocities[i] = inst.velocities[i];
+            if (inst.velocities) {
+              newVelocities[i] = inst.velocities[i];
+            } else {
+              newVelocities[i] = getVelocityForSymbol(inst.notes[i]);
+            }
           }
           return { ...inst, notes: newNotes, velocities: newVelocities };
         }),
@@ -170,7 +184,11 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
           const newVelocities = Array(newTotalNotes).fill(0);
           for (let i = 0; i < Math.min(inst.notes.length, newTotalNotes); i++) {
             newNotes[i] = inst.notes[i];
-            newVelocities[i] = inst.velocities[i];
+            if (inst.velocities) {
+              newVelocities[i] = inst.velocities[i];
+            } else {
+              newVelocities[i] = getVelocityForSymbol(inst.notes[i]);
+            }
           }
           return { ...inst, notes: newNotes, velocities: newVelocities };
         }),

@@ -72,7 +72,45 @@ export interface DrumInstrument {
   /**
    * Velocities for each note (typically 0-1.0, but can go up to 1.2 for accents).
    */
-  velocities: number[];
+  velocities?: number[];
+}
+
+/**
+ * Helper to create a single instrument with correctly sized and optionally initialized arrays.
+ */
+export function createInstrument(
+  grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'>,
+  id: string,
+  category: DrumCategory,
+  presetVariety: string,
+  customName: string,
+  initialNote?: DrumSymbol,
+): DrumInstrument {
+  const totalNotes = calculateTotalNotes(grid);
+  const notes = Array(totalNotes).fill(initialNote || 'none');
+  const velocities = notes.map((n) => getVelocityForSymbol(n));
+
+  return {
+    id,
+    category,
+    presetVariety,
+    customName,
+    notes,
+    velocities,
+  };
+}
+
+/**
+ * Helper to create a standard set of instruments for a new grid.
+ */
+export function createDefaultDrumInstruments(
+  grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'>,
+): DrumInstrument[] {
+  return [
+    createInstrument(grid, 'hihat', 'hi-hat', 'Hi-Hat', 'Hi-Hat'),
+    createInstrument(grid, 'snare', 'snare', 'Snare', 'Snare'),
+    createInstrument(grid, 'kick', 'kick', 'Kick', 'Kick'),
+  ];
 }
 
 /**

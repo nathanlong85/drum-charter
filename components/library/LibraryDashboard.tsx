@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/client';
-import type { GrooveSnippet, Notebook, SongChart } from '@/lib/types/groove';
+import {
+  createDefaultDrumInstruments,
+  type GrooveSnippet,
+  type Notebook,
+  type SongChart,
+} from '@/lib/types/groove';
 import { LibraryCard } from './LibraryCard';
 
 const supabase = createClient();
@@ -237,33 +242,13 @@ export default function LibraryDashboard({
           timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
           resolution: 16,
           measures: 1,
-          instruments: [
-            {
-              id: 'kick',
-              category: 'kick',
-              presetVariety: 'Kick',
-              customName: 'Kick',
-              notes: Array(16).fill('none'),
-              velocities: Array(16).fill(0),
-            },
-            {
-              id: 'snare',
-              category: 'snare',
-              presetVariety: 'Snare',
-              customName: 'Snare',
-              notes: Array(16).fill('none'),
-              velocities: Array(16).fill(0),
-            },
-            {
-              id: 'hihat',
-              category: 'hi-hat',
-              presetVariety: 'Hi-Hat',
-              customName: 'Hi-Hat',
-              notes: Array(16).fill('none'),
-              velocities: Array(16).fill(0),
-            },
-          ],
+          instruments: createDefaultDrumInstruments({
+            timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+            resolution: 16,
+            measures: 1,
+          }),
           createdAt: null,
+
           updatedAt: null,
         };
         const saved = await supabaseService.saveGrooveSnippet(newSnippet);

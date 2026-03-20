@@ -15,12 +15,16 @@ class MockAudioContext {
     return currentAudioTime;
   }
   state = 'running' as const;
-  decodeAudioData = vi.fn().mockResolvedValue({} as AudioBuffer);
-  createBufferSource = vi.fn().mockReturnValue({
+  decodeAudioData = vi.fn().mockImplementation(async (_data) => {
+    // Return a dummy buffer with a 'name' property we can check
+    // In real Web Audio API, buffers don't have names, but we can mock it
+    return { duration: 1, length: 44100, sampleRate: 44100, numberOfChannels: 1 } as any;
+  });
+  createBufferSource = vi.fn().mockImplementation(() => ({
     buffer: null,
     connect: mockConnect,
     start: mockStart,
-  });
+  }));
   createGain = vi.fn().mockReturnValue({
     gain: {
       setValueAtTime: mockSetValueAtTime,

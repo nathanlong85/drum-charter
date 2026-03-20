@@ -3,26 +3,20 @@
 import { useReducer } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { grooveReducer } from '@/lib/state/groove-reducer';
-import { type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
+import { createInstrument, type GrooveGrid } from '@/lib/types/groove';
 
-const INITIAL_DEMO_GRID: GrooveGrid = {
+const DEMO_META = {
   timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
   resolution: 16,
   measures: 1,
+} as const;
+
+const INITIAL_DEMO_GRID: GrooveGrid = {
+  ...DEMO_META,
   instruments: [
+    createInstrument(DEMO_META, 'hh', 'hi-hat', 'Hi-Hat', 'Hi-Hat', 'hi_hat_closed'),
     {
-      id: 'hh',
-      category: 'hi-hat',
-      presetVariety: 'Hi-Hat',
-      customName: 'Hi-Hat',
-      notes: Array(16).fill('hi_hat_closed'),
-      velocities: Array(16).fill(getVelocityForSymbol('hi_hat_closed')),
-    },
-    {
-      id: 'sn',
-      category: 'snare',
-      presetVariety: 'Snare',
-      customName: 'Snare',
+      ...createInstrument(DEMO_META, 'sn', 'snare', 'Snare', 'Snare'),
       notes: [
         'none',
         'none',
@@ -44,10 +38,7 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
       velocities: [0, 0, 0, 0, 0.7, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 0, 0],
     },
     {
-      id: 'bd',
-      category: 'kick',
-      presetVariety: 'Kick',
-      customName: 'Bass',
+      ...createInstrument(DEMO_META, 'bd', 'kick', 'Kick', 'Bass'),
       notes: [
         'standard',
         'none',

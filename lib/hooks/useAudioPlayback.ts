@@ -56,7 +56,6 @@ export function useAudioPlayback({
         tom_high: '/audio/samples/drum-kit/default/tom_high.wav',
         tom_medium: '/audio/samples/drum-kit/default/tom_medium.wav',
         tom_floor: '/audio/samples/drum-kit/default/tom_floor.wav',
-        standard: '/audio/samples/drum-kit/default/snare.wav', // Fallback
         click_high: '/audio/samples/metronome/click_high.wav',
         click_low: '/audio/samples/metronome/click_low.wav',
       };
@@ -132,44 +131,38 @@ export function useAudioPlayback({
           const variety = inst.presetVariety.toLowerCase().replace(/\s+/g, '_');
 
           // Determine velocity: explicit value from inst.velocities, or derived from symbol
-          let velocity = _getVelocityForSymbolInHook(symbol);
+          let velocity = getVelocityForSymbol(symbol);
           if (inst.velocities && inst.velocities[step] !== undefined) {
             velocity = inst.velocities[step];
           }
 
-          // 1. Try symbol-specific sound first (e.g., if "rim_shot" is a global sample)
-          if (samplesRef.current.has(symbol)) {
-            playSample(symbol, time, velocity);
-            return;
+          // Search strategy for samples:
+          const candidates = [
+            symbol, // 1. Direct symbol (e.g. 'hi_hat_open')
+            `${variety}_${symbol}`, // 2. variety + symbol (e.g. 'snare_rim_shot')
+            `${category}_${symbol}`, // 3. category + symbol (e.g. 'snare_rim_shot')
+            `${variety}_standard`, // 4. variety default (e.g. 'snare_standard')
+            `${category}_standard`, // 5. category default (e.g. 'snare_standard')
+            variety, // 6. raw variety (e.g. 'snare')
+            category, // 7. raw category (e.g. 'snare')
+          ];
+
+          for (const cand of candidates) {
+            if (samplesRef.current.has(cand as DrumSymbol)) {
+              playSample(cand, time, velocity);
+              return;
+            }
           }
 
-          // 2. Try variety + symbol combination (e.g., snare_rim_shot)
-          const combinedKey = `${variety}_${symbol}`;
-          if (samplesRef.current.has(combinedKey as DrumSymbol)) {
-            playSample(combinedKey, time, velocity);
-            return;
-          }
-
-          // 3. Fallback to variety default
-          if (samplesRef.current.has(variety as DrumSymbol)) {
-            playSample(variety, time, velocity);
-            return;
-          }
-
-          // 4. Fallback to category default
-          if (category.includes('kick') || category.includes('bass')) {
+          // Special hardcoded fallbacks for 'kick' and other common names if not caught by simple rules
+          if (category === 'kick' || category === 'bass') {
             playSample('kick', time, velocity);
-          } else if (category.includes('snare')) {
+          } else if (category === 'snare') {
             playSample('snare', time, velocity);
-          } else if (category.includes('hi-hat') || category.includes('hat')) {
+          } else if (category === 'hi-hat') {
             playSample('hi_hat_closed', time, velocity);
-          } else if (category.includes('ride')) {
-            playSample('ride', time, velocity);
-          } else if (category.includes('crash')) {
-            playSample('crash', time, velocity);
-          } else if (category.includes('tom')) {
+          } else if (category === 'tom') {
             if (variety.includes('high')) playSample('tom_high', time, velocity);
-            else if (variety.includes('mid')) playSample('tom_medium', time, velocity);
             else if (variety.includes('floor')) playSample('tom_floor', time, velocity);
             else playSample('tom_medium', time, velocity);
           }
@@ -181,14 +174,7 @@ export function useAudioPlayback({
         onStepChange(step);
       }
     },
-    [
-      grid,
-      metronomeEnabled,
-      metronomeVolume,
-      onStepChange,
-      playSample,
-      _getVelocityForSymbolInHook,
-    ],
+    [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample],
   );
 
   const nextNote = useCallback(() => {

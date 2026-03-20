@@ -78,7 +78,7 @@ function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
       presetVariety,
       customName: label,
       notes: inst.notes || [],
-      velocities: inst.velocities || Array((inst.notes || []).length).fill(0),
+      velocities: inst.velocities,
     } as DrumInstrument;
   });
 

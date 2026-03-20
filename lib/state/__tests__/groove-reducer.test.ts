@@ -52,6 +52,7 @@ describe('grooveReducer', () => {
     const nextState = grooveReducer(initialGrid, action);
     expect(nextState.resolution).toBe(8);
     expect(nextState.instruments[0].notes.length).toBe(8);
+    expect(nextState.instruments[0].velocities?.length).toBe(8);
   });
 
   it('handles SET_MEASURES', () => {
@@ -59,6 +60,7 @@ describe('grooveReducer', () => {
     const nextState = grooveReducer(initialGrid, action);
     expect(nextState.measures).toBe(2);
     expect(nextState.instruments[0].notes.length).toBe(32);
+    expect(nextState.instruments[0].velocities?.length).toBe(32);
   });
 
   it('handles SET_TIME_SIGNATURE', () => {
@@ -73,6 +75,7 @@ describe('grooveReducer', () => {
     expect(nextState.timeSignature.beatValue).toBe(4);
     // 3 beats * (16 / 4) = 12 notes per measure
     expect(nextState.instruments[0].notes.length).toBe(12);
+    expect(nextState.instruments[0].velocities?.length).toBe(12);
   });
 
   it('handles SET_TIME_SIGNATURE with different beat value', () => {
@@ -87,6 +90,7 @@ describe('grooveReducer', () => {
     expect(nextState.timeSignature.beatValue).toBe(8);
     // 6 beats * (16 / 8) = 12 notes per measure
     expect(nextState.instruments[0].notes.length).toBe(12);
+    expect(nextState.instruments[0].velocities?.length).toBe(12);
   });
 
   it('handles SET_VELOCITY', () => {
