@@ -9,14 +9,20 @@ In general, all finished project work (work that you consider "Done") must be ve
 
 #### Requirements Summary
 Whether a PR is created, these requirements must be met for work to be "Done" (refer to the `definition-of-done` skill for the full workflow):
-- The whole project must be fully linted with clean results. **You MUST verify that your linting commands cover all modified files, including those in hidden directories like `.gemini/`.**
+
+**For Code Changes:**
+- The whole project must be fully linted with clean results.
 - Any new code must be 100% tested (covering all branches and logic).
-  - UI workflows and user journeys must have comprehensive e2e tests.
-  - Use integration tests where appropriate.
-  - Use unit tests where appropriate.
 - The entire test suite must pass.
-- **The local CodeRabbit feedback loop must have been fully run.**
-- **Final Pre-Push Check**: Always run the `definition-of-done` skill (which executes `./.agents/skills/definition-of-done/scripts/verify_done.sh`) immediately before pushing to ensure no regressions or formatting issues were introduced by last-minute edits.
+- The local CodeRabbit feedback loop must have been fully run.
+
+**For Documentation, Rules, or Skills ONLY:**
+- If your changes are restricted to `.md` files, `.gemini/rules/`, or `.agents/skills/`, you may bypass the CodeRabbit loop and full test suite.
+- You MUST still run linting (`pnpm lint` and `pnpm lint:md`).
+- If linting applies automatic fixes to code files, you MUST then run the full verification suite (tests + CodeRabbit).
+
+#### Final Pre-Push Check
+Always run the `definition-of-done` skill (which executes `./.agents/skills/definition-of-done/scripts/verify_done.sh` for code or specialized checks for docs) immediately before pushing.
 
 **If creating a PR**: These requirements must be met before the PR is created.
 **If directly presenting work (no PR)**: These requirements must be met before work is presented.
