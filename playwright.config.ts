@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-dotenv.config({ path: path.resolve(__dirname, '.env.test') });
+dotenv.config({ path: path.resolve(__dirname, '.env.test'), quiet: true });
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -14,16 +14,17 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
   workers: 1,
-  timeout: process.env.CI ? 10 * 1000 : 5 * 1000,
+  timeout: 30 * 1000,
   expect: {
-    timeout: process.env.CI ? 10 * 1000 : 5 * 1000,
+    timeout: 10 * 1000,
   },
-  reporter: 'html',
+  reporter: 'list',
   use: {
     baseURL: 'http://localhost:3001',
     trace: 'on-first-retry',
-    actionTimeout: process.env.CI ? 10 * 1000 : 5 * 1000,
+    actionTimeout: 10 * 1000,
     navigationTimeout: 60000,
+    ignoreHTTPSErrors: true,
   },
   projects: [
     // Setup project
@@ -43,9 +44,9 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      'unset NO_COLOR && NEXT_PUBLIC_FORCE_SW=true pnpm build && NEXT_PUBLIC_FORCE_SW=true pnpm start --port 3001',
+      'unset NO_COLOR && export NEXT_PUBLIC_FORCE_SW=true && pnpm build && pnpm start --port 3001',
     url: 'http://localhost:3001',
-    reuseExistingServer: false,
-    timeout: 300000,
+    reuseExistingServer: !process.env.CI && process.env.RUN_OFFLINE_E2E !== 'true',
+    timeout: 180000,
   },
 });

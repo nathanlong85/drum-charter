@@ -6,7 +6,7 @@ import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
 
 interface SnippetPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function SnippetPage({ params }: SnippetPageProps) {

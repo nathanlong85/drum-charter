@@ -71,6 +71,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [ ] [Chore] Expand E2E test coverage for all core UI flows (#22)
 
 ### 🟢 Done
+- [x] [Chore] Standardize PWA architecture and Enable HTTPS/Offline Verification (#18) `✓`
 - [x] [Feature] Dark Mode Support (#4) `✓`
 - [x] [Chore] GitHub Actions CI Pipeline (Linting, Unit Tests, E2E) (#20) `✓`
 - [x] [Chore] CI Security Hardening (SHA pinning, least-privilege permissions, pinned Supabase CLI) (#20) `✓`
@@ -119,7 +120,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ## Project Rules & Collaborative Protocols
 
-To ensure high-quality collaboration and maintain the stability of the DrumCharter codebase, the following protocols are strictly enforced. **These take precedence over all other instructions and are now formally located in `.junie/guidelines.md`.**
+To ensure high-quality collaboration and maintain the stability of the DrumCharter codebase, the following protocols are strictly enforced. **These take precedence over all other instructions and are now formally located in `GEMINI.md` and `.gemini/rules/`.**
 
 ---
 

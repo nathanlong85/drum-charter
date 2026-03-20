@@ -23,6 +23,8 @@ const mockSong: SongChart = {
     title: 'Test Song',
     bpm: 120,
     timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+    metronomeEnabled: false,
+    metronomeVolume: 0.5,
   },
   sections: [
     {
@@ -119,6 +121,56 @@ describe('SongEditor', () => {
         expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
           expect.objectContaining({
             tags: expect.arrayContaining(['rock', 'jazz']),
+          }),
+        );
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('updates metronome enabled status', async () => {
+    render(<SongEditor initialSong={mockSong} />);
+
+    // Add grid first to make metronome controls available
+    const addGridButton = screen.getByText('+ ADD GRID');
+    fireEvent.click(addGridButton);
+
+    // Find metronome toggle (it's a button with aria-label)
+    const toggle = screen.getByLabelText('Enable Metronome');
+    fireEvent.click(toggle);
+
+    await waitFor(
+      () => {
+        expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
+          expect.objectContaining({
+            header: expect.objectContaining({ metronomeEnabled: true }),
+          }),
+        );
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('updates metronome volume', async () => {
+    render(<SongEditor initialSong={mockSong} />);
+
+    // Add grid first
+    const addGridButton = screen.getByText('+ ADD GRID');
+    fireEvent.click(addGridButton);
+
+    // Open metronome settings
+    const settingsButton = screen.getByLabelText('Metronome Settings');
+    fireEvent.click(settingsButton);
+
+    // Find volume slider
+    const slider = screen.getByTestId('metronome-volume-slider');
+    fireEvent.change(slider, { target: { value: '0.8' } });
+
+    await waitFor(
+      () => {
+        expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
+          expect.objectContaining({
+            header: expect.objectContaining({ metronomeVolume: 0.8 }),
           }),
         );
       },
