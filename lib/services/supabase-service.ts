@@ -1,16 +1,19 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient as createBrowserClient } from '@/lib/supabase/client';
 import type { Database, Json } from '../supabase/database.types';
-import type {
-  DrumCategory,
-  DrumInstrument,
-  GrooveGrid,
-  GrooveSnippet,
-  Notebook,
-  NotebookSection,
-  SongChart,
-  SongSection,
-  TimeSignature,
+import {
+  calculateTotalNotes,
+  type DrumCategory,
+  type DrumInstrument,
+  type DrumSymbol,
+  type GrooveGrid,
+  type GrooveSnippet,
+  getVelocityForSymbol,
+  type Notebook,
+  type NotebookSection,
+  type SongChart,
+  type SongSection,
+  type TimeSignature,
 } from '../types/groove';
 
 type DbSongChart = Database['public']['Tables']['song_charts']['Row'];
@@ -28,9 +31,17 @@ const fromJson = <T>(val: Json): T => val as unknown as T;
 function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
   if (!grid) return undefined;
 
+  const targetLength = calculateTotalNotes(grid);
+
   const instruments = (grid.instruments || []).map((inst: any) => {
-    // If already migrated, return as is
-    if (inst.category && inst.id && inst.presetVariety) {
+    // If already fully migrated, return as is
+    if (
+      inst.category &&
+      inst.id &&
+      inst.presetVariety &&
+      inst.notes?.length === targetLength &&
+      inst.velocities?.length === targetLength
+    ) {
       return inst as DrumInstrument;
     }
 
@@ -72,13 +83,33 @@ function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
       else presetVariety = 'Mid Tom';
     }
 
+    // Normalize notes to target length
+    const notes = Array(targetLength).fill('none');
+    for (let i = 0; i < Math.min(targetLength, (inst.notes || []).length); i++) {
+      notes[i] = inst.notes[i];
+    }
+
+    // Normalize velocities to target length
+    const velocities = Array(targetLength).fill(0);
+    for (let i = 0; i < targetLength; i++) {
+      if (inst.velocities && inst.velocities[i] !== undefined) {
+        velocities[i] = inst.velocities[i];
+      } else {
+        velocities[i] = getVelocityForSymbol(notes[i] as DrumSymbol);
+      }
+    }
+
     return {
-      id: inst.instrumentId || crypto.randomUUID?.() || Math.random().toString(36).substring(2),
+      id:
+        inst.id ||
+        inst.instrumentId ||
+        crypto.randomUUID?.() ||
+        Math.random().toString(36).substring(2),
       category,
       presetVariety,
-      customName: label,
-      notes: inst.notes || [],
-      velocities: inst.velocities,
+      customName: label || presetVariety,
+      notes,
+      velocities,
     } as DrumInstrument;
   });
 

@@ -103,10 +103,6 @@ export function useAudioPlayback({
     source.start(time);
   }, []);
 
-  const _getVelocityForSymbolInHook = useCallback((symbol: DrumSymbol): number => {
-    return getVelocityForSymbol(symbol);
-  }, []);
-
   const scheduleNote = useCallback(
     (step: number, time: number) => {
       // 1. Schedule Metronome if enabled
@@ -141,10 +137,8 @@ export function useAudioPlayback({
             symbol, // 1. Direct symbol (e.g. 'hi_hat_open')
             `${variety}_${symbol}`, // 2. variety + symbol (e.g. 'snare_rim_shot')
             `${category}_${symbol}`, // 3. category + symbol (e.g. 'snare_rim_shot')
-            `${variety}_standard`, // 4. variety default (e.g. 'snare_standard')
-            `${category}_standard`, // 5. category default (e.g. 'snare_standard')
-            variety, // 6. raw variety (e.g. 'snare')
-            category, // 7. raw category (e.g. 'snare')
+            variety, // 4. raw variety (e.g. 'snare')
+            category, // 5. raw category (e.g. 'snare')
           ];
 
           for (const cand of candidates) {
