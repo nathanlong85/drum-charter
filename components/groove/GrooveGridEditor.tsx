@@ -47,7 +47,6 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   const [localBpm, setLocalBpm] = useState(120);
 
   const bpm = parentBpm !== undefined ? parentBpm : localBpm;
-  const [_showMetronomeSettings, _setShowMetronomeSettings] = useState(false);
 
   const {
     isPlaying,

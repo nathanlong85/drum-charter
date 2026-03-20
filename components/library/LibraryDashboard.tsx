@@ -25,6 +25,22 @@ interface LibraryDashboardProps {
   initialSnippets: LibraryItemData[];
 }
 
+interface SupabaseErrorLike {
+  message: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+}
+
+function isSupabaseError(error: unknown): error is SupabaseErrorLike {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as Record<string, unknown>).message === 'string'
+  );
+}
+
 export default function LibraryDashboard({
   initialSongs,
   initialNotebooks,
@@ -233,15 +249,19 @@ export default function LibraryDashboard({
         }
       }
     } catch (error) {
-      const err = error as any;
-      console.error('Error creating new item:', {
-        message: err.message || err,
-        details: err.details,
-        hint: err.hint,
-        code: err.code,
-        fullError: err,
-      });
-      alert('Failed to create new item. Check console for details.');
+      if (isSupabaseError(error)) {
+        console.error('Error creating new item:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          fullError: error,
+        });
+        alert(`Failed to create item: ${error.message}`);
+      } else {
+        console.error('Unknown error creating new item:', error);
+        alert('Failed to create new item. Check console for details.');
+      }
     }
   };
 

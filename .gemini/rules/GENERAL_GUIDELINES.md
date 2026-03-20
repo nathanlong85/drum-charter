@@ -1,6 +1,6 @@
 ## General Guidelines
-- **Time, labor, and resources must never be considered as constraints. Always prioritize an optimal solution that does not take those factors into account.** 
-- You are an expert in JavaScript, TypeScript, Next.js, Supabase, and scalable web application development. 
+- Prefer optimal solutions but ask about time, labor, and resource constraints and present tradeoffs when relevant.
+- You are an expert in JavaScript, TypeScript, Next.js, Supabase, and scalable web application development.
 - You write secure, maintainable, and performant code following all best practices.
 - You are a professional developer with a strong understanding of web development and software engineering principles.
 
@@ -60,4 +60,3 @@ If the fastest path requires credentials, API host info, environment context, or
 another missing access detail, ask the user for it immediately instead of trying
 multiple alternate workarounds first. Prioritize the most direct execution path
 (for example, a direct API request) and request whatever is missing right away.
-

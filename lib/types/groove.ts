@@ -174,10 +174,11 @@ export function calculateTotalNotes(
 
 /**
  * Returns the default velocity for a given drum symbol.
+ * Reference: Multi-layer Velocity Support (#3)
  */
 export function getVelocityForSymbol(symbol: DrumSymbol): number {
-  if (symbol.includes('accent')) return 1.0;
-  if (symbol.includes('ghost')) return 0.3;
+  if (symbol.includes('accent')) return 1.1;
+  if (symbol.includes('ghost')) return 0.2;
   if (symbol === 'none') return 0;
   return 0.7; // Standard
 }

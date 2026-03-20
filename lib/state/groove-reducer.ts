@@ -70,8 +70,7 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
           const newVelocities = inst.velocities
             ? [...inst.velocities]
             : Array(newNotes.length).fill(0);
-          newVelocities[action.noteIndex] =
-            getVelocityForSymbol(action.symbol) ?? newVelocities[action.noteIndex];
+          newVelocities[action.noteIndex] = getVelocityForSymbol(action.symbol);
 
           return { ...inst, notes: newNotes, velocities: newVelocities };
         }),

@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient as createBrowserClient } from '@/lib/supabase/client';
-import type { Database } from '../supabase/database.types';
+import type { Database, Json } from '../supabase/database.types';
 import type {
   GrooveGrid,
   GrooveSnippet,
@@ -16,9 +16,9 @@ type DbNotebook = Database['public']['Tables']['notebooks']['Row'];
 type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row'];
 
 // Helper to safely cast domain types to Supabase JSON fields
-const toJson = <T>(val: T) => val as any;
+const toJson = <T>(val: T): Json => val as any;
 // Helper to safely cast Supabase JSON fields back to domain types
-const fromJson = <T>(val: any) => val as T;
+const fromJson = <T>(val: Json): T => val as any;
 
 const _SNIPPET_RETRY_DELAY_MS = 3000;
 
