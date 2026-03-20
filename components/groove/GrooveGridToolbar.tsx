@@ -81,7 +81,11 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           <input
             type="number"
             value={bpm}
-            onChange={(e) => onBpmChange(parseInt(e.target.value, 10) || 60)}
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10);
+              if (Number.isNaN(val)) return;
+              onBpmChange(Math.max(40, Math.min(300, val)));
+            }}
             className={borderedInputClass}
             min="40"
             max="300"
@@ -220,9 +224,11 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           <input
             type="number"
             value={state.timeSignature.beatsPerMeasure}
-            onChange={(e) =>
-              updateTimeSignature(parseInt(e.target.value, 10) || 1, state.timeSignature.beatValue)
-            }
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10);
+              if (Number.isNaN(val)) return;
+              updateTimeSignature(Math.max(1, val), state.timeSignature.beatValue);
+            }}
             className={`${borderedInputClass} w-12`}
             min="1"
           />

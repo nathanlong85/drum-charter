@@ -92,7 +92,15 @@ export default function LibraryDashboard({
         setSnippets(snippets.filter((s) => s.id !== id));
       }
     } catch (error) {
-      console.error('Error deleting item:', error);
+      if (isSupabaseError(error)) {
+        console.error('Error deleting item:', {
+          message: error.message,
+          details: error.details,
+          code: error.code,
+        });
+      } else {
+        console.error('Error deleting item:', error);
+      }
       alert('Failed to delete item.');
     }
   };
@@ -114,7 +122,15 @@ export default function LibraryDashboard({
       // Optional: redirect to the new item
       // window.location.href = `/${type}s/${duplicated.id}`;
     } catch (error) {
-      console.error('Error duplicating item:', error);
+      if (isSupabaseError(error)) {
+        console.error('Error duplicating item:', {
+          message: error.message,
+          details: error.details,
+          code: error.code,
+        });
+      } else {
+        console.error('Error duplicating item:', error);
+      }
       alert('Failed to duplicate item.');
     }
   };

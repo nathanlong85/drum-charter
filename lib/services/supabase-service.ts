@@ -16,9 +16,9 @@ type DbNotebook = Database['public']['Tables']['notebooks']['Row'];
 type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row'];
 
 // Helper to safely cast domain types to Supabase JSON fields
-const toJson = <T>(val: T): Json => val as any;
+const toJson = <T>(val: T): Json => val as unknown as Json;
 // Helper to safely cast Supabase JSON fields back to domain types
-const fromJson = <T>(val: Json): T => val as any;
+const fromJson = <T>(val: Json): T => val as unknown as T;
 
 const _SNIPPET_RETRY_DELAY_MS = 3000;
 

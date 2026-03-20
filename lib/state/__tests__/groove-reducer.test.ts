@@ -25,7 +25,7 @@ describe('grooveReducer', () => {
     // Toggle 2: Accent
     const state2 = grooveReducer(state1, action);
     expect(state2.instruments[0].notes[0]).toBe('accent');
-    expect(state2.instruments[0].velocities?.[0]).toBe(1.1);
+    expect(state2.instruments[0].velocities?.[0]).toBe(1.2);
 
     // Toggle 3: Ghost
     const state3 = grooveReducer(state2, action);

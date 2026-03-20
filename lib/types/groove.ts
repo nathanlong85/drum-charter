@@ -62,8 +62,8 @@ export interface InstrumentGrid {
    */
   notes: DrumSymbol[];
   /**
-   * Optional velocities for each note (0-1).
-   * If not provided, defaults to 1.0 (accent), 0.7 (standard), or 0.3 (ghost) based on symbol.
+   * Optional velocities for each note (typically 0-1.0, but can go up to 1.2 for accents).
+   * If not provided, defaults to 1.2 (accent), 0.7 (standard), or 0.2 (ghost) based on symbol.
    */
   velocities?: number[];
 }
@@ -177,7 +177,7 @@ export function calculateTotalNotes(
  * Reference: Multi-layer Velocity Support (#3)
  */
 export function getVelocityForSymbol(symbol: DrumSymbol): number {
-  if (symbol.includes('accent')) return 1.1;
+  if (symbol.includes('accent')) return 1.2;
   if (symbol.includes('ghost')) return 0.2;
   if (symbol === 'none') return 0;
   return 0.7; // Standard
