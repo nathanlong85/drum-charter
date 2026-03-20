@@ -9,16 +9,24 @@ This skill automates the verification process for DrumCharter, ensuring that all
 
 ## Workflow
 
-When you think you've finished a task (feature, bug fix, or documentation update), follow these steps:
+When you think you've finished a task (feature, bug fix, or documentation update), follow these steps in order:
 
-### 1. Run Automated Verification
-Execute the bundled verification script. This script runs Biome linting, Markdown linting, Vitest unit tests, and Playwright E2E tests.
+### 1. CodeRabbit Feedback Loop
+Before final verification, you MUST complete the local CodeRabbit feedback loop as defined in `CODE_REVIEW_PROTOCOL.md`.
+- Activate the `code-review` skill.
+- Run `cr review --prompt-only --base main`.
+- Address feedback following the "Structured Feedback Review" (3-run state machine).
+- The loop is finished only when no `Critical` or `Major` issues remain or the 3-run limit is reached.
+
+### 2. Run Automated Verification
+Once the CodeRabbit loop is complete, execute the bundled verification script to ensure no regressions or formatting issues were introduced.
+This script runs Biome linting, Markdown linting, Vitest unit tests, and Playwright E2E tests.
 
 ```bash
 ./.agents/skills/definition-of-done/scripts/verify_done.sh
 ```
 
-### 2. Manual Checks
+### 3. Manual Checks
 In addition to the automated script, manually verify the following:
 
 - **100% Test Coverage**: Ensure all new code paths have corresponding unit or E2E tests.
@@ -26,8 +34,11 @@ In addition to the automated script, manually verify the following:
 - **No Residual Debugging**: Ensure no `console.log` or temporary debugging code remains.
 - **Type Safety**: Confirm that there are no new TypeScript errors (run `pnpm tsc` if unsure).
 
-### 3. Reporting
-Once all checks pass, report to the user that the task is "Done" and provide a brief summary of what was verified.
+### 4. Reporting
+Once all checks pass, report to the user that the task is "Done" and provide a brief summary of:
+- CodeRabbit loop results.
+- Verification script outcome.
+- Any manual checks performed.
 
 ## Resources
 

@@ -5,17 +5,17 @@
 - You are a professional developer with a strong understanding of web development and software engineering principles.
 
 ### Definition of "Done"
-In general, all finished project work (work that you consider "Done") must be in an up-to-date PR before being presented to the user, unless otherwise specified.
+In general, all finished project work (work that you consider "Done") must be verified using the **`definition-of-done` skill** and be in an up-to-date PR before being presented to the user, unless otherwise specified.
 
-#### Requirements
-Whether a PR is created, these requirements must be met for work to be "Done":
+#### Requirements Summary
+Whether a PR is created, these requirements must be met for work to be "Done" (refer to the `definition-of-done` skill for the full workflow):
 - The whole project must be fully linted with clean results. **You MUST verify that your linting commands cover all modified files, including those in hidden directories like `.gemini/`.**
 - Any new code must be 100% tested (covering all branches and logic).
   - UI workflows and user journeys must have comprehensive e2e tests.
   - Use integration tests where appropriate.
   - Use unit tests where appropriate.
 - The entire test suite must pass.
-- The local CodeRabbit feedback loop must have been fully run.
+- **The local CodeRabbit feedback loop must have been fully run.**
 - **Final Pre-Push Check**: Always run the `definition-of-done` skill (which executes `./.agents/skills/definition-of-done/scripts/verify_done.sh`) immediately before pushing to ensure no regressions or formatting issues were introduced by last-minute edits.
 
 **If creating a PR**: These requirements must be met before the PR is created.
