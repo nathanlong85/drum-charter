@@ -1,4 +1,4 @@
-## 📂 GITHUB COMPONENT ACCESS PROTOCOL
+# 📂 GITHUB COMPONENT ACCESS PROTOCOL
 These are the access protocols for accessing GitHub components. If there is a better way than what is listed here,
 please let the user know and we will adjust these. Otherwise, please follow the instructions below.
 

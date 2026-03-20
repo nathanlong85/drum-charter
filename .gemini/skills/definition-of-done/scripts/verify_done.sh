@@ -29,7 +29,7 @@ fi
 
 # 3. E2E Tests (Scoped to project if possible, otherwise full)
 echo "🎭 Running Playwright E2E tests (chromium)..."
-pnpm test:e2e --project=chromium
+RUN_OFFLINE_E2E=true pnpm test:e2e --project=chromium
 if [ $? -ne 0 ]; then
   echo "❌ E2E tests failed."
   exit 1
