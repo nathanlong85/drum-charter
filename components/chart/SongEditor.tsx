@@ -4,7 +4,12 @@ import { debounce } from 'lodash';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
-import type { SongChart, SongSection, SongSubSection } from '@/lib/types/groove';
+import {
+  createDefaultDrumInstruments,
+  type SongChart,
+  type SongSection,
+  type SongSubSection,
+} from '@/lib/types/groove';
 
 type SongAction =
   | { type: 'SET_SONG'; song: SongChart }
@@ -446,23 +451,11 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                               timeSignature: state.header.timeSignature,
                               resolution: 16,
                               measures: 1,
-                              instruments: [
-                                {
-                                  instrumentId: 'kick',
-                                  label: 'Kick',
-                                  notes: Array(16).fill('none'),
-                                },
-                                {
-                                  instrumentId: 'snare',
-                                  label: 'Snare',
-                                  notes: Array(16).fill('none'),
-                                },
-                                {
-                                  instrumentId: 'hihat',
-                                  label: 'Hi-Hat',
-                                  notes: Array(16).fill('none'),
-                                },
-                              ],
+                              instruments: createDefaultDrumInstruments({
+                                timeSignature: state.header.timeSignature,
+                                resolution: 16,
+                                measures: 1,
+                              }),
                             },
                           },
                         })

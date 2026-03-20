@@ -8,9 +8,30 @@ const mockGrid: GrooveGrid = {
   resolution: 16,
   measures: 1,
   instruments: [
-    { instrumentId: 'hh', label: 'Hi-Hat', notes: Array(16).fill('none') },
-    { instrumentId: 'sn', label: 'Snare', notes: Array(16).fill('none') },
-    { instrumentId: 'bd', label: 'Bass', notes: Array(16).fill('none') },
+    {
+      id: 'hh',
+      category: 'hi-hat',
+      presetVariety: 'Hi-Hat',
+      customName: 'Hi-Hat',
+      notes: Array(16).fill('none'),
+      velocities: Array(16).fill(0),
+    },
+    {
+      id: 'sn',
+      category: 'snare',
+      presetVariety: 'Snare',
+      customName: 'Snare',
+      notes: Array(16).fill('none'),
+      velocities: Array(16).fill(0),
+    },
+    {
+      id: 'bd',
+      category: 'kick',
+      presetVariety: 'Kick',
+      customName: 'Bass',
+      notes: Array(16).fill('none'),
+      velocities: Array(16).fill(0),
+    },
   ],
 };
 

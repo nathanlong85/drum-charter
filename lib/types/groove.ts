@@ -1,4 +1,9 @@
 /**
+ * Supported drum categories for grouping and symbol filtering.
+ */
+export type DrumCategory = 'kick' | 'snare' | 'tom' | 'crash' | 'ride' | 'hi-hat' | 'misc';
+
+/**
  * Supported drum hit types (symbols).
  * We can expand this as we integrate the spreadsheet of symbols.
  */
@@ -52,20 +57,60 @@ export interface TimeSignature {
 
 /**
  * Represents a single instrument's sequence in the grid.
+ * Transitioned from InstrumentGrid to DrumInstrument (#27).
  */
-export interface InstrumentGrid {
-  instrumentId: string;
-  label: string;
+export interface DrumInstrument {
+  id: string; // Unique UUID for the track/row
+  category: DrumCategory;
+  presetVariety: string; // The specific sample set (e.g. "Floor Tom")
+  customName: string; // User-defined label
   /**
    * notes array length = (beatsPerMeasure * (resolution / beatValue)) * measures
    * For 4/4 at 16th resolution, 1 measure: (4 * (16 / 4)) * 1 = 16 notes.
    */
   notes: DrumSymbol[];
   /**
-   * Optional velocities for each note (typically 0-1.0, but can go up to 1.2 for accents).
-   * If not provided, defaults to 1.2 (accent), 0.7 (standard), or 0.2 (ghost) based on symbol.
+   * Velocities for each note (typically 0-1.0, but can go up to 1.2 for accents).
    */
   velocities?: number[];
+}
+
+/**
+ * Helper to create a single instrument with correctly sized and optionally initialized arrays.
+ */
+export function createInstrument(
+  grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'>,
+  id: string,
+  category: DrumCategory,
+  presetVariety: string,
+  customName: string,
+  initialNote?: DrumSymbol,
+): DrumInstrument {
+  const totalNotes = calculateTotalNotes(grid);
+  const notes = Array(totalNotes).fill(initialNote || 'none');
+  const velocities = notes.map((n) => getVelocityForSymbol(n));
+
+  return {
+    id,
+    category,
+    presetVariety,
+    customName,
+    notes,
+    velocities,
+  };
+}
+
+/**
+ * Helper to create a standard set of instruments for a new grid.
+ */
+export function createDefaultDrumInstruments(
+  grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'>,
+): DrumInstrument[] {
+  return [
+    createInstrument(grid, 'hihat', 'hi-hat', 'Hi-Hat', 'Hi-Hat'),
+    createInstrument(grid, 'snare', 'snare', 'Snare', 'Snare'),
+    createInstrument(grid, 'kick', 'kick', 'Kick', 'Kick'),
+  ];
 }
 
 /**
@@ -76,7 +121,7 @@ export interface GrooveGrid {
   timeSignature: TimeSignature;
   resolution: BeatResolution;
   measures: number;
-  instruments: InstrumentGrid[];
+  instruments: DrumInstrument[];
 }
 
 /**
@@ -194,4 +239,69 @@ export function getNextSymbol(current: string): DrumSymbol {
     ghost: 'none',
   };
   return nextMap[current] || 'none';
+}
+
+/**
+ * Provides a list of applicable symbols for a given drum category.
+ * Used for SymbolPicker filtering (#29).
+ */
+export function getSymbolsForCategory(category: DrumCategory): DrumSymbol[] {
+  const baseSymbols: DrumSymbol[] = ['none', 'standard', 'standard_opt', 'accent', 'accent_opt'];
+
+  switch (category) {
+    case 'kick':
+      return baseSymbols;
+    case 'snare':
+      return [
+        ...baseSymbols,
+        'buzz',
+        'buzz_opt',
+        'cross_stick',
+        'cross_stick_opt',
+        'rim_shot',
+        'rim_shot_opt',
+        'ghost',
+        'ghost_opt',
+        'double',
+        'double_opt',
+        'flam',
+        'flam_opt',
+      ];
+    case 'tom':
+    case 'misc':
+      return [...baseSymbols, 'ghost', 'ghost_opt', 'double', 'double_opt', 'flam', 'flam_opt'];
+    case 'crash':
+    case 'ride':
+      return [
+        ...baseSymbols,
+        'ghost',
+        'ghost_opt',
+        'double',
+        'double_opt',
+        'flam',
+        'flam_opt',
+        'cymbal_bell',
+        'cymbal_bell_opt',
+        'cymbal_choke',
+        'cymbal_choke_opt',
+      ];
+    case 'hi-hat':
+      return [
+        'none',
+        'standard',
+        'standard_opt',
+        'hi_hat_closed',
+        'hi_hat_closed_opt',
+        'hi_hat_loose',
+        'hi_hat_loose_opt',
+        'hi_hat_open',
+        'hi_hat_open_opt',
+        'hi_hat_pedal_chick',
+        'hi_hat_pedal_chick_opt',
+        'accent',
+        'accent_opt',
+      ];
+    default:
+      return baseSymbols;
+  }
 }

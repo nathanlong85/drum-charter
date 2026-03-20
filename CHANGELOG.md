@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0-alpha] - 2026-03-20
+
+### Added
+- **Drum-Aware Data Model**: Transitioned the Groove Grid from a flat `instrumentId` to a structured `DrumInstrument` object, including `category`, `presetVariety`, and `customName`.
+- **Runtime Migration Layer**: Implemented a robust migration system in `supabaseService` to automatically upgrade legacy JSON grid data to the new format upon retrieval.
+- **Category-Specific Symbols**: Added `getSymbolsForCategory` helper to support filtered symbol selection based on drum type (e.g., Kick vs. Snare).
+- **Enhanced Type Safety**: Updated `GrooveAction`, `GrooveGrid`, and all editor components to use the new `DrumInstrument` and `DrumCategory` types.
+- **UUID for Tracks**: Each instrument track now has a unique `id` for more reliable state tracking and UI rendering.
+
+### Changed
+- **Audio Engine Refinement**: Updated `useAudioPlayback` to use `category` and `presetVariety` for sample mapping, improving fallback logic and accuracy.
+- **Editor UI Updates**: Standardized default instrument creation across `SongEditor`, `NotebookEditor`, and `SnippetEditor` to use the new structured model.
+
 ## [0.1.12-alpha] - 2026-03-18
 
 ### Added

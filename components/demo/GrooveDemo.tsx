@@ -3,21 +3,20 @@
 import { useReducer } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { grooveReducer } from '@/lib/state/groove-reducer';
-import type { GrooveGrid } from '@/lib/types/groove';
+import { createInstrument, type GrooveGrid } from '@/lib/types/groove';
 
-const INITIAL_DEMO_GRID: GrooveGrid = {
+const DEMO_META = {
   timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
   resolution: 16,
   measures: 1,
+} as const;
+
+const INITIAL_DEMO_GRID: GrooveGrid = {
+  ...DEMO_META,
   instruments: [
+    createInstrument(DEMO_META, 'hh', 'hi-hat', 'Hi-Hat', 'Hi-Hat', 'hi_hat_closed'),
     {
-      instrumentId: 'hh',
-      label: 'Hi-Hat',
-      notes: Array(16).fill('hi_hat_closed'),
-    },
-    {
-      instrumentId: 'sn',
-      label: 'Snare',
+      ...createInstrument(DEMO_META, 'sn', 'snare', 'Snare', 'Snare'),
       notes: [
         'none',
         'none',
@@ -36,10 +35,10 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
         'none',
         'none',
       ],
+      velocities: [0, 0, 0, 0, 0.7, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 0, 0],
     },
     {
-      instrumentId: 'bd',
-      label: 'Bass',
+      ...createInstrument(DEMO_META, 'bd', 'kick', 'Kick', 'Bass'),
       notes: [
         'standard',
         'none',
@@ -58,6 +57,7 @@ const INITIAL_DEMO_GRID: GrooveGrid = {
         'none',
         'none',
       ],
+      velocities: [0.7, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 0, 0, 0, 0, 0, 0],
     },
   ],
 };

@@ -4,7 +4,12 @@ import { debounce } from 'lodash';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
-import type { GrooveGrid, Notebook, NotebookSection } from '@/lib/types/groove';
+import {
+  createDefaultDrumInstruments,
+  type GrooveGrid,
+  type Notebook,
+  type NotebookSection,
+} from '@/lib/types/groove';
 import { formatDateTime } from '@/lib/utils/format';
 
 type NotebookAction =
@@ -282,23 +287,11 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
                         timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
                         resolution: 16,
                         measures: 1,
-                        instruments: [
-                          {
-                            instrumentId: 'hh',
-                            label: 'Hi-Hat',
-                            notes: Array(16).fill('none'),
-                          },
-                          {
-                            instrumentId: 'sn',
-                            label: 'Snare',
-                            notes: Array(16).fill('none'),
-                          },
-                          {
-                            instrumentId: 'bd',
-                            label: 'Bass',
-                            notes: Array(16).fill('none'),
-                          },
-                        ],
+                        instruments: createDefaultDrumInstruments({
+                          timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+                          resolution: 16,
+                          measures: 1,
+                        }),
                       },
                     })
                   }

@@ -37,7 +37,7 @@ test.describe('Notebook Editor', () => {
     // Interact with the grid in the second section
     const grid = secondSection.getByTestId('groove-grid');
     await expect(grid).toBeVisible();
-    const kickRow = grid.getByTestId('instrument-row-bass'); // Notebook initial grid uses 'Bass' label
+    const kickRow = grid.getByTestId('instrument-row-kick'); // Factory uses 'Kick' label
     await kickRow.getByTestId('note-cell').first().click();
 
     await waitForSave(page);
@@ -58,7 +58,7 @@ test.describe('Notebook Editor', () => {
     const reloadedGrid = page.locator('div.relative.group').nth(1).getByTestId('groove-grid');
     await expect(
       reloadedGrid
-        .getByTestId('instrument-row-bass')
+        .getByTestId('instrument-row-kick')
         .getByTestId('note-cell')
         .first()
         .locator('img'),

@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
+import { type DrumSymbol, type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
 
 interface UseAudioPlaybackProps {
   grid: GrooveGrid;
@@ -9,23 +9,6 @@ interface UseAudioPlaybackProps {
   onStepChange?: (step: number) => void;
   initialMetronomeEnabled?: boolean;
   initialMetronomeVolume?: number;
-}
-
-export function getVelocityForSymbol(symbol: DrumSymbol): number {
-  // Mapping for Multi-layer Velocity Support (#3)
-  // Accents: 1.1 (pops over the mix)
-  // Standard: 0.7 (baseline)
-  // Ghost: 0.2 (subtle)
-
-  if (symbol === 'accent') return 1.1;
-  if (symbol === 'ghost') return 0.2;
-  if (symbol === 'standard') return 0.7;
-  if (symbol === 'none') return 0;
-
-  // Handle _opt variants and other symbols
-  if (symbol.includes('accent')) return 1.1;
-  if (symbol.includes('ghost')) return 0.2;
-  return 0.7; // Default for everything else
 }
 
 export function useAudioPlayback({
@@ -73,7 +56,6 @@ export function useAudioPlayback({
         tom_high: '/audio/samples/drum-kit/default/tom_high.wav',
         tom_medium: '/audio/samples/drum-kit/default/tom_medium.wav',
         tom_floor: '/audio/samples/drum-kit/default/tom_floor.wav',
-        standard: '/audio/samples/drum-kit/default/snare.wav', // Fallback
         click_high: '/audio/samples/metronome/click_high.wav',
         click_low: '/audio/samples/metronome/click_low.wav',
       };
@@ -121,10 +103,6 @@ export function useAudioPlayback({
     source.start(time);
   }, []);
 
-  const _getVelocityForSymbolInHook = useCallback((symbol: DrumSymbol): number => {
-    return getVelocityForSymbol(symbol);
-  }, []);
-
   const scheduleNote = useCallback(
     (step: number, time: number) => {
       // 1. Schedule Metronome if enabled
@@ -145,42 +123,41 @@ export function useAudioPlayback({
       grid.instruments.forEach((inst) => {
         const symbol = inst.notes[step];
         if (symbol && symbol !== 'none') {
-          const instId = inst.instrumentId.toLowerCase();
+          const category = inst.category.toLowerCase();
+          const variety = inst.presetVariety.toLowerCase().replace(/\s+/g, '_');
 
           // Determine velocity: explicit value from inst.velocities, or derived from symbol
-          let velocity = _getVelocityForSymbolInHook(symbol);
+          let velocity = getVelocityForSymbol(symbol);
           if (inst.velocities && inst.velocities[step] !== undefined) {
             velocity = inst.velocities[step];
           }
 
-          // 1. Try symbol-specific sound first (e.g., if "rim_shot" is a global sample)
-          if (samplesRef.current.has(symbol)) {
-            playSample(symbol, time, velocity);
-            return;
+          // Search strategy for samples:
+          const candidates = [
+            symbol, // 1. Direct symbol (e.g. 'hi_hat_open')
+            `${variety}_${symbol}`, // 2. variety + symbol (e.g. 'snare_rim_shot')
+            `${category}_${symbol}`, // 3. category + symbol (e.g. 'snare_rim_shot')
+            variety, // 4. raw variety (e.g. 'snare')
+            category, // 5. raw category (e.g. 'snare')
+          ];
+
+          for (const cand of candidates) {
+            if (samplesRef.current.has(cand as DrumSymbol)) {
+              playSample(cand, time, velocity);
+              return;
+            }
           }
 
-          // 2. Try instrument + symbol combination (e.g., snare_rim_shot)
-          const combinedKey = `${instId}_${symbol}`;
-          if (samplesRef.current.has(combinedKey as DrumSymbol)) {
-            playSample(combinedKey, time, velocity);
-            return;
-          }
-
-          // 3. Fallback to instrument default
-          if (instId.includes('kick') || instId.includes('bass')) {
+          // Special hardcoded fallbacks for 'kick' and other common names if not caught by simple rules
+          if (category === 'kick' || category === 'bass') {
             playSample('kick', time, velocity);
-          } else if (instId.includes('snare')) {
+          } else if (category === 'snare') {
             playSample('snare', time, velocity);
-          } else if (instId.includes('hi_hat') || instId.includes('hat')) {
+          } else if (category === 'hi-hat') {
             playSample('hi_hat_closed', time, velocity);
-          } else if (instId.includes('ride')) {
-            playSample('ride', time, velocity);
-          } else if (instId.includes('crash')) {
-            playSample('crash', time, velocity);
-          } else if (instId.includes('tom')) {
-            if (instId.includes('high')) playSample('tom_high', time, velocity);
-            else if (instId.includes('mid')) playSample('tom_medium', time, velocity);
-            else if (instId.includes('floor')) playSample('tom_floor', time, velocity);
+          } else if (category === 'tom') {
+            if (variety.includes('high')) playSample('tom_high', time, velocity);
+            else if (variety.includes('floor')) playSample('tom_floor', time, velocity);
             else playSample('tom_medium', time, velocity);
           }
         }
@@ -191,14 +168,7 @@ export function useAudioPlayback({
         onStepChange(step);
       }
     },
-    [
-      grid,
-      metronomeEnabled,
-      metronomeVolume,
-      onStepChange,
-      playSample,
-      _getVelocityForSymbolInHook,
-    ],
+    [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample],
   );
 
   const nextNote = useCallback(() => {

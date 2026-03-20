@@ -63,8 +63,10 @@ describe('Theme Class Verification', () => {
       measures: 1,
       instruments: [
         {
-          instrumentId: 'hihat',
-          label: 'Hi-Hat',
+          id: 'hihat',
+          category: 'hi-hat',
+          presetVariety: 'Hi-Hat',
+          customName: 'Hi-Hat',
           notes: Array(16).fill('none'),
           velocities: Array(16).fill(0),
         },

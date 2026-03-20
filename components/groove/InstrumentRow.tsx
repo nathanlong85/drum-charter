@@ -1,23 +1,18 @@
 'use client';
 
 import type React from 'react';
-import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
+import { type DrumInstrument, type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
 import { NoteCell } from './NoteCell';
 
 interface InstrumentRowProps {
-  label: string;
-  instrumentId: string;
-  notes: DrumSymbol[];
-  velocities?: number[];
+  instrument: DrumInstrument;
   grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'>;
   onNoteClick: (index: number) => void;
   onNoteContextMenu: (index: number, e: React.MouseEvent) => void;
 }
 
 export const InstrumentRow: React.FC<InstrumentRowProps> = ({
-  label,
-  notes,
-  velocities,
+  instrument,
   grid,
   onNoteClick,
   onNoteContextMenu,
@@ -29,16 +24,21 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   return (
     <div
       className="flex border-b border-gray-300 dark:border-gray-700"
-      data-testid={`instrument-row-${label.toLowerCase().replace(/\s+/g, '-')}`}
+      data-testid={`instrument-row-${instrument.customName.toLowerCase().replace(/\s+/g, '-')}`}
     >
       <div className="w-24 h-8 flex items-center px-2 bg-gray-50 dark:bg-gray-900 font-medium text-sm text-gray-700 dark:text-gray-300 border-r border-gray-400 dark:border-gray-600 select-none">
-        {label}
+        <span className="truncate" title={instrument.customName}>
+          {instrument.customName}
+        </span>
       </div>
       <div className="flex">
-        {notes.map((symbol, i) => {
+        {instrument.notes.map((symbol, i) => {
           const isBeat = i % notesPerBeat === 0;
           const isMeasureBoundary = (i + 1) % totalNotesPerMeasure === 0;
-          const velocity = velocities ? velocities[i] : undefined;
+          const velocity =
+            instrument.velocities && instrument.velocities[i] !== undefined
+              ? instrument.velocities[i]
+              : getVelocityForSymbol(symbol);
 
           return (
             <NoteCell

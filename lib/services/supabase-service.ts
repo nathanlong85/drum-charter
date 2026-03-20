@@ -1,14 +1,19 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient as createBrowserClient } from '@/lib/supabase/client';
 import type { Database, Json } from '../supabase/database.types';
-import type {
-  GrooveGrid,
-  GrooveSnippet,
-  Notebook,
-  NotebookSection,
-  SongChart,
-  SongSection,
-  TimeSignature,
+import {
+  calculateTotalNotes,
+  type DrumCategory,
+  type DrumInstrument,
+  type DrumSymbol,
+  type GrooveGrid,
+  type GrooveSnippet,
+  getVelocityForSymbol,
+  type Notebook,
+  type NotebookSection,
+  type SongChart,
+  type SongSection,
+  type TimeSignature,
 } from '../types/groove';
 
 type DbSongChart = Database['public']['Tables']['song_charts']['Row'];
@@ -19,6 +24,100 @@ type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row'];
 const toJson = <T>(val: T): Json => val as unknown as Json;
 // Helper to safely cast Supabase JSON fields back to domain types
 const fromJson = <T>(val: Json): T => val as unknown as T;
+
+/**
+ * Migration helper to transition old InstrumentGrid data to DrumInstrument (#27).
+ */
+function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
+  if (!grid) return undefined;
+
+  const targetLength = calculateTotalNotes(grid);
+
+  const instruments = (grid.instruments || []).map((inst: any) => {
+    // If already fully migrated, return as is
+    if (
+      inst.category &&
+      inst.id &&
+      inst.presetVariety &&
+      inst.notes?.length === targetLength &&
+      inst.velocities?.length === targetLength
+    ) {
+      return inst as DrumInstrument;
+    }
+
+    // Migration mapping
+    const instrumentId = (inst.instrumentId || '').toLowerCase();
+    const label = inst.label || '';
+
+    let category: DrumCategory = 'misc';
+    let presetVariety = 'Misc';
+
+    if (
+      instrumentId.includes('kick') ||
+      instrumentId.includes('bd') ||
+      instrumentId.includes('bass')
+    ) {
+      category = 'kick';
+      presetVariety = 'Kick';
+    } else if (instrumentId.includes('snare') || instrumentId.includes('sn')) {
+      category = 'snare';
+      presetVariety = 'Snare';
+    } else if (
+      instrumentId.includes('hi_hat') ||
+      instrumentId.includes('hh') ||
+      instrumentId.includes('hat')
+    ) {
+      category = 'hi-hat';
+      presetVariety = 'Hi-Hat';
+    } else if (instrumentId.includes('ride')) {
+      category = 'ride';
+      presetVariety = 'Ride';
+    } else if (instrumentId.includes('crash')) {
+      category = 'crash';
+      presetVariety = 'Crash';
+    } else if (instrumentId.includes('tom')) {
+      category = 'tom';
+      if (instrumentId.includes('high')) presetVariety = 'High Tom';
+      else if (instrumentId.includes('mid')) presetVariety = 'Mid Tom';
+      else if (instrumentId.includes('floor')) presetVariety = 'Floor Tom';
+      else presetVariety = 'Mid Tom';
+    }
+
+    // Normalize notes to target length
+    const notes = Array(targetLength).fill('none');
+    for (let i = 0; i < Math.min(targetLength, (inst.notes || []).length); i++) {
+      notes[i] = inst.notes[i];
+    }
+
+    // Normalize velocities to target length
+    const velocities = Array(targetLength).fill(0);
+    for (let i = 0; i < targetLength; i++) {
+      if (inst.velocities && inst.velocities[i] !== undefined) {
+        velocities[i] = inst.velocities[i];
+      } else {
+        velocities[i] = getVelocityForSymbol(notes[i] as DrumSymbol);
+      }
+    }
+
+    return {
+      id:
+        inst.id ||
+        inst.instrumentId ||
+        crypto.randomUUID?.() ||
+        Math.random().toString(36).substring(2),
+      category,
+      presetVariety,
+      customName: label || presetVariety,
+      notes,
+      velocities,
+    } as DrumInstrument;
+  });
+
+  return {
+    ...grid,
+    instruments,
+  };
+}
 
 const _SNIPPET_RETRY_DELAY_MS = 3000;
 
@@ -144,6 +243,15 @@ export const supabaseService = {
     }
 
     // Map DB row to SongChart interface
+    const sections = fromJson<SongSection[]>(data.sections).map((s) => ({
+      ...s,
+      grid: s.grid ? migrateGrooveGrid(s.grid) : undefined,
+      subSections: s.subSections?.map((ss) => ({
+        ...ss,
+        grid: ss.grid ? migrateGrooveGrid(ss.grid) : undefined,
+      })),
+    }));
+
     return {
       id: data.id,
       header: {
@@ -153,7 +261,7 @@ export const supabaseService = {
         metronomeEnabled: !!data.metronome_enabled,
         metronomeVolume: data.metronome_volume ?? 0.5,
       },
-      sections: fromJson<SongSection[]>(data.sections),
+      sections,
       tags: data.tags || [],
       userId: data.user_id,
       isPublic: !!data.is_public,
@@ -222,10 +330,15 @@ export const supabaseService = {
       throw new Error('Notebook not found');
     }
 
+    const sections = fromJson<NotebookSection[]>(data.sections).map((s) => ({
+      ...s,
+      grid: s.grid ? migrateGrooveGrid(s.grid) : undefined,
+    }));
+
     return {
       id: data.id,
       title: data.title,
-      sections: fromJson<NotebookSection[]>(data.sections),
+      sections,
       tags: data.tags || [],
       userId: data.user_id,
       isPublic: !!data.is_public,
@@ -414,7 +527,11 @@ export const supabaseService = {
       throw new Error('Groove snippet not found');
     }
 
-    const gridData = fromJson<GrooveGrid>(data.grid_data);
+    const gridData = migrateGrooveGrid(fromJson<GrooveGrid>(data.grid_data));
+
+    if (!gridData) {
+      throw new Error('Invalid grid data in groove snippet');
+    }
 
     return {
       id: data.id,
