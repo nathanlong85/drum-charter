@@ -62,8 +62,8 @@ export interface InstrumentGrid {
    */
   notes: DrumSymbol[];
   /**
-   * Optional velocities for each note (0-1).
-   * If not provided, defaults to 1.0 (accent), 0.7 (standard), or 0.3 (ghost) based on symbol.
+   * Optional velocities for each note (typically 0-1.0, but can go up to 1.2 for accents).
+   * If not provided, defaults to 1.2 (accent), 0.7 (standard), or 0.2 (ghost) based on symbol.
    */
   velocities?: number[];
 }
@@ -170,4 +170,28 @@ export function calculateTotalNotes(
   const { timeSignature, resolution, measures } = grid;
   // Formula: (beatsPerMeasure * (resolution / beatValue)) * measures
   return timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures;
+}
+
+/**
+ * Returns the default velocity for a given drum symbol.
+ * Reference: Multi-layer Velocity Support (#3)
+ */
+export function getVelocityForSymbol(symbol: DrumSymbol): number {
+  if (symbol.includes('accent')) return 1.2;
+  if (symbol.includes('ghost')) return 0.2;
+  if (symbol === 'none') return 0;
+  return 0.7; // Standard
+}
+
+/**
+ * Returns the next symbol in the cycle for a basic click toggle.
+ */
+export function getNextSymbol(current: string): DrumSymbol {
+  const nextMap: Record<string, DrumSymbol> = {
+    none: 'standard',
+    standard: 'accent',
+    accent: 'ghost',
+    ghost: 'none',
+  };
+  return nextMap[current] || 'none';
 }

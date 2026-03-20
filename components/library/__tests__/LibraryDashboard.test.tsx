@@ -61,9 +61,7 @@ describe('LibraryDashboard Creation Flow', () => {
           fullError: mockError,
         }),
       );
-      expect(alertMock).toHaveBeenCalledWith(
-        'Failed to create new item. Check console for details.',
-      );
+      expect(alertMock).toHaveBeenCalledWith('Failed to create item: Supabase Error');
     });
 
     alertMock.mockRestore();

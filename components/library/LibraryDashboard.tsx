@@ -10,10 +10,36 @@ const supabase = createClient();
 
 type ItemType = 'song' | 'notebook' | 'snippet';
 
+export interface LibraryItemData {
+  id: string;
+  title: string;
+  bpm?: number | null;
+  tags?: string[] | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  createdAt?: string | null;
+}
+
 interface LibraryDashboardProps {
-  initialSongs: any[];
-  initialNotebooks: any[];
-  initialSnippets: any[];
+  initialSongs: LibraryItemData[];
+  initialNotebooks: LibraryItemData[];
+  initialSnippets: LibraryItemData[];
+}
+
+interface SupabaseErrorLike {
+  message: string;
+  details?: string;
+  hint?: string;
+  code?: string;
+}
+
+function isSupabaseError(error: unknown): error is SupabaseErrorLike {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as Record<string, unknown>).message === 'string'
+  );
 }
 
 export default function LibraryDashboard({
@@ -67,7 +93,15 @@ export default function LibraryDashboard({
         setSnippets(snippets.filter((s) => s.id !== id));
       }
     } catch (error) {
-      console.error('Error deleting item:', error);
+      if (isSupabaseError(error)) {
+        console.error('Error deleting item:', {
+          message: error.message,
+          details: error.details,
+          code: error.code,
+        });
+      } else {
+        console.error('Error deleting item:', error);
+      }
       alert('Failed to delete item.');
     }
   };
@@ -89,12 +123,20 @@ export default function LibraryDashboard({
       // Optional: redirect to the new item
       // window.location.href = `/${type}s/${duplicated.id}`;
     } catch (error) {
-      console.error('Error duplicating item:', error);
+      if (isSupabaseError(error)) {
+        console.error('Error duplicating item:', {
+          message: error.message,
+          details: error.details,
+          code: error.code,
+        });
+      } else {
+        console.error('Error duplicating item:', error);
+      }
       alert('Failed to duplicate item.');
     }
   };
 
-  const filterItems = (items: any[]) => {
+  const filterItems = (items: LibraryItemData[]) => {
     return items.filter((item) => {
       const normalizedItemTags = (item.tags || [])
         .map((t: string) => t.trim().toLowerCase())
@@ -108,8 +150,7 @@ export default function LibraryDashboard({
       );
 
       const selectedTagsMatch =
-        selectedTags.length === 0 ||
-        selectedTags.every((tag) => normalizedItemTags.includes(tag.trim().toLowerCase()));
+        selectedTags.length === 0 || selectedTags.every((tag) => normalizedItemTags.includes(tag));
 
       return (titleMatch || queryTagMatch) && selectedTagsMatch;
     });
@@ -224,15 +265,20 @@ export default function LibraryDashboard({
           throw new Error('Snippet creation failed - no ID returned');
         }
       }
-    } catch (error: any) {
-      console.error('Error creating new item:', {
-        message: error.message || error,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-        fullError: error,
-      });
-      alert('Failed to create new item. Check console for details.');
+    } catch (error) {
+      if (isSupabaseError(error)) {
+        console.error('Error creating new item:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          fullError: error,
+        });
+        alert(`Failed to create item: ${error.message}`);
+      } else {
+        console.error('Unknown error creating new item:', error);
+        alert('Failed to create new item. Check console for details.');
+      }
     }
   };
 
@@ -354,9 +400,9 @@ export default function LibraryDashboard({
               id: item.id,
               title: item.title,
               type: activeTab,
-              bpm: item.bpm,
-              tags: item.tags,
-              createdAt: item.created_at || item.createdAt,
+              bpm: item.bpm ?? undefined,
+              tags: item.tags ?? undefined,
+              createdAt: item.created_at || item.createdAt || '',
             }}
             onDelete={handleDelete}
             onDuplicate={handleDuplicate}

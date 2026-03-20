@@ -2,6 +2,8 @@ import {
   calculateTotalNotes,
   type DrumSymbol,
   type GrooveGrid,
+  getNextSymbol,
+  getVelocityForSymbol,
   type InstrumentGrid,
 } from '../types/groove';
 
@@ -37,34 +39,20 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
         instruments: action.payload,
       };
     case 'TOGGLE_NOTE': {
-      const nextMap: Record<string, DrumSymbol> = {
-        none: 'standard',
-        standard: 'accent',
-        accent: 'ghost',
-        ghost: 'none',
-      };
-
-      const velocityMap: Record<string, number> = {
-        standard: 0.7,
-        accent: 1.0,
-        ghost: 0.3,
-        none: 0,
-      };
-
       return {
         ...state,
         instruments: state.instruments.map((inst) => {
           if (inst.instrumentId !== action.instrumentId) return inst;
           const newNotes = [...inst.notes];
           const current = newNotes[action.noteIndex] || 'none';
-          const nextSymbol = nextMap[current] || 'none';
+          const nextSymbol = getNextSymbol(current);
           newNotes[action.noteIndex] = nextSymbol;
 
           // Automatically set velocity based on symbol if not already set or being reset
           const newVelocities = inst.velocities
             ? [...inst.velocities]
             : Array(newNotes.length).fill(0);
-          newVelocities[action.noteIndex] = velocityMap[nextSymbol] || 0;
+          newVelocities[action.noteIndex] = getVelocityForSymbol(nextSymbol);
 
           return { ...inst, notes: newNotes, velocities: newVelocities };
         }),
@@ -72,13 +60,6 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
     }
 
     case 'SET_SYMBOL': {
-      const velocityMap: Record<string, number> = {
-        standard: 0.7,
-        accent: 1.0,
-        ghost: 0.3,
-        none: 0,
-      };
-
       return {
         ...state,
         instruments: state.instruments.map((inst) => {
@@ -89,8 +70,7 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
           const newVelocities = inst.velocities
             ? [...inst.velocities]
             : Array(newNotes.length).fill(0);
-          newVelocities[action.noteIndex] =
-            velocityMap[action.symbol] || newVelocities[action.noteIndex];
+          newVelocities[action.noteIndex] = getVelocityForSymbol(action.symbol);
 
           return { ...inst, notes: newNotes, velocities: newVelocities };
         }),

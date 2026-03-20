@@ -74,6 +74,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## Status Board (Kanban)
 
 ### 🔵 In Progress
+- [ ] [Chore] Comprehensive Codebase Audit and Standardization (#24)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Data Model Update (JSON) & Migration (#27)
   - [ ] [Task] Instrument Customization UI (#28)
