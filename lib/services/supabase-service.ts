@@ -25,8 +25,8 @@ const fromJson = <T>(val: Json): T => val as unknown as T;
 /**
  * Migration helper to transition old InstrumentGrid data to DrumInstrument (#27).
  */
-function migrateGrooveGrid(grid: any): GrooveGrid {
-  if (!grid) return grid;
+function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
+  if (!grid) return undefined;
 
   const instruments = (grid.instruments || []).map((inst: any) => {
     // If already migrated, return as is
@@ -497,6 +497,10 @@ export const supabaseService = {
     }
 
     const gridData = migrateGrooveGrid(fromJson<GrooveGrid>(data.grid_data));
+
+    if (!gridData) {
+      throw new Error('Invalid grid data in groove snippet');
+    }
 
     return {
       id: data.id,

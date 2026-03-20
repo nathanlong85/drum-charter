@@ -250,6 +250,8 @@ export function getSymbolsForCategory(category: DrumCategory): DrumSymbol[] {
     case 'hi-hat':
       return [
         'none',
+        'standard',
+        'standard_opt',
         'hi_hat_closed',
         'hi_hat_closed_opt',
         'hi_hat_loose',
