@@ -43,7 +43,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'unset NO_COLOR && export NEXT_PUBLIC_FORCE_SW=true && pnpm build && pnpm start --port 3001',
+    command:
+      'unset NO_COLOR && export NEXT_PUBLIC_FORCE_SW=true && pnpm build && pnpm start --port 3001',
     url: 'http://localhost:3001',
     reuseExistingServer: !process.env.CI && process.env.RUN_OFFLINE_E2E !== 'true',
     timeout: 180000,
