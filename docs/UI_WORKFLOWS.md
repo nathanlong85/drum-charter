@@ -42,6 +42,12 @@ This document outlines the core user journeys and system interactions for DrumCh
 - **Persistence**: Any change triggers a **2s debounced** call to `supabaseService.save[ItemType]`.
 - **State**: `isSaving` state is indicated in the editor header.
 
+### Workflow: Instrument Customization (Drum-Aware)
+- **Trigger**: Click "Add Instrument" or the settings icon on an existing instrument row.
+- **Action**: Opens a dialog to select a **Category** (e.g., Kick), a **Preset Variety** (e.g., High Tom), and an optional **Custom Name**.
+- **Logic**: If adding a duplicate variety, the system auto-increments the name (e.g., "Crash" -> "Crash 2").
+- **Constraint**: The **Category** restricts the set of symbols available in the `SymbolPicker`.
+
 ### Workflow: Section Management (Notebook/Song)
 - **Trigger**: Click "Add Section" or "Delete Section".
 - **Action**: `useReducer` updates the array of sections.
@@ -78,7 +84,12 @@ This document outlines the core user journeys and system interactions for DrumCh
 - **Trigger**: Click "Play" or "Stop" in `GrooveGridEditor`.
 - **Action**: `useAudioPlayback` hook starts/stops the Web Audio API scheduler.
 - **Visual State**: A visual playhead (active step highlight) moves across the grid in real-time.
-- **Audio State**: Samples (Kick, Snare, Hi-Hat, etc.) are triggered based on the grid's note state and symbols.
+- **Audio State**: Samples are triggered based on the grid's note state, symbol, and preset variety.
+
+### Workflow: Optional Hit Management
+- **Trigger**: Toggle the "Optional Hits" switch in the playback toolbar.
+- **Action**: Filters the audio scheduler.
+- **Behavior**: If disabled, symbols marked as "Optional" (e.g., ghost notes, optional accents) will not trigger audio samples, allowing the user to focus on core rhythms.
 
 ### Workflow: Metronome Integration
 - **Trigger**: Click the "Metronome" (Bell) icon in the editor toolbar.
