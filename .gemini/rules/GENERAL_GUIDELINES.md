@@ -6,13 +6,14 @@ In general, all finished project work (work that you consider "Done") must be in
 
 #### Requirements
 Whether or not a PR will be created, the following requirements must be met for work to be considered "Done":
-- The whole project must be fully linted with clean results.
+- The whole project must be fully linted with clean results. **You MUST verify that your linting commands cover all modified files, including those in hidden directories like `.gemini/`.**
 - Any new code must be 100% tested.
   - UI workflows and user journeys must have comprehensive e2e tests.
   - Use integration tests where appropriate.
   - Use unit tests where appropriate.
 - The entire test suite must pass.
 - The local CodeRabbit feedback loop must have been fully run.
+- **Final Pre-Push Check**: Always run the project's full verification suite (e.g., `verify_done.sh`) immediately before pushing to ensure no regressions or formatting issues were introduced by last-minute edits.
 
 **If creating a PR to present work to the user**: The above requirements must be met before the PR is created.
 **If directly presenting work to the user (no PR)**: The above requirements must be met before the work is presented.
