@@ -1,6 +1,7 @@
 'use client';
 
 import { debounce } from 'lodash';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -163,6 +164,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
   const [state, dispatch] = useReducer(songReducer, initialSong);
   const [isSaving, setIsSaving] = useState(false);
   const isMountedRef = useRef(true);
+  const router = useRouter();
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -345,9 +347,24 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
           )}
           <button
             onClick={async () => {
+              if (confirm('Are you sure you want to delete this song?')) {
+                try {
+                  await supabaseService.deleteSongChart(state.id);
+                  router.push('/library');
+                } catch (_error) {
+                  alert('Failed to delete song chart.');
+                }
+              }
+            }}
+            className="text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest mr-4"
+          >
+            DELETE
+          </button>
+          <button
+            onClick={async () => {
               try {
                 const duplicated = await supabaseService.duplicateSongChart(state.id);
-                window.location.href = `/songs/${duplicated.id}`;
+                router.push(`/songs/${duplicated.id}`);
               } catch (_error) {
                 alert('Failed to duplicate song chart.');
               }

@@ -1,13 +1,23 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { SongChart } from '@/lib/types/groove';
 import SongEditor from '../SongEditor';
 
+// Mock useRouter
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 // Mock Supabase service
 vi.mock('@/lib/services/supabase-service', () => ({
   supabaseService: {
     saveSongChart: vi.fn().mockResolvedValue({}),
+    duplicateSongChart: vi.fn().mockResolvedValue({ id: 'song-2' }),
+    deleteSongChart: vi.fn().mockResolvedValue({}),
   },
 }));
 
@@ -79,7 +89,6 @@ describe('SongEditor', () => {
 
   it('removes a section', () => {
     render(<SongEditor initialSong={mockSong} />);
-    // Find the remove button (using the title we added in the SVG)
     const removeButton = screen.getByTitle('Remove Section');
 
     fireEvent.click(removeButton);
@@ -131,11 +140,10 @@ describe('SongEditor', () => {
   it('updates metronome enabled status', async () => {
     render(<SongEditor initialSong={mockSong} />);
 
-    // Add grid first to make metronome controls available
+    // Add grid first
     const addGridButton = screen.getByText('+ ADD GRID');
     fireEvent.click(addGridButton);
 
-    // Find metronome toggle (it's a button with aria-label)
     const toggle = screen.getByLabelText('Enable Metronome');
     fireEvent.click(toggle);
 
@@ -158,11 +166,9 @@ describe('SongEditor', () => {
     const addGridButton = screen.getByText('+ ADD GRID');
     fireEvent.click(addGridButton);
 
-    // Open metronome settings
     const settingsButton = screen.getByLabelText('Metronome Settings');
     fireEvent.click(settingsButton);
 
-    // Find volume slider
     const slider = screen.getByTestId('metronome-volume-slider');
     fireEvent.change(slider, { target: { value: '0.8' } });
 
@@ -176,5 +182,269 @@ describe('SongEditor', () => {
       },
       { timeout: 3000 },
     );
+  });
+
+  it('duplicates the song', async () => {
+    render(<SongEditor initialSong={mockSong} />);
+    const duplicateBtn = screen.getByText(/duplicate/i);
+    fireEvent.click(duplicateBtn);
+
+    await waitFor(() => {
+      expect(supabaseService.duplicateSongChart).toHaveBeenCalledWith('song-1');
+      expect(mockPush).toHaveBeenCalledWith('/songs/song-2');
+    });
+  });
+
+  it('copies public link to clipboard', async () => {
+    const publicSong = { ...mockSong, isPublic: true };
+    render(<SongEditor initialSong={publicSong} />);
+
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+    const copyBtn = screen.getByText(/COPY PUBLIC LINK/i);
+    fireEvent.click(copyBtn);
+
+    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/public/songs/song-1'));
+  });
+
+  it('views public song', () => {
+    const publicSong = { ...mockSong, isPublic: true };
+    render(<SongEditor initialSong={publicSong} />);
+
+    const viewBtn = screen.getByText(/VIEW PUBLIC/i);
+    expect(viewBtn).toHaveAttribute('href', '/public/songs/song-1');
+  });
+
+  it('adds and removes sub-sections', () => {
+    render(<SongEditor initialSong={mockSong} />);
+    const addSubBtn = screen.getByText(/\+ ADD SUBSECTION/i);
+    fireEvent.click(addSubBtn);
+
+    expect(screen.getByDisplayValue('New Subsection')).toBeDefined();
+
+    const subSectionRemove = screen
+      .getAllByRole('button')
+      .find((b) => b.innerHTML.includes('M6 18L18 6M6 6l12 12'));
+    if (subSectionRemove) fireEvent.click(subSectionRemove);
+
+    expect(screen.queryByDisplayValue('New Subsection')).toBeNull();
+  });
+
+  it('toggles public state', async () => {
+    render(<SongEditor initialSong={mockSong} />);
+    const toggleBtn = screen.getByText(/PRIVATE/);
+    fireEvent.click(toggleBtn);
+
+    expect(screen.getByText(/● PUBLIC/)).toBeDefined();
+    await waitFor(
+      () => {
+        expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
+          expect.objectContaining({ isPublic: true }),
+        );
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('updates section name and measures', async () => {
+    render(<SongEditor initialSong={mockSong} />);
+    const nameInput = screen.getByDisplayValue('Verse');
+    fireEvent.change(nameInput, { target: { value: 'Chorus' } });
+
+    const measuresInput = screen.getByDisplayValue('8');
+    fireEvent.change(measuresInput, { target: { value: '4' } });
+
+    await waitFor(
+      () => {
+        expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
+          expect.objectContaining({
+            sections: expect.arrayContaining([
+              expect.objectContaining({ name: 'Chorus', measuresCount: 4 }),
+            ]),
+          }),
+        );
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('updates notes in a section', async () => {
+    render(<SongEditor initialSong={mockSong} />);
+    const notesArea = screen.getByDisplayValue('Play softly');
+    fireEvent.change(notesArea, { target: { value: 'Play loudly\nFast' } });
+
+    await waitFor(
+      () => {
+        expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
+          expect.objectContaining({
+            sections: expect.arrayContaining([
+              expect.objectContaining({ notes: ['Play loudly', 'Fast'] }),
+            ]),
+          }),
+        );
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('adds a grid to a section', async () => {
+    render(<SongEditor initialSong={mockSong} />);
+    const addGridBtn = screen.getByText(/\+ ADD GRID/i);
+    fireEvent.click(addGridBtn);
+
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('groove-grid')).toBeInTheDocument();
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('updates a grid within a section', async () => {
+    const songWithGrid = { ...mockSong };
+    songWithGrid.sections[0].grid = {
+      timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+      resolution: 16,
+      measures: 1,
+      instruments: [],
+    };
+    render(<SongEditor initialSong={songWithGrid} />);
+
+    const incMeasures = screen.getByTitle('Increase measures');
+    fireEvent.click(incMeasures);
+
+    await waitFor(
+      () => {
+        expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
+          expect.objectContaining({
+            sections: expect.arrayContaining([
+              expect.objectContaining({
+                grid: expect.objectContaining({ measures: 2 }),
+              }),
+            ]),
+          }),
+        );
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('handles subsection grid updates', async () => {
+    const songWithSub = { ...mockSong };
+    songWithSub.sections[0].subSections = [
+      {
+        id: 'sub-1',
+        name: 'Fill',
+        measuresCount: 1,
+        notes: [],
+        grid: {
+          timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+          resolution: 16,
+          measures: 1,
+          instruments: [],
+        },
+      },
+    ];
+    render(<SongEditor initialSong={songWithSub} />);
+
+    // Find the subsection container - it's the one containing the "Fill" input
+    const subSectionInput = screen.getByDisplayValue('Fill');
+    const subSectionContainer = subSectionInput.closest('div')?.parentElement;
+    if (!subSectionContainer) throw new Error('Subsection container not found');
+
+    const incMeasures = within(subSectionContainer).getByTitle('Increase measures');
+    fireEvent.click(incMeasures);
+
+    await waitFor(
+      () => {
+        expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
+          expect.objectContaining({
+            sections: expect.arrayContaining([
+              expect.objectContaining({
+                subSections: expect.arrayContaining([
+                  expect.objectContaining({
+                    grid: expect.objectContaining({ measures: 2 }),
+                  }),
+                ]),
+              }),
+            ]),
+          }),
+        );
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('handles error during duplication', async () => {
+    supabaseService.duplicateSongChart = vi.fn().mockRejectedValue(new Error('Fail'));
+    vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+    render(<SongEditor initialSong={mockSong} />);
+    fireEvent.click(screen.getByText(/duplicate/i));
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith('Failed to duplicate song chart.');
+    });
+  });
+
+  it('handles error during deletion', async () => {
+    supabaseService.deleteSongChart = vi.fn().mockRejectedValue(new Error('Fail'));
+    vi.spyOn(window, 'alert').mockImplementation(() => {});
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    render(<SongEditor initialSong={mockSong} />);
+    fireEvent.click(screen.getByText(/delete/i));
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith('Failed to delete song chart.');
+    });
+  });
+
+  it('handles auto-save error gracefully', async () => {
+    supabaseService.saveSongChart = vi.fn().mockRejectedValue(new Error('Fail'));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(<SongEditor initialSong={mockSong} />);
+    fireEvent.change(screen.getByDisplayValue('Test Song'), { target: { value: 'New' } });
+
+    await waitFor(
+      () => {
+        expect(consoleSpy).toHaveBeenCalledWith(
+          'Failed to auto-save song chart:',
+          expect.anything(),
+        );
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('removes a subsection from a section', async () => {
+    const songWithSub = { ...mockSong };
+    songWithSub.sections[0].subSections = [
+      {
+        id: 'sub-1',
+        name: 'Fill',
+        measuresCount: 1,
+        notes: [],
+      },
+    ];
+    render(<SongEditor initialSong={songWithSub} />);
+
+    // Find specifically the remove button for the subsection
+    // The main section remove is "Remove Section" title
+    const removeBtns = screen
+      .getAllByRole('button')
+      .filter((b) => b.innerHTML.includes('M6 18L18 6M6 6l12 12'));
+    fireEvent.click(removeBtns[0]);
+
+    expect(screen.queryByDisplayValue('Fill')).toBeNull();
+  });
+
+  it('does not attempt to update state if unmounted during save', async () => {
+    const { unmount } = render(<SongEditor initialSong={mockSong} />);
+    fireEvent.change(screen.getByDisplayValue('Test Song'), { target: { value: 'New' } });
+    unmount();
   });
 });

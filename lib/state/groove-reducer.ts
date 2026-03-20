@@ -30,6 +30,13 @@ export type GrooveAction =
       label: string;
     }
   | { type: 'REMOVE_INSTRUMENT'; id: string }
+  | {
+      type: 'UPDATE_INSTRUMENT';
+      id: string;
+      updates: Partial<Pick<DrumInstrument, 'category' | 'presetVariety' | 'customName'>>;
+    }
+  | { type: 'MOVE_INSTRUMENT'; id: string; direction: 'up' | 'down' }
+  | { type: 'SET_GRID_SETTINGS'; settings: Partial<Pick<GrooveGrid, 'playbackOptionalHits'>> }
   | { type: 'SET_RESOLUTION'; resolution: 4 | 8 | 16 }
   | { type: 'SET_MEASURES'; measures: number }
   | { type: 'SET_TIME_SIGNATURE'; beatsPerMeasure: number; beatValue: number }
@@ -120,6 +127,46 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
       return {
         ...state,
         instruments: state.instruments.filter((inst) => inst.id !== action.id),
+      };
+    }
+
+    case 'UPDATE_INSTRUMENT': {
+      return {
+        ...state,
+        instruments: state.instruments.map((inst) => {
+          if (inst.id !== action.id) return inst;
+          return { ...inst, ...action.updates };
+        }),
+      };
+    }
+
+    case 'MOVE_INSTRUMENT': {
+      const idx = state.instruments.findIndex((inst) => inst.id === action.id);
+      if (idx === -1) return state;
+
+      const newInstruments = [...state.instruments];
+      if (action.direction === 'up' && idx > 0) {
+        [newInstruments[idx - 1], newInstruments[idx]] = [
+          newInstruments[idx],
+          newInstruments[idx - 1],
+        ];
+      } else if (action.direction === 'down' && idx < newInstruments.length - 1) {
+        [newInstruments[idx + 1], newInstruments[idx]] = [
+          newInstruments[idx],
+          newInstruments[idx + 1],
+        ];
+      }
+
+      return {
+        ...state,
+        instruments: newInstruments,
+      };
+    }
+
+    case 'SET_GRID_SETTINGS': {
+      return {
+        ...state,
+        ...action.settings,
       };
     }
 

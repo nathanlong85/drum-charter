@@ -1,6 +1,7 @@
 'use client';
 
 import { debounce } from 'lodash';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
@@ -78,6 +79,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
   const [state, dispatch] = useReducer(snippetReducer, initialSnippet);
   const [isSaving, setIsSaving] = useState(false);
   const isMountedRef = useRef(true);
+  const router = useRouter();
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -179,9 +181,24 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
             <div className="text-right">
               <button
                 onClick={async () => {
+                  if (confirm('Are you sure you want to delete this snippet?')) {
+                    try {
+                      await supabaseService.deleteGrooveSnippet(state.id);
+                      router.push('/library');
+                    } catch (_error) {
+                      alert('Failed to delete snippet.');
+                    }
+                  }
+                }}
+                className="text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest no-print mb-1 block"
+              >
+                DELETE
+              </button>
+              <button
+                onClick={async () => {
                   try {
                     const duplicated = await supabaseService.duplicateGrooveSnippet(state.id);
-                    window.location.href = `/snippets/${duplicated.id}`;
+                    router.push(`/snippets/${duplicated.id}`);
                   } catch (_error) {
                     alert('Failed to duplicate snippet.');
                   }

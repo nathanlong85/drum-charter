@@ -91,13 +91,16 @@ test.describe('Song Chart Editor', () => {
     // Right-click for symbol picker
     await firstCell.click({ button: 'right' });
     // SymbolPicker uses a fixed/absolute positioning div
-    const picker = page.locator('div.fixed.z-50.bg-white');
+    // Use a more flexible locator for the picker
+    const picker = page
+      .locator('div.fixed.z-50.bg-white, div.fixed.z-50.dark\\:bg-gray-800')
+      .first();
     await expect(picker).toBeVisible();
 
-    // Select a different symbol (e.g., ghost hit)
-    // The symbol buttons have aria-label="ghost"
+    // Select a different symbol (e.g., accent hit)
+    // The symbol buttons have aria-labels like "accent"
     // Use dispatchEvent('click') for all fixed overlay interactions to avoid viewport issues
-    await picker.locator('button[aria-label="ghost"]').dispatchEvent('click');
+    await picker.locator('button[aria-label="accent"]').dispatchEvent('click');
 
     // Velocity adjustment buttons (Ghost/Std/Accent)
     const ghostVelBtn = picker.locator('button', { hasText: 'Ghost' });

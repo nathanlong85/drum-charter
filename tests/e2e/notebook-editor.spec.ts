@@ -69,20 +69,20 @@ test.describe('Notebook Editor', () => {
     // Add two sections with grids
     await page.click('text=Add New Section');
     await page
-      .locator('div.relative.group')
+      .getByTestId('notebook-section')
       .first()
       .getByRole('button', { name: /\+ Add Grid/i })
       .click();
 
     await page.click('text=Add New Section');
     await page
-      .locator('div.relative.group')
+      .getByTestId('notebook-section')
       .nth(1)
       .getByRole('button', { name: /\+ Add Grid/i })
       .click();
 
-    const firstSection = page.locator('div.relative.group').first();
-    const secondSection = page.locator('div.relative.group').nth(1);
+    const firstSection = page.getByTestId('notebook-section').first();
+    const secondSection = page.getByTestId('notebook-section').nth(1);
 
     const firstToolbar = firstSection.getByTestId('groove-toolbar');
     const secondToolbar = secondSection.getByTestId('groove-toolbar');

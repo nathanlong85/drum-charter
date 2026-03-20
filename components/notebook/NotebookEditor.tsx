@@ -1,6 +1,7 @@
 'use client';
 
 import { debounce } from 'lodash';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -109,6 +110,7 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
   const [state, dispatch] = useReducer(notebookReducer, initialNotebook);
   const [isSaving, setIsSaving] = useState(false);
   const isMountedRef = useRef(true);
+  const router = useRouter();
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -200,9 +202,24 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
               </div>
               <button
                 onClick={async () => {
+                  if (confirm('Are you sure you want to delete this notebook?')) {
+                    try {
+                      await supabaseService.deleteNotebook(state.id);
+                      router.push('/library');
+                    } catch (_error) {
+                      alert('Failed to delete notebook.');
+                    }
+                  }
+                }}
+                className="text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest"
+              >
+                DELETE
+              </button>
+              <button
+                onClick={async () => {
                   try {
                     const duplicated = await supabaseService.duplicateNotebook(state.id);
-                    window.location.href = `/notebooks/${duplicated.id}`;
+                    router.push(`/notebooks/${duplicated.id}`);
                   } catch (_error) {
                     alert('Failed to duplicate notebook.');
                   }
@@ -245,7 +262,7 @@ export default function NotebookEditor({ initialNotebook }: NotebookEditorProps)
 
       <div className="space-y-16">
         {state.sections.map((section) => (
-          <div key={section.id} className="relative group">
+          <div key={section.id} className="relative group" data-testid="notebook-section">
             <div className="flex items-center gap-4 mb-4">
               <input
                 type="text"

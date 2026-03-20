@@ -28,7 +28,7 @@ const fromJson = <T>(val: Json): T => val as unknown as T;
 /**
  * Migration helper to transition old InstrumentGrid data to DrumInstrument (#27).
  */
-function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
+export function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
   if (!grid) return undefined;
 
   const targetLength = calculateTotalNotes(grid);
@@ -125,7 +125,7 @@ const _SNIPPET_RETRY_DELAY_MS = 3000;
  * Shared retry helper for fetching data from Supabase.
  * Bails early on 404/401/403 errors and only retries on transient network or server issues.
  */
-async function fetchWithRetry<T>(
+export async function fetchWithRetry<T>(
   fetchFn: () => PromiseLike<{ data: T | null; error: unknown }>,
   id: string,
   typeName: string,

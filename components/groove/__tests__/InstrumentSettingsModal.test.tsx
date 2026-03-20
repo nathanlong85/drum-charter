@@ -1,0 +1,150 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { DrumInstrument } from '@/lib/types/groove';
+import { InstrumentSettingsModal } from '../InstrumentSettingsModal';
+
+// Mock Radix Dialog
+vi.mock('@radix-ui/react-dialog', () => ({
+  Root: ({ children, _open, onOpenChange }: any) => (
+    <div data-testid="dialog-root">
+      <button data-testid="trigger-close" onClick={() => onOpenChange?.(false)}>
+        Close
+      </button>
+      <button data-testid="trigger-open" onClick={() => onOpenChange?.(true)}>
+        Open
+      </button>
+      {children}
+    </div>
+  ),
+  Portal: ({ children }: any) => <div data-testid="dialog-portal">{children}</div>,
+  Overlay: () => <div data-testid="dialog-overlay" />,
+  Content: ({ children }: any) => (
+    <div data-testid="dialog-content" onClick={(e) => e.stopPropagation()}>
+      {children}
+    </div>
+  ),
+  Title: ({ children }: any) => <h2>{children}</h2>,
+  Close: ({ children, asChild }: any) => {
+    if (asChild) return children;
+    return (
+      <button onClick={() => {}} data-testid="dialog-close">
+        {children}
+      </button>
+    );
+  },
+}));
+
+const mockInstrument: DrumInstrument = {
+  id: 'test-id',
+  category: 'snare',
+  presetVariety: 'Snare',
+  customName: 'My Snare',
+  notes: [],
+  velocities: [],
+};
+
+describe('InstrumentSettingsModal', () => {
+  const onSave = vi.fn();
+  const onClose = vi.fn();
+  const onDelete = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+  });
+
+  it('renders initial instrument data', () => {
+    render(
+      <InstrumentSettingsModal
+        instrument={mockInstrument}
+        onSave={onSave}
+        onClose={onClose}
+        onDelete={onDelete}
+      />,
+    );
+
+    expect(screen.getByLabelText(/Custom Name/i)).toHaveValue('My Snare');
+  });
+
+  it('calls onSave with updated values', () => {
+    render(
+      <InstrumentSettingsModal
+        instrument={mockInstrument}
+        onSave={onSave}
+        onClose={onClose}
+        onDelete={onDelete}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/Custom Name/i), { target: { value: 'New Name' } });
+    fireEvent.change(screen.getByLabelText(/Category/i), { target: { value: 'kick' } });
+    fireEvent.change(screen.getByLabelText(/Variety/i), { target: { value: 'Electronic Kick' } });
+
+    fireEvent.submit(screen.getByRole('button', { name: /Save Changes/i }));
+
+    expect(onSave).toHaveBeenCalledWith({
+      customName: 'New Name',
+      category: 'kick',
+      presetVariety: 'Electronic Kick',
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('calls onDelete after confirmation', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    render(
+      <InstrumentSettingsModal
+        instrument={mockInstrument}
+        onSave={onSave}
+        onClose={onClose}
+        onDelete={onDelete}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Delete Row/i }));
+    expect(onDelete).toHaveBeenCalled();
+  });
+
+  it('calls onClose when dialog signals close', () => {
+    render(
+      <InstrumentSettingsModal
+        instrument={mockInstrument}
+        onSave={onSave}
+        onClose={onClose}
+        onDelete={onDelete}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId('trigger-close'));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('does not call onClose when dialog signals open', () => {
+    render(
+      <InstrumentSettingsModal
+        instrument={mockInstrument}
+        onSave={onSave}
+        onClose={onClose}
+        onDelete={onDelete}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId('trigger-open'));
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('focuses the input after mount', async () => {
+    render(
+      <InstrumentSettingsModal
+        instrument={mockInstrument}
+        onSave={onSave}
+        onClose={onClose}
+        onDelete={onDelete}
+      />,
+    );
+
+    const input = screen.getByLabelText(/Custom Name/i);
+    vi.advanceTimersByTime(150);
+    expect(document.activeElement).toBe(input);
+  });
+});

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import type React from 'react';
-import type { DrumSymbol } from '@/lib/types/groove';
+import { type DrumCategory, type DrumSymbol, getSymbolsForCategory } from '@/lib/types/groove';
 
 interface SymbolPickerProps {
   onSelect: (symbol: DrumSymbol) => void;
@@ -10,6 +10,7 @@ interface SymbolPickerProps {
   currentVelocity: number;
   onClose: () => void;
   position: { top: number; left: number };
+  category?: DrumCategory;
 }
 
 const symbols: DrumSymbol[] = [
@@ -82,16 +83,19 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
   currentVelocity,
   onClose,
   position,
+  category,
 }) => {
+  const filteredSymbols = category ? getSymbolsForCategory(category) : symbols;
+
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
       <div
-        className="fixed z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 shadow-xl rounded p-3 flex flex-col gap-3"
+        className="fixed z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 shadow-xl rounded p-3 flex flex-col gap-3 min-w-[240px]"
         style={{ top: position.top, left: position.left }}
       >
-        <div className="grid grid-cols-6 gap-1">
-          {symbols.map((sym) => (
+        <div className="grid grid-cols-5 gap-1">
+          {filteredSymbols.map((sym) => (
             <button
               key={sym}
               onClick={() => {
