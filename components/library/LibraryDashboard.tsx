@@ -17,6 +17,7 @@ export interface LibraryItemData {
   tags?: string[] | null;
   created_at?: string | null;
   updated_at?: string | null;
+  createdAt?: string | null;
 }
 
 interface LibraryDashboardProps {
@@ -401,7 +402,7 @@ export default function LibraryDashboard({
               type: activeTab,
               bpm: item.bpm ?? undefined,
               tags: item.tags ?? undefined,
-              createdAt: item.created_at || '',
+              createdAt: item.created_at || item.createdAt || '',
             }}
             onDelete={handleDelete}
             onDuplicate={handleDuplicate}
