@@ -171,3 +171,26 @@ export function calculateTotalNotes(
   // Formula: (beatsPerMeasure * (resolution / beatValue)) * measures
   return timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures;
 }
+
+/**
+ * Returns the default velocity for a given drum symbol.
+ */
+export function getVelocityForSymbol(symbol: DrumSymbol): number {
+  if (symbol.includes('accent')) return 1.0;
+  if (symbol.includes('ghost')) return 0.3;
+  if (symbol === 'none') return 0;
+  return 0.7; // Standard
+}
+
+/**
+ * Returns the next symbol in the cycle for a basic click toggle.
+ */
+export function getNextSymbol(current: string): DrumSymbol {
+  const nextMap: Record<string, DrumSymbol> = {
+    none: 'standard',
+    standard: 'accent',
+    accent: 'ghost',
+    ghost: 'none',
+  };
+  return nextMap[current] || 'none';
+}

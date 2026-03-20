@@ -10,10 +10,19 @@ const supabase = createClient();
 
 type ItemType = 'song' | 'notebook' | 'snippet';
 
+export interface LibraryItemData {
+  id: string;
+  title: string;
+  bpm?: number | null;
+  tags?: string[] | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
 interface LibraryDashboardProps {
-  initialSongs: any[];
-  initialNotebooks: any[];
-  initialSnippets: any[];
+  initialSongs: LibraryItemData[];
+  initialNotebooks: LibraryItemData[];
+  initialSnippets: LibraryItemData[];
 }
 
 export default function LibraryDashboard({
@@ -94,7 +103,7 @@ export default function LibraryDashboard({
     }
   };
 
-  const filterItems = (items: any[]) => {
+  const filterItems = (items: LibraryItemData[]) => {
     return items.filter((item) => {
       const normalizedItemTags = (item.tags || [])
         .map((t: string) => t.trim().toLowerCase())
@@ -108,8 +117,7 @@ export default function LibraryDashboard({
       );
 
       const selectedTagsMatch =
-        selectedTags.length === 0 ||
-        selectedTags.every((tag) => normalizedItemTags.includes(tag.trim().toLowerCase()));
+        selectedTags.length === 0 || selectedTags.every((tag) => normalizedItemTags.includes(tag));
 
       return (titleMatch || queryTagMatch) && selectedTagsMatch;
     });
@@ -224,13 +232,14 @@ export default function LibraryDashboard({
           throw new Error('Snippet creation failed - no ID returned');
         }
       }
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as any;
       console.error('Error creating new item:', {
-        message: error.message || error,
-        details: error.details,
-        hint: error.hint,
-        code: error.code,
-        fullError: error,
+        message: err.message || err,
+        details: err.details,
+        hint: err.hint,
+        code: err.code,
+        fullError: err,
       });
       alert('Failed to create new item. Check console for details.');
     }
@@ -354,9 +363,9 @@ export default function LibraryDashboard({
               id: item.id,
               title: item.title,
               type: activeTab,
-              bpm: item.bpm,
-              tags: item.tags,
-              createdAt: item.created_at || item.createdAt,
+              bpm: item.bpm ?? undefined,
+              tags: item.tags ?? undefined,
+              createdAt: item.created_at || '',
             }}
             onDelete={handleDelete}
             onDuplicate={handleDuplicate}

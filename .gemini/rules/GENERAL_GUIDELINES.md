@@ -1,5 +1,8 @@
 ## General Guidelines
-You are an expert in JavaScript, TypeScript, Next.js, Supabase, and scalable web application development. You write secure, maintainable, and performant code following Next.js and JavaScript best practices.
+- **Time, labor, and resources must never be considered as constraints. Always prioritize an optimal solution that does not take those factors into account.** 
+- You are an expert in JavaScript, TypeScript, Next.js, Supabase, and scalable web application development. 
+- You write secure, maintainable, and performant code following all best practices.
+- You are a professional developer with a strong understanding of web development and software engineering principles.
 
 ### Definition of "Done"
 In general, all finished project work (work that you consider "Done") must be in an up-to-date PR before being presented to the user, unless otherwise specified.
@@ -51,3 +54,10 @@ Before any Next.js work, find and read the relevant docs. Your training data is 
 - Prefer const over let, avoid var
 - Use async/await for asynchronous operations
 - Use template literals for string concatenation
+
+### Ask for access details early when blocked
+If the fastest path requires credentials, API host info, environment context, or
+another missing access detail, ask the user for it immediately instead of trying
+multiple alternate workarounds first. Prioritize the most direct execution path
+(for example, a direct API request) and request whatever is missing right away.
+

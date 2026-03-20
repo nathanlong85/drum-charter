@@ -15,6 +15,11 @@ type DbSongChart = Database['public']['Tables']['song_charts']['Row'];
 type DbNotebook = Database['public']['Tables']['notebooks']['Row'];
 type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row'];
 
+// Helper to safely cast domain types to Supabase JSON fields
+const toJson = <T>(val: T) => val as any;
+// Helper to safely cast Supabase JSON fields back to domain types
+const fromJson = <T>(val: any) => val as T;
+
 const _SNIPPET_RETRY_DELAY_MS = 3000;
 
 /**
@@ -101,10 +106,8 @@ export const supabaseService = {
         id: chart.id,
         title: chart.header.title,
         bpm: chart.header.bpm ?? null,
-        time_signature: chart.header
-          .timeSignature as unknown as Database['public']['Tables']['song_charts']['Insert']['time_signature'],
-        sections:
-          chart.sections as unknown as Database['public']['Tables']['song_charts']['Insert']['sections'],
+        time_signature: toJson(chart.header.timeSignature),
+        sections: toJson(chart.sections),
         tags: chart.tags,
         is_public: chart.isPublic,
         metronome_enabled: chart.header.metronomeEnabled,
@@ -146,11 +149,11 @@ export const supabaseService = {
       header: {
         title: data.title,
         bpm: data.bpm || undefined,
-        timeSignature: data.time_signature as unknown as TimeSignature,
+        timeSignature: fromJson<TimeSignature>(data.time_signature),
         metronomeEnabled: !!data.metronome_enabled,
         metronomeVolume: data.metronome_volume ?? 0.5,
       },
-      sections: data.sections as unknown as SongSection[],
+      sections: fromJson<SongSection[]>(data.sections),
       tags: data.tags || [],
       userId: data.user_id,
       isPublic: !!data.is_public,
@@ -185,8 +188,7 @@ export const supabaseService = {
       .upsert({
         id: notebook.id,
         title: notebook.title,
-        sections:
-          notebook.sections as unknown as Database['public']['Tables']['notebooks']['Insert']['sections'],
+        sections: toJson(notebook.sections),
         tags: notebook.tags,
         is_public: notebook.isPublic,
         updated_at: new Date().toISOString(),
@@ -223,7 +225,7 @@ export const supabaseService = {
     return {
       id: data.id,
       title: data.title,
-      sections: data.sections as unknown as NotebookSection[],
+      sections: fromJson<NotebookSection[]>(data.sections),
       tags: data.tags || [],
       userId: data.user_id,
       isPublic: !!data.is_public,
@@ -360,12 +362,12 @@ export const supabaseService = {
         id: snippet.id,
         title: snippet.title,
         tags: snippet.tags,
-        grid_data: {
+        grid_data: toJson({
           timeSignature: snippet.timeSignature,
           resolution: snippet.resolution,
           measures: snippet.measures,
           instruments: snippet.instruments,
-        } as unknown as Database['public']['Tables']['groove_snippets']['Insert']['grid_data'],
+        }),
         is_public: snippet.isPublic,
         updated_at: new Date().toISOString(),
         user_id: snippet.userId,
@@ -412,7 +414,7 @@ export const supabaseService = {
       throw new Error('Groove snippet not found');
     }
 
-    const gridData = data.grid_data as unknown as GrooveGrid;
+    const gridData = fromJson<GrooveGrid>(data.grid_data);
 
     return {
       id: data.id,
