@@ -5,9 +5,9 @@ You are an expert in JavaScript, TypeScript, Next.js, Supabase, and scalable web
 In general, all finished project work (work that you consider "Done") must be in an up-to-date PR before being presented to the user, unless otherwise specified.
 
 #### Requirements
-Whether or not a PR will be created, the following requirements must be met for work to be considered "Done":
+Whether a PR is created, these requirements must be met for work to be "Done":
 - The whole project must be fully linted with clean results. **You MUST verify that your linting commands cover all modified files, including those in hidden directories like `.gemini/`.**
-- Any new code must be 100% tested.
+- Any new code must be 100% tested (covering all branches and logic).
   - UI workflows and user journeys must have comprehensive e2e tests.
   - Use integration tests where appropriate.
   - Use unit tests where appropriate.
@@ -15,20 +15,20 @@ Whether or not a PR will be created, the following requirements must be met for 
 - The local CodeRabbit feedback loop must have been fully run.
 - **Final Pre-Push Check**: Always run the project's full verification suite (e.g., `verify_done.sh`) immediately before pushing to ensure no regressions or formatting issues were introduced by last-minute edits.
 
-**If creating a PR to present work to the user**: The above requirements must be met before the PR is created.
-**If directly presenting work to the user (no PR)**: The above requirements must be met before the work is presented.
+**If creating a PR**: These requirements must be met before the PR is created.
+**If directly presenting work (no PR)**: These requirements must be met before work is presented.
 
 ### PR descriptions must be fenced Markdown
 Whenever the user asks for a PR description, always provide the output in a fenced Markdown code block.
 
 ### Code Style
-- Try to not be repetitive. Use DRY principles when possible unless it makes the code unreadable.
-- Try to not let lines get too long. Break them up if necessary for readability.
+- Try not to be repetitive. Use DRY principles when possible unless it makes the code unreadable.
+- Try not to let lines get too long. Break them up if necessary for readability.
 - Use consistent indentation.
 
 ### Testing
 - Test all code paths.
-- Preferred code coverage is 100% when possible.
+- Code coverage must be 100% for all new files.
 
 ### Linting
 - Ensure that all code is formatted correctly.
@@ -41,7 +41,7 @@ When the user presents ideas or suggestions, think critically and push back when
 When the user asks "why" questions or asks for help understanding something, they want an explanation and discussion, NOT automatic fixes to their code. Only make code changes when the user explicitly asks for them. The user values understanding the problem themselves and making their own decisions about how to fix it.
 
 ### Avoid redundant method comments
-Don't add comments that simply restate what the method name already makes clear. For example, `generate_new_token!` doesn't need a comment saying "Generate a new token and set the token_digest". JSDoc or TSDoc documentation attributes (`@param`, `@return`, etc.) should still be included, but omit the redundant description line when the method name is self-documenting.
+Don't add comments that simply restate what the method name already makes clear. For example, `generateNewToken` doesn't need a comment saying "Generate a new token and update the token digest". JSDoc or TSDoc documentation attributes (`@param`, `@return`, etc.) should still be included, but omit the redundant description line when the method name is self-documenting.
 
 ### Next.js: ALWAYS read docs before coding
 Before any Next.js work, find and read the relevant docs. Your training data is outdated — the docs are the source of truth.
