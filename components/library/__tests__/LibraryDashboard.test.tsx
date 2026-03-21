@@ -36,7 +36,7 @@ vi.mock('@/lib/services/supabase-service', () => ({
 const originalLocation = window.location;
 beforeEach(() => {
   vi.clearAllMocks();
-  // @ts-expect-error
+  // @ts-expect-error overriding readonly window.location for test mocking
   delete window.location;
   window.location = { ...originalLocation, assign: vi.fn() };
   vi.spyOn(window, 'alert').mockImplementation(() => {});

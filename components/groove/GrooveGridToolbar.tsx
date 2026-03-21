@@ -271,7 +271,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
         </button>
 
         <button
-          onClick={onToggleEditInstruments}
+          onClick={() => onToggleEditInstruments?.()}
           className={`${iconButtonClass} ${
             isEditingInstruments
               ? 'bg-blue-600 text-white hover:bg-blue-700'

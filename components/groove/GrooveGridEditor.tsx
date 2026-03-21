@@ -327,18 +327,26 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           />
         )}
 
-        {editingInstrumentId && (
-          <InstrumentSettingsModal
-            instrument={state.instruments.find((i) => i.id === editingInstrumentId)!}
-            onClose={() => setEditingInstrumentId(null)}
-            onSave={(updates) => {
-              wrappedDispatch({ type: 'UPDATE_INSTRUMENT', id: editingInstrumentId, updates });
-            }}
-            onDelete={() => {
-              wrappedDispatch({ type: 'REMOVE_INSTRUMENT', id: editingInstrumentId });
-            }}
-          />
-        )}
+        {(() => {
+          const editingInstrument = editingInstrumentId
+            ? state.instruments.find((i) => i.id === editingInstrumentId)
+            : undefined;
+
+          if (!editingInstrument) return null;
+
+          return (
+            <InstrumentSettingsModal
+              instrument={editingInstrument}
+              onClose={() => setEditingInstrumentId(null)}
+              onSave={(updates) => {
+                wrappedDispatch({ type: 'UPDATE_INSTRUMENT', id: editingInstrument.id, updates });
+              }}
+              onDelete={() => {
+                wrappedDispatch({ type: 'REMOVE_INSTRUMENT', id: editingInstrument.id });
+              }}
+            />
+          );
+        })()}
       </div>
     </div>
   );

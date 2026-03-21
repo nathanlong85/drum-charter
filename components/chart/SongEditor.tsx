@@ -349,9 +349,12 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             onClick={async () => {
               if (confirm('Are you sure you want to delete this song?')) {
                 try {
+                  // Flush any pending debounced saves before deleting to avoid race conditions
+                  debouncedSave.flush();
                   await supabaseService.deleteSongChart(state.id);
                   router.push('/library');
-                } catch (_error) {
+                } catch (error) {
+                  console.error('Failed to delete song chart:', error);
                   alert('Failed to delete song chart.');
                 }
               }

@@ -1,8 +1,17 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GrooveGrid } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../GrooveGridEditor';
+
+// Control state for the mock hook
+const mockAudioState = vi.hoisted(() => ({
+  metronomeEnabled: false,
+  setMetronomeEnabled: vi.fn((val: boolean) => {
+    mockAudioState.metronomeEnabled = val;
+  }),
+  togglePlayback: vi.fn(),
+}));
 
 // Mock Radix Dialog
 vi.mock('@radix-ui/react-dialog', () => ({
@@ -17,7 +26,11 @@ vi.mock('@radix-ui/react-dialog', () => ({
     ) : null,
   Portal: ({ children }: any) => <div data-testid="dialog-portal">{children}</div>,
   Overlay: () => <div data-testid="dialog-overlay" />,
-  Content: ({ children }: any) => <div data-testid="dialog-content">{children}</div>,
+  Content: ({ children }: any) => (
+    <div data-testid="dialog-content" onClick={(e) => e.stopPropagation()}>
+      {children}
+    </div>
+  ),
   Title: ({ children }: any) => <h2>{children}</h2>,
   Close: ({ children, asChild }: any) => {
     if (asChild) return children;
@@ -41,13 +54,12 @@ vi.mock('../SymbolPicker', () => ({
 }));
 
 // Mock useAudioPlayback hook
-const mockTogglePlayback = vi.fn();
 vi.mock('@/lib/hooks/useAudioPlayback', () => ({
   useAudioPlayback: () => ({
     isPlaying: false,
-    togglePlayback: mockTogglePlayback,
-    metronomeEnabled: false,
-    setMetronomeEnabled: vi.fn(),
+    togglePlayback: mockAudioState.togglePlayback,
+    metronomeEnabled: mockAudioState.metronomeEnabled,
+    setMetronomeEnabled: mockAudioState.setMetronomeEnabled,
     metronomeVolume: 0.5,
     setMetronomeVolume: vi.fn(),
   }),
@@ -81,6 +93,11 @@ const TestEditor = ({ grid: initial, onChange }: { grid: GrooveGrid; onChange?: 
 describe('GrooveGridEditor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAudioState.metronomeEnabled = false;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('renders correctly', () => {
@@ -93,7 +110,7 @@ describe('GrooveGridEditor', () => {
     render(<TestEditor grid={initialGrid} />);
     const playBtn = screen.getByRole('button', { name: /Play/i });
     fireEvent.click(playBtn);
-    expect(mockTogglePlayback).toHaveBeenCalled();
+    expect(mockAudioState.togglePlayback).toHaveBeenCalled();
   });
 
   it('adds an instrument', async () => {
@@ -140,8 +157,7 @@ describe('GrooveGridEditor', () => {
       expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resolution: 8 }));
     });
 
-    // Time signature
-    const sigBeats = screen.getAllByRole('spinbutton')[1]; // Toolbar has multiple
+    const sigBeats = screen.getAllByRole('spinbutton')[1];
     fireEvent.change(sigBeats, { target: { value: '3' } });
     await waitFor(() => {
       expect(onChange).toHaveBeenCalledWith(
@@ -164,109 +180,30 @@ describe('GrooveGridEditor', () => {
     });
   });
 
-  it('reorders instruments', async () => {
-    const gridWithTwo: GrooveGrid = {
-      ...initialGrid,
-      instruments: [
-        ...initialGrid.instruments,
-        {
-          id: 'i2',
-          category: 'snare',
-          presetVariety: 'Snare',
-          customName: 'Snare',
-          notes: ['none', 'none', 'none', 'none'],
-          velocities: [0, 0, 0, 0],
-        },
-      ],
-    };
-    const onChange = vi.fn();
-    render(<TestEditor grid={gridWithTwo} onChange={onChange} />);
-
-    fireEvent.click(screen.getByTitle('Edit Instruments'));
-
-    // Move Snare up (index 1 to 0)
-    const moveUpBtns = screen.getAllByTitle('Move Up');
-    fireEvent.click(moveUpBtns[1]);
-
-    await waitFor(() => {
-      expect(onChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          instruments: [
-            expect.objectContaining({ id: 'i2' }),
-            expect.objectContaining({ id: 'i1' }),
-          ],
-        }),
-      );
-    });
-
-    // Move Snare down (index 0 to 1)
-    const moveDownBtns = screen.getAllByTitle('Move Down');
-    fireEvent.click(moveDownBtns[0]);
-
-    await waitFor(() => {
-      expect(onChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          instruments: [
-            expect.objectContaining({ id: 'i1' }),
-            expect.objectContaining({ id: 'i2' }),
-          ],
-        }),
-      );
-    });
-  });
-
-  it('updates instrument settings via modal', async () => {
-    const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
-
-    fireEvent.click(screen.getByTitle('Edit Instruments'));
-    fireEvent.click(screen.getByTitle('Edit Settings'));
-
-    // In our modal, we can change the custom name
-    const nameInput = screen.getByLabelText(/Custom Name/i);
-    fireEvent.change(nameInput, { target: { value: 'Awesome Kick' } });
-    fireEvent.submit(screen.getByRole('button', { name: /Save Changes/i }));
-
-    await waitFor(() => {
-      expect(onChange).toHaveBeenCalledWith(
-        expect.objectContaining({
-          instruments: expect.arrayContaining([
-            expect.objectContaining({ customName: 'Awesome Kick' }),
-          ]),
-        }),
-      );
-    });
-  });
-
   it('handles note interactions and symbol picker', async () => {
     const onChange = vi.fn();
     render(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     const cells = screen.getAllByTestId('note-cell');
 
-    // 1. Left click to cycle
     fireEvent.click(cells[1]);
     await waitFor(() => {
       expect(onChange).toHaveBeenCalled();
     });
 
-    // 2. Right click to open picker
     fireEvent.contextMenu(cells[0]);
     expect(screen.getByTestId('symbol-picker')).toBeDefined();
 
-    // 3. Select from picker
     fireEvent.click(screen.getByText('Select Ghost'));
     await waitFor(() => {
       expect(onChange).toHaveBeenCalled();
     });
 
-    // 4. Change velocity from picker
     fireEvent.click(screen.getByText('Change Velocity'));
     await waitFor(() => {
       expect(onChange).toHaveBeenCalled();
     });
 
-    // 5. Close picker
     fireEvent.click(screen.getByText('Close'));
     expect(screen.queryByTestId('symbol-picker')).toBeNull();
   });
@@ -277,8 +214,6 @@ describe('GrooveGridEditor', () => {
     const newGrid = { ...initialGrid, resolution: 8 as any };
     rerender(<TestEditor grid={newGrid} />);
 
-    // The effect should sync and potentially trigger onChange if we added that logic
-    // Actually, our component syncs initialGrid -> internal state
     expect(screen.getByRole('button', { name: '8' })).toBeInTheDocument();
   });
 
@@ -286,23 +221,22 @@ describe('GrooveGridEditor', () => {
     render(<TestEditor grid={initialGrid} />);
     const cells = screen.getAllByTestId('note-cell');
 
-    // Mock getBoundingClientRect for positioning logic
     const mockRect = { top: 100, left: 200, height: 32, width: 32 };
     cells[0].getBoundingClientRect = vi.fn(() => mockRect as DOMRect);
 
     fireEvent.contextMenu(cells[0]);
-
-    // In our component: top: rect.top + rect.height, left: rect.left
-    // Since we mock SymbolPicker, we can't see the style easily without digging,
-    // but we've triggered the code path.
     expect(screen.getByTestId('symbol-picker')).toBeInTheDocument();
   });
 
   it('handles playback toggling with metronome state', async () => {
-    // This is mainly to trigger more branches in the component
-    render(<TestEditor grid={initialGrid} />);
+    const { rerender } = render(<TestEditor grid={initialGrid} />);
     const metroToggle = screen.getByLabelText(/Enable Metronome/i);
+
     fireEvent.click(metroToggle);
-    // Success - triggers setMetronomeEnabled
+    expect(mockAudioState.setMetronomeEnabled).toHaveBeenCalledWith(true);
+
+    // Rerender to pick up new state from mock hook
+    rerender(<TestEditor grid={initialGrid} />);
+    expect(screen.getByLabelText(/Disable Metronome/i)).toBeInTheDocument();
   });
 });

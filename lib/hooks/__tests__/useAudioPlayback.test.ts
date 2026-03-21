@@ -402,9 +402,7 @@ describe('useAudioPlayback', () => {
     const onStepChange = vi.fn();
     const { result } = renderHook(
       () => useAudioPlayback({ grid: mockGrid, bpm: 120, onStepChange }),
-      {
-        // Use any to avoid complex mock setup for now
-      } as any,
+      {},
     );
 
     await act(async () => {
@@ -433,6 +431,7 @@ describe('useAudioPlayback', () => {
           id: 'k',
           category: 'kick',
           presetVariety: 'Kick',
+          customName: 'Kick',
           notes: ['standard'],
           velocities: [0.7],
         },
@@ -440,6 +439,7 @@ describe('useAudioPlayback', () => {
           id: 's',
           category: 'snare',
           presetVariety: 'Snare',
+          customName: 'Snare',
           notes: ['rim_shot'],
           velocities: [0.7],
         },
@@ -447,6 +447,7 @@ describe('useAudioPlayback', () => {
           id: 'h',
           category: 'hi-hat',
           presetVariety: 'Hi-Hat',
+          customName: 'Hi-Hat',
           notes: ['hi_hat_open'],
           velocities: [0.7],
         },
@@ -454,6 +455,7 @@ describe('useAudioPlayback', () => {
           id: 't1',
           category: 'tom',
           presetVariety: 'High Tom',
+          customName: 'High Tom',
           notes: ['standard'],
           velocities: [0.7],
         },
@@ -461,6 +463,7 @@ describe('useAudioPlayback', () => {
           id: 't2',
           category: 'tom',
           presetVariety: 'Floor Tom',
+          customName: 'Floor Tom',
           notes: ['standard'],
           velocities: [0.7],
         },
@@ -468,6 +471,7 @@ describe('useAudioPlayback', () => {
           id: 't3',
           category: 'tom',
           presetVariety: 'Mid Tom',
+          customName: 'Mid Tom',
           notes: ['standard'],
           velocities: [0.7],
         },

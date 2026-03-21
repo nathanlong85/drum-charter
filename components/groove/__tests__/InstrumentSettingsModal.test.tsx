@@ -53,6 +53,10 @@ describe('InstrumentSettingsModal', () => {
     vi.useFakeTimers();
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('renders initial instrument data', () => {
     render(
       <InstrumentSettingsModal
@@ -80,7 +84,7 @@ describe('InstrumentSettingsModal', () => {
     fireEvent.change(screen.getByLabelText(/Category/i), { target: { value: 'kick' } });
     fireEvent.change(screen.getByLabelText(/Variety/i), { target: { value: 'Electronic Kick' } });
 
-    fireEvent.submit(screen.getByRole('button', { name: /Save Changes/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Save Changes/i }));
 
     expect(onSave).toHaveBeenCalledWith({
       customName: 'New Name',

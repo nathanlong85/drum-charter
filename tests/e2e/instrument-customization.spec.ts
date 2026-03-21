@@ -4,6 +4,8 @@ test.describe('Instrument Customization', () => {
   test.beforeEach(async ({ page }) => {
     // Go to library and create a new snippet to test customization
     await page.goto('/library');
+    // Switch to Snippets tab
+    await page.getByTestId('tab-snippet').click();
     await page.click('button:has-text("New Snippet")');
     await expect(page).toHaveURL(/\/snippets\/.+/);
   });

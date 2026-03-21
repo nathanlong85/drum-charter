@@ -99,11 +99,11 @@ test.describe('Notebook Editor', () => {
     await page.reload();
 
     const reloadedFirstToolbar = page
-      .locator('div.relative.group')
+      .getByTestId('notebook-section')
       .first()
       .getByTestId('groove-toolbar');
     const reloadedSecondToolbar = page
-      .locator('div.relative.group')
+      .getByTestId('notebook-section')
       .nth(1)
       .getByTestId('groove-toolbar');
 

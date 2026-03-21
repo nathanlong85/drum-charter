@@ -91,11 +91,11 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [ ] [Chore] Comprehensive Codebase Audit and Standardization (#24)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [x] [Task] Data Model Update (JSON) & Migration (#27) `✓`
-  - [ ] [Task] Instrument Customization UI (#28)
-  - [ ] [Task] Context-Aware Symbol Picker (#29)
-  - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
+  - [x] [Task] Instrument Customization UI (#28) `✓`
+  - [x] [Task] Context-Aware Symbol Picker (#29) `✓`
+  - [x] [Task] Refined Audio Engine & Sample Matrix (#30) `✓`
   - [ ] [Task] Drum Sample Sourcing (#31)
-  - [ ] [Task] Optional Hit Playback Toggle (#32)
+  - [x] [Task] Optional Hit Playback Toggle (#32) `✓`
 - [ ] [Chore] Expand E2E test coverage for all core UI flows (#22)
 
 ### 🟢 Done
