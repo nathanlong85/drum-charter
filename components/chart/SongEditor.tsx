@@ -349,8 +349,8 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             onClick={async () => {
               if (confirm('Are you sure you want to delete this song?')) {
                 try {
-                  // Flush any pending debounced saves before deleting to avoid race conditions
-                  debouncedSave.flush();
+                  // Cancel any pending debounced saves before deleting
+                  debouncedSave.cancel();
                   await supabaseService.deleteSongChart(state.id);
                   router.push('/library');
                 } catch (error) {
@@ -366,9 +366,12 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
           <button
             onClick={async () => {
               try {
+                // Flush any pending saves before duplicating so the clone has latest data
+                debouncedSave.flush();
                 const duplicated = await supabaseService.duplicateSongChart(state.id);
                 router.push(`/songs/${duplicated.id}`);
-              } catch (_error) {
+              } catch (error) {
+                console.error('Failed to duplicate song chart:', error);
                 alert('Failed to duplicate song chart.');
               }
             }}

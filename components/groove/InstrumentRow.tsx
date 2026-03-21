@@ -39,31 +39,43 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
         {isEditing ? (
           <div className="flex items-center gap-1 w-full">
             <div className="flex flex-col">
-              <button
-                onClick={onMoveUp}
-                className="p-0.5 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-blue-500"
-                title="Move Up"
-              >
-                <ChevronUp size={12} strokeWidth={3} />
-              </button>
-              <button
-                onClick={onMoveDown}
-                className="p-0.5 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-blue-500"
-                title="Move Down"
-              >
-                <ChevronDown size={12} strokeWidth={3} />
-              </button>
+              {onMoveUp && (
+                <button
+                  type="button"
+                  onClick={onMoveUp}
+                  className="p-0.5 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-blue-500"
+                  title="Move Up"
+                  aria-label="Move instrument up"
+                >
+                  <ChevronUp size={12} strokeWidth={3} />
+                </button>
+              )}
+              {onMoveDown && (
+                <button
+                  type="button"
+                  onClick={onMoveDown}
+                  className="p-0.5 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-blue-500"
+                  title="Move Down"
+                  aria-label="Move instrument down"
+                >
+                  <ChevronDown size={12} strokeWidth={3} />
+                </button>
+              )}
             </div>
             <span className="truncate flex-1" title={instrument.customName}>
               {instrument.customName}
             </span>
-            <button
-              onClick={onSettingsClick}
-              className="p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-blue-600"
-              title="Edit Settings"
-            >
-              <Settings2 size={14} />
-            </button>
+            {onSettingsClick && (
+              <button
+                type="button"
+                onClick={onSettingsClick}
+                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-blue-600"
+                title="Edit Settings"
+                aria-label="Edit instrument settings"
+              >
+                <Settings2 size={14} />
+              </button>
+            )}
           </div>
         ) : (
           <span className="truncate w-full" title={instrument.customName}>

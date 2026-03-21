@@ -36,7 +36,7 @@ vi.mock('@/lib/services/supabase-service', () => ({
 const originalLocation = window.location;
 beforeEach(() => {
   vi.clearAllMocks();
-  // @ts-expect-error overriding readonly window.location for test mocking
+  // @ts-expect-error stubbing window.location for tests to mock assign behavior
   delete window.location;
   window.location = { ...originalLocation, assign: vi.fn() };
   vi.spyOn(window, 'alert').mockImplementation(() => {});
@@ -52,9 +52,13 @@ const mockProps = {
   initialSnippets: [{ id: 'sn1', title: 'Snippet 1', tags: ['funk'] }],
 };
 
+interface AuthMock {
+  getUser: ReturnType<typeof vi.fn>;
+}
+
 describe('LibraryDashboard', () => {
   const getAuthMock = () => {
-    return (createClient() as any).auth;
+    return (createClient() as any).auth as AuthMock;
   };
 
   describe('Rendering and Filtering', () => {
@@ -205,22 +209,29 @@ describe('LibraryDashboard', () => {
   });
 
   describe('Management Flow', () => {
-    it('handles item deletion for all types', async () => {
+    it('deletes song', async () => {
       vi.spyOn(window, 'confirm').mockReturnValue(true);
       render(<LibraryDashboard {...mockProps} />);
 
-      // 1. Delete Song
       fireEvent.click(screen.getAllByTitle(/Delete/i)[0]);
       expect(supabaseService.deleteSongChart).toHaveBeenCalledWith('s1');
       await waitFor(() => expect(screen.queryByText('Song 1')).toBeNull());
+    });
 
-      // 2. Delete Notebook
+    it('deletes notebook', async () => {
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      render(<LibraryDashboard {...mockProps} />);
+
       fireEvent.click(screen.getByTestId('tab-notebook'));
       fireEvent.click(screen.getAllByTitle(/Delete/i)[0]);
       expect(supabaseService.deleteNotebook).toHaveBeenCalledWith('n1');
       await waitFor(() => expect(screen.queryByText('Notebook 1')).toBeNull());
+    });
 
-      // 3. Delete Snippet
+    it('deletes snippet', async () => {
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      render(<LibraryDashboard {...mockProps} />);
+
       fireEvent.click(screen.getByTestId('tab-snippet'));
       fireEvent.click(screen.getAllByTitle(/Delete/i)[0]);
       expect(supabaseService.deleteGrooveSnippet).toHaveBeenCalledWith('sn1');

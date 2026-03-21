@@ -102,10 +102,16 @@ test.describe('Song Chart Editor', () => {
     // Use dispatchEvent('click') for all fixed overlay interactions to avoid viewport issues
     await picker.locator('button[aria-label="accent"]').dispatchEvent('click');
 
+    // Verify cell icon changed to accent
+    await expect(firstCell.locator('img[alt="accent"]')).toBeVisible();
+
     // Velocity adjustment buttons (Ghost/Std/Accent)
     const ghostVelBtn = picker.locator('button', { hasText: 'Ghost' });
     await expect(ghostVelBtn).toBeVisible();
     await ghostVelBtn.dispatchEvent('click');
+
+    // Verify velocity bar changed (ghost is 0.3, so width should be 30%)
+    await expect(firstCell.locator('div[style*="width: 30%"]')).toBeVisible();
 
     // Click Done
     await picker.locator('button', { hasText: 'Done' }).dispatchEvent('click');

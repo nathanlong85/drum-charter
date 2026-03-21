@@ -117,8 +117,8 @@ describe('SymbolPicker', () => {
       />,
     );
 
-    const backdrop = document.body.querySelector('.fixed.inset-0.z-40');
-    if (backdrop) fireEvent.click(backdrop);
+    const backdrop = screen.getByTestId('symbolpicker-backdrop');
+    fireEvent.click(backdrop);
     expect(onClose).toHaveBeenCalled();
   });
 });

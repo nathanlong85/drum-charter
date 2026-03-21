@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { SongChart } from '@/lib/types/groove';
@@ -443,8 +443,25 @@ describe('SongEditor', () => {
   });
 
   it('does not attempt to update state if unmounted during save', async () => {
+    vi.useFakeTimers();
+    const saveSpy = vi.fn().mockResolvedValue({});
+    supabaseService.saveSongChart = saveSpy;
+
+    // Use a more indirect way to check for state updates since we can't easily spy on internal useState
+    // We'll verify that no additional save calls happen after the unmount.
     const { unmount } = render(<SongEditor initialSong={mockSong} />);
-    fireEvent.change(screen.getByDisplayValue('Test Song'), { target: { value: 'New' } });
+
+    fireEvent.change(screen.getByDisplayValue('Test Song'), {
+      target: { value: 'Unmounted Update' },
+    });
+
     unmount();
+
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    expect(saveSpy).not.toHaveBeenCalled();
+    vi.useRealTimers();
   });
 });

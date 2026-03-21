@@ -144,13 +144,16 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
       const idx = state.instruments.findIndex((inst) => inst.id === action.id);
       if (idx === -1) return state;
 
+      if (action.direction === 'up' && idx === 0) return state;
+      if (action.direction === 'down' && idx === state.instruments.length - 1) return state;
+
       const newInstruments = [...state.instruments];
-      if (action.direction === 'up' && idx > 0) {
+      if (action.direction === 'up') {
         [newInstruments[idx - 1], newInstruments[idx]] = [
           newInstruments[idx],
           newInstruments[idx - 1],
         ];
-      } else if (action.direction === 'down' && idx < newInstruments.length - 1) {
+      } else {
         [newInstruments[idx + 1], newInstruments[idx]] = [
           newInstruments[idx],
           newInstruments[idx + 1],

@@ -15,11 +15,11 @@ describe('TagInput', () => {
     expect(screen.getByText('funk')).toBeInTheDocument();
   });
 
-  it('adds a tag on Enter', () => {
+  it('adds a tag on Enter and normalizes to lowercase', () => {
     render(<TagInput tags={[]} onChange={onChange} />);
     const input = screen.getByPlaceholderText(/Add tag.../i);
 
-    fireEvent.change(input, { target: { value: 'jazz' } });
+    fireEvent.change(input, { target: { value: 'JaZz' } });
     fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
     expect(onChange).toHaveBeenCalledWith(['jazz']);
@@ -103,19 +103,22 @@ describe('TagInput', () => {
 
   it('hides suggestions on blur after timeout', async () => {
     vi.useFakeTimers();
-    render(<TagInput tags={[]} onChange={onChange} suggestions={['rock']} />);
-    const input = screen.getByPlaceholderText(/Add tag.../i);
+    try {
+      render(<TagInput tags={[]} onChange={onChange} suggestions={['rock']} />);
+      const input = screen.getByPlaceholderText(/Add tag.../i);
 
-    fireEvent.focus(input);
-    expect(screen.getByText('Suggestions')).toBeInTheDocument();
+      fireEvent.focus(input);
+      expect(screen.getByText('Suggestions')).toBeInTheDocument();
 
-    fireEvent.blur(input);
+      fireEvent.blur(input);
 
-    act(() => {
-      vi.advanceTimersByTime(10);
-    });
+      act(() => {
+        vi.advanceTimersByTime(10);
+      });
 
-    expect(screen.queryByText('Suggestions')).not.toBeInTheDocument();
-    vi.useRealTimers();
+      expect(screen.queryByText('Suggestions')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

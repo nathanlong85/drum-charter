@@ -183,9 +183,12 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                 onClick={async () => {
                   if (confirm('Are you sure you want to delete this snippet?')) {
                     try {
+                      // Cancel any pending debounced saves before deleting
+                      debouncedSave.cancel();
                       await supabaseService.deleteGrooveSnippet(state.id);
                       router.push('/library');
-                    } catch (_error) {
+                    } catch (error) {
+                      console.error('Failed to delete snippet:', error);
                       alert('Failed to delete snippet.');
                     }
                   }
@@ -197,9 +200,12 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
               <button
                 onClick={async () => {
                   try {
+                    // Flush any pending saves before duplicating so the clone has latest data
+                    debouncedSave.flush();
                     const duplicated = await supabaseService.duplicateGrooveSnippet(state.id);
                     router.push(`/snippets/${duplicated.id}`);
-                  } catch (_error) {
+                  } catch (error) {
+                    console.error('Failed to duplicate snippet:', error);
                     alert('Failed to duplicate snippet.');
                   }
                 }}

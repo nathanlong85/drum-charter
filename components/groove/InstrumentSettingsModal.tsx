@@ -64,7 +64,10 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
             <Dialog.Title className="text-lg font-bold text-gray-900 dark:text-gray-100">
               Instrument Settings
             </Dialog.Title>
-            <Dialog.Close className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-500">
+            <Dialog.Close
+              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-500"
+              aria-label="Close"
+            >
               <X size={20} />
             </Dialog.Close>
           </div>

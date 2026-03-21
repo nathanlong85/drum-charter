@@ -22,13 +22,13 @@ test.describe('Notebook Editor', () => {
     // Add first section (Text)
     await page.click('text=Add New Section');
     // Sections are wrapped in a relative group div
-    const firstSection = page.locator('div.relative.group').first();
+    const firstSection = page.getByTestId('notebook-section').first();
     await firstSection.locator('input[placeholder="Section Name"]').fill('Technical Drills');
     await firstSection.locator('textarea[placeholder*="Add notes"]').fill('Work on single strokes');
 
     // Add second section (with Grid)
     await page.click('text=Add New Section');
-    const secondSection = page.locator('div.relative.group').nth(1);
+    const secondSection = page.getByTestId('notebook-section').nth(1);
     await secondSection.locator('input[placeholder="Section Name"]').fill('Groove Exercise');
 
     // Explicitly click the button in the second section

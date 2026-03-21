@@ -89,7 +89,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-40" onClick={onClose} />
+      <div className="fixed inset-0 z-40" onClick={onClose} data-testid="symbolpicker-backdrop" />
       <div
         className="fixed z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 shadow-xl rounded p-3 flex flex-col gap-3 min-w-[240px]"
         style={{ top: position.top, left: position.left }}

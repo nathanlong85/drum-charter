@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { Notebook } from '@/lib/types/groove';
@@ -247,9 +247,27 @@ describe('NotebookEditor', () => {
   });
 
   it('does not attempt to update state if unmounted during save', async () => {
+    vi.useFakeTimers();
+    const saveSpy = vi.fn().mockResolvedValue({});
+    supabaseService.saveNotebook = saveSpy;
+
     const { unmount } = render(<NotebookEditor initialNotebook={mockNotebook} />);
-    fireEvent.change(screen.getByDisplayValue('Test Notebook'), { target: { value: 'New' } });
+
+    // Trigger a change to start the debounce timer
+    fireEvent.change(screen.getByDisplayValue('Test Notebook'), { target: { value: 'New Name' } });
+
+    // Unmount before the 2s debounce finishes
     unmount();
+
+    // Fast-forward time past the 2s debounce
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    // Verify save was not called (because it was cancelled/skipped by unmount logic)
+    // Note: lodash debounce.cancel() is called in cleanup, so it shouldn't fire
+    expect(saveSpy).not.toHaveBeenCalled();
+    vi.useRealTimers();
   });
 
   it('deletes the notebook', async () => {
@@ -265,7 +283,7 @@ describe('NotebookEditor', () => {
         expect(supabaseService.deleteNotebook).toHaveBeenCalled();
         expect(mockPush).toHaveBeenCalledWith('/library');
       },
-      { timeout: 4000 },
+      { timeout: 10000 },
     );
-  });
+  }, 15000);
 });

@@ -101,7 +101,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         initialGrid.measures !== state.measures ||
         initialGrid.resolution !== state.resolution ||
         initialGrid.timeSignature.beatsPerMeasure !== state.timeSignature.beatsPerMeasure ||
-        initialGrid.timeSignature.beatValue !== state.timeSignature.beatValue;
+        initialGrid.timeSignature.beatValue !== state.timeSignature.beatValue ||
+        initialGrid.playbackOptionalHits !== state.playbackOptionalHits;
 
       if (isDifferent) {
         dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
@@ -114,6 +115,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     state.resolution,
     state.timeSignature.beatValue,
     state.timeSignature.beatsPerMeasure,
+    state.playbackOptionalHits,
   ]);
 
   const wrappedDispatch = (action: GrooveAction) => {

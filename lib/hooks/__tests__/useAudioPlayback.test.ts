@@ -479,40 +479,46 @@ describe('useAudioPlayback', () => {
     };
 
     // Mock fetch to only succeed for the basic fallback names
-    vi.stubGlobal(
-      'fetch',
-      vi.fn((url: string) => {
-        const allowed = [
-          'kick.wav',
-          'snare.wav',
-          'hihat_closed.wav',
-          'tom_high.wav',
-          'tom_floor.wav',
-          'tom_medium.wav',
-        ];
-        if (allowed.some((name) => url.includes(name))) {
-          return Promise.resolve({
-            ok: true,
-            arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
-          });
-        }
-        return Promise.resolve({ ok: false });
-      }),
-    );
+    const originalFetch = global.fetch;
+    try {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn((url: string) => {
+          const allowed = [
+            'kick.wav',
+            'snare.wav',
+            'hihat_closed.wav',
+            'tom_high.wav',
+            'tom_floor.wav',
+            'tom_medium.wav',
+          ];
+          if (allowed.some((name) => url.includes(name))) {
+            return Promise.resolve({
+              ok: true,
+              arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+            });
+          }
+          return Promise.resolve({ ok: false });
+        }),
+      );
 
-    const { result } = renderHook(() => useAudioPlayback({ grid: fallbackGrid, bpm: 120 }));
+      const { result } = renderHook(() => useAudioPlayback({ grid: fallbackGrid, bpm: 120 }));
 
-    await act(async () => {
-      await vi.runAllTimersAsync();
-    });
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
 
-    act(() => {
-      result.current.togglePlayback();
-    });
+      act(() => {
+        result.current.togglePlayback();
+      });
 
-    // Step 0: Should trigger 6 playSample calls (one for each instrument)
-    // All should hit the hardcoded fallbacks
-    expect(mockStart).toHaveBeenCalledTimes(6);
+      // Step 0: Should trigger 6 playSample calls (one for each instrument)
+      // All should hit the hardcoded fallbacks
+      expect(mockStart).toHaveBeenCalledTimes(6);
+    } finally {
+      // Restore the file-level global fetch mock
+      vi.stubGlobal('fetch', originalFetch);
+    }
   });
 
   it('stops scheduling when isPlaying becomes false', async () => {

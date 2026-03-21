@@ -113,10 +113,10 @@ describe('InstrumentRow', () => {
   });
 
   it('falls back to getVelocityForSymbol if velocities are missing', () => {
-    const instWithoutVel = { ...mockInstrument, velocities: undefined };
+    const { velocities: _v, ...instWithoutVel } = mockInstrument;
     render(
       <InstrumentRow
-        instrument={instWithoutVel as any}
+        instrument={instWithoutVel as DrumInstrument}
         grid={mockGrid}
         onNoteClick={onNoteClick}
         onNoteContextMenu={onNoteContextMenu}

@@ -203,6 +203,7 @@ describe('supabaseService', () => {
         resolution: 16,
         measures: 1,
         instruments: [],
+        playbackOptionalHits: false,
       };
       mockSupabase.from.mockReturnValue(mockResponse({ id: 'snip-1' }));
       const result = await supabaseService.saveGrooveSnippet(mockSnip as any);
@@ -226,11 +227,13 @@ describe('supabaseService', () => {
           resolution: 16,
           measures: 1,
           instruments: [],
+          playbackOptionalHits: false,
         },
       };
       mockSupabase.from.mockReturnValue(mockResponse(dbRow));
       const result = await supabaseService.getGrooveSnippet('snip-1');
       expect(result.id).toBe('snip-1');
+      expect(result.playbackOptionalHits).toBe(false);
     });
 
     it('getGrooveSnippet throws if migration fails', async () => {

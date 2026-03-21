@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { GrooveGrid } from '@/lib/types/groove';
+import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../GrooveGridEditor';
 
 // Control state for the mock hook
@@ -13,26 +13,38 @@ const mockAudioState = vi.hoisted(() => ({
   togglePlayback: vi.fn(),
 }));
 
+interface DialogProps {
+  children?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  asChild?: boolean;
+}
+
 // Mock Radix Dialog
 vi.mock('@radix-ui/react-dialog', () => ({
-  Root: ({ children, open, onOpenChange }: any) =>
+  Root: ({ children, open, onOpenChange }: DialogProps) =>
     open ? (
       <div data-testid="dialog-root">
         <button data-testid="trigger-close" onClick={() => onOpenChange?.(false)}>
           Close
         </button>
+        <button data-testid="trigger-open" onClick={() => onOpenChange?.(true)}>
+          Open
+        </button>
         {children}
       </div>
     ) : null,
-  Portal: ({ children }: any) => <div data-testid="dialog-portal">{children}</div>,
+  Portal: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dialog-portal">{children}</div>
+  ),
   Overlay: () => <div data-testid="dialog-overlay" />,
-  Content: ({ children }: any) => (
+  Content: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="dialog-content" onClick={(e) => e.stopPropagation()}>
       {children}
     </div>
   ),
-  Title: ({ children }: any) => <h2>{children}</h2>,
-  Close: ({ children, asChild }: any) => {
+  Title: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
+  Close: ({ children, asChild }: DialogProps) => {
     if (asChild) return children;
     return (
       <button onClick={() => {}} data-testid="dialog-close">
@@ -42,9 +54,15 @@ vi.mock('@radix-ui/react-dialog', () => ({
   },
 }));
 
+interface MockSymbolPickerProps {
+  onSelect: (symbol: DrumSymbol) => void;
+  onVelocityChange: (velocity: number) => void;
+  onClose: () => void;
+}
+
 // Mock SymbolPicker to verify its usage
 vi.mock('../SymbolPicker', () => ({
-  SymbolPicker: ({ onSelect, onVelocityChange, onClose }: any) => (
+  SymbolPicker: ({ onSelect, onVelocityChange, onClose }: MockSymbolPickerProps) => (
     <div data-testid="symbol-picker">
       <button onClick={() => onSelect('ghost')}>Select Ghost</button>
       <button onClick={() => onVelocityChange(0.5)}>Change Velocity</button>
@@ -81,7 +99,12 @@ const initialGrid: GrooveGrid = {
   ],
 };
 
-const TestEditor = ({ grid: initial, onChange }: { grid: GrooveGrid; onChange?: any }) => {
+interface TestEditorProps {
+  grid: GrooveGrid;
+  onChange?: (grid: GrooveGrid) => void;
+}
+
+const TestEditor: React.FC<TestEditorProps> = ({ grid: initial, onChange }) => {
   const [grid, setGrid] = React.useState(initial);
   const handleChange = (newGrid: GrooveGrid) => {
     setGrid(newGrid);
@@ -211,7 +234,7 @@ describe('GrooveGridEditor', () => {
   it('syncs with initialGrid when it changes', async () => {
     const { rerender } = render(<TestEditor grid={initialGrid} />);
 
-    const newGrid = { ...initialGrid, resolution: 8 as any };
+    const newGrid: GrooveGrid = { ...initialGrid, resolution: 8 };
     rerender(<TestEditor grid={newGrid} />);
 
     expect(screen.getByRole('button', { name: '8' })).toBeInTheDocument();

@@ -117,8 +117,8 @@ describe('migrateGrooveGrid', () => {
     };
 
     const result = migrateGrooveGrid(grid) as GrooveGrid;
-    // Should return the exact object reference (or deep equal)
-    expect(result.instruments[0]).toEqual(instrument);
+    // Should return the exact object reference
+    expect(result.instruments[0]).toBe(instrument);
   });
 
   it('re-migrates if lengths are wrong even if metadata exists', () => {

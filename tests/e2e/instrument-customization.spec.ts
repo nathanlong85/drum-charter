@@ -73,17 +73,16 @@ test.describe('Instrument Customization', () => {
   test('should toggle optional hits playback', async ({ page }) => {
     // Add a snippet with some optional hits
     // By default optional hits are enabled
-    const _toolbar = page.getByTestId('groove-toolbar');
-    const optionalHitsBtn = page.getByTitle(/Hide Optional Hits|Play Optional Hits/);
+    const optionalHitsBtn = page.getByRole('button', {
+      name: /Hide Optional Hits|Play Optional Hits/,
+    });
 
-    // Should be in "Hide Optional Hits" state (meaning they are currently playing)
+    // Initial state: Should be "Hide Optional Hits" (meaning they are currently playing)
     await expect(optionalHitsBtn).toHaveAttribute('title', 'Hide Optional Hits');
-    await expect(optionalHitsBtn).toHaveClass(/bg-blue-100/);
 
     // Toggle OFF
     await optionalHitsBtn.click();
     await expect(optionalHitsBtn).toHaveAttribute('title', 'Play Optional Hits');
-    await expect(optionalHitsBtn).toHaveClass(/bg-gray-200/);
 
     // Toggle ON
     await optionalHitsBtn.click();

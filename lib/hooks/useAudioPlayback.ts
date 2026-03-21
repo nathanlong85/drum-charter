@@ -28,11 +28,26 @@ export function useAudioPlayback({
   const currentStepRef = useRef(0);
   const timerIDRef = useRef<number | null>(null);
   const gridRef = useRef(grid);
+  const bpmRef = useRef(bpm);
+  const metronomeEnabledRef = useRef(metronomeEnabled);
+  const metronomeVolumeRef = useRef(metronomeVolume);
 
-  // Keep grid ref in sync
+  // Keep refs in sync
   useEffect(() => {
     gridRef.current = grid;
   }, [grid]);
+
+  useEffect(() => {
+    bpmRef.current = bpm;
+  }, [bpm]);
+
+  useEffect(() => {
+    metronomeEnabledRef.current = metronomeEnabled;
+  }, [metronomeEnabled]);
+
+  useEffect(() => {
+    metronomeVolumeRef.current = metronomeVolume;
+  }, [metronomeVolume]);
 
   // Configuration
   const lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
@@ -115,7 +130,7 @@ export function useAudioPlayback({
     (step: number, time: number) => {
       const currentGrid = gridRef.current;
       // 1. Schedule Metronome if enabled
-      if (metronomeEnabled) {
+      if (metronomeEnabledRef.current) {
         const stepsPerBeat = currentGrid.resolution / currentGrid.timeSignature.beatValue;
         const isBeat = step % stepsPerBeat === 0;
 
@@ -124,7 +139,7 @@ export function useAudioPlayback({
             Math.floor(step / stepsPerBeat) % currentGrid.timeSignature.beatsPerMeasure;
           const isFirstBeat = beatInMeasure === 0;
           const sampleKey = isFirstBeat ? 'click_high' : 'click_low';
-          playSample(sampleKey, time, metronomeVolume);
+          playSample(sampleKey, time, metronomeVolumeRef.current);
         }
       }
 
@@ -183,12 +198,12 @@ export function useAudioPlayback({
         onStepChange(step);
       }
     },
-    [metronomeEnabled, metronomeVolume, onStepChange, playSample],
+    [onStepChange, playSample],
   );
 
   const nextNote = useCallback(() => {
     const currentGrid = gridRef.current;
-    const secondsPerBeat = 60.0 / bpm;
+    const secondsPerBeat = 60.0 / bpmRef.current;
     const { resolution, timeSignature, measures } = currentGrid;
     const secondsPerStep = secondsPerBeat / (resolution / timeSignature.beatValue);
 
@@ -196,7 +211,7 @@ export function useAudioPlayback({
     currentStepRef.current =
       (currentStepRef.current + 1) %
       (timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures);
-  }, [bpm]);
+  }, []);
 
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;

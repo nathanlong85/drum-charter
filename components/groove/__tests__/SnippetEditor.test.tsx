@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { GrooveSnippet } from '@/lib/types/groove';
@@ -169,9 +169,21 @@ describe('SnippetEditor', () => {
   });
 
   it('does not attempt to update state if unmounted during save', async () => {
+    vi.useFakeTimers();
+    const saveSpy = vi.fn().mockResolvedValue({});
+    supabaseService.saveGrooveSnippet = saveSpy;
+
     const { unmount } = render(<SnippetEditor initialSnippet={mockSnippet} />);
-    fireEvent.change(screen.getByDisplayValue('Test Snippet'), { target: { value: 'New' } });
+    fireEvent.change(screen.getByDisplayValue('Test Snippet'), { target: { value: 'New Name' } });
+
     unmount();
+
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    expect(saveSpy).not.toHaveBeenCalled();
+    vi.useRealTimers();
   });
 
   it('deletes the snippet', async () => {
