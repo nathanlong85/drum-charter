@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1-alpha] - 2026-03-21
+
+### Added
+- **Quick Clear Grid/Row**: Added a "Clear Grid" button to the main toolbar and "Clear Row" buttons to individual instruments (visible in edit mode) for rapid resets.
+- **Multi-cell Selection**: Implemented drag-to-select functionality in the Groove Editor, allowing users to highlight a range of cells across multiple instruments.
+- **Batch Editing**: Selected cells can now be updated simultaneously using the Symbol Picker or Velocity controls.
+- **Keyboard Modifiers**:
+  - **Shift + Click**: Quickly toggle the 'Optional' state of a drum hit.
+  - **Alt + Click**: Open the Symbol Picker directly, skipping the standard note toggle.
+  - **Delete/Backspace**: Clear the current selection or a single focused cell.
+- **Grid Clipboard**: Added support for copying selected grid data as JSON (`Cmd/Ctrl + C`) and pasting it at a target location (`Cmd/Ctrl + V`).
+- **Ergonomics E2E Suite**: Added a comprehensive Playwright test suite (`tests/e2e/grid-ergonomics.spec.ts`) covering all new selection and rapid editing features.
+
+### Changed
+- **Reducer Enhancements**: Updated `grooveReducer` with `CLEAR_GRID`, `CLEAR_ROW`, `TOGGLE_OPTIONAL`, `SET_SELECTION_SYMBOLS`, `SET_SELECTION_VELOCITY`, and `PASTE_SELECTION` actions.
+- **NoteCell API**: Updated `NoteCell` and `InstrumentRow` to support mouse event propagation and selection state rendering.
+
 ## [0.2.0-alpha] - 2026-03-20
 
 ### Added
