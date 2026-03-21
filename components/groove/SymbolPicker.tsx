@@ -77,37 +77,7 @@ const symbolLabels: Partial<Record<DrumSymbol, string>> = {
   rim_shot_opt: 'Opt Rim',
 };
 
-const allSymbols: DrumSymbol[] = [
-  'none',
-  'standard',
-  'standard_opt',
-  'ghost',
-  'ghost_opt',
-  'accent',
-  'accent_opt',
-  'buzz',
-  'buzz_opt',
-  'cross_stick',
-  'cross_stick_opt',
-  'cymbal_bell',
-  'cymbal_bell_opt',
-  'cymbal_choke',
-  'cymbal_choke_opt',
-  'double',
-  'double_opt',
-  'flam',
-  'flam_opt',
-  'hi_hat_closed',
-  'hi_hat_closed_opt',
-  'hi_hat_loose',
-  'hi_hat_loose_opt',
-  'hi_hat_open',
-  'hi_hat_open_opt',
-  'hi_hat_pedal_chick',
-  'hi_hat_pedal_chick_opt',
-  'rim_shot',
-  'rim_shot_opt',
-];
+const allSymbols = Object.keys(symbolToIcon) as DrumSymbol[];
 
 export const SymbolPicker: React.FC<SymbolPickerProps> = ({
   onSelect,
@@ -125,13 +95,16 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
       <div
         className="fixed z-50 bg-white dark:bg-gray-900 border-2 border-zinc-800 dark:border-zinc-700 shadow-2xl rounded-lg p-4 flex flex-col gap-4 min-w-[280px] animate-in zoom-in-95 duration-100"
         style={{ top: position.top, left: position.left }}
+        data-testid="symbol-picker"
       >
         <div className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2">
           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
             {category || 'Select Symbol'}
           </span>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Close"
             className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
           >
             ✕
@@ -142,12 +115,13 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
           {filteredSymbols.map((sym) => (
             <button
               key={sym}
+              type="button"
               onClick={() => {
                 onSelect(sym);
               }}
               className="group flex flex-col items-center gap-1 p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-all border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
-              title={sym.replace(/_/g, ' ')}
-              aria-label={sym.replace(/_/g, ' ')}
+              title={symbolLabels[sym] || sym.replace(/_/g, ' ')}
+              aria-label={symbolLabels[sym] || sym.replace(/_/g, ' ')}
             >
               <div className="w-8 h-8 flex items-center justify-center">
                 {sym === 'none' ? (
