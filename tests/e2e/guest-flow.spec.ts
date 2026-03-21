@@ -99,15 +99,11 @@ test.describe('Guest Access & Library Flow', () => {
         resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
-    console.log('Clicking New Snippet button...');
     await page.getByRole('button', { name: /New Snippet/i }).click();
-    console.log('Waiting for snippet creation response...');
     await createPromise;
 
     // Wait for redirect
-    console.log('Waiting for redirect to snippet editor...');
     await page.waitForURL(/\/snippets\/.+/, { timeout: 10000 });
-    console.log('URL after snippet creation:', page.url());
     await expect(page).toHaveURL(/\/snippets\/.+/);
 
     const titleInput = page.getByPlaceholder(/Snippet Title/i);
@@ -146,16 +142,12 @@ test.describe('Guest Access & Library Flow', () => {
       (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
-    console.log('Clicking New Notebook button...');
     await page.click('button:has-text("NEW")');
     await page.click('button:has-text("Notebook")');
-    console.log('Waiting for notebook creation response...');
     await createPromise;
 
     // Wait for redirect
-    console.log('Waiting for redirect to notebook editor...');
     await page.waitForURL(/\/notebooks\/.+/, { timeout: 10000 });
-    console.log('URL after notebook creation:', page.url());
     await expect(page).toHaveURL(/\/notebooks\/.+/);
 
     // Check for "Guest Mode" indicator
