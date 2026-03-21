@@ -97,6 +97,11 @@ Group findings by severity:
 2. **Warning** - Bugs, performance issues, anti-patterns
 3. **Info** - Style issues, suggestions, minor improvements
 
+**Reporting Requirements (MANDATORY)**: At the start of every review run, you MUST explicitly state:
+- **Run and Loop Number**: e.g., "Starting CodeReview Loop 1, Run 1".
+- **Target Severities**: Specify which severities are being addressed (e.g., "Addressing all severities" or "Addressing Critical and Major findings").
+- **Finding Summary**: Before addressing findings, provide a brief one-line summary: "Found X findings (Y Critical, Z Major, ...). I will address N findings."
+
 Create a task list for issues found that need to be addressed.
 
 ### 4. Fix Issues (Autonomous Workflow)

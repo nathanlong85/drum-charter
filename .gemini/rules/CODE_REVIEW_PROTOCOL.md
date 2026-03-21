@@ -14,6 +14,10 @@
 #### 1.1 Local CodeRabbit Feedback Review Loop
 - **Local Review Loop**: Always use the `code-review` agent skill (running `cr review --prompt-only --base main`) locally to perform the review loops.
 - **Code Quality**: Always lint and ensure all related tests pass before kicking off the next run in the review loop.
+- **Reporting Requirements**: At the start of every review run, you MUST explicitly state:
+  - **Run and Loop Number**: e.g., "Starting CodeReview Loop 1, Run 1".
+  - **Target Severities**: Specify which severities are being addressed (e.g., "Addressing all severities" or "Addressing Critical and Major findings").
+  - **Finding Summary**: Before addressing findings, provide a brief one-line summary: "Found X findings (Y Critical, Z Major, ...). I will address N findings."
 - **Structured Feedback Review**: Treat the PR review as a three-run state machine. **During these runs, you do NOT need to stop and ask for approval for individual steps (pushing, committing, editing, or starting the next run) unless the loop itself is finished or a critical conflict arises.**
   1. **Run 1 (Initial)**: Address ALL unresolved comments regardless of severity. If there is no feedback, terminate the review loop.
   2. **Run 2**: Address ONLY `Critical` and `Major` severity comments. If there is no `Critical` or `Major` feedback, terminate the review loop.
