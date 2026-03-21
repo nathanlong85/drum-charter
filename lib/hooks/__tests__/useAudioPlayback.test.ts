@@ -400,9 +400,8 @@ describe('useAudioPlayback', () => {
 
   it('calls onStepChange callback', async () => {
     const onStepChange = vi.fn();
-    const { result } = renderHook(
-      () => useAudioPlayback({ grid: mockGrid, bpm: 120, onStepChange }),
-      {},
+    const { result } = renderHook(() =>
+      useAudioPlayback({ grid: mockGrid, bpm: 120, onStepChange }),
     );
 
     await act(async () => {

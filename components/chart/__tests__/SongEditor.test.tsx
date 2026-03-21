@@ -444,24 +444,28 @@ describe('SongEditor', () => {
 
   it('does not attempt to update state if unmounted during save', async () => {
     vi.useFakeTimers();
-    const saveSpy = vi.fn().mockResolvedValue({});
-    supabaseService.saveSongChart = saveSpy;
+    try {
+      const saveSpy = vi.fn().mockResolvedValue({});
+      supabaseService.saveSongChart = saveSpy;
 
-    // Use a more indirect way to check for state updates since we can't easily spy on internal useState
-    // We'll verify that no additional save calls happen after the unmount.
-    const { unmount } = render(<SongEditor initialSong={mockSong} />);
+      // Use a more indirect way to check for state updates since we can't easily spy on internal useState
+      // We'll verify that no additional save calls happen after the unmount.
+      const { unmount } = render(<SongEditor initialSong={mockSong} />);
 
-    fireEvent.change(screen.getByDisplayValue('Test Song'), {
-      target: { value: 'Unmounted Update' },
-    });
+      fireEvent.change(screen.getByDisplayValue('Test Song'), {
+        target: { value: 'Unmounted Update' },
+      });
 
-    unmount();
+      unmount();
 
-    act(() => {
-      vi.advanceTimersByTime(3000);
-    });
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
 
-    expect(saveSpy).not.toHaveBeenCalled();
-    vi.useRealTimers();
+      // Verify save was NOT called
+      expect(saveSpy).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

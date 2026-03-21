@@ -109,6 +109,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           }`}
           title={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
           aria-label={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
+          aria-pressed={metronomeEnabled}
         >
           {metronomeEnabled ? <Bell size={18} /> : <BellOff size={18} />}
         </button>

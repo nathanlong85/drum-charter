@@ -6,7 +6,7 @@ test.describe('Authentication and Core Flow', () => {
   });
 
   test('User can see library and navigate to existing items', async ({ page }) => {
-    await expect(page.getByText(/My Library/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /My Library/i })).toBeVisible();
     await expect(page.getByText(/Songs/i)).toBeVisible();
     await expect(page.getByText(/Notebooks/i)).toBeVisible();
     await expect(page.getByText(/Snippets/i)).toBeVisible();

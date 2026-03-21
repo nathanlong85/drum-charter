@@ -237,6 +237,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
               resolution: state.resolution,
               measures: state.measures,
               instruments: state.instruments,
+              playbackOptionalHits: state.playbackOptionalHits,
             }}
             onChange={(grid) => dispatch({ type: 'UPDATE_GRID', grid })}
             bpm={state.bpm}

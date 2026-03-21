@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus } from 'lucide-react';
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 
 import { useAudioPlayback } from '@/lib/hooks/useAudioPlayback';
 import { type GrooveAction, grooveReducer } from '@/lib/state/groove-reducer';
@@ -118,12 +118,15 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     state.playbackOptionalHits,
   ]);
 
-  const wrappedDispatch = (action: GrooveAction) => {
-    dispatch(action);
-    // Note: This is a bit tricky because useReducer's state isn't updated yet.
-    // We should ideally use the reducer function directly to get the next state for the callback.
-    onChange?.(grooveReducer(state, action));
-  };
+  const wrappedDispatch = useCallback(
+    (action: GrooveAction) => {
+      dispatch(action);
+      // Note: This is a bit tricky because useReducer's state isn't updated yet.
+      // We should ideally use the reducer function directly to get the next state for the callback.
+      onChange?.(grooveReducer(state, action));
+    },
+    [onChange, state],
+  );
 
   const handleNoteClick = (id: string, noteIndex: number) => {
     wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });

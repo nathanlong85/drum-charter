@@ -248,26 +248,30 @@ describe('NotebookEditor', () => {
 
   it('does not attempt to update state if unmounted during save', async () => {
     vi.useFakeTimers();
-    const saveSpy = vi.fn().mockResolvedValue({});
-    supabaseService.saveNotebook = saveSpy;
+    try {
+      const saveSpy = vi.fn().mockResolvedValue({});
+      supabaseService.saveNotebook = saveSpy;
 
-    const { unmount } = render(<NotebookEditor initialNotebook={mockNotebook} />);
+      const { unmount } = render(<NotebookEditor initialNotebook={mockNotebook} />);
 
-    // Trigger a change to start the debounce timer
-    fireEvent.change(screen.getByDisplayValue('Test Notebook'), { target: { value: 'New Name' } });
+      // Trigger a change to start the debounce timer
+      fireEvent.change(screen.getByDisplayValue('Test Notebook'), {
+        target: { value: 'New Name' },
+      });
 
-    // Unmount before the 2s debounce finishes
-    unmount();
+      // Unmount before the 2s debounce finishes
+      unmount();
 
-    // Fast-forward time past the 2s debounce
-    act(() => {
-      vi.advanceTimersByTime(3000);
-    });
+      // Fast-forward time past the 2s debounce
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
 
-    // Verify save was not called (because it was cancelled/skipped by unmount logic)
-    // Note: lodash debounce.cancel() is called in cleanup, so it shouldn't fire
-    expect(saveSpy).not.toHaveBeenCalled();
-    vi.useRealTimers();
+      // Verify save was NOT called (because it was cancelled/skipped by unmount logic)
+      expect(saveSpy).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('deletes the notebook', async () => {

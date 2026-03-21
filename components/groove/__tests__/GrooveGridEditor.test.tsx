@@ -55,6 +55,7 @@ vi.mock('@radix-ui/react-dialog', () => ({
 }));
 
 interface MockSymbolPickerProps {
+  position?: { top: number; left: number };
   onSelect: (symbol: DrumSymbol) => void;
   onVelocityChange: (velocity: number) => void;
   onClose: () => void;
@@ -62,8 +63,8 @@ interface MockSymbolPickerProps {
 
 // Mock SymbolPicker to verify its usage
 vi.mock('../SymbolPicker', () => ({
-  SymbolPicker: ({ onSelect, onVelocityChange, onClose }: MockSymbolPickerProps) => (
-    <div data-testid="symbol-picker">
+  SymbolPicker: ({ position, onSelect, onVelocityChange, onClose }: MockSymbolPickerProps) => (
+    <div data-testid="symbol-picker" data-top={position?.top} data-left={position?.left}>
       <button onClick={() => onSelect('ghost')}>Select Ghost</button>
       <button onClick={() => onVelocityChange(0.5)}>Change Velocity</button>
       <button onClick={onClose}>Close</button>
@@ -106,6 +107,11 @@ interface TestEditorProps {
 
 const TestEditor: React.FC<TestEditorProps> = ({ grid: initial, onChange }) => {
   const [grid, setGrid] = React.useState(initial);
+
+  React.useEffect(() => {
+    setGrid(initial);
+  }, [initial]);
+
   const handleChange = (newGrid: GrooveGrid) => {
     setGrid(newGrid);
     onChange?.(newGrid);
@@ -232,12 +238,16 @@ describe('GrooveGridEditor', () => {
   });
 
   it('syncs with initialGrid when it changes', async () => {
-    const { rerender } = render(<TestEditor grid={initialGrid} />);
+    const onChange = vi.fn();
+    const { rerender } = render(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     const newGrid: GrooveGrid = { ...initialGrid, resolution: 8 };
-    rerender(<TestEditor grid={newGrid} />);
+    rerender(<TestEditor grid={newGrid} onChange={onChange} />);
 
-    expect(screen.getByRole('button', { name: '8' })).toBeInTheDocument();
+    await waitFor(() => {
+      const button = screen.getByRole('button', { name: '8' });
+      expect(button).toHaveClass('bg-blue-600');
+    });
   });
 
   it('positions the symbol picker correctly on context menu', async () => {
@@ -247,8 +257,12 @@ describe('GrooveGridEditor', () => {
     const mockRect = { top: 100, left: 200, height: 32, width: 32 };
     cells[0].getBoundingClientRect = vi.fn(() => mockRect as DOMRect);
 
-    fireEvent.contextMenu(cells[0]);
-    expect(screen.getByTestId('symbol-picker')).toBeInTheDocument();
+    fireEvent.contextMenu(cells[0], { clientX: 250, clientY: 350 });
+
+    const picker = screen.getByTestId('symbol-picker');
+    expect(picker).toBeInTheDocument();
+    expect(picker).toHaveAttribute('data-top', '350');
+    expect(picker).toHaveAttribute('data-left', '250');
   });
 
   it('handles playback toggling with metronome state', async () => {
@@ -259,7 +273,12 @@ describe('GrooveGridEditor', () => {
     expect(mockAudioState.setMetronomeEnabled).toHaveBeenCalledWith(true);
 
     // Rerender to pick up new state from mock hook
+    mockAudioState.metronomeEnabled = true;
     rerender(<TestEditor grid={initialGrid} />);
-    expect(screen.getByLabelText(/Disable Metronome/i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      const disableToggle = screen.getByLabelText(/Disable Metronome/i);
+      expect(disableToggle).toHaveAttribute('aria-pressed', 'true');
+    });
   });
 });

@@ -68,17 +68,21 @@ const mockInstrument: DrumInstrument = {
 };
 
 describe('InstrumentSettingsModal', () => {
-  const onSave = vi.fn();
-  const onClose = vi.fn();
-  const onDelete = vi.fn();
+  let onSave: any;
+  let onClose: any;
+  let onDelete: any;
 
   beforeEach(() => {
+    onSave = vi.fn();
+    onClose = vi.fn();
+    onDelete = vi.fn();
     vi.clearAllMocks();
     vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it('renders initial instrument data', () => {

@@ -170,20 +170,24 @@ describe('SnippetEditor', () => {
 
   it('does not attempt to update state if unmounted during save', async () => {
     vi.useFakeTimers();
-    const saveSpy = vi.fn().mockResolvedValue({});
-    supabaseService.saveGrooveSnippet = saveSpy;
+    try {
+      const saveSpy = vi.fn().mockResolvedValue({});
+      supabaseService.saveGrooveSnippet = saveSpy;
 
-    const { unmount } = render(<SnippetEditor initialSnippet={mockSnippet} />);
-    fireEvent.change(screen.getByDisplayValue('Test Snippet'), { target: { value: 'New Name' } });
+      const { unmount } = render(<SnippetEditor initialSnippet={mockSnippet} />);
+      fireEvent.change(screen.getByDisplayValue('Test Snippet'), { target: { value: 'New Name' } });
 
-    unmount();
+      unmount();
 
-    act(() => {
-      vi.advanceTimersByTime(3000);
-    });
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
 
-    expect(saveSpy).not.toHaveBeenCalled();
-    vi.useRealTimers();
+      // Verify save was NOT called
+      expect(saveSpy).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('deletes the snippet', async () => {

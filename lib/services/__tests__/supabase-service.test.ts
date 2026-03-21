@@ -203,11 +203,15 @@ describe('supabaseService', () => {
         resolution: 16,
         measures: 1,
         instruments: [],
-        playbackOptionalHits: false,
+        playbackOptionalHits: true,
       };
-      mockSupabase.from.mockReturnValue(mockResponse({ id: 'snip-1' }));
+      mockSupabase.from.mockReturnValue(
+        mockResponse({ id: 'snip-1', grid_data: { playbackOptionalHits: true } }),
+      );
       const result = await supabaseService.saveGrooveSnippet(mockSnip as any);
       expect(result.id).toBe('snip-1');
+      // Verify that playbackOptionalHits is preserved when saving and returning
+      expect((result.grid_data as any).playbackOptionalHits).toBe(true);
     });
 
     it('saveGrooveSnippet handles error', async () => {
