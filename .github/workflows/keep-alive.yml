@@ -11,12 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Verify Secrets
+        env:
+          URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          if [ -z "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" ]; then
+          if [ -z "$URL" ]; then
             echo "Error: NEXT_PUBLIC_SUPABASE_URL is not set"
             exit 1
           fi
-          if [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+          if [ -z "$KEY" ]; then
             echo "Error: SUPABASE_SERVICE_ROLE_KEY is not set"
             exit 1
           fi

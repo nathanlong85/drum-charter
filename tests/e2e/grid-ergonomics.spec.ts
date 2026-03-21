@@ -21,8 +21,8 @@ test.describe('Grid Ergonomics', () => {
     await firstCell.click();
     await expect(firstCell.locator('img')).toBeVisible();
 
-    // Handle confirm dialog
-    page.on('dialog', (dialog) => dialog.accept());
+    // Handle confirm dialog - register BEFORE trigger
+    page.once('dialog', (dialog) => dialog.accept());
 
     // Click Clear Grid button
     await page.getByTestId('clear-grid-button').click();
@@ -42,11 +42,10 @@ test.describe('Grid Ergonomics', () => {
     // Enter Edit mode
     await page.getByTitle('Edit Instruments').click();
 
-    // Handle confirm dialog
-    page.on('dialog', (dialog) => dialog.accept());
+    // Handle confirm dialog - register BEFORE trigger
+    page.once('dialog', (dialog) => dialog.accept());
 
     // Click Clear Row button
-    // Find the instrument ID from the row's test ID or just locator
     const clearRowBtn = snareRow.locator('button[title="Clear Row"]');
     await clearRowBtn.click();
 
@@ -123,8 +122,7 @@ test.describe('Grid Ergonomics', () => {
     await firstCell.click();
     await expect(firstCell.locator('img')).toBeVisible();
 
-    // Select the cell
-    await firstCell.click();
+    // Select the cell via mouse move/down/up (no second click)
     const box = await firstCell.boundingBox();
     if (!box) throw new Error('No box');
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

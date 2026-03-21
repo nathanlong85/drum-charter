@@ -72,11 +72,11 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ---
 
 ## V2 Feature Scope (In Planning)
-- [ ] **Advanced Grid Ergonomics**:
-  - [ ] **Multi-cell Interaction**: Implement selection box (drag-to-select), multi-cell clear, and multi-cell symbol application. (#35)
-  - [ ] **Grid Clipboard**: Support copy/pasting single or multiple cells within and across grids. (#35)
-  - [ ] **Modifier Clicks**: Support `Shift + Click` for optional hits and other keyboard + click combos for rapid articulation entry. (#36)
-  - [ ] **Quick Clear**: Add "Clear Grid" and "Clear Row" functions for rapid resets. (#34)
+- [x] **Advanced Grid Ergonomics**:
+  - [x] **Multi-cell Interaction**: Implement selection box (drag-to-select), multi-cell clear, and multi-cell symbol application. (#35) `✓`
+  - [x] **Grid Clipboard**: Support copy/pasting single or multiple cells within and across grids. (#35) `✓`
+  - [x] **Modifier Clicks**: Support `Shift + Click` for optional hits and other keyboard + click combos for rapid articulation entry. (#36) `✓`
+  - [x] **Quick Clear**: Add "Clear Grid" and "Clear Row" functions for rapid resets. (#34) `✓`
 - [ ] **Performance & Live Mode**:
   - [ ] **Live Mode UI**: High-contrast, fullscreen-optimized view for stage use. (#37)
   - [ ] **Remote Control Integration**: Support for Bluetooth foot switches and MIDI controllers for hands-free page turning. (#39)
