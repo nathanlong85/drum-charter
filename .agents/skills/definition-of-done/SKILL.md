@@ -46,11 +46,19 @@ In addition to the automated checks, manually verify the following:
 - **No Residual Debugging**: Ensure no `console.log` or temporary debugging code remains.
 - **Type Safety**: Confirm that there are no new TypeScript errors (run `pnpm tsc` if unsure).
 
-### 4. Reporting
-Once all checks pass, report to the user that the task is "Done" and provide a brief summary of:
-- CodeRabbit loop results.
-- Verification script outcome.
-- Any manual checks performed.
+### 4. Reporting (MANDATORY)
+Once all checks pass, you MUST report completion using this exact checklist format before proposing a push:
+
+```markdown
+### ✅ Definition of Done Checklist
+- [ ] **Clean Lint**: ZERO errors and ZERO warnings.
+- [ ] **CodeRabbit Loop**: Local review completed and addressed.
+- [ ] **Unit Tests**: 100% pass rate.
+- [ ] **E2E Tests**: 100% pass rate.
+- [ ] **Manual Checks**: Plan updated, no logs, types verified.
+```
+
+If any box cannot be checked, the task is NOT done. Proposing a push with a partial checklist is a protocol violation.
 
 ## Resources
 

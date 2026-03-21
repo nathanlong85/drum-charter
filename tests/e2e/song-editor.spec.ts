@@ -92,26 +92,24 @@ test.describe('Song Chart Editor', () => {
     await firstCell.click({ button: 'right' });
     // SymbolPicker uses a fixed/absolute positioning div
     // Use a more flexible locator for the picker
-    const picker = page
-      .locator('div.fixed.z-50.bg-white, div.fixed.z-50.dark\\:bg-gray-800')
-      .first();
+    const picker = page.getByTestId('symbol-picker');
     await expect(picker).toBeVisible();
 
     // Select a different symbol (e.g., accent hit)
-    // The symbol buttons have aria-labels like "accent"
+    // The symbol buttons have aria-labels like "Accent"
     // Use dispatchEvent('click') for all fixed overlay interactions to avoid viewport issues
-    await picker.locator('button[aria-label="accent"]').dispatchEvent('click');
+    await picker.locator('button[aria-label="Accent"]').dispatchEvent('click');
 
     // Verify cell icon changed to accent
     await expect(firstCell.locator('img[alt="accent"]')).toBeVisible();
 
-    // Velocity adjustment buttons (Ghost/Std/Accent)
-    const ghostVelBtn = picker.locator('button', { hasText: 'Ghost' });
+    // Velocity adjustment buttons (GHOST/STD/ACCENT)
+    const ghostVelBtn = picker.locator('button', { hasText: 'GHOST' });
     await expect(ghostVelBtn).toBeVisible();
     await ghostVelBtn.dispatchEvent('click');
 
-    // Verify velocity bar changed (ghost is 0.3, so width should be 30%)
-    await expect(firstCell.locator('div[style*="width: 30%"]')).toBeVisible();
+    // Verify velocity bar changed (ghost is 0.2, so width should be 20%)
+    await expect(firstCell.locator('div[style*="width: 20%"]')).toBeVisible();
 
     // Click Done
     await picker.locator('button', { hasText: 'Done' }).dispatchEvent('click');

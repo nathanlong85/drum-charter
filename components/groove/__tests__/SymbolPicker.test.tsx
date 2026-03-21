@@ -23,41 +23,41 @@ describe('SymbolPicker', () => {
       />,
     );
 
-    // Standard hit should always be there
-    expect(screen.getByLabelText('standard')).toBeInTheDocument();
+    // Standard hit should always be there (Capitalized label)
+    expect(screen.getByLabelText('Standard')).toBeInTheDocument();
   });
 
   it('filters symbols for kick category', () => {
     render(
       <SymbolPicker
-        category="kick"
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
         currentVelocity={0.7}
         onClose={onClose}
         position={position}
+        category="kick"
       />,
     );
 
-    expect(screen.getByLabelText('standard')).toBeInTheDocument();
-    // Rim shot should NOT be there for kick
-    expect(screen.queryByLabelText('rim shot')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Standard')).toBeInTheDocument();
+    // Rim shot should NOT be there for kick (Label: Rim Shot)
+    expect(screen.queryByLabelText('Rim Shot')).not.toBeInTheDocument();
   });
 
   it('shows rim shot for snare category', () => {
     render(
       <SymbolPicker
-        category="snare"
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
         currentVelocity={0.7}
         onClose={onClose}
         position={position}
+        category="snare"
       />,
     );
 
-    // The aria-label is exactly "rim shot" (no underscore in UI)
-    expect(screen.getByLabelText('rim shot')).toBeInTheDocument();
+    // The aria-label is exactly "Rim Shot"
+    expect(screen.getByLabelText('Rim Shot')).toBeInTheDocument();
   });
 
   it('calls onSelect when a symbol is clicked', () => {
@@ -71,7 +71,7 @@ describe('SymbolPicker', () => {
       />,
     );
 
-    fireEvent.click(screen.getByLabelText('accent'));
+    fireEvent.click(screen.getByLabelText('Accent'));
     expect(onSelect).toHaveBeenCalledWith('accent');
   });
 

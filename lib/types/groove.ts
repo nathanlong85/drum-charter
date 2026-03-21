@@ -269,8 +269,9 @@ export function getSymbolsForCategory(category: DrumCategory): DrumSymbol[] {
         'flam_opt',
       ];
     case 'tom':
-    case 'misc':
       return [...baseSymbols, 'ghost', 'ghost_opt', 'double', 'double_opt', 'flam', 'flam_opt'];
+    case 'misc':
+      return [...baseSymbols, 'ghost', 'ghost_opt', 'flam', 'flam_opt'];
     case 'crash':
     case 'ride':
       return [
