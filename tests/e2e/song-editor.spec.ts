@@ -110,8 +110,8 @@ test.describe('Song Chart Editor', () => {
     await expect(ghostVelBtn).toBeVisible();
     await ghostVelBtn.dispatchEvent('click');
 
-    // Verify velocity bar changed (ghost is 0.3, so width should be 30%)
-    await expect(firstCell.locator('div[style*="width: 30%"]')).toBeVisible();
+    // Verify velocity bar changed (ghost is 0.2, so width should be 20%)
+    await expect(firstCell.locator('div[style*="width: 20%"]')).toBeVisible();
 
     // Click Done
     await picker.locator('button', { hasText: 'Done' }).dispatchEvent('click');
