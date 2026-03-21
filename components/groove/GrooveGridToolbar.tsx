@@ -1,4 +1,4 @@
-import { Bell, BellOff, Minus, Play, Plus, Square, Volume2 } from 'lucide-react';
+import { Bell, BellOff, Layers, Minus, Play, Plus, Settings2, Square, Volume2 } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import type { BeatResolution, GrooveGrid } from '@/lib/types/groove';
@@ -34,6 +34,9 @@ export interface GrooveGridToolbarProps {
   updateMeasures: (delta: number) => void;
   updateResolution: (res: BeatResolution) => void;
   updateTimeSignature: (beats: number, value: number) => void;
+  isEditingInstruments?: boolean;
+  onToggleEditInstruments?: () => void;
+  onToggleOptionalHits?: (enabled: boolean) => void;
 }
 
 export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
@@ -49,6 +52,9 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
   updateMeasures,
   updateResolution,
   updateTimeSignature,
+  isEditingInstruments,
+  onToggleEditInstruments,
+  onToggleOptionalHits,
 }) => {
   const [showMetronomeSettings, setShowMetronomeSettings] = useState(false);
 
@@ -103,6 +109,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           }`}
           title={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
           aria-label={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
+          aria-pressed={metronomeEnabled}
         >
           {metronomeEnabled ? <Bell size={18} /> : <BellOff size={18} />}
         </button>
@@ -247,6 +254,34 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="flex-1" />
+
+      <div className={lastGroupClass}>
+        <button
+          onClick={() => onToggleOptionalHits?.(state.playbackOptionalHits === false)}
+          className={`${iconButtonClass} ${
+            state.playbackOptionalHits !== false
+              ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+          }`}
+          title={state.playbackOptionalHits !== false ? 'Hide Optional Hits' : 'Play Optional Hits'}
+        >
+          <Layers size={18} />
+        </button>
+
+        <button
+          onClick={() => onToggleEditInstruments?.()}
+          className={`${iconButtonClass} ${
+            isEditingInstruments
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+          }`}
+          title={isEditingInstruments ? 'Finish Editing' : 'Edit Instruments'}
+        >
+          <Settings2 size={18} />
+        </button>
       </div>
     </div>
   );

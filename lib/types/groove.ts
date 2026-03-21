@@ -122,6 +122,7 @@ export interface GrooveGrid {
   resolution: BeatResolution;
   measures: number;
   instruments: DrumInstrument[];
+  playbackOptionalHits?: boolean; // Toggle for practicing without "extra" hits
 }
 
 /**
@@ -222,7 +223,7 @@ export function calculateTotalNotes(
  * Reference: Multi-layer Velocity Support (#3)
  */
 export function getVelocityForSymbol(symbol: DrumSymbol): number {
-  if (symbol.includes('accent')) return 1.2;
+  if (symbol.includes('accent') || symbol.includes('rim_shot')) return 1.2;
   if (symbol.includes('ghost')) return 0.2;
   if (symbol === 'none') return 0;
   return 0.7; // Standard

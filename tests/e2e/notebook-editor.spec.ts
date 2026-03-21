@@ -22,13 +22,13 @@ test.describe('Notebook Editor', () => {
     // Add first section (Text)
     await page.click('text=Add New Section');
     // Sections are wrapped in a relative group div
-    const firstSection = page.locator('div.relative.group').first();
+    const firstSection = page.getByTestId('notebook-section').first();
     await firstSection.locator('input[placeholder="Section Name"]').fill('Technical Drills');
     await firstSection.locator('textarea[placeholder*="Add notes"]').fill('Work on single strokes');
 
     // Add second section (with Grid)
     await page.click('text=Add New Section');
-    const secondSection = page.locator('div.relative.group').nth(1);
+    const secondSection = page.getByTestId('notebook-section').nth(1);
     await secondSection.locator('input[placeholder="Section Name"]').fill('Groove Exercise');
 
     // Explicitly click the button in the second section
@@ -55,7 +55,7 @@ test.describe('Notebook Editor', () => {
       'Groove Exercise',
     );
 
-    const reloadedGrid = page.locator('div.relative.group').nth(1).getByTestId('groove-grid');
+    const reloadedGrid = page.getByTestId('notebook-section').nth(1).getByTestId('groove-grid');
     await expect(
       reloadedGrid
         .getByTestId('instrument-row-kick')
@@ -69,20 +69,20 @@ test.describe('Notebook Editor', () => {
     // Add two sections with grids
     await page.click('text=Add New Section');
     await page
-      .locator('div.relative.group')
+      .getByTestId('notebook-section')
       .first()
       .getByRole('button', { name: /\+ Add Grid/i })
       .click();
 
     await page.click('text=Add New Section');
     await page
-      .locator('div.relative.group')
+      .getByTestId('notebook-section')
       .nth(1)
       .getByRole('button', { name: /\+ Add Grid/i })
       .click();
 
-    const firstSection = page.locator('div.relative.group').first();
-    const secondSection = page.locator('div.relative.group').nth(1);
+    const firstSection = page.getByTestId('notebook-section').first();
+    const secondSection = page.getByTestId('notebook-section').nth(1);
 
     const firstToolbar = firstSection.getByTestId('groove-toolbar');
     const secondToolbar = secondSection.getByTestId('groove-toolbar');
@@ -99,11 +99,11 @@ test.describe('Notebook Editor', () => {
     await page.reload();
 
     const reloadedFirstToolbar = page
-      .locator('div.relative.group')
+      .getByTestId('notebook-section')
       .first()
       .getByTestId('groove-toolbar');
     const reloadedSecondToolbar = page
-      .locator('div.relative.group')
+      .getByTestId('notebook-section')
       .nth(1)
       .getByTestId('groove-toolbar');
 

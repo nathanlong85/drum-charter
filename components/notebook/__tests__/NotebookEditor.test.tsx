@@ -1,13 +1,23 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { Notebook } from '@/lib/types/groove';
 import NotebookEditor from '../NotebookEditor';
 
+// Mock useRouter
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 // Mock Supabase service
 vi.mock('@/lib/services/supabase-service', () => ({
   supabaseService: {
     saveNotebook: vi.fn().mockResolvedValue({}),
+    duplicateNotebook: vi.fn().mockResolvedValue({ id: 'notebook-2' }),
+    deleteNotebook: vi.fn().mockResolvedValue({}),
   },
 }));
 
@@ -80,6 +90,23 @@ describe('NotebookEditor', () => {
     expect(screen.queryByDisplayValue('Paradiddles')).toBeNull();
   });
 
+  it('updates section name', async () => {
+    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    const nameInput = screen.getByDisplayValue('Paradiddles');
+    fireEvent.change(nameInput, { target: { value: 'Single Strokes' } });
+
+    await waitFor(
+      () => {
+        expect(supabaseService.saveNotebook).toHaveBeenCalledWith(
+          expect.objectContaining({
+            sections: expect.arrayContaining([expect.objectContaining({ name: 'Single Strokes' })]),
+          }),
+        );
+      },
+      { timeout: 3000 },
+    );
+  });
+
   it('updates section notes', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const notesArea = screen.getByDisplayValue('Keep it even');
@@ -104,11 +131,12 @@ describe('NotebookEditor', () => {
 
   it('updates tags', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const tagsInput = screen.getByDisplayValue('technique');
+    const tagsInput = screen.getByPlaceholderText('Add tag...');
 
-    fireEvent.change(tagsInput, { target: { value: 'technique, rudiments' } });
+    fireEvent.change(tagsInput, { target: { value: 'rudiments' } });
+    fireEvent.keyDown(tagsInput, { key: 'Enter', code: 'Enter' });
 
-    expect(screen.getByDisplayValue('technique, rudiments')).toBeDefined();
+    expect(screen.getByText('rudiments')).toBeDefined();
 
     await waitFor(
       () => {
@@ -117,6 +145,147 @@ describe('NotebookEditor', () => {
             tags: ['technique', 'rudiments'],
           }),
         );
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('duplicates the notebook', async () => {
+    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    const duplicateBtn = screen.getByText(/duplicate/i);
+    fireEvent.click(duplicateBtn);
+
+    await waitFor(() => {
+      expect(supabaseService.duplicateNotebook).toHaveBeenCalledWith('notebook-1');
+      expect(mockPush).toHaveBeenCalledWith('/notebooks/notebook-2');
+    });
+  });
+
+  it('adds and removes a grid in a section', async () => {
+    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    const addGridBtn = screen.getByText(/\+ Add Grid/i);
+    fireEvent.click(addGridBtn);
+
+    await waitFor(
+      () => {
+        expect(screen.getByTestId('groove-grid')).toBeInTheDocument();
+      },
+      { timeout: 4000 },
+    );
+
+    const removeGridBtn = screen.getByText('Remove Grid');
+    fireEvent.click(removeGridBtn);
+
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId('groove-grid')).toBeNull();
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('handles public link for notebooks', async () => {
+    const publicNb = { ...mockNotebook, isPublic: true };
+    render(<NotebookEditor initialNotebook={publicNb} />);
+
+    const viewBtn = screen.getByText(/View/i);
+    expect(viewBtn).toHaveAttribute('href', '/public/notebooks/notebook-1');
+  });
+
+  it('toggles public state', async () => {
+    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    const checkbox = screen.getByLabelText(/Public/i);
+    fireEvent.click(checkbox);
+
+    await waitFor(
+      () => {
+        expect(supabaseService.saveNotebook).toHaveBeenCalledWith(
+          expect.objectContaining({ isPublic: true }),
+        );
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('handles error during duplication', async () => {
+    vi.spyOn(supabaseService, 'duplicateNotebook').mockRejectedValueOnce(new Error('Fail'));
+    vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    fireEvent.click(screen.getByText(/duplicate/i));
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith('Failed to duplicate notebook.');
+    });
+  });
+
+  it('handles error during deletion', async () => {
+    vi.spyOn(supabaseService, 'deleteNotebook').mockRejectedValueOnce(new Error('Fail'));
+    vi.spyOn(window, 'alert').mockImplementation(() => {});
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    fireEvent.click(screen.getByText(/delete/i));
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith('Failed to delete notebook.');
+    });
+  });
+
+  it('handles auto-save error gracefully', async () => {
+    vi.spyOn(supabaseService, 'saveNotebook').mockRejectedValueOnce(new Error('Fail'));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    fireEvent.change(screen.getByDisplayValue('Test Notebook'), { target: { value: 'New' } });
+
+    await waitFor(
+      () => {
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to auto-save notebook:', expect.anything());
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('does not attempt to update state if unmounted during save', async () => {
+    vi.useFakeTimers();
+    try {
+      const saveSpy = vi.spyOn(supabaseService, 'saveNotebook').mockResolvedValueOnce({} as any);
+
+      const { unmount } = render(<NotebookEditor initialNotebook={mockNotebook} />);
+
+      // Trigger a change to start the debounce timer
+      fireEvent.change(screen.getByDisplayValue('Test Notebook'), {
+        target: { value: 'New Name' },
+      });
+
+      // Unmount before the 2s debounce finishes
+      unmount();
+
+      // Fast-forward time past the 2s debounce
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+
+      // Verify save WAS called because cleanup calls flush() while isMountedRef.current is still true
+      expect(saveSpy).toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('deletes the notebook', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    vi.spyOn(supabaseService, 'deleteNotebook').mockResolvedValueOnce({} as any);
+
+    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    const deleteBtn = screen.getByText(/delete/i);
+    fireEvent.click(deleteBtn);
+
+    await waitFor(
+      () => {
+        expect(supabaseService.deleteNotebook).toHaveBeenCalled();
+        expect(mockPush).toHaveBeenCalledWith('/library');
       },
       { timeout: 3000 },
     );

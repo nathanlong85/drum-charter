@@ -41,12 +41,12 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
   - [x] Support for multiple measures `✓`
   - [x] Inline editing of drum hits (Toggle and Symbol Picker) `✓`
   - [x] Full Drum Symbols integration (Required and Optional) `✓`
-- [ ] **Drum-Aware Grid Architecture** (Next Phase):
+- [x] **Drum-Aware Grid Architecture** (Next Phase):
   - [x] **Data Model Overhaul**: Transition from flat `instrumentId` to a structured `DrumInstrument` (Category, Preset Variety, Custom Name). `✓`
-  - [ ] **Symbol Filtering**: Restrict available symbols in the `SymbolPicker` based on the drum category (e.g., Snare vs. Kick).
-  - [ ] **Sample Matrix**: Implement a `PresetVariety + Symbol` audio mapping for high-fidelity playback.
-  - [ ] **Dynamic Instrument Management**: Support adding custom varieties based on presets with auto-incrementing default names.
-  - [ ] **Optional Hit Control**: Add a toggle to enable/disable playback of optional hits during practice.
+  - [x] **Symbol Filtering**: Restrict available symbols in the `SymbolPicker` based on the drum category (e.g., Snare vs. Kick). `✓`
+  - [x] **Sample Matrix**: Implement a `PresetVariety + Symbol` audio mapping for high-fidelity playback. `✓`
+  - [x] **Dynamic Instrument Management**: Support adding custom varieties based on presets with auto-incrementing default names. `✓`
+  - [x] **Optional Hit Control**: Add a toggle to enable/disable playback of optional hits during practice. `✓`
 - [x] **Song Charts**:
   - [x] Data structure for Song Charts (Header, Sections, Sub-sections) `✓`
   - [x] Section/Sub-section measure counts (e.g., "Chorus (6M)") `✓`
@@ -91,11 +91,11 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [ ] [Chore] Comprehensive Codebase Audit and Standardization (#24)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [x] [Task] Data Model Update (JSON) & Migration (#27) `✓`
-  - [ ] [Task] Instrument Customization UI (#28)
-  - [ ] [Task] Context-Aware Symbol Picker (#29)
-  - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
+  - [x] [Task] Instrument Customization UI (#28) `✓`
+  - [x] [Task] Context-Aware Symbol Picker (#29) `✓`
+  - [x] [Task] Refined Audio Engine & Sample Matrix (#30) `✓`
   - [ ] [Task] Drum Sample Sourcing (#31)
-  - [ ] [Task] Optional Hit Playback Toggle (#32)
+  - [x] [Task] Optional Hit Playback Toggle (#32) `✓`
 - [ ] [Chore] Expand E2E test coverage for all core UI flows (#22)
 
 ### 🟢 Done

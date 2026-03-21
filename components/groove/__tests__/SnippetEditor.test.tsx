@@ -1,13 +1,23 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { GrooveSnippet } from '@/lib/types/groove';
 import SnippetEditor from '../SnippetEditor';
 
+// Mock useRouter
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
+
 // Mock Supabase service
 vi.mock('@/lib/services/supabase-service', () => ({
   supabaseService: {
     saveGrooveSnippet: vi.fn().mockResolvedValue({}),
+    duplicateGrooveSnippet: vi.fn().mockResolvedValue({ id: 'snippet-2' }),
+    deleteGrooveSnippet: vi.fn().mockResolvedValue({}),
   },
 }));
 
@@ -81,6 +91,119 @@ describe('SnippetEditor', () => {
         );
       },
       { timeout: 3000 },
+    );
+  });
+
+  it('duplicates the snippet', async () => {
+    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    const duplicateBtn = screen.getByText(/duplicate/i);
+    fireEvent.click(duplicateBtn);
+
+    await waitFor(() => {
+      expect(supabaseService.duplicateGrooveSnippet).toHaveBeenCalledWith('snippet-1');
+      expect(mockPush).toHaveBeenCalledWith('/snippets/snippet-2');
+    });
+  });
+
+  it('handles public state toggle', async () => {
+    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    const checkbox = screen.getByLabelText(/Public/i);
+    fireEvent.click(checkbox);
+
+    await waitFor(
+      () => {
+        expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
+          expect.objectContaining({ isPublic: true }),
+        );
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('handles public link for snippets', async () => {
+    const publicSnippet = { ...mockSnippet, isPublic: true };
+    render(<SnippetEditor initialSnippet={publicSnippet} />);
+
+    const viewBtn = screen.getByText(/View/i);
+    expect(viewBtn).toHaveAttribute('href', '/public/snippets/snippet-1');
+  });
+
+  it('handles error during duplication', async () => {
+    supabaseService.duplicateGrooveSnippet = vi.fn().mockRejectedValue(new Error('Fail'));
+    vi.spyOn(window, 'alert').mockImplementation(() => {});
+
+    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    fireEvent.click(screen.getByText(/duplicate/i));
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith('Failed to duplicate snippet.');
+    });
+  });
+
+  it('handles error during deletion', async () => {
+    supabaseService.deleteGrooveSnippet = vi.fn().mockRejectedValue(new Error('Fail'));
+    vi.spyOn(window, 'alert').mockImplementation(() => {});
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    fireEvent.click(screen.getByText(/delete/i));
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith('Failed to delete snippet.');
+    });
+  });
+
+  it('handles auto-save error gracefully', async () => {
+    supabaseService.saveGrooveSnippet = vi.fn().mockRejectedValue(new Error('Fail'));
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    fireEvent.change(screen.getByDisplayValue('Test Snippet'), { target: { value: 'New' } });
+
+    await waitFor(
+      () => {
+        expect(consoleSpy).toHaveBeenCalledWith('Failed to auto-save snippet:', expect.anything());
+      },
+      { timeout: 4000 },
+    );
+  });
+
+  it('does not attempt to update state if unmounted during save', async () => {
+    vi.useFakeTimers();
+    try {
+      const saveSpy = vi.fn().mockResolvedValue({});
+      supabaseService.saveGrooveSnippet = saveSpy;
+
+      const { unmount } = render(<SnippetEditor initialSnippet={mockSnippet} />);
+      fireEvent.change(screen.getByDisplayValue('Test Snippet'), { target: { value: 'New Name' } });
+
+      unmount();
+
+      act(() => {
+        vi.advanceTimersByTime(3000);
+      });
+
+      // Verify save WAS called because cleanup calls flush() while isMountedRef.current is still true
+      expect(saveSpy).toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('deletes the snippet', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    supabaseService.deleteGrooveSnippet = vi.fn().mockResolvedValue({});
+
+    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    const deleteBtn = screen.getByText(/delete/i);
+    fireEvent.click(deleteBtn);
+
+    await waitFor(
+      () => {
+        expect(supabaseService.deleteGrooveSnippet).toHaveBeenCalled();
+        expect(mockPush).toHaveBeenCalledWith('/library');
+      },
+      { timeout: 4000 },
     );
   });
 });

@@ -27,6 +27,27 @@ export function useAudioPlayback({
   const nextNoteTimeRef = useRef(0);
   const currentStepRef = useRef(0);
   const timerIDRef = useRef<number | null>(null);
+  const gridRef = useRef(grid);
+  const bpmRef = useRef(bpm);
+  const metronomeEnabledRef = useRef(metronomeEnabled);
+  const metronomeVolumeRef = useRef(metronomeVolume);
+
+  // Keep refs in sync
+  useEffect(() => {
+    gridRef.current = grid;
+  }, [grid]);
+
+  useEffect(() => {
+    bpmRef.current = bpm;
+  }, [bpm]);
+
+  useEffect(() => {
+    metronomeEnabledRef.current = metronomeEnabled;
+  }, [metronomeEnabled]);
+
+  useEffect(() => {
+    metronomeVolumeRef.current = metronomeVolume;
+  }, [metronomeVolume]);
 
   // Configuration
   const lookahead = 25.0; // How frequently to call scheduling function (in milliseconds)
@@ -40,7 +61,9 @@ export function useAudioPlayback({
 
       const sampleMap: Record<string, string> = {
         kick: '/audio/samples/drum-kit/default/kick.wav',
+        kick_standard: '/audio/samples/drum-kit/default/kick.wav',
         snare: '/audio/samples/drum-kit/default/snare.wav',
+        snare_standard: '/audio/samples/drum-kit/default/snare.wav',
         snare_cross_stick: '/audio/samples/drum-kit/default/snare_cross_stick.wav',
         snare_flam: '/audio/samples/drum-kit/default/snare_flam.wav',
         snare_buzz: '/audio/samples/drum-kit/default/snare_buzz.wav',
@@ -105,24 +128,31 @@ export function useAudioPlayback({
 
   const scheduleNote = useCallback(
     (step: number, time: number) => {
+      const currentGrid = gridRef.current;
       // 1. Schedule Metronome if enabled
-      if (metronomeEnabled) {
-        const stepsPerBeat = grid.resolution / grid.timeSignature.beatValue;
+      if (metronomeEnabledRef.current) {
+        const stepsPerBeat = currentGrid.resolution / currentGrid.timeSignature.beatValue;
         const isBeat = step % stepsPerBeat === 0;
 
         if (isBeat) {
           const beatInMeasure =
-            Math.floor(step / stepsPerBeat) % grid.timeSignature.beatsPerMeasure;
+            Math.floor(step / stepsPerBeat) % currentGrid.timeSignature.beatsPerMeasure;
           const isFirstBeat = beatInMeasure === 0;
           const sampleKey = isFirstBeat ? 'click_high' : 'click_low';
-          playSample(sampleKey, time, metronomeVolume);
+          playSample(sampleKey, time, metronomeVolumeRef.current);
         }
       }
 
       // 2. Check each instrument at this step
-      grid.instruments.forEach((inst) => {
+      currentGrid.instruments.forEach((inst) => {
         const symbol = inst.notes[step];
         if (symbol && symbol !== 'none') {
+          // Check optional hit toggle
+          const isOptional = symbol.endsWith('_opt');
+          if (isOptional && currentGrid.playbackOptionalHits === false) {
+            return;
+          }
+
           const category = inst.category.toLowerCase();
           const variety = inst.presetVariety.toLowerCase().replace(/\s+/g, '_');
 
@@ -168,19 +198,20 @@ export function useAudioPlayback({
         onStepChange(step);
       }
     },
-    [grid, metronomeEnabled, metronomeVolume, onStepChange, playSample],
+    [onStepChange, playSample],
   );
 
   const nextNote = useCallback(() => {
-    const secondsPerBeat = 60.0 / bpm;
-    const { resolution, timeSignature, measures } = grid;
+    const currentGrid = gridRef.current;
+    const secondsPerBeat = 60.0 / bpmRef.current;
+    const { resolution, timeSignature, measures } = currentGrid;
     const secondsPerStep = secondsPerBeat / (resolution / timeSignature.beatValue);
 
     nextNoteTimeRef.current += secondsPerStep;
     currentStepRef.current =
       (currentStepRef.current + 1) %
       (timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures);
-  }, [bpm, grid]);
+  }, []);
 
   const scheduler = useCallback(() => {
     if (!audioContextRef.current) return;

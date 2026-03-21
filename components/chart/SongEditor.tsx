@@ -1,6 +1,7 @@
 'use client';
 
 import { debounce } from 'lodash';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -163,30 +164,37 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
   const [state, dispatch] = useReducer(songReducer, initialSong);
   const [isSaving, setIsSaving] = useState(false);
   const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+  const pendingSaveRef = useRef<Promise<any> | null>(null);
+  const router = useRouter();
 
   const debouncedSave = useCallback(
     debounce(async (song: SongChart) => {
       if (!isMountedRef.current) return;
       setIsSaving(true);
+      const savePromise = supabaseService.saveSongChart(song);
+      pendingSaveRef.current = savePromise;
       try {
-        await supabaseService.saveSongChart(song);
+        await savePromise;
       } catch (error) {
         console.error('Failed to auto-save song chart:', error);
       } finally {
         if (isMountedRef.current) {
           setIsSaving(false);
         }
+        if (pendingSaveRef.current === savePromise) {
+          pendingSaveRef.current = null;
+        }
       }
     }, 2000),
     [],
   );
+
+  const settleAutosave = useCallback(async () => {
+    debouncedSave.flush();
+    if (pendingSaveRef.current) {
+      await pendingSaveRef.current;
+    }
+  }, [debouncedSave]);
 
   const isInitialRender = useRef(true);
 
@@ -204,9 +212,15 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
   useEffect(() => {
     return () => {
       debouncedSave.flush();
-      debouncedSave.cancel();
     };
   }, [debouncedSave]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white min-h-screen relative">
@@ -246,9 +260,13 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             >
               {state.isPublic ? '● PUBLIC' : '○ PRIVATE'}
             </button>
-            {isSaving && (
+            {isSaving ? (
               <span className="text-xs font-mono text-blue-500 animate-pulse bg-blue-50 px-2 py-1 rounded no-print">
                 SAVING...
+              </span>
+            ) : (
+              <span className="text-xs font-mono text-emerald-500 bg-emerald-50 px-2 py-1 rounded no-print">
+                SAVED
               </span>
             )}
             <div className="text-right">
@@ -345,10 +363,29 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
           )}
           <button
             onClick={async () => {
+              if (confirm('Are you sure you want to delete this song?')) {
+                try {
+                  await settleAutosave();
+                  await supabaseService.deleteSongChart(state.id);
+                  router.push('/library');
+                } catch (error) {
+                  console.error('Failed to delete song chart:', error);
+                  alert('Failed to delete song chart.');
+                }
+              }
+            }}
+            className="text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest mr-4"
+          >
+            DELETE
+          </button>
+          <button
+            onClick={async () => {
               try {
+                await settleAutosave();
                 const duplicated = await supabaseService.duplicateSongChart(state.id);
-                window.location.href = `/songs/${duplicated.id}`;
-              } catch (_error) {
+                router.push(`/songs/${duplicated.id}`);
+              } catch (error) {
+                console.error('Failed to duplicate song chart:', error);
                 alert('Failed to duplicate song chart.');
               }
             }}
@@ -519,6 +556,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                         })
                       }
                       className="absolute -right-8 top-0 opacity-0 group-hover/sub:opacity-100 p-1 text-zinc-300 hover:text-red-500 transition-all no-print"
+                      data-testid="remove-subsection-btn"
                     >
                       <svg
                         className="w-4 h-4"

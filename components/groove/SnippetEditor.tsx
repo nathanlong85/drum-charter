@@ -1,6 +1,7 @@
 'use client';
 
 import { debounce } from 'lodash';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
@@ -78,30 +79,37 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
   const [state, dispatch] = useReducer(snippetReducer, initialSnippet);
   const [isSaving, setIsSaving] = useState(false);
   const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+  const pendingSaveRef = useRef<Promise<any> | null>(null);
+  const router = useRouter();
 
   const debouncedSave = useCallback(
     debounce(async (snippet: GrooveSnippet) => {
       if (!isMountedRef.current) return;
       setIsSaving(true);
+      const savePromise = supabaseService.saveGrooveSnippet(snippet);
+      pendingSaveRef.current = savePromise;
       try {
-        await supabaseService.saveGrooveSnippet(snippet);
+        await savePromise;
       } catch (error) {
         console.error('Failed to auto-save snippet:', error);
       } finally {
         if (isMountedRef.current) {
           setIsSaving(false);
         }
+        if (pendingSaveRef.current === savePromise) {
+          pendingSaveRef.current = null;
+        }
       }
     }, 2000),
     [],
   );
+
+  const settleAutosave = useCallback(async () => {
+    debouncedSave.flush();
+    if (pendingSaveRef.current) {
+      await pendingSaveRef.current;
+    }
+  }, [debouncedSave]);
 
   const isInitialRender = useRef(true);
 
@@ -119,9 +127,15 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
   useEffect(() => {
     return () => {
       debouncedSave.flush();
-      debouncedSave.cancel();
     };
   }, [debouncedSave]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white min-h-screen">
@@ -179,14 +193,33 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
             <div className="text-right">
               <button
                 onClick={async () => {
+                  if (confirm('Are you sure you want to delete this snippet?')) {
+                    try {
+                      await settleAutosave();
+                      await supabaseService.deleteGrooveSnippet(state.id);
+                      router.push('/library');
+                    } catch (error) {
+                      console.error('Failed to delete snippet:', error);
+                      alert('Failed to delete snippet.');
+                    }
+                  }
+                }}
+                className="text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest no-print mb-1 block"
+              >
+                DELETE
+              </button>
+              <button
+                onClick={async () => {
                   try {
+                    await settleAutosave();
                     const duplicated = await supabaseService.duplicateGrooveSnippet(state.id);
-                    window.location.href = `/snippets/${duplicated.id}`;
-                  } catch (_error) {
+                    router.push(`/snippets/${duplicated.id}`);
+                  } catch (error) {
+                    console.error('Failed to duplicate snippet:', error);
                     alert('Failed to duplicate snippet.');
                   }
                 }}
-                className="text-[10px] font-bold text-zinc-500 hover:text-blue-600 uppercase tracking-widest no-print mb-1 block"
+                className="text-[10px] font-bold text-zinc-500 hover:text-blue-600 uppercase tracking-widest no-print block"
               >
                 DUPLICATE
               </button>
@@ -214,6 +247,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
               resolution: state.resolution,
               measures: state.measures,
               instruments: state.instruments,
+              playbackOptionalHits: state.playbackOptionalHits,
             }}
             onChange={(grid) => dispatch({ type: 'UPDATE_GRID', grid })}
             bpm={state.bpm}

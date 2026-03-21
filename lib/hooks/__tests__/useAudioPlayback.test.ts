@@ -339,4 +339,212 @@ describe('useAudioPlayback', () => {
     });
     expect(mockStart).toHaveBeenCalledTimes(4);
   });
+
+  it('respects playbackOptionalHits toggle', async () => {
+    const gridWithOptional: GrooveGrid = {
+      ...mockGrid,
+      playbackOptionalHits: false,
+      instruments: [
+        {
+          id: 'kick',
+          category: 'kick',
+          presetVariety: 'Kick',
+          customName: 'Kick',
+          notes: ['standard', 'accent_opt', 'standard_opt', 'ghost_opt'],
+          velocities: [0.7, 1.2, 0.7, 0.2],
+        },
+      ],
+    };
+
+    const { result, rerender } = renderHook(({ grid }) => useAudioPlayback({ grid, bpm: 120 }), {
+      initialProps: { grid: gridWithOptional },
+    });
+
+    // Wait for samples
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    act(() => {
+      result.current.togglePlayback();
+    });
+
+    // Step 0: Standard -> Should play
+    expect(mockStart).toHaveBeenCalledTimes(1);
+
+    // Step 1: accent_opt -> Should skip (playbackOptionalHits is false)
+    act(() => {
+      currentAudioTime += 0.15;
+      vi.advanceTimersByTime(150);
+    });
+    expect(mockStart).toHaveBeenCalledTimes(1); // Still 1
+
+    // Step 2: standard_opt -> Should skip
+    act(() => {
+      currentAudioTime += 0.15;
+      vi.advanceTimersByTime(150);
+    });
+    expect(mockStart).toHaveBeenCalledTimes(1); // Still 1
+
+    // Toggle optional hits ON
+    const gridWithOptionalOn = { ...gridWithOptional, playbackOptionalHits: true };
+    rerender({ grid: gridWithOptionalOn });
+
+    // Step 3: ghost_opt -> Should play (now true)
+    act(() => {
+      currentAudioTime += 0.15;
+      vi.advanceTimersByTime(150);
+    });
+    expect(mockStart).toHaveBeenCalledTimes(2);
+  });
+
+  it('calls onStepChange callback', async () => {
+    const onStepChange = vi.fn();
+    const { result } = renderHook(() =>
+      useAudioPlayback({ grid: mockGrid, bpm: 120, onStepChange }),
+    );
+
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    act(() => {
+      result.current.togglePlayback();
+    });
+
+    expect(onStepChange).toHaveBeenCalledWith(0);
+
+    act(() => {
+      currentAudioTime += 0.15;
+      vi.advanceTimersByTime(150);
+    });
+    expect(onStepChange).toHaveBeenCalledWith(1);
+  });
+
+  it('searches for samples using variety and category fallbacks', async () => {
+    // This test verifies that the hardcoded fallbacks are reached if candidates loop misses
+    const fallbackGrid: GrooveGrid = {
+      ...mockGrid,
+      instruments: [
+        {
+          id: 'k',
+          category: 'kick',
+          presetVariety: 'Kick',
+          customName: 'Kick',
+          notes: ['standard'],
+          velocities: [0.7],
+        },
+        {
+          id: 's',
+          category: 'snare',
+          presetVariety: 'Snare',
+          customName: 'Snare',
+          notes: ['rim_shot'],
+          velocities: [0.7],
+        },
+        {
+          id: 'h',
+          category: 'hi-hat',
+          presetVariety: 'Hi-Hat',
+          customName: 'Hi-Hat',
+          notes: ['hi_hat_open'],
+          velocities: [0.7],
+        },
+        {
+          id: 't1',
+          category: 'tom',
+          presetVariety: 'High Tom',
+          customName: 'High Tom',
+          notes: ['standard'],
+          velocities: [0.7],
+        },
+        {
+          id: 't2',
+          category: 'tom',
+          presetVariety: 'Floor Tom',
+          customName: 'Floor Tom',
+          notes: ['standard'],
+          velocities: [0.7],
+        },
+        {
+          id: 't3',
+          category: 'tom',
+          presetVariety: 'Mid Tom',
+          customName: 'Mid Tom',
+          notes: ['standard'],
+          velocities: [0.7],
+        },
+      ],
+    };
+
+    // Mock fetch to only succeed for the basic fallback names
+    const originalFetch = global.fetch;
+    try {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn((url: string) => {
+          const allowed = [
+            'kick.wav',
+            'snare.wav',
+            'hihat_closed.wav',
+            'tom_high.wav',
+            'tom_floor.wav',
+            'tom_medium.wav',
+          ];
+          if (allowed.some((name) => url.includes(name))) {
+            return Promise.resolve({
+              ok: true,
+              arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+            });
+          }
+          return Promise.resolve({ ok: false });
+        }),
+      );
+
+      const { result } = renderHook(() => useAudioPlayback({ grid: fallbackGrid, bpm: 120 }));
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+
+      act(() => {
+        result.current.togglePlayback();
+      });
+
+      // Step 0: Should trigger 6 playSample calls (one for each instrument)
+      // All should hit the hardcoded fallbacks
+      expect(mockStart).toHaveBeenCalledTimes(6);
+    } finally {
+      // Restore the file-level global fetch mock
+      vi.stubGlobal('fetch', originalFetch);
+    }
+  });
+
+  it('stops scheduling when isPlaying becomes false', async () => {
+    const { result } = renderHook(() => useAudioPlayback({ grid: mockGrid, bpm: 120 }));
+
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+
+    act(() => {
+      result.current.togglePlayback();
+    });
+
+    expect(result.current.isPlaying).toBe(true);
+
+    act(() => {
+      result.current.togglePlayback();
+    });
+    expect(result.current.isPlaying).toBe(false);
+
+    const callsBefore = mockStart.mock.calls.length;
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    // Should not have scheduled more notes
+    expect(mockStart.mock.calls.length).toBe(callsBefore);
+  });
 });

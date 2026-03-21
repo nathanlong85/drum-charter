@@ -1,17 +1,20 @@
 'use client';
 
-import React, { useEffect, useReducer, useState } from 'react';
+import { Plus } from 'lucide-react';
+import React, { useCallback, useEffect, useReducer, useState } from 'react';
 
 import { useAudioPlayback } from '@/lib/hooks/useAudioPlayback';
 import { type GrooveAction, grooveReducer } from '@/lib/state/groove-reducer';
 import {
   type BeatResolution,
+  createInstrument,
   type DrumSymbol,
   type GrooveGrid,
   getVelocityForSymbol,
 } from '@/lib/types/groove';
 import { GrooveGridToolbar } from './GrooveGridToolbar';
 import { InstrumentRow } from './InstrumentRow';
+import { InstrumentSettingsModal } from './InstrumentSettingsModal';
 import { SymbolPicker } from './SymbolPicker';
 
 interface GrooveGridEditorProps {
@@ -45,6 +48,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   const [_showSettings, _setShowSettings] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [localBpm, setLocalBpm] = useState(120);
+  const [isEditingInstruments, setIsEditingInstruments] = useState(false);
+  const [editingInstrumentId, setEditingInstrumentId] = useState<string | null>(null);
 
   const bpm = parentBpm !== undefined ? parentBpm : localBpm;
 
@@ -96,7 +101,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         initialGrid.measures !== state.measures ||
         initialGrid.resolution !== state.resolution ||
         initialGrid.timeSignature.beatsPerMeasure !== state.timeSignature.beatsPerMeasure ||
-        initialGrid.timeSignature.beatValue !== state.timeSignature.beatValue;
+        initialGrid.timeSignature.beatValue !== state.timeSignature.beatValue ||
+        initialGrid.playbackOptionalHits !== state.playbackOptionalHits;
 
       if (isDifferent) {
         dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
@@ -109,14 +115,18 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     state.resolution,
     state.timeSignature.beatValue,
     state.timeSignature.beatsPerMeasure,
+    state.playbackOptionalHits,
   ]);
 
-  const wrappedDispatch = (action: GrooveAction) => {
-    dispatch(action);
-    // Note: This is a bit tricky because useReducer's state isn't updated yet.
-    // We should ideally use the reducer function directly to get the next state for the callback.
-    onChange?.(grooveReducer(state, action));
-  };
+  const wrappedDispatch = useCallback(
+    (action: GrooveAction) => {
+      dispatch(action);
+      // Note: This is a bit tricky because useReducer's state isn't updated yet.
+      // We should ideally use the reducer function directly to get the next state for the callback.
+      onChange?.(grooveReducer(state, action));
+    },
+    [onChange, state],
+  );
 
   const handleNoteClick = (id: string, noteIndex: number) => {
     wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
@@ -170,6 +180,18 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     });
   };
 
+  const handleAddInstrument = () => {
+    const id = crypto.randomUUID?.() || Math.random().toString(36).substring(2);
+    const newInst = createInstrument(state, id, 'misc', 'Misc', 'New Instrument');
+    wrappedDispatch({
+      type: 'ADD_INSTRUMENT',
+      id: newInst.id,
+      category: newInst.category,
+      presetVariety: newInst.presetVariety,
+      label: newInst.customName,
+    });
+  };
+
   // Generate headers (1 e + a)
   const renderHeader = () => {
     if (!state) return null;
@@ -212,7 +234,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
 
     return (
       <div className="flex border-b-2 border-gray-400 dark:border-gray-600">
-        <div className="w-24 h-8 bg-gray-200 dark:bg-gray-800 border-r border-gray-400 dark:border-gray-600" />
+        <div className="w-32 h-8 bg-gray-200 dark:bg-gray-800 border-r border-gray-400 dark:border-gray-600" />
         <div className="flex">{headers}</div>
       </div>
     );
@@ -245,6 +267,14 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         updateMeasures={updateMeasures}
         updateResolution={updateResolution}
         updateTimeSignature={updateTimeSignature}
+        isEditingInstruments={isEditingInstruments}
+        onToggleEditInstruments={() => setIsEditingInstruments(!isEditingInstruments)}
+        onToggleOptionalHits={(enabled) =>
+          wrappedDispatch({
+            type: 'SET_GRID_SETTINGS',
+            settings: { playbackOptionalHits: enabled },
+          })
+        }
       />
 
       <div
@@ -260,14 +290,34 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
               grid={state}
               onNoteClick={(idx) => handleNoteClick(inst.id, idx)}
               onNoteContextMenu={(idx, e) => handleNoteContextMenu(inst.id, idx, e)}
+              isEditing={isEditingInstruments}
+              onSettingsClick={() => setEditingInstrumentId(inst.id)}
+              onMoveUp={() =>
+                wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'up' })
+              }
+              onMoveDown={() =>
+                wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'down' })
+              }
             />
           ))}
+
+          {isEditingInstruments && (
+            <button
+              onClick={handleAddInstrument}
+              className="flex items-center justify-center h-8 w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold transition-colors uppercase tracking-wider"
+              data-testid="add-instrument-button"
+            >
+              <Plus size={14} className="mr-1" />
+              Add Instrument
+            </button>
+          )}
         </div>
 
         {pickerPos && (
           <SymbolPicker
             position={{ top: pickerPos.top, left: pickerPos.left }}
             onSelect={handleSymbolSelect}
+            category={state.instruments.find((i) => i.id === pickerPos.id)?.category}
             onVelocityChange={(vel) => handleVelocityChange(pickerPos.id, pickerPos.noteIndex, vel)}
             currentVelocity={
               state.instruments.find((i) => i.id === pickerPos.id)?.velocities?.[
@@ -281,6 +331,27 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
             onClose={() => setPickerPos(null)}
           />
         )}
+
+        {(() => {
+          const editingInstrument = editingInstrumentId
+            ? state.instruments.find((i) => i.id === editingInstrumentId)
+            : undefined;
+
+          if (!editingInstrument) return null;
+
+          return (
+            <InstrumentSettingsModal
+              instrument={editingInstrument}
+              onClose={() => setEditingInstrumentId(null)}
+              onSave={(updates) => {
+                wrappedDispatch({ type: 'UPDATE_INSTRUMENT', id: editingInstrument.id, updates });
+              }}
+              onDelete={() => {
+                wrappedDispatch({ type: 'REMOVE_INSTRUMENT', id: editingInstrument.id });
+              }}
+            />
+          );
+        })()}
       </div>
     </div>
   );
