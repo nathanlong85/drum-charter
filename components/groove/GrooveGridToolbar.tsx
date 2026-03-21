@@ -1,4 +1,15 @@
-import { Bell, BellOff, Layers, Minus, Play, Plus, Settings2, Square, Volume2 } from 'lucide-react';
+import {
+  Bell,
+  BellOff,
+  Layers,
+  Minus,
+  Play,
+  Plus,
+  Settings2,
+  Square,
+  Trash2,
+  Volume2,
+} from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import type { BeatResolution, GrooveGrid } from '@/lib/types/groove';
@@ -37,6 +48,7 @@ export interface GrooveGridToolbarProps {
   isEditingInstruments?: boolean;
   onToggleEditInstruments?: () => void;
   onToggleOptionalHits?: (enabled: boolean) => void;
+  onClearGrid?: () => void;
 }
 
 export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
@@ -55,6 +67,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
   isEditingInstruments,
   onToggleEditInstruments,
   onToggleOptionalHits,
+  onClearGrid,
 }) => {
   const [showMetronomeSettings, setShowMetronomeSettings] = useState(false);
 
@@ -259,6 +272,19 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
       <div className="flex-1" />
 
       <div className={lastGroupClass}>
+        <button
+          onClick={() => {
+            if (window.confirm('Clear all notes in the grid?')) {
+              onClearGrid?.();
+            }
+          }}
+          className={`${iconButtonClass} bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400`}
+          title="Clear Grid"
+          data-testid="clear-grid-button"
+        >
+          <Trash2 size={18} />
+        </button>
+
         <button
           onClick={() => onToggleOptionalHits?.(state.playbackOptionalHits === false)}
           className={`${iconButtonClass} ${

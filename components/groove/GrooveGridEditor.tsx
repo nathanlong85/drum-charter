@@ -51,6 +51,12 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   const [isEditingInstruments, setIsEditingInstruments] = useState(false);
   const [editingInstrumentId, setEditingInstrumentId] = useState<string | null>(null);
 
+  const [selectionRange, setSelectionRange] = useState<{
+    start: { instIdx: number; noteIdx: number };
+    end: { instIdx: number; noteIdx: number };
+  } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
   const bpm = parentBpm !== undefined ? parentBpm : localBpm;
 
   const {
@@ -128,12 +134,73 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     [onChange, state],
   );
 
-  const handleNoteClick = (id: string, noteIndex: number) => {
+  const handleNoteClick = (id: string, noteIndex: number, e: React.MouseEvent) => {
+    if (selectionRange) {
+      const instIdx = state.instruments.findIndex((i) => i.id === id);
+      const isSameCell =
+        selectionRange.start.instIdx === instIdx && selectionRange.start.noteIdx === noteIndex;
+      const isSingleCell =
+        selectionRange.start.instIdx === selectionRange.end.instIdx &&
+        selectionRange.start.noteIdx === selectionRange.end.noteIdx;
+
+      if (!isSameCell || !isSingleCell) {
+        setSelectionRange(null);
+        return;
+      }
+    }
+
+    if (e.shiftKey) {
+      wrappedDispatch({ type: 'TOGGLE_OPTIONAL', id, noteIndex });
+      return;
+    }
+
+    if (e.altKey) {
+      setPickerPos({
+        top: e.clientY,
+        left: e.clientX,
+        id,
+        noteIndex,
+      });
+      return;
+    }
+
     wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
+  };
+
+  const handleNoteMouseDown = (instIdx: number, noteIdx: number, e: React.MouseEvent) => {
+    if (e.button !== 0) return; // Only left click
+    setSelectionRange({
+      start: { instIdx, noteIdx },
+      end: { instIdx, noteIdx },
+    });
+    setIsDragging(true);
+  };
+
+  const handleNoteMouseEnter = (instIdx: number, noteIdx: number) => {
+    if (isDragging && selectionRange) {
+      setSelectionRange({
+        ...selectionRange,
+        end: { instIdx, noteIdx },
+      });
+    }
   };
 
   const handleNoteContextMenu = (id: string, noteIndex: number, e: React.MouseEvent) => {
     e.preventDefault();
+
+    // If context menu is opened outside current selection, clear it
+    if (selectionRange) {
+      const instIdx = state.instruments.findIndex((i) => i.id === id);
+      const minInst = Math.min(selectionRange.start.instIdx, selectionRange.end.instIdx);
+      const maxInst = Math.max(selectionRange.start.instIdx, selectionRange.end.instIdx);
+      const minNote = Math.min(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
+      const maxNote = Math.max(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
+
+      if (instIdx < minInst || instIdx > maxInst || noteIndex < minNote || noteIndex > maxNote) {
+        setSelectionRange(null);
+      }
+    }
+
     setPickerPos({
       top: e.clientY,
       left: e.clientX,
@@ -143,23 +210,109 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   };
 
   const handleVelocityChange = (id: string, noteIndex: number, velocity: number) => {
-    wrappedDispatch({
-      type: 'SET_VELOCITY',
-      id,
-      noteIndex,
-      velocity,
-    });
+    if (selectionRange) {
+      wrappedDispatch({
+        type: 'SET_SELECTION_VELOCITY',
+        selection: selectionRange,
+        velocity,
+      });
+    } else {
+      wrappedDispatch({
+        type: 'SET_VELOCITY',
+        id,
+        noteIndex,
+        velocity,
+      });
+    }
   };
 
   const handleSymbolSelect = (symbol: DrumSymbol) => {
     if (!pickerPos) return;
-    wrappedDispatch({
-      type: 'SET_SYMBOL',
-      id: pickerPos.id,
-      noteIndex: pickerPos.noteIndex,
-      symbol,
-    });
+    if (selectionRange) {
+      wrappedDispatch({
+        type: 'SET_SELECTION_SYMBOLS',
+        selection: selectionRange,
+        symbol,
+      });
+    } else {
+      wrappedDispatch({
+        type: 'SET_SYMBOL',
+        id: pickerPos.id,
+        noteIndex: pickerPos.noteIndex,
+        symbol,
+      });
+    }
   };
+
+  useEffect(() => {
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectionRange) {
+        e.preventDefault();
+        wrappedDispatch({
+          type: 'SET_SELECTION_SYMBOLS',
+          selection: selectionRange,
+          symbol: 'none',
+        });
+      }
+      // Copy functionality (internal JSON to clipboard)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectionRange) {
+        const { start, end } = selectionRange;
+        const minInst = Math.min(start.instIdx, end.instIdx);
+        const maxInst = Math.max(start.instIdx, end.instIdx);
+        const minNote = Math.min(start.noteIdx, end.noteIdx);
+        const maxNote = Math.max(start.noteIdx, end.noteIdx);
+
+        const selectedData = state.instruments.slice(minInst, maxInst + 1).map((inst) => ({
+          category: inst.category,
+          presetVariety: inst.presetVariety,
+          notes: inst.notes.slice(minNote, maxNote + 1),
+          velocities: inst.velocities?.slice(minNote, maxNote + 1),
+        }));
+
+        try {
+          await navigator.clipboard.writeText(JSON.stringify(selectedData));
+        } catch (err) {
+          console.error('Failed to copy to clipboard:', err);
+        }
+      }
+    };
+
+    const handlePaste = async (e: ClipboardEvent) => {
+      if (!selectionRange) return;
+      const text = e.clipboardData?.getData('text');
+      if (!text) return;
+
+      try {
+        const data = JSON.parse(text);
+        if (Array.isArray(data) && data.length > 0 && data[0].notes) {
+          const { start, end } = selectionRange;
+          const targetInstIdx = Math.min(start.instIdx, end.instIdx);
+          const targetNoteIdx = Math.min(start.noteIdx, end.noteIdx);
+
+          wrappedDispatch({
+            type: 'PASTE_SELECTION',
+            target: { instIdx: targetInstIdx, noteIdx: targetNoteIdx },
+            data,
+          });
+        }
+      } catch (_err) {
+        // Not valid JSON or not our format, ignore
+      }
+    };
+
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('paste', handlePaste);
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('paste', handlePaste);
+    };
+  }, [selectionRange, state.instruments, wrappedDispatch]);
 
   const updateMeasures = (delta: number) => {
     const newMeasures = Math.max(1, state.measures + delta);
@@ -275,6 +428,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
             settings: { playbackOptionalHits: enabled },
           })
         }
+        onClearGrid={() => wrappedDispatch({ type: 'CLEAR_GRID' })}
       />
 
       <div
@@ -283,13 +437,17 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       >
         {renderHeader()}
         <div className="flex flex-col">
-          {state?.instruments.map((inst) => (
+          {state?.instruments.map((inst, instIdx) => (
             <InstrumentRow
               key={inst.id}
               instrument={inst}
               grid={state}
-              onNoteClick={(idx) => handleNoteClick(inst.id, idx)}
+              onNoteClick={(idx, e) => handleNoteClick(inst.id, idx, e)}
               onNoteContextMenu={(idx, e) => handleNoteContextMenu(inst.id, idx, e)}
+              onNoteMouseDown={(idx, e) => handleNoteMouseDown(instIdx, idx, e)}
+              onNoteMouseEnter={(idx) => handleNoteMouseEnter(instIdx, idx)}
+              selectionRange={selectionRange}
+              instIdx={instIdx}
               isEditing={isEditingInstruments}
               onSettingsClick={() => setEditingInstrumentId(inst.id)}
               onMoveUp={() =>
@@ -298,6 +456,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
               onMoveDown={() =>
                 wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'down' })
               }
+              onClear={() => wrappedDispatch({ type: 'CLEAR_ROW', id: inst.id })}
             />
           ))}
 

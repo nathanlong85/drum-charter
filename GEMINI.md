@@ -6,6 +6,9 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## Agent Capabilities
 - You are free to recommend and use additional packages beyond those already included if they improve outcomes (for example, UI libraries like Radix to enhance accessibility and UX).
 
+## GitHub Identity
+- My dedicated GitHub account is **`nathanlong85-ai`**. Use this login for search queries and when identifying assigned issues/PRs.
+
 ---
 
 @./.gemini/rules/COLLABORATION_PROTOCOL.md

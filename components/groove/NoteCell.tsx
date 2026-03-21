@@ -7,10 +7,13 @@ import type { DrumSymbol } from '@/lib/types/groove';
 interface NoteCellProps {
   symbol: DrumSymbol;
   velocity?: number;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
   onContextMenu: (e: React.MouseEvent) => void;
+  onMouseDown?: (e: React.MouseEvent) => void;
+  onMouseEnter?: (e: React.MouseEvent) => void;
   isBeat?: boolean;
   isMeasureBoundary?: boolean;
+  isSelected?: boolean;
 }
 
 const symbolToIcon: Record<DrumSymbol, string | null> = {
@@ -50,8 +53,11 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   velocity,
   onClick,
   onContextMenu,
+  onMouseDown,
+  onMouseEnter,
   isBeat,
   isMeasureBoundary,
+  isSelected,
 }) => {
   const iconPath = symbolToIcon[symbol];
 
@@ -74,12 +80,15 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     <div
       onClick={onClick}
       onContextMenu={onContextMenu}
+      onMouseDown={onMouseDown}
+      onMouseEnter={onMouseEnter}
       data-testid="note-cell"
       className={`
         w-8 h-8 flex items-center justify-center border-r border-gray-300 dark:border-gray-700 cursor-pointer
         hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors relative
         ${isBeat ? 'bg-gray-50 dark:bg-gray-900' : ''}
         ${isMeasureBoundary ? 'border-r-2 border-r-gray-800 dark:border-r-gray-200' : ''}
+        ${isSelected ? 'bg-blue-200/50 dark:bg-blue-800/50 ring-2 ring-blue-500 ring-inset z-10' : ''}
       `}
     >
       {iconPath && (

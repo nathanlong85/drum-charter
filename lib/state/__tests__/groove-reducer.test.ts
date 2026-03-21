@@ -172,4 +172,89 @@ describe('grooveReducer', () => {
     });
     expect(nextState.playbackOptionalHits).toBe(false);
   });
+
+  it('handles CLEAR_GRID', () => {
+    const withNotes = {
+      ...initialGrid,
+      instruments: [{ ...initialGrid.instruments[0], notes: ['standard', 'accent'] }],
+    };
+    const nextState = grooveReducer(withNotes, { type: 'CLEAR_GRID' });
+    expect(nextState.instruments[0].notes.every((n) => n === 'none')).toBe(true);
+  });
+
+  it('handles CLEAR_ROW', () => {
+    const withNotes = {
+      ...initialGrid,
+      instruments: [{ ...initialGrid.instruments[0], notes: ['standard', 'accent'] }],
+    };
+    const nextState = grooveReducer(withNotes, { type: 'CLEAR_ROW', id: 'hh' });
+    expect(nextState.instruments[0].notes.every((n) => n === 'none')).toBe(true);
+  });
+
+  it('handles TOGGLE_OPTIONAL', () => {
+    const withStandard = {
+      ...initialGrid,
+      instruments: [{ ...initialGrid.instruments[0], notes: ['standard'] }],
+    };
+    // standard -> standard_opt
+    let state = grooveReducer(withStandard, { type: 'TOGGLE_OPTIONAL', id: 'hh', noteIndex: 0 });
+    expect(state.instruments[0].notes[0]).toBe('standard_opt');
+
+    // standard_opt -> standard
+    state = grooveReducer(state, { type: 'TOGGLE_OPTIONAL', id: 'hh', noteIndex: 0 });
+    expect(state.instruments[0].notes[0]).toBe('standard');
+
+    // none -> none (unchanged)
+    const withNone = {
+      ...initialGrid,
+      instruments: [{ ...initialGrid.instruments[0], notes: ['none'] }],
+    };
+    state = grooveReducer(withNone, { type: 'TOGGLE_OPTIONAL', id: 'hh', noteIndex: 0 });
+    expect(state.instruments[0].notes[0]).toBe('none');
+  });
+
+  it('handles SET_SELECTION_SYMBOLS', () => {
+    const selection = {
+      start: { instIdx: 0, noteIdx: 0 },
+      end: { instIdx: 0, noteIdx: 2 },
+    };
+    const nextState = grooveReducer(initialGrid, {
+      type: 'SET_SELECTION_SYMBOLS',
+      selection,
+      symbol: 'buzz',
+    });
+    expect(nextState.instruments[0].notes.slice(0, 3)).toEqual(['buzz', 'buzz', 'buzz']);
+    expect(nextState.instruments[0].notes[3]).toBe('none');
+  });
+
+  it('handles SET_SELECTION_VELOCITY', () => {
+    const selection = {
+      start: { instIdx: 0, noteIdx: 0 },
+      end: { instIdx: 0, noteIdx: 2 },
+    };
+    const nextState = grooveReducer(initialGrid, {
+      type: 'SET_SELECTION_VELOCITY',
+      selection,
+      velocity: 0.5,
+    });
+    expect(nextState.instruments[0].velocities.slice(0, 3)).toEqual([0.5, 0.5, 0.5]);
+  });
+
+  it('handles PASTE_SELECTION', () => {
+    const data = [
+      {
+        notes: ['standard' as const, 'accent' as const],
+        velocities: [0.7, 1.2],
+      },
+    ];
+    const nextState = grooveReducer(initialGrid, {
+      type: 'PASTE_SELECTION',
+      target: { instIdx: 0, noteIdx: 1 },
+      data,
+    });
+    expect(nextState.instruments[0].notes[1]).toBe('standard');
+    expect(nextState.instruments[0].notes[2]).toBe('accent');
+    expect(nextState.instruments[0].velocities[1]).toBe(0.7);
+    expect(nextState.instruments[0].velocities[2]).toBe(1.2);
+  });
 });

@@ -84,6 +84,15 @@ vi.mock('@/lib/hooks/useAudioPlayback', () => ({
   }),
 }));
 
+// Mock navigator.clipboard
+Object.defineProperty(navigator, 'clipboard', {
+  value: {
+    writeText: vi.fn().mockResolvedValue(undefined),
+    readText: vi.fn().mockResolvedValue(''),
+  },
+  configurable: true,
+});
+
 const initialGrid: GrooveGrid = {
   timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
   resolution: 4,
@@ -279,6 +288,257 @@ describe('GrooveGridEditor', () => {
     await waitFor(() => {
       const disableToggle = screen.getByLabelText(/Disable Metronome/i);
       expect(disableToggle).toHaveAttribute('aria-pressed', 'true');
+    });
+  });
+
+  describe('Clear actions', () => {
+    it('clears the entire grid when confirmed', async () => {
+      const onChange = vi.fn();
+      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const clearBtn = screen.getByTestId('clear-grid-button');
+
+      fireEvent.click(clearBtn);
+
+      expect(confirmSpy).toHaveBeenCalledWith('Clear all notes in the grid?');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            instruments: expect.arrayContaining([
+              expect.objectContaining({
+                notes: ['none', 'none', 'none', 'none'],
+              }),
+            ]),
+          }),
+        );
+      });
+    });
+
+    it('does not clear the grid when cancelled', async () => {
+      const onChange = vi.fn();
+      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+
+      vi.spyOn(window, 'confirm').mockReturnValue(false);
+      const clearBtn = screen.getByTestId('clear-grid-button');
+
+      fireEvent.click(clearBtn);
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('clears a specific row when confirmed during editing', async () => {
+      const onChange = vi.fn();
+      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+
+      // Enable editing mode
+      fireEvent.click(screen.getByTitle('Edit Instruments'));
+
+      const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+      const clearRowBtn = screen.getByTestId('clear-row-i1');
+
+      fireEvent.click(clearRowBtn);
+
+      expect(confirmSpy).toHaveBeenCalledWith('Clear all notes for Kick?');
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            instruments: expect.arrayContaining([
+              expect.objectContaining({
+                id: 'i1',
+                notes: ['none', 'none', 'none', 'none'],
+              }),
+            ]),
+          }),
+        );
+      });
+    });
+  });
+
+  describe('Multi-cell selection', () => {
+    it('selects multiple cells via drag', async () => {
+      render(<TestEditor grid={initialGrid} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      fireEvent.mouseDown(cells[0], { button: 0 });
+      fireEvent.mouseEnter(cells[1]);
+      fireEvent.mouseUp(window);
+
+      expect(cells[0]).toHaveClass('bg-blue-200/50');
+      expect(cells[1]).toHaveClass('bg-blue-200/50');
+      expect(cells[2]).not.toHaveClass('bg-blue-200/50');
+    });
+
+    it('clears selected cells with Delete key', async () => {
+      const onChange = vi.fn();
+      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      fireEvent.mouseDown(cells[0], { button: 0 });
+      fireEvent.mouseUp(window);
+
+      fireEvent.keyDown(window, { key: 'Delete' });
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            instruments: expect.arrayContaining([
+              expect.objectContaining({
+                notes: expect.arrayContaining(['none']),
+              }),
+            ]),
+          }),
+        );
+      });
+    });
+
+    it('applies symbol to all selected cells', async () => {
+      const onChange = vi.fn();
+      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      fireEvent.mouseDown(cells[1], { button: 0 });
+      fireEvent.mouseEnter(cells[2]);
+      fireEvent.mouseUp(window);
+
+      fireEvent.contextMenu(cells[1]);
+      fireEvent.click(screen.getByText('Select Ghost'));
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            instruments: expect.arrayContaining([
+              expect.objectContaining({
+                notes: ['standard', 'ghost', 'ghost', 'none'],
+              }),
+            ]),
+          }),
+        );
+      });
+    });
+
+    it('toggles optional state with Shift+Click', async () => {
+      const onChange = vi.fn();
+      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      fireEvent.click(cells[0], { shiftKey: true });
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            instruments: expect.arrayContaining([
+              expect.objectContaining({
+                notes: ['standard_opt', 'none', 'none', 'none'],
+              }),
+            ]),
+          }),
+        );
+      });
+    });
+
+    it('opens symbol picker directly with Alt+Click', async () => {
+      render(<TestEditor grid={initialGrid} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      fireEvent.click(cells[1], { altKey: true });
+
+      expect(screen.getByTestId('symbol-picker')).toBeInTheDocument();
+    });
+
+    it('copies selected cells to clipboard', async () => {
+      render(<TestEditor grid={initialGrid} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      fireEvent.mouseDown(cells[0], { button: 0 });
+      fireEvent.mouseUp(window);
+
+      fireEvent.keyDown(window, { key: 'c', ctrlKey: true });
+
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        expect.stringContaining('"notes":["standard"]'),
+      );
+    });
+
+    it('pastes data into the grid', async () => {
+      const onChange = vi.fn();
+      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      // Select target cell
+      fireEvent.mouseDown(cells[1], { button: 0 });
+      fireEvent.mouseUp(window);
+
+      const pasteData = JSON.stringify([{ notes: ['accent'] }]);
+      const pasteEvent = new Event('paste') as any;
+      pasteEvent.clipboardData = {
+        getData: () => pasteData,
+      };
+
+      fireEvent(window, pasteEvent);
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            instruments: expect.arrayContaining([
+              expect.objectContaining({
+                notes: ['standard', 'accent', 'none', 'none'],
+              }),
+            ]),
+          }),
+        );
+      });
+    });
+
+    it('clears selection when clicking outside cells', async () => {
+      render(<TestEditor grid={initialGrid} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      fireEvent.mouseDown(cells[0], { button: 0 });
+      fireEvent.mouseUp(window);
+      expect(cells[0]).toHaveClass('bg-blue-200/50');
+
+      // Click another cell (not the same one)
+      fireEvent.mouseDown(cells[1], { button: 0 });
+      fireEvent.click(cells[1]);
+      expect(cells[0]).not.toHaveClass('bg-blue-200/50');
+    });
+
+    it('applies velocity to all selected cells', async () => {
+      const onChange = vi.fn();
+      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      fireEvent.mouseDown(cells[0], { button: 0 });
+      fireEvent.mouseEnter(cells[1]);
+      fireEvent.mouseUp(window);
+
+      fireEvent.contextMenu(cells[0]);
+      fireEvent.click(screen.getByText('Change Velocity'));
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            instruments: expect.arrayContaining([
+              expect.objectContaining({
+                velocities: [0.5, 0.5, 0, 0],
+              }),
+            ]),
+          }),
+        );
+      });
+    });
+
+    it('clears selection when opening context menu outside range', async () => {
+      render(<TestEditor grid={initialGrid} />);
+      const cells = screen.getAllByTestId('note-cell');
+
+      fireEvent.mouseDown(cells[0], { button: 0 });
+      fireEvent.mouseUp(window);
+      expect(cells[0]).toHaveClass('bg-blue-200/50');
+
+      fireEvent.contextMenu(cells[2]);
+      expect(cells[0]).not.toHaveClass('bg-blue-200/50');
     });
   });
 });
