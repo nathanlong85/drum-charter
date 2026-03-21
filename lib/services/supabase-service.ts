@@ -475,13 +475,13 @@ export const supabaseService = {
         id: snippet.id,
         title: snippet.title,
         tags: snippet.tags,
-        grid_data: {
+        grid_data: toJson({
           timeSignature: snippet.timeSignature,
           resolution: snippet.resolution,
           measures: snippet.measures,
           instruments: snippet.instruments,
           playbackOptionalHits: snippet.playbackOptionalHits,
-        } as any,
+        }),
 
         is_public: snippet.isPublic,
         updated_at: new Date().toISOString(),

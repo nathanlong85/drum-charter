@@ -79,31 +79,37 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
   const [state, dispatch] = useReducer(snippetReducer, initialSnippet);
   const [isSaving, setIsSaving] = useState(false);
   const isMountedRef = useRef(true);
+  const pendingSaveRef = useRef<Promise<any> | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
 
   const debouncedSave = useCallback(
     debounce(async (snippet: GrooveSnippet) => {
       if (!isMountedRef.current) return;
       setIsSaving(true);
+      const savePromise = supabaseService.saveGrooveSnippet(snippet);
+      pendingSaveRef.current = savePromise;
       try {
-        await supabaseService.saveGrooveSnippet(snippet);
+        await savePromise;
       } catch (error) {
         console.error('Failed to auto-save snippet:', error);
       } finally {
         if (isMountedRef.current) {
           setIsSaving(false);
         }
+        if (pendingSaveRef.current === savePromise) {
+          pendingSaveRef.current = null;
+        }
       }
     }, 2000),
     [],
   );
+
+  const settleAutosave = useCallback(async () => {
+    debouncedSave.flush();
+    if (pendingSaveRef.current) {
+      await pendingSaveRef.current;
+    }
+  }, [debouncedSave]);
 
   const isInitialRender = useRef(true);
 
@@ -121,9 +127,15 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
   useEffect(() => {
     return () => {
       debouncedSave.flush();
-      debouncedSave.cancel();
     };
   }, [debouncedSave]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white min-h-screen">
@@ -183,8 +195,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                 onClick={async () => {
                   if (confirm('Are you sure you want to delete this snippet?')) {
                     try {
-                      // Cancel any pending debounced saves before deleting
-                      debouncedSave.cancel();
+                      await settleAutosave();
                       await supabaseService.deleteGrooveSnippet(state.id);
                       router.push('/library');
                     } catch (error) {
@@ -200,8 +211,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
               <button
                 onClick={async () => {
                   try {
-                    // Flush any pending saves before duplicating so the clone has latest data
-                    debouncedSave.flush();
+                    await settleAutosave();
                     const duplicated = await supabaseService.duplicateGrooveSnippet(state.id);
                     router.push(`/snippets/${duplicated.id}`);
                   } catch (error) {
@@ -209,7 +219,7 @@ export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                     alert('Failed to duplicate snippet.');
                   }
                 }}
-                className="text-[10px] font-bold text-zinc-500 hover:text-blue-600 uppercase tracking-widest no-print mb-1 block"
+                className="text-[10px] font-bold text-zinc-500 hover:text-blue-600 uppercase tracking-widest no-print block"
               >
                 DUPLICATE
               </button>

@@ -164,31 +164,37 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
   const [state, dispatch] = useReducer(songReducer, initialSong);
   const [isSaving, setIsSaving] = useState(false);
   const isMountedRef = useRef(true);
+  const pendingSaveRef = useRef<Promise<any> | null>(null);
   const router = useRouter();
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
 
   const debouncedSave = useCallback(
     debounce(async (song: SongChart) => {
       if (!isMountedRef.current) return;
       setIsSaving(true);
+      const savePromise = supabaseService.saveSongChart(song);
+      pendingSaveRef.current = savePromise;
       try {
-        await supabaseService.saveSongChart(song);
+        await savePromise;
       } catch (error) {
         console.error('Failed to auto-save song chart:', error);
       } finally {
         if (isMountedRef.current) {
           setIsSaving(false);
         }
+        if (pendingSaveRef.current === savePromise) {
+          pendingSaveRef.current = null;
+        }
       }
     }, 2000),
     [],
   );
+
+  const settleAutosave = useCallback(async () => {
+    debouncedSave.flush();
+    if (pendingSaveRef.current) {
+      await pendingSaveRef.current;
+    }
+  }, [debouncedSave]);
 
   const isInitialRender = useRef(true);
 
@@ -206,9 +212,15 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
   useEffect(() => {
     return () => {
       debouncedSave.flush();
-      debouncedSave.cancel();
     };
   }, [debouncedSave]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white min-h-screen relative">
@@ -248,9 +260,13 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             >
               {state.isPublic ? '● PUBLIC' : '○ PRIVATE'}
             </button>
-            {isSaving && (
+            {isSaving ? (
               <span className="text-xs font-mono text-blue-500 animate-pulse bg-blue-50 px-2 py-1 rounded no-print">
                 SAVING...
+              </span>
+            ) : (
+              <span className="text-xs font-mono text-emerald-500 bg-emerald-50 px-2 py-1 rounded no-print">
+                SAVED
               </span>
             )}
             <div className="text-right">
@@ -349,8 +365,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             onClick={async () => {
               if (confirm('Are you sure you want to delete this song?')) {
                 try {
-                  // Cancel any pending debounced saves before deleting
-                  debouncedSave.cancel();
+                  await settleAutosave();
                   await supabaseService.deleteSongChart(state.id);
                   router.push('/library');
                 } catch (error) {
@@ -366,8 +381,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
           <button
             onClick={async () => {
               try {
-                // Flush any pending saves before duplicating so the clone has latest data
-                debouncedSave.flush();
+                await settleAutosave();
                 const duplicated = await supabaseService.duplicateSongChart(state.id);
                 router.push(`/songs/${duplicated.id}`);
               } catch (error) {
@@ -542,6 +556,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                         })
                       }
                       className="absolute -right-8 top-0 opacity-0 group-hover/sub:opacity-100 p-1 text-zinc-300 hover:text-red-500 transition-all no-print"
+                      data-testid="remove-subsection-btn"
                     >
                       <svg
                         className="w-4 h-4"

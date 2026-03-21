@@ -55,7 +55,7 @@ test.describe('Notebook Editor', () => {
       'Groove Exercise',
     );
 
-    const reloadedGrid = page.locator('div.relative.group').nth(1).getByTestId('groove-grid');
+    const reloadedGrid = page.getByTestId('notebook-section').nth(1).getByTestId('groove-grid');
     await expect(
       reloadedGrid
         .getByTestId('instrument-row-kick')

@@ -29,7 +29,7 @@ interface CloseProps {
 
 // Mock Radix Dialog
 vi.mock('@radix-ui/react-dialog', () => ({
-  Root: ({ children, _open, onOpenChange }: RootProps) => (
+  Root: ({ children, open: _open, onOpenChange }: RootProps) => (
     <div data-testid="dialog-root">
       <button data-testid="trigger-close" onClick={() => onOpenChange?.(false)}>
         Close
@@ -68,9 +68,9 @@ const mockInstrument: DrumInstrument = {
 };
 
 describe('InstrumentSettingsModal', () => {
-  let onSave: any;
-  let onClose: any;
-  let onDelete: any;
+  let onSave: ReturnType<typeof vi.fn>;
+  let onClose: ReturnType<typeof vi.fn>;
+  let onDelete: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     onSave = vi.fn();

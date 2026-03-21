@@ -58,7 +58,7 @@ interface AuthMock {
 
 describe('LibraryDashboard', () => {
   const getAuthMock = () => {
-    return (createClient() as any).auth as AuthMock;
+    return vi.mocked(createClient)().auth as unknown as AuthMock;
   };
 
   describe('Rendering and Filtering', () => {
@@ -106,7 +106,7 @@ describe('LibraryDashboard', () => {
         data: { user: { id: 'test-user-id' } },
         error: null,
       });
-      (supabaseService.saveSongChart as any).mockResolvedValue({ id: 'new-song-id' });
+      vi.mocked(supabaseService).saveSongChart.mockResolvedValue({ id: 'new-song-id' } as any);
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByText(/New Song/i));
@@ -122,7 +122,7 @@ describe('LibraryDashboard', () => {
         data: { user: { id: 'test-user-id' } },
         error: null,
       });
-      (supabaseService.saveNotebook as any).mockResolvedValue({ id: 'new-nb-id' });
+      vi.mocked(supabaseService).saveNotebook.mockResolvedValue({ id: 'new-nb-id' } as any);
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-notebook'));
@@ -139,7 +139,7 @@ describe('LibraryDashboard', () => {
         data: { user: { id: 'test-user-id' } },
         error: null,
       });
-      (supabaseService.saveGrooveSnippet as any).mockResolvedValue({ id: 'new-snip-id' });
+      vi.mocked(supabaseService).saveGrooveSnippet.mockResolvedValue({ id: 'new-snip-id' } as any);
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-snippet'));
@@ -171,7 +171,7 @@ describe('LibraryDashboard', () => {
         error: null,
       });
       const error = { message: 'Network error', code: '500' };
-      (supabaseService.saveSongChart as any).mockRejectedValue(error);
+      vi.mocked(supabaseService).saveSongChart.mockRejectedValue(error);
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByText(/New Song/i));
@@ -185,7 +185,7 @@ describe('LibraryDashboard', () => {
 
     it('handles notebook creation error', async () => {
       getAuthMock().getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
-      (supabaseService.saveNotebook as any).mockRejectedValue(new Error('NB Fail'));
+      vi.mocked(supabaseService).saveNotebook.mockRejectedValue(new Error('NB Fail'));
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-notebook'));
@@ -197,7 +197,7 @@ describe('LibraryDashboard', () => {
 
     it('handles snippet creation error', async () => {
       getAuthMock().getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
-      (supabaseService.saveGrooveSnippet as any).mockRejectedValue(new Error('Snip Fail'));
+      vi.mocked(supabaseService).saveGrooveSnippet.mockRejectedValue(new Error('Snip Fail'));
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-snippet'));

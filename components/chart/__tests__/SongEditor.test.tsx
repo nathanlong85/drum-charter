@@ -55,6 +55,10 @@ describe('SongEditor', () => {
     vi.clearAllMocks();
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('renders the song title and BPM', () => {
     render(<SongEditor initialSong={mockSong} />);
     expect(screen.getByDisplayValue('Test Song')).toBeDefined();
@@ -200,13 +204,19 @@ describe('SongEditor', () => {
     render(<SongEditor initialSong={publicSong} />);
 
     const writeText = vi.fn().mockResolvedValue(undefined);
+    const originalClipboard = navigator.clipboard;
     Object.assign(navigator, { clipboard: { writeText } });
     vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     const copyBtn = screen.getByText(/COPY PUBLIC LINK/i);
     fireEvent.click(copyBtn);
 
-    expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/public/songs/song-1'));
+    await waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith(expect.stringContaining('/public/songs/song-1'));
+    });
+
+    // Cleanup
+    Object.assign(navigator, { clipboard: originalClipboard });
   });
 
   it('views public song', () => {
@@ -224,10 +234,8 @@ describe('SongEditor', () => {
 
     expect(screen.getByDisplayValue('New Subsection')).toBeDefined();
 
-    const subSectionRemove = screen
-      .getAllByRole('button')
-      .find((b) => b.innerHTML.includes('M6 18L18 6M6 6l12 12'));
-    if (subSectionRemove) fireEvent.click(subSectionRemove);
+    const subSectionRemove = screen.getByTestId('remove-subsection-btn');
+    fireEvent.click(subSectionRemove);
 
     expect(screen.queryByDisplayValue('New Subsection')).toBeNull();
   });
@@ -462,8 +470,8 @@ describe('SongEditor', () => {
         vi.advanceTimersByTime(3000);
       });
 
-      // Verify save was NOT called
-      expect(saveSpy).not.toHaveBeenCalled();
+      // Verify save WAS called because cleanup calls flush() while isMountedRef.current is still true
+      expect(saveSpy).toHaveBeenCalled();
     } finally {
       vi.useRealTimers();
     }

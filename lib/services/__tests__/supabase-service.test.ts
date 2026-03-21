@@ -1,8 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchWithRetry, supabaseService } from '../supabase-service';
 
 // Helper to create a mock Supabase response
-const mockResponse = (data: any = null, error: any = null) => ({
+const mockResponse = <TData = any, TError = any>(
+  data: TData | null = null,
+  error: TError | null = null,
+) => ({
   data,
   error,
   maybeSingle: vi.fn().mockResolvedValue({ data, error }),
@@ -29,6 +32,11 @@ describe('supabaseService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   describe('CRUD Operations', () => {
@@ -205,12 +213,26 @@ describe('supabaseService', () => {
         instruments: [],
         playbackOptionalHits: true,
       };
-      mockSupabase.from.mockReturnValue(
-        mockResponse({ id: 'snip-1', grid_data: { playbackOptionalHits: true } }),
-      );
+
+      const upsertSpy = vi.fn().mockReturnThis();
+      mockSupabase.from.mockReturnValue({
+        ...mockResponse({ id: 'snip-1', grid_data: { playbackOptionalHits: true } }),
+        upsert: upsertSpy,
+      });
+
       const result = await supabaseService.saveGrooveSnippet(mockSnip as any);
       expect(result.id).toBe('snip-1');
-      // Verify that playbackOptionalHits is preserved when saving and returning
+
+      // Verify the payload sent to Supabase
+      expect(upsertSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          grid_data: expect.objectContaining({
+            playbackOptionalHits: true,
+          }),
+        }),
+      );
+
+      // Verify that playbackOptionalHits is preserved when returning
       expect((result.grid_data as any).playbackOptionalHits).toBe(true);
     });
 

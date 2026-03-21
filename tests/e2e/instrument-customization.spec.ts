@@ -66,8 +66,8 @@ test.describe('Instrument Customization', () => {
 
     // Finish Editing
     await page.getByTitle('Finish Editing').click();
-    await expect(page.getByTestId('add-instrument-button')).not.toBeVisible();
-    await expect(page.getByTitle('Move Up')).not.toBeVisible();
+    await expect(page.getByTestId('add-instrument-button')).toBeHidden();
+    await expect(page.getByTitle('Move Up').first()).toBeHidden();
   });
 
   test('should toggle optional hits playback', async ({ page }) => {
