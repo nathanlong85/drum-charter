@@ -41,10 +41,10 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
   - [x] Support for multiple measures `✓`
   - [x] Inline editing of drum hits (Toggle and Symbol Picker) `✓`
   - [x] Full Drum Symbols integration (Required and Optional) `✓`
-- [x] **Drum-Aware Grid Architecture** (Next Phase):
+- [ ] **Drum-Aware Grid Architecture** (Next Phase):
   - [x] **Data Model Overhaul**: Transition from flat `instrumentId` to a structured `DrumInstrument` (Category, Preset Variety, Custom Name). `✓`
   - [x] **Symbol Filtering**: Restrict available symbols in the `SymbolPicker` based on the drum category (e.g., Snare vs. Kick). `✓`
-  - [x] **Sample Matrix**: Implement a `PresetVariety + Symbol` audio mapping for high-fidelity playback. `✓`
+  - [ ] **Sample Matrix**: Implement a `PresetVariety + Symbol` audio mapping for high-fidelity playback. (#30)
   - [x] **Dynamic Instrument Management**: Support adding custom varieties based on presets with auto-incrementing default names. `✓`
   - [x] **Optional Hit Control**: Add a toggle to enable/disable playback of optional hits during practice. `✓`
 - [x] **Song Charts**:
@@ -72,33 +72,36 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ---
 
 ## V2 Feature Scope (In Planning)
-- [ ] **Advanced Grid Ergonomics**:
-  - [ ] **Multi-cell Interaction**: Implement selection box (drag-to-select), multi-cell clear, and multi-cell symbol application.
-  - [ ] **Grid Clipboard**: Support copy/pasting single or multiple cells within and across grids.
-  - [ ] **Modifier Clicks**: Support `Shift + Click` for optional hits and other keyboard + click combos for rapid articulation entry.
-  - [ ] **Quick Clear**: Add "Clear Grid" and "Clear Row" functions for rapid resets.
+- [x] **Advanced Grid Ergonomics**:
+  - [x] **Multi-cell Interaction**: Implement selection box (drag-to-select), multi-cell clear, and multi-cell symbol application. (#35) `✓`
+  - [x] **Grid Clipboard**: Support copy/pasting single or multiple cells within and across grids. (#35) `✓`
+  - [x] **Modifier Clicks**: Support `Shift + Click` for optional hits and other keyboard + click combos for rapid articulation entry. (#36) `✓`
+  - [x] **Quick Clear**: Add "Clear Grid" and "Clear Row" functions for rapid resets. (#34) `✓`
 - [ ] **Performance & Live Mode**:
-  - [ ] **Live Mode UI**: High-contrast, fullscreen-optimized view for stage use.
-  - [ ] **Remote Control Integration**: Support for Bluetooth foot switches and MIDI controllers for hands-free page turning.
-  - [ ] **Setlist Management**: Create, reorder, and save lists of songs for seamless performance transitions.
-  - [ ] **Continuous Playback**: Auto-advance to the next song in a setlist after the current one finishes or on a manual trigger.
+  - [ ] **Live Mode UI**: High-contrast, fullscreen-optimized view for stage use. (#37)
+  - [ ] **Remote Control Integration**: Support for Bluetooth foot switches and MIDI controllers for hands-free page turning. (#39)
+  - [ ] **Setlist Management**: Create, reorder, and save lists of songs for seamless performance transitions. (#38)
+  - [ ] **Continuous Playback**: Auto-advance to the next song in a setlist after the current one finishes or on a manual trigger. (#38)
 
 ---
 
 ## Status Board (Kanban)
 
 ### 🔵 In Progress
-- [ ] [Chore] Comprehensive Codebase Audit and Standardization (#24)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
-  - [x] [Task] Data Model Update (JSON) & Migration (#27) `✓`
-  - [x] [Task] Instrument Customization UI (#28) `✓`
-  - [x] [Task] Context-Aware Symbol Picker (#29) `✓`
-  - [x] [Task] Refined Audio Engine & Sample Matrix (#30) `✓`
+  - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
-  - [x] [Task] Optional Hit Playback Toggle (#32) `✓`
 - [ ] [Chore] Expand E2E test coverage for all core UI flows (#22)
 
 ### 🟢 Done
+- [x] [Feature] Keyboard Modifiers for Rapid Editing (#36) `✓`
+- [x] [Feature] Multi-cell Selection & Copy/Paste (#35) `✓`
+- [x] [Feature] Quick Clear Grid/Row functionality (#34) `✓`
+- [x] [Task] Optional Hit Playback Toggle (#32) `✓`
+- [x] [Chore] Comprehensive Codebase Audit and Standardization (#24) `✓`
+- [x] [Task] Context-Aware Symbol Picker (#29) `✓`
+- [x] [Task] Instrument Customization UI (#28) `✓`
+- [x] [Task] Data Model Update (JSON) & Migration (#27) `✓`
 - [x] [Chore] Standardize PWA architecture and Enable HTTPS/Offline Verification (#18) `✓`
 - [x] [Feature] Dark Mode Support (#4) `✓`
 - [x] [Chore] GitHub Actions CI Pipeline (Linting, Unit Tests, E2E) (#20) `✓`

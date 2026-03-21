@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, ChevronUp, Settings2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Settings2, Trash2 } from 'lucide-react';
 import type React from 'react';
 import { type DrumInstrument, type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
 import { NoteCell } from './NoteCell';
@@ -8,12 +8,20 @@ import { NoteCell } from './NoteCell';
 interface InstrumentRowProps {
   instrument: DrumInstrument;
   grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'>;
-  onNoteClick: (index: number) => void;
+  onNoteClick: (index: number, e: React.MouseEvent) => void;
   onNoteContextMenu: (index: number, e: React.MouseEvent) => void;
+  onNoteMouseDown?: (index: number, e: React.MouseEvent) => void;
+  onNoteMouseEnter?: (index: number) => void;
+  selectionRange?: {
+    start: { instIdx: number; noteIdx: number };
+    end: { instIdx: number; noteIdx: number };
+  } | null;
+  instIdx: number;
   isEditing?: boolean;
   onSettingsClick?: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  onClear?: () => void;
 }
 
 export const InstrumentRow: React.FC<InstrumentRowProps> = ({
@@ -21,10 +29,15 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   grid,
   onNoteClick,
   onNoteContextMenu,
+  onNoteMouseDown,
+  onNoteMouseEnter,
+  selectionRange,
+  instIdx,
   isEditing,
   onSettingsClick,
   onMoveUp,
   onMoveDown,
+  onClear,
 }) => {
   const { timeSignature, resolution } = grid;
   const notesPerBeat = resolution / timeSignature.beatValue;
@@ -76,6 +89,22 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
                 <Settings2 size={14} />
               </button>
             )}
+            {onClear && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`Clear all notes for ${instrument.customName}?`)) {
+                    onClear();
+                  }
+                }}
+                className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors text-gray-400 hover:text-red-600"
+                title="Clear Row"
+                aria-label={`Clear all notes for ${instrument.customName}`}
+                data-testid={`clear-row-${instrument.id}`}
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
           </div>
         ) : (
           <span className="truncate w-full" title={instrument.customName}>
@@ -92,15 +121,27 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
               ? instrument.velocities[i]
               : getVelocityForSymbol(symbol);
 
+          let isSelected = false;
+          if (selectionRange) {
+            const minInst = Math.min(selectionRange.start.instIdx, selectionRange.end.instIdx);
+            const maxInst = Math.max(selectionRange.start.instIdx, selectionRange.end.instIdx);
+            const minNote = Math.min(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
+            const maxNote = Math.max(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
+            isSelected = instIdx >= minInst && instIdx <= maxInst && i >= minNote && i <= maxNote;
+          }
+
           return (
             <NoteCell
               key={i}
               symbol={symbol}
               velocity={velocity}
-              onClick={() => onNoteClick(i)}
+              onClick={(e) => onNoteClick(i, e)}
               onContextMenu={(e) => onNoteContextMenu(i, e)}
+              onMouseDown={(e) => onNoteMouseDown?.(i, e)}
+              onMouseEnter={() => onNoteMouseEnter?.(i)}
               isBeat={isBeat}
               isMeasureBoundary={isMeasureBoundary}
+              isSelected={isSelected}
             />
           );
         })}

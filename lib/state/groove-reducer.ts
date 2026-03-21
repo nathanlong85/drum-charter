@@ -40,6 +40,33 @@ export type GrooveAction =
   | { type: 'SET_RESOLUTION'; resolution: 4 | 8 | 16 }
   | { type: 'SET_MEASURES'; measures: number }
   | { type: 'SET_TIME_SIGNATURE'; beatsPerMeasure: number; beatValue: number }
+  | { type: 'CLEAR_GRID' }
+  | { type: 'CLEAR_ROW'; id: string }
+  | { type: 'TOGGLE_OPTIONAL'; id: string; noteIndex: number }
+  | {
+      type: 'SET_SELECTION_SYMBOLS';
+      selection: {
+        start: { instIdx: number; noteIdx: number };
+        end: { instIdx: number; noteIdx: number };
+      };
+      symbol: DrumSymbol;
+    }
+  | {
+      type: 'SET_SELECTION_VELOCITY';
+      selection: {
+        start: { instIdx: number; noteIdx: number };
+        end: { instIdx: number; noteIdx: number };
+      };
+      velocity: number;
+    }
+  | {
+      type: 'PASTE_SELECTION';
+      target: { instIdx: number; noteIdx: number };
+      data: Array<{
+        notes: DrumSymbol[];
+        velocities?: number[];
+      }>;
+    }
   | { type: 'SET_GRID'; payload: DrumInstrument[] }
   | { type: 'SET_FULL_GRID'; grid: GrooveGrid };
 
@@ -52,6 +79,139 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
         ...state,
         instruments: action.payload,
       };
+    case 'CLEAR_GRID': {
+      return {
+        ...state,
+        instruments: state.instruments.map((inst) => ({
+          ...inst,
+          notes: Array(inst.notes.length).fill('none'),
+          velocities: Array(inst.notes.length).fill(0),
+        })),
+      };
+    }
+
+    case 'CLEAR_ROW': {
+      return {
+        ...state,
+        instruments: state.instruments.map((inst) => {
+          if (inst.id !== action.id) return inst;
+          return {
+            ...inst,
+            notes: Array(inst.notes.length).fill('none'),
+            velocities: Array(inst.notes.length).fill(0),
+          };
+        }),
+      };
+    }
+
+    case 'TOGGLE_OPTIONAL': {
+      return {
+        ...state,
+        instruments: state.instruments.map((inst) => {
+          if (inst.id !== action.id) return inst;
+          const newNotes = [...inst.notes];
+          const current = newNotes[action.noteIndex];
+          if (!current || current === 'none') return inst;
+
+          if (current.endsWith('_opt')) {
+            newNotes[action.noteIndex] = current.replace('_opt', '') as DrumSymbol;
+          } else {
+            newNotes[action.noteIndex] = `${current}_opt` as DrumSymbol;
+          }
+
+          return { ...inst, notes: newNotes };
+        }),
+      };
+    }
+
+    case 'SET_SELECTION_SYMBOLS': {
+      const { selection, symbol } = action;
+      const minInst = Math.max(0, Math.min(selection.start.instIdx, selection.end.instIdx));
+      const maxInst = Math.min(
+        state.instruments.length - 1,
+        Math.max(selection.start.instIdx, selection.end.instIdx),
+      );
+      const rawMinNote = Math.min(selection.start.noteIdx, selection.end.noteIdx);
+      const rawMaxNote = Math.max(selection.start.noteIdx, selection.end.noteIdx);
+
+      return {
+        ...state,
+        instruments: state.instruments.map((inst, i) => {
+          if (i < minInst || i > maxInst) return inst;
+          const newNotes = [...inst.notes];
+          const newVelocities = inst.velocities
+            ? [...inst.velocities]
+            : Array(inst.notes.length).fill(0);
+
+          const minNote = Math.max(0, rawMinNote);
+          const maxNote = Math.min(inst.notes.length - 1, rawMaxNote);
+
+          for (let j = minNote; j <= maxNote; j++) {
+            newNotes[j] = symbol;
+            newVelocities[j] = getVelocityForSymbol(symbol);
+          }
+          return { ...inst, notes: newNotes, velocities: newVelocities };
+        }),
+      };
+    }
+
+    case 'SET_SELECTION_VELOCITY': {
+      const { selection, velocity } = action;
+      const minInst = Math.max(0, Math.min(selection.start.instIdx, selection.end.instIdx));
+      const maxInst = Math.min(
+        state.instruments.length - 1,
+        Math.max(selection.start.instIdx, selection.end.instIdx),
+      );
+      const rawMinNote = Math.min(selection.start.noteIdx, selection.end.noteIdx);
+      const rawMaxNote = Math.max(selection.start.noteIdx, selection.end.noteIdx);
+
+      return {
+        ...state,
+        instruments: state.instruments.map((inst, i) => {
+          if (i < minInst || i > maxInst) return inst;
+          const newVelocities = inst.velocities
+            ? [...inst.velocities]
+            : Array(inst.notes.length).fill(0);
+
+          const minNote = Math.max(0, rawMinNote);
+          const maxNote = Math.min(inst.notes.length - 1, rawMaxNote);
+
+          for (let j = minNote; j <= maxNote; j++) {
+            newVelocities[j] = velocity;
+          }
+          return { ...inst, velocities: newVelocities };
+        }),
+      };
+    }
+
+    case 'PASTE_SELECTION': {
+      const { target, data } = action;
+
+      return {
+        ...state,
+        instruments: state.instruments.map((inst, i) => {
+          const relativeInstIdx = i - target.instIdx;
+          if (relativeInstIdx < 0 || relativeInstIdx >= data.length) return inst;
+
+          const pasteData = data[relativeInstIdx];
+          const newNotes = [...inst.notes];
+          const newVelocities = inst.velocities
+            ? [...inst.velocities]
+            : Array(inst.notes.length).fill(0);
+
+          for (let j = 0; j < pasteData.notes.length; j++) {
+            const targetNoteIdx = target.noteIdx + j;
+            if (targetNoteIdx < newNotes.length) {
+              newNotes[targetNoteIdx] = pasteData.notes[j];
+              newVelocities[targetNoteIdx] =
+                pasteData.velocities?.[j] ?? getVelocityForSymbol(pasteData.notes[j]);
+            }
+          }
+
+          return { ...inst, notes: newNotes, velocities: newVelocities };
+        }),
+      };
+    }
     case 'TOGGLE_NOTE': {
       return {
         ...state,

@@ -19,6 +19,7 @@ When you think you've finished a task (feature, bug fix, or documentation update
 Before final verification, you MUST complete the local CodeRabbit feedback loop as defined in `CODE_REVIEW_PROTOCOL.md`.
 - Activate the `code-review` skill.
 - Run `cr review --prompt-only --base main`.
+- **MANDATORY**: For each run, report the Loop and Run number, target severities, and a summary of findings (Total, Critical, Major, etc.) before addressing them.
 - Address feedback following the "Structured Feedback Review" (3-run state machine).
 - The loop is finished only when no `Critical` or `Major` issues remain or the 3-run limit is reached.
 

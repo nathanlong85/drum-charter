@@ -51,7 +51,7 @@ describe('InstrumentRow', () => {
     );
 
     fireEvent.click(screen.getAllByTestId('note-cell')[0]);
-    expect(onNoteClick).toHaveBeenCalledWith(0);
+    expect(onNoteClick).toHaveBeenCalledWith(0, expect.anything());
 
     fireEvent.contextMenu(screen.getAllByTestId('note-cell')[1]);
     expect(onNoteContextMenu).toHaveBeenCalledWith(1, expect.anything());
