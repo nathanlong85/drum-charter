@@ -124,9 +124,7 @@ test.describe('Grid Ergonomics', () => {
     await expect(firstCell.locator('img')).toBeVisible();
 
     // Select the cell
-    await firstCell.click(); // Standard click clears selection if it was already selected?
-    // Wait, my handleNoteClick clears if it's the SAME cell? No, it keeps it.
-    // Let's use dragging to be sure.
+    await firstCell.click();
     const box = await firstCell.boundingBox();
     if (!box) throw new Error('No box');
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

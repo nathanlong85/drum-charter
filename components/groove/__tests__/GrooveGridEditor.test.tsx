@@ -472,7 +472,7 @@ describe('GrooveGridEditor', () => {
       const pasteData = JSON.stringify([{ notes: ['accent'] }]);
       const pasteEvent = new Event('paste') as any;
       pasteEvent.clipboardData = {
-        getData: () => pasteData,
+        getData: vi.fn((type) => (type === 'text' ? pasteData : '')),
       };
 
       fireEvent(window, pasteEvent);

@@ -1,4 +1,3 @@
-import path from 'node:path';
 import withSerwistInit from '@serwist/next';
 
 const withSerwist = withSerwistInit({
@@ -11,5 +10,5 @@ const withSerwist = withSerwistInit({
 });
 
 export default withSerwist({
-  outputFileTracingRoot: path.join(__dirname),
+  outputFileTracingRoot: './',
 });

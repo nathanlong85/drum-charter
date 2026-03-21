@@ -250,6 +250,16 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     };
 
     const handleKeyDown = async (e: KeyboardEvent) => {
+      // Don't trigger global actions if user is typing in an input/textarea
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
       if ((e.key === 'Delete' || e.key === 'Backspace') && selectionRange) {
         e.preventDefault();
         wrappedDispatch({
