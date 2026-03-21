@@ -245,6 +245,22 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   };
 
   useEffect(() => {
+    const isClipboardSelection = (
+      value: unknown,
+    ): value is Array<{ notes: DrumSymbol[]; velocities?: number[] }> =>
+      Array.isArray(value) &&
+      value.every((row) => {
+        if (!row || typeof row !== 'object') return false;
+        const record = row as Record<string, unknown>;
+        return (
+          Array.isArray(record.notes) &&
+          record.notes.every((note) => typeof note === 'string') &&
+          (record.velocities === undefined ||
+            (Array.isArray(record.velocities) &&
+              record.velocities.every((velocity) => typeof velocity === 'number')))
+        );
+      });
+
     const handleMouseUp = () => {
       setIsDragging(false);
     };
@@ -252,11 +268,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     const handleKeyDown = async (e: KeyboardEvent) => {
       // Don't trigger global actions if user is typing in an input/textarea
       const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return;
       }
 
@@ -298,7 +310,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
 
       try {
         const data = JSON.parse(text);
-        if (Array.isArray(data) && data.length > 0 && data[0].notes) {
+        if (isClipboardSelection(data) && data.length > 0) {
           const { start, end } = selectionRange;
           const targetInstIdx = Math.min(start.instIdx, end.instIdx);
           const targetNoteIdx = Math.min(start.noteIdx, end.noteIdx);

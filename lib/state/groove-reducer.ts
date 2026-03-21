@@ -127,7 +127,10 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
     case 'SET_SELECTION_SYMBOLS': {
       const { selection, symbol } = action;
       const minInst = Math.max(0, Math.min(selection.start.instIdx, selection.end.instIdx));
-      const maxInst = Math.min(state.instruments.length - 1, Math.max(selection.start.instIdx, selection.end.instIdx));
+      const maxInst = Math.min(
+        state.instruments.length - 1,
+        Math.max(selection.start.instIdx, selection.end.instIdx),
+      );
       const rawMinNote = Math.min(selection.start.noteIdx, selection.end.noteIdx);
       const rawMaxNote = Math.max(selection.start.noteIdx, selection.end.noteIdx);
 
@@ -155,7 +158,10 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
     case 'SET_SELECTION_VELOCITY': {
       const { selection, velocity } = action;
       const minInst = Math.max(0, Math.min(selection.start.instIdx, selection.end.instIdx));
-      const maxInst = Math.min(state.instruments.length - 1, Math.max(selection.start.instIdx, selection.end.instIdx));
+      const maxInst = Math.min(
+        state.instruments.length - 1,
+        Math.max(selection.start.instIdx, selection.end.instIdx),
+      );
       const rawMinNote = Math.min(selection.start.noteIdx, selection.end.noteIdx);
       const rawMaxNote = Math.max(selection.start.noteIdx, selection.end.noteIdx);
 

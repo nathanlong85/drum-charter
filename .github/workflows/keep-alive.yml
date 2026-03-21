@@ -40,6 +40,7 @@ jobs:
           # Counting profiles counts as database activity.
           echo "Executing keep-alive query..."
           RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "${SUPABASE_URL}/rest/v1/profiles?select=count" \
+          --connect-timeout 5 --max-time 20 --retry 2 --retry-delay 2 \
           -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
           -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
           -H "Content-Type: application/json")
@@ -48,11 +49,11 @@ jobs:
           BODY=$(echo "$RESPONSE" | head -n -1)
 
           echo "HTTP Status: $HTTP_STATUS"
-          echo "Response Body: $BODY"
 
           if [ "$HTTP_STATUS" -eq 200 ]; then
             echo "Successfully kept Supabase instance alive."
           else
+            echo "Response Body: $BODY"
             echo "Failed to query database. Status code: $HTTP_STATUS"
             exit 1
           fi
