@@ -341,10 +341,15 @@ describe('supabaseService', () => {
       expect(setlists).toHaveLength(1);
     });
 
-    it('deleteSetlist calls supabase delete', async () => {
-      mockSupabase.from.mockReturnValue(mockResponse());
+    it('deleteSetlist calls supabase delete and throws if not found', async () => {
+      // Mock found
+      mockSupabase.from.mockReturnValue(mockResponse([{ id: '1' }]));
       await supabaseService.deleteSetlist('1');
       expect(mockSupabase.from).toHaveBeenCalledWith('setlists');
+
+      // Mock not found
+      mockSupabase.from.mockReturnValue(mockResponse([]));
+      await expect(supabaseService.deleteSetlist('2')).rejects.toThrow('Setlist not found');
     });
   });
 

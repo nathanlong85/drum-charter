@@ -5,7 +5,8 @@ CREATE TABLE "public"."setlists" (
     "songs" jsonb NOT NULL DEFAULT '[]'::jsonb,
     "is_public" boolean DEFAULT false,
     "created_at" timestamp with time zone DEFAULT timezone('utc'::text, now()),
-    "updated_at" timestamp with time zone DEFAULT timezone('utc'::text, now())
+    "updated_at" timestamp with time zone DEFAULT timezone('utc'::text, now()),
+    CONSTRAINT "songs_is_array_check" CHECK (jsonb_typeof(songs) = 'array')
 );
 
 ALTER TABLE "public"."setlists" ENABLE ROW LEVEL SECURITY;

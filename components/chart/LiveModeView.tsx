@@ -49,10 +49,11 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
           activeEl.tagName === 'TEXTAREA' ||
           activeEl.tagName === 'SELECT' ||
           activeEl.tagName === 'A' ||
-          activeEl.isContentEditable);
+          activeEl.isContentEditable ||
+          activeEl.getAttribute('role') === 'textbox');
 
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
-        if (isInteractive && e.key === ' ') return;
+        if (isInteractive) return; // Space also triggers buttons, don't hijack
         e.preventDefault();
         nextSection();
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
@@ -80,8 +81,15 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
 
   if (!activeSection) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-yellow-400">
-        <p className="text-2xl font-bold">No sections found in this chart.</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-yellow-400 gap-8">
+        <p className="text-2xl font-bold text-center">No sections found in this chart.</p>
+        <button
+          onClick={onExit}
+          data-testid="exit-live-mode-empty-btn"
+          className="px-8 py-4 bg-red-900 text-red-100 rounded-xl font-black uppercase tracking-tighter hover:bg-red-800 transition-all shadow-2xl"
+        >
+          Exit Live Mode
+        </button>
       </div>
     );
   }
@@ -92,37 +100,39 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       data-testid="live-mode-view"
       id="live-mode-view-root"
     >
-      {/* Header */}
-      <header className="p-6 bg-zinc-900 border-b border-zinc-800 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-black uppercase tracking-tighter text-yellow-400">
-            {chart.header.title}
-          </h1>
-          <div className="flex gap-4 mt-1 text-zinc-400 font-mono text-sm uppercase">
-            <span>BPM: {chart.header.bpm || 'N/A'}</span>
-            <span>
-              {chart.header.timeSignature.beatsPerMeasure}/{chart.header.timeSignature.beatValue}
-            </span>
+      {/* Header - Hidden in Fullscreen */}
+      {!isFullscreen && (
+        <header className="p-6 bg-zinc-900 border-b border-zinc-800 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-black uppercase tracking-tighter text-yellow-400">
+              {chart.header.title}
+            </h1>
+            <div className="flex gap-4 mt-1 text-zinc-400 font-mono text-sm uppercase">
+              <span>BPM: {chart.header.bpm || 'N/A'}</span>
+              <span>
+                {chart.header.timeSignature.beatsPerMeasure}/{chart.header.timeSignature.beatValue}
+              </span>
+            </div>
           </div>
-        </div>
 
-        <div className="flex gap-4">
-          <button
-            onClick={toggleFullscreen}
-            data-testid="live-mode-fullscreen-btn"
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-sm font-bold uppercase transition-colors border border-zinc-700"
-          >
-            {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen (F)'}
-          </button>
-          <button
-            onClick={onExit}
-            data-testid="exit-live-mode-btn"
-            className="px-4 py-2 bg-red-900/50 hover:bg-red-900 text-red-200 rounded text-sm font-bold uppercase transition-colors border border-red-800"
-          >
-            Exit Live Mode
-          </button>
-        </div>
-      </header>
+          <div className="flex gap-4">
+            <button
+              onClick={toggleFullscreen}
+              data-testid="live-mode-fullscreen-btn"
+              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-sm font-bold uppercase transition-colors border border-zinc-700"
+            >
+              {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen (F)'}
+            </button>
+            <button
+              onClick={onExit}
+              data-testid="exit-live-mode-btn"
+              className="px-4 py-2 bg-red-900/50 hover:bg-red-900 text-red-200 rounded text-sm font-bold uppercase transition-colors border border-red-800"
+            >
+              Exit Live Mode
+            </button>
+          </div>
+        </header>
+      )}
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col p-8 lg:p-12 overflow-y-auto">
@@ -187,64 +197,73 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
         </div>
       </main>
 
-      {/* Navigation Footer */}
-      <footer className="p-6 bg-zinc-950 border-t border-zinc-900 flex justify-between items-center">
-        <button
-          disabled={activeSectionIdx === 0}
-          onClick={prevSection}
-          className="flex items-center gap-4 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors group"
-        >
-          <div className="w-12 h-12 rounded-full border-2 border-current flex items-center justify-center group-hover:bg-zinc-800">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="3"
-                d="M15 19l-7-7 7-7"
+      {/* Navigation Footer - Hidden in Fullscreen */}
+      {!isFullscreen && (
+        <footer className="p-6 bg-zinc-950 border-t border-zinc-900 flex justify-between items-center">
+          <button
+            disabled={activeSectionIdx === 0}
+            onClick={prevSection}
+            className="flex items-center gap-4 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors group"
+          >
+            <div className="w-12 h-12 rounded-full border-2 border-current flex items-center justify-center group-hover:bg-zinc-800">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="3"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </div>
+            <div className="text-left">
+              <div className="text-[10px] font-black uppercase tracking-widest opacity-50">
+                Previous
+              </div>
+              <div className="text-lg font-bold uppercase">
+                {activeSectionIdx > 0 ? chart.sections[activeSectionIdx - 1].name : 'Start'}
+              </div>
+            </div>
+          </button>
+
+          <div className="flex gap-2">
+            {chart.sections.map((_, idx) => (
+              <div
+                key={idx}
+                className={`h-2 rounded-full transition-all ${
+                  idx === activeSectionIdx ? 'w-8 bg-yellow-400' : 'w-2 bg-zinc-800'
+                }`}
               />
-            </svg>
+            ))}
           </div>
-          <div className="text-left">
-            <div className="text-[10px] font-black uppercase tracking-widest opacity-50">
-              Previous
-            </div>
-            <div className="text-lg font-bold uppercase">
-              {activeSectionIdx > 0 ? chart.sections[activeSectionIdx - 1].name : 'Start'}
-            </div>
-          </div>
-        </button>
 
-        <div className="flex gap-2">
-          {chart.sections.map((_, idx) => (
-            <div
-              key={idx}
-              className={`h-2 rounded-full transition-all ${
-                idx === activeSectionIdx ? 'w-8 bg-yellow-400' : 'w-2 bg-zinc-800'
-              }`}
-            />
-          ))}
-        </div>
-
-        <button
-          disabled={activeSectionIdx === chart.sections.length - 1}
-          onClick={nextSection}
-          className="flex items-center gap-4 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors group text-right"
-        >
-          <div className="text-right">
-            <div className="text-[10px] font-black uppercase tracking-widest opacity-50">Next</div>
-            <div className="text-lg font-bold uppercase text-yellow-400">
-              {activeSectionIdx < chart.sections.length - 1
-                ? chart.sections[activeSectionIdx + 1].name
-                : 'End'}
+          <button
+            disabled={activeSectionIdx === chart.sections.length - 1}
+            onClick={nextSection}
+            className="flex items-center gap-4 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors group text-right"
+          >
+            <div className="text-right">
+              <div className="text-[10px] font-black uppercase tracking-widest opacity-50">
+                Next
+              </div>
+              <div className="text-lg font-bold uppercase text-yellow-400">
+                {activeSectionIdx < chart.sections.length - 1
+                  ? chart.sections[activeSectionIdx + 1].name
+                  : 'End'}
+              </div>
             </div>
-          </div>
-          <div className="w-12 h-12 rounded-full border-2 border-current flex items-center justify-center group-hover:bg-zinc-800 border-yellow-400 text-yellow-400">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M9 5l7 7-7 7" />
-            </svg>
-          </div>
-        </button>
-      </footer>
+            <div className="w-12 h-12 rounded-full border-2 border-current flex items-center justify-center group-hover:bg-zinc-800 border-yellow-400 text-yellow-400">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="3"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </div>
+          </button>
+        </footer>
+      )}
     </div>
   );
 };

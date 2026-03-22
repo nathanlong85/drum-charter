@@ -471,6 +471,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           })
         }
         onClearGrid={() => wrappedDispatch({ type: 'CLEAR_GRID' })}
+        readOnly={readOnly}
       />
 
       <div
@@ -499,6 +500,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                 wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'down' })
               }
               onClear={() => wrappedDispatch({ type: 'CLEAR_ROW', id: inst.id })}
+              readOnly={readOnly}
             />
           ))}
 

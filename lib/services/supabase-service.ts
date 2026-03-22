@@ -623,9 +623,12 @@ export const supabaseService = {
 
   async deleteSetlist(id: string, supabaseParam?: SupabaseClient<Database>) {
     const supabase = supabaseParam || createBrowserClient();
-    const { error } = await supabase.from('setlists').delete().eq('id', id);
+    const { data, error } = await supabase.from('setlists').delete().eq('id', id).select();
 
     if (error) throw error;
+    if (!data || data.length === 0) {
+      throw new Error(`Setlist not found or deletion blocked: ${id}`);
+    }
   },
 
   async duplicateSetlist(id: string, supabaseParam?: SupabaseClient<Database>): Promise<DbSetlist> {

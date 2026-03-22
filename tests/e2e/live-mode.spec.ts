@@ -26,13 +26,23 @@ test.describe('Live Mode', () => {
     // Wait for redirect to a song ID
     await page.waitForURL(/\/songs\/[0-9a-f-]+/, { timeout: 30000 });
 
-    // Add a section to ensure LiveModeView has content
+    // Add first section
     const addSectionBtn = page.getByRole('button', { name: /Add New Section/i });
     await expect(addSectionBtn).toBeVisible({ timeout: 15000 });
     await addSectionBtn.click();
-
-    // Wait for the section to be added
     await expect(page.getByPlaceholder(/Section Name/i)).toBeVisible({ timeout: 10000 });
+
+    // Name the first section
+    await page.getByPlaceholder(/Section Name/i).fill('Section 1');
+
+    // Add a second section
+    await addSectionBtn.click();
+    // Wait for the second section's placeholder to appear (index 1)
+    await expect(page.getByPlaceholder(/Section Name/i).nth(1)).toBeVisible({ timeout: 10000 });
+    await page
+      .getByPlaceholder(/Section Name/i)
+      .nth(1)
+      .fill('Section 2');
 
     // Ensure GO LIVE is ready
     await expect(page.getByTestId('go-live-button')).toBeVisible({ timeout: 20000 });
@@ -46,7 +56,6 @@ test.describe('Live Mode', () => {
     // Verify live mode is active
     await expect(page.getByTestId('exit-live-mode-btn')).toBeVisible({ timeout: 15000 });
     await expect(page.locator('#live-mode-view-root')).toBeVisible();
-    await expect(page.locator('header')).toContainText(/Exit/i);
 
     // Exit live mode
     await page.getByTestId('exit-live-mode-btn').click();
@@ -59,26 +68,34 @@ test.describe('Live Mode', () => {
 
     // Verify live mode is active
     await expect(page.getByTestId('exit-live-mode-btn')).toBeVisible({ timeout: 15000 });
-    await expect(page.locator('#live-mode-view-root')).toBeVisible();
 
-    // Verify section name is visible
-    await expect(page.getByRole('heading', { level: 2 })).toBeVisible();
+    // Section 1 should be active
+    await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 1');
 
-    // Press ArrowRight - should stay on same section but not crash
+    // Press ArrowRight to go to next section
     await page.keyboard.press('ArrowRight');
-    await expect(page.getByRole('heading', { level: 2 })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 2');
 
-    // Press ArrowLeft - should stay on same section but not crash
+    // Press ArrowLeft to go back
     await page.keyboard.press('ArrowLeft');
-    await expect(page.getByRole('heading', { level: 2 })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 1');
   });
 
   test('should toggle fullscreen with F key', async ({ page }) => {
-    await page.getByTestId('go-live-button').click();
+    await page.waitForTimeout(1000);
+    await page.getByTestId('go-live-button').click({ force: true });
 
-    // Playwright doesn't easily support verifying actual OS fullscreen,
-    // but we can check if the button text changes if we implement that.
+    // Header should be visible initially
+    await expect(page.locator('header')).toBeVisible();
+
+    // Toggle fullscreen with F
     await page.keyboard.press('f');
-    // For now we just verify it doesn't crash
+
+    // Header should be hidden in fullscreen (per our logic)
+    await expect(page.locator('header')).toBeHidden();
+
+    // Toggle back with F
+    await page.keyboard.press('f');
+    await expect(page.locator('header')).toBeVisible();
   });
 });
