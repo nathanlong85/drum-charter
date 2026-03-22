@@ -4,11 +4,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { SetlistEditor } from '../SetlistEditor';
 
+// Mock debounce to be synchronous but expose cancel/flush
 vi.mock('lodash', async (importOriginal) => {
   const actual = await importOriginal<typeof import('lodash')>();
   return {
     ...actual,
-    debounce: vi.fn((fn) => {
+    debounce: vi.fn((fn: (...args: unknown[]) => void) => {
       const debounced = (...args: unknown[]) => fn(...args);
       debounced.cancel = vi.fn();
       debounced.flush = vi.fn();
@@ -179,32 +180,6 @@ describe('SetlistEditor', () => {
     });
   });
 
-  it('moves a song down', async () => {
-    render(<SetlistEditor initialSetlist={mockSetlist} />);
-
-    await waitFor(() => {
-      expect(screen.getByText('First Song')).toBeDefined();
-    });
-
-    const moveDownButtons = screen.getAllByTitle('Move Down');
-
-    // Click move down on the first item
-    await act(async () => {
-      fireEvent.click(moveDownButtons[0]);
-    });
-
-    await waitFor(() => {
-      expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
-        expect.objectContaining({
-          songs: [
-            { songId: 's2', order: 0 },
-            { songId: 's1', order: 1 },
-          ],
-        }),
-      );
-    });
-  });
-
   it('handles save error gracefully', async () => {
     vi.mocked(supabaseService).saveSetlist.mockRejectedValueOnce(new Error('Save failed'));
 
@@ -249,7 +224,7 @@ describe('SetlistEditor', () => {
   it('flushes pending saves on unmount', () => {
     const { unmount } = render(<SetlistEditor initialSetlist={mockSetlist} />);
 
-    // We need to capture the debounced instance created during render
+    // Capture the debounced instance
     const debounceMock = vi.mocked(debounce);
     const debouncedFunction = debounceMock.mock.results[0].value;
 

@@ -123,7 +123,7 @@ export default function LibraryDashboard({
 
   const handleDuplicate = async (id: string, type: ItemType) => {
     try {
-      let duplicated;
+      let duplicated: LibraryItemData;
       if (type === 'song') {
         duplicated = await supabaseService.duplicateSongChart(id);
         setSongs((prev) => [duplicated, ...prev]);
@@ -136,9 +136,9 @@ export default function LibraryDashboard({
       } else if (type === 'setlist') {
         duplicated = await supabaseService.duplicateSetlist(id);
         setSetlists((prev) => [duplicated, ...prev]);
+      } else {
+        throw new Error(`Unsupported type for duplication: ${type}`);
       }
-
-      // Optional: redirect to the new item
       // window.location.href = `/${type}s/${duplicated.id}`;
     } catch (error) {
       if (isSupabaseError(error)) {
