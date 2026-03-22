@@ -14,6 +14,7 @@ interface NoteCellProps {
   isBeat?: boolean;
   isMeasureBoundary?: boolean;
   isSelected?: boolean;
+  readOnly?: boolean;
 }
 
 const symbolToIcon: Record<DrumSymbol, string | null> = {
@@ -58,6 +59,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   isBeat,
   isMeasureBoundary,
   isSelected,
+  readOnly = false,
 }) => {
   const iconPath = symbolToIcon[symbol];
 
@@ -78,17 +80,18 @@ export const NoteCell: React.FC<NoteCellProps> = ({
 
   return (
     <div
-      onClick={onClick}
-      onContextMenu={onContextMenu}
-      onMouseDown={onMouseDown}
-      onMouseEnter={onMouseEnter}
+      onClick={readOnly ? undefined : onClick}
+      onContextMenu={readOnly ? (e) => e.preventDefault() : onContextMenu}
+      onMouseDown={readOnly ? undefined : onMouseDown}
+      onMouseEnter={readOnly ? undefined : onMouseEnter}
       data-testid="note-cell"
       className={`
-        w-8 h-8 flex items-center justify-center border-r border-gray-300 dark:border-gray-700 cursor-pointer
-        hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors relative
+        w-8 h-8 flex items-center justify-center border-r border-gray-300 dark:border-gray-700 
+        transition-colors relative
+        ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900'}
         ${isBeat ? 'bg-gray-50 dark:bg-gray-900' : ''}
         ${isMeasureBoundary ? 'border-r-2 border-r-gray-800 dark:border-r-gray-200' : ''}
-        ${isSelected ? 'bg-blue-200/50 dark:bg-blue-800/50 ring-2 ring-blue-500 ring-inset z-10' : ''}
+        ${isSelected && !readOnly ? 'bg-blue-200/50 dark:bg-blue-800/50 ring-2 ring-blue-500 ring-inset z-10' : ''}
       `}
     >
       {iconPath && (

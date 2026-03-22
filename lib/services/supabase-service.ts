@@ -11,6 +11,8 @@ import {
   getVelocityForSymbol,
   type Notebook,
   type NotebookSection,
+  type Setlist,
+  type SetlistItem,
   type SongChart,
   type SongSection,
   type TimeSignature,
@@ -19,6 +21,7 @@ import {
 type DbSongChart = Database['public']['Tables']['song_charts']['Row'];
 type DbNotebook = Database['public']['Tables']['notebooks']['Row'];
 type DbGrooveSnippet = Database['public']['Tables']['groove_snippets']['Row'];
+type DbSetlist = Database['public']['Tables']['setlists']['Row'];
 
 // Helper to safely cast domain types to Supabase JSON fields
 const toJson = <T>(val: T): Json => val as unknown as Json;
@@ -545,5 +548,107 @@ export const supabaseService = {
       updatedAt: data.updated_at || null,
       ...gridData,
     };
+  },
+
+  // --- Setlists ---
+  async saveSetlist(
+    setlist: Setlist,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<DbSetlist> {
+    const supabase = supabaseParam || createBrowserClient();
+    if (!setlist.userId) {
+      throw new Error('User ID is required to save a setlist');
+    }
+
+    const { data, error } = await supabase
+      .from('setlists')
+      .upsert({
+        id: setlist.id,
+        title: setlist.title,
+        songs: toJson(setlist.songs),
+        is_public: setlist.isPublic,
+        updated_at: new Date().toISOString(),
+        user_id: setlist.userId,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error(`Supabase error in saveSetlist:`, {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code,
+      });
+      throw error;
+    }
+    return data;
+  },
+
+  async getSetlist(id: string, supabaseParam?: SupabaseClient<Database>): Promise<Setlist> {
+    const supabase = supabaseParam || createBrowserClient();
+
+    const data = await fetchWithRetry<DbSetlist>(
+      () => supabase.from('setlists').select('*').eq('id', id).maybeSingle(),
+      id,
+      'Setlist',
+    );
+
+    if (!data) {
+      throw new Error('Setlist not found');
+    }
+
+    return {
+      id: data.id,
+      title: data.title,
+      songs: fromJson<SetlistItem[]>(data.songs),
+      userId: data.user_id,
+      isPublic: !!data.is_public,
+      createdAt: data.created_at || null,
+      updatedAt: data.updated_at || null,
+    };
+  },
+
+  async listSetlists(supabaseParam?: SupabaseClient<Database>) {
+    const supabase = supabaseParam || createBrowserClient();
+    const { data, error } = await supabase
+      .from('setlists')
+      .select('id, title, created_at')
+      .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteSetlist(id: string, supabaseParam?: SupabaseClient<Database>) {
+    const supabase = supabaseParam || createBrowserClient();
+    const { error } = await supabase.from('setlists').delete().eq('id', id);
+
+    if (error) throw error;
+  },
+
+  async duplicateSetlist(id: string, supabaseParam?: SupabaseClient<Database>): Promise<DbSetlist> {
+    const supabase = supabaseParam || createBrowserClient();
+    const original = await this.getSetlist(id, supabase);
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) {
+      throw new Error('Authenticated user required to duplicate a setlist');
+    }
+
+    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original;
+
+    const duplicate: Setlist = {
+      ...rest,
+      userId: user.id,
+      createdAt: null,
+      updatedAt: null,
+      title: `${rest.title} (Copy)`,
+      isPublic: false,
+    } as Setlist;
+
+    return this.saveSetlist(duplicate, supabase);
   },
 };

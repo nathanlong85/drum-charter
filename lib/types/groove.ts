@@ -188,6 +188,27 @@ export interface SongSubSection {
 }
 
 /**
+ * Represents an entry in a setlist.
+ */
+export interface SetlistItem {
+  songId: string;
+  order: number;
+}
+
+/**
+ * A setlist is a collection of songs organized for a performance.
+ */
+export interface Setlist {
+  id: string;
+  userId: string;
+  title: string;
+  songs: SetlistItem[];
+  isPublic: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+/**
  * A full song chart document.
  */
 export interface SongChart {

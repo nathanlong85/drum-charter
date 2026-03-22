@@ -303,6 +303,49 @@ describe('supabaseService', () => {
       expect(mockSupabase.from).toHaveBeenCalledWith('notebooks');
       expect(mockSupabase.from).toHaveBeenCalledWith('groove_snippets');
     });
+
+    it('saveSetlist throws error if userId is missing', async () => {
+      await expect(supabaseService.saveSetlist({ userId: undefined } as any)).rejects.toThrow(
+        'User ID is required',
+      );
+    });
+
+    it('saveSetlist upserts and returns data', async () => {
+      const mockSetlist = {
+        id: 'sl-1',
+        userId: 'user-123',
+        title: 'Setlist',
+        songs: [],
+        isPublic: false,
+      };
+      mockSupabase.from.mockReturnValue(mockResponse({ id: 'sl-1' }));
+      const result = await supabaseService.saveSetlist(mockSetlist as any);
+      expect(result.id).toBe('sl-1');
+    });
+
+    it('getSetlist fetches data', async () => {
+      const dbRow = {
+        id: 'sl-1',
+        title: 'Setlist',
+        songs: [],
+        user_id: 'user-123',
+      };
+      mockSupabase.from.mockReturnValue(mockResponse(dbRow));
+      const result = await supabaseService.getSetlist('sl-1');
+      expect(result.id).toBe('sl-1');
+    });
+
+    it('listSetlists returns data', async () => {
+      mockSupabase.from.mockReturnValue(mockResponse([{ id: '1' }]));
+      const setlists = await supabaseService.listSetlists();
+      expect(setlists).toHaveLength(1);
+    });
+
+    it('deleteSetlist calls supabase delete', async () => {
+      mockSupabase.from.mockReturnValue(mockResponse());
+      await supabaseService.deleteSetlist('1');
+      expect(mockSupabase.from).toHaveBeenCalledWith('setlists');
+    });
   });
 
   describe('Duplication', () => {
@@ -356,6 +399,16 @@ describe('supabaseService', () => {
 
       const result = await supabaseService.duplicateGrooveSnippet('s1');
       expect(result.id).toBe('s2');
+    });
+
+    it('duplicateSetlist clones and saves with new title', async () => {
+      const original = { id: 'sl1', title: 'Orig', songs: [], user_id: 'u1' };
+      mockSupabase.from.mockReturnValueOnce(mockResponse(original));
+      mockSupabase.auth.getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
+      mockSupabase.from.mockReturnValueOnce(mockResponse({ id: 'sl2' }));
+
+      const result = await supabaseService.duplicateSetlist('sl1');
+      expect(result.id).toBe('sl2');
     });
 
     it('throws error if user not authenticated during duplication', async () => {

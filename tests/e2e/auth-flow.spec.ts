@@ -7,9 +7,9 @@ test.describe('Authentication and Core Flow', () => {
 
   test('User can see library and navigate to existing items', async ({ page }) => {
     await expect(page.getByRole('heading', { name: /My Library/i })).toBeVisible();
-    await expect(page.getByText(/Songs/i)).toBeVisible();
-    await expect(page.getByText(/Notebooks/i)).toBeVisible();
-    await expect(page.getByText(/Snippets/i)).toBeVisible();
+    await expect(page.getByTestId('tab-song')).toBeVisible();
+    await expect(page.getByTestId('tab-notebook')).toBeVisible();
+    await expect(page.getByTestId('tab-snippet')).toBeVisible();
   });
 
   test('User can create and edit a new snippet with persistence', async ({ page }) => {
