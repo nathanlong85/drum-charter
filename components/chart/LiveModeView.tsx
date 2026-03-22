@@ -61,7 +61,8 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
           break;
         case 'exit_live_mode':
           handleExit();
-          break;      }
+          break;
+      }
     },
     [nextSection, prevSection, toggleFullscreen, handleExit],
   );

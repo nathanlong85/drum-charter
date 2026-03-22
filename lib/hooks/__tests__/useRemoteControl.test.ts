@@ -1,5 +1,4 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { debounce } from 'lodash';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useRemoteControl } from '../useRemoteControl';
 
@@ -73,7 +72,9 @@ describe('useRemoteControl', () => {
     };
     localStorage.setItem('drumcharter_remote_config', JSON.stringify(customConfig));
 
-    const { result } = renderHook(() => useRemoteControl({ onAction: mockOnAction, isActive: true }));
+    const { result } = renderHook(() =>
+      useRemoteControl({ onAction: mockOnAction, isActive: true }),
+    );
 
     // Custom mapping exists
     expect(result.current.config.keyboard.j).toContain('next_section');
@@ -198,7 +199,9 @@ describe('useRemoteControl', () => {
     });
 
     it('sets up MIDI listeners and handles messages', async () => {
-      const { result } = renderHook(() => useRemoteControl({ onAction: mockOnAction, isActive: true }));
+      const { result } = renderHook(() =>
+        useRemoteControl({ onAction: mockOnAction, isActive: true }),
+      );
 
       const mockInput = mockInputs.get('input1');
       await waitFor(() => {
@@ -234,7 +237,9 @@ describe('useRemoteControl', () => {
     });
 
     it('ignores Note Off messages for mapping', async () => {
-      const { result } = renderHook(() => useRemoteControl({ onAction: mockOnAction, isActive: true }));
+      const { result } = renderHook(() =>
+        useRemoteControl({ onAction: mockOnAction, isActive: true }),
+      );
 
       const mockInput = mockInputs.get('input1');
       await waitFor(() => {

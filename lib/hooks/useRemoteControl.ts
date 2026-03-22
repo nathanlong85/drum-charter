@@ -57,7 +57,7 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
   }, [isActive]);
 
   // SSR Safe navigator check
-  const getNavigator = () => (typeof navigator !== 'undefined' ? navigator : null);
+  const getNavigator = useCallback(() => (typeof navigator !== 'undefined' ? navigator : null), []);
 
   // Load config from local storage
   useEffect(() => {
@@ -117,7 +117,7 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
 
         const currentConfig = configRef.current;
         const newKeyboardConfig = { ...currentConfig.keyboard };
-        
+
         // Append to existing actions for this key, ensuring no duplicates
         const existingActions = newKeyboardConfig[key] || [];
         if (!existingActions.includes(currentIsListening)) {
@@ -152,7 +152,7 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
         if (isInteractive && key !== 'escape') return;
 
         e.preventDefault();
-        actions.forEach(action => onAction(action));
+        actions.forEach((action) => onAction(action));
       }
     };
 
@@ -203,7 +203,7 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
       if (currentIsListening) {
         const currentConfig = configRef.current;
         const newMidiConfig = { ...currentConfig.midi };
-        
+
         const existingActions = newMidiConfig[eventKey] || [];
         if (!existingActions.includes(currentIsListening)) {
           newMidiConfig[eventKey] = [...existingActions, currentIsListening];
@@ -218,14 +218,14 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
       if (isActiveRef.current) {
         const actions = configRef.current.midi[eventKey];
         if (actions) {
-          actions.forEach(action => onActionRef.current(action));
+          actions.forEach((action) => onActionRef.current(action));
         }
       }
     };
 
     const refreshMidiState = () => {
       setMidiConnected(midiAccess.inputs.size > 0);
-      
+
       const inputs = midiAccess.inputs.values();
       for (let input = inputs.next(); input && !input.done; input = inputs.next()) {
         input.value.onmidimessage = onMIDIMessage;
@@ -255,7 +255,7 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
         input.value.onmidimessage = null;
       }
     };
-  }, [midiAccess, saveConfig]);
+  }, [midiAccess, saveConfig, getNavigator]);
 
   const listenForMap = (action: RemoteAction) => {
     setIsListeningForMap(action);
@@ -267,12 +267,8 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
   };
 
   const getMappingForAction = (action: RemoteAction) => {
-    const keys = Object.keys(config.keyboard).filter((k) => 
-      config.keyboard[k].includes(action)
-    );
-    const midis = Object.keys(config.midi).filter((m) => 
-      config.midi[m].includes(action)
-    );
+    const keys = Object.keys(config.keyboard).filter((k) => config.keyboard[k].includes(action));
+    const midis = Object.keys(config.midi).filter((m) => config.midi[m].includes(action));
 
     return {
       keyboard: keys,
