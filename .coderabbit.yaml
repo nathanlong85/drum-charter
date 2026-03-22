@@ -5,5 +5,5 @@ reviews:
   # Path filters to ignore specific directories
   # Use '!' prefix to exclude paths
   path_filters:
-    - "!**/.agents/**"
-    - "!**/.junie/**"
+    - '!**/.agents/**'
+    - '!**/.junie/**'

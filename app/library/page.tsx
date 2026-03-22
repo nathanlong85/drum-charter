@@ -15,7 +15,7 @@ export default async function LibraryPage() {
   }
 
   // Fetch data in parallel
-  const [songsRes, notebooksRes, snippetsRes] = await Promise.all([
+  const [songsRes, notebooksRes, snippetsRes, setlistsRes] = await Promise.all([
     supabase
       .from('song_charts')
       .select('id, title, bpm, tags, created_at, updated_at')
@@ -29,6 +29,11 @@ export default async function LibraryPage() {
     supabase
       .from('groove_snippets')
       .select('id, title, tags, created_at, updated_at')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false }),
+    supabase
+      .from('setlists')
+      .select('id, title, created_at, updated_at')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false }),
   ]);
@@ -48,6 +53,7 @@ export default async function LibraryPage() {
           initialSongs={songsRes.data || []}
           initialNotebooks={notebooksRes.data || []}
           initialSnippets={snippetsRes.data || []}
+          initialSetlists={setlistsRes.data || []}
         />
       </div>
     </main>

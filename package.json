@@ -10,6 +10,7 @@
     "lint:md": "markdownlint --ignore node_modules --ignore playwright-report --ignore test-results . .gemini",
     "lint:fix": "biome check . --write --unsafe",
     "test": "vitest",
+    "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
     "format": "prettier --write ."

@@ -1,0 +1,72 @@
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
+import { AuthStatus } from '@/components/auth/AuthStatus';
+import { SetlistEditor } from '@/components/setlist/SetlistEditor';
+import { supabaseService } from '@/lib/services/supabase-service';
+import { createClient } from '@/lib/supabase/server';
+
+interface SetlistPageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function SetlistPage({ params }: SetlistPageProps) {
+  const { id } = await params;
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  let formattedSetlist;
+  try {
+    formattedSetlist = await supabaseService.getSetlist(id, supabase);
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      ((error as { code?: string }).code === 'PGRST116' ||
+        (error as { message?: string }).message?.includes('not found'))
+    ) {
+      notFound();
+    }
+    console.error('Error loading setlist:', error);
+    throw error;
+  }
+
+  return (
+    <main className="min-h-screen bg-zinc-50">
+      <nav className="bg-white border-b border-zinc-200 py-4 px-8 mb-8">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-6">
+            <Link
+              href="/library"
+              className="text-sm font-bold text-zinc-500 hover:text-zinc-900 flex items-center gap-2 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              BACK TO LIBRARY
+            </Link>
+            <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest hidden sm:block">
+              DrumCharter / Setlist / {id.slice(0, 8)}
+            </div>
+          </div>
+          <AuthStatus />
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto px-6">
+        <SetlistEditor initialSetlist={formattedSetlist} />
+      </div>
+    </main>
+  );
+}

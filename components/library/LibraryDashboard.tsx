@@ -7,13 +7,14 @@ import {
   createDefaultDrumInstruments,
   type GrooveSnippet,
   type Notebook,
+  type Setlist,
   type SongChart,
 } from '@/lib/types/groove';
 import { LibraryCard } from './LibraryCard';
 
 const supabase = createClient();
 
-type ItemType = 'song' | 'notebook' | 'snippet';
+type ItemType = 'song' | 'notebook' | 'snippet' | 'setlist';
 
 export interface LibraryItemData {
   id: string;
@@ -29,6 +30,7 @@ interface LibraryDashboardProps {
   initialSongs: LibraryItemData[];
   initialNotebooks: LibraryItemData[];
   initialSnippets: LibraryItemData[];
+  initialSetlists: LibraryItemData[];
 }
 
 interface SupabaseErrorLike {
@@ -51,6 +53,7 @@ export default function LibraryDashboard({
   initialSongs,
   initialNotebooks,
   initialSnippets,
+  initialSetlists,
 }: LibraryDashboardProps) {
   const [activeTab, setActiveTab] = useState<ItemType>('song');
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,6 +61,7 @@ export default function LibraryDashboard({
   const [songs, setSongs] = useState(initialSongs);
   const [notebooks, setNotebooks] = useState(initialNotebooks);
   const [snippets, setSnippets] = useState(initialSnippets);
+  const [setlists, setSetlists] = useState(initialSetlists);
 
   const allAvailableTags = Array.from(
     new Set([
@@ -68,6 +72,9 @@ export default function LibraryDashboard({
         (n.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
       ),
       ...snippets.flatMap((s) =>
+        (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
+      ),
+      ...setlists.flatMap((s) =>
         (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
       ),
     ]),
@@ -96,6 +103,9 @@ export default function LibraryDashboard({
       } else if (type === 'snippet') {
         await supabaseService.deleteGrooveSnippet(id);
         setSnippets(snippets.filter((s) => s.id !== id));
+      } else if (type === 'setlist') {
+        await supabaseService.deleteSetlist(id);
+        setSetlists(setlists.filter((s) => s.id !== id));
       }
     } catch (error) {
       if (isSupabaseError(error)) {
@@ -123,6 +133,9 @@ export default function LibraryDashboard({
       } else if (type === 'snippet') {
         duplicated = await supabaseService.duplicateGrooveSnippet(id);
         setSnippets([duplicated, ...snippets]);
+      } else if (type === 'setlist') {
+        duplicated = await supabaseService.duplicateSetlist(id);
+        setSetlists([duplicated, ...setlists]);
       }
 
       // Optional: redirect to the new item
@@ -165,6 +178,7 @@ export default function LibraryDashboard({
     { id: 'song', label: 'Song Charts', count: songs.length },
     { id: 'notebook', label: 'Notebooks', count: notebooks.length },
     { id: 'snippet', label: 'Snippets', count: snippets.length },
+    { id: 'setlist', label: 'Setlists', count: setlists.length },
   ];
 
   const currentItems =
@@ -172,7 +186,9 @@ export default function LibraryDashboard({
       ? filterItems(songs)
       : activeTab === 'notebook'
         ? filterItems(notebooks)
-        : filterItems(snippets);
+        : activeTab === 'snippet'
+          ? filterItems(snippets)
+          : filterItems(setlists);
 
   const handleCreateNew = async () => {
     try {
@@ -257,6 +273,23 @@ export default function LibraryDashboard({
           window.location.assign(`/snippets/${saved.id}`);
         } else {
           throw new Error('Snippet creation failed - no ID returned');
+        }
+      } else if (activeTab === 'setlist') {
+        const newSetlist: Setlist = {
+          id: crypto.randomUUID(),
+          userId,
+          title: 'Untitled Setlist',
+          songs: [],
+          isPublic: false,
+          createdAt: null,
+          updatedAt: null,
+        };
+        const saved = await supabaseService.saveSetlist(newSetlist);
+        if (saved?.id) {
+          console.log('Created setlist:', saved.id);
+          window.location.assign(`/setlists/${saved.id}`);
+        } else {
+          throw new Error('Setlist creation failed - no ID returned');
         }
       }
     } catch (error) {

@@ -121,9 +121,9 @@ Commands for running AI-powered code reviews using the CodeRabbit CLI. Use the `
 
 - **Goal**: Address code quality issues in a 3-loop state machine using the local `coderabbit` CLI.
 - **Protocol**:
-    - **Loop 1**: Address **ALL** findings (Critical, Major, Minor, Trivial).
-    - **Loop 2**: Address ONLY **Critical** and **Major** findings.
-    - **Loop 3**: Address ONLY **Critical** and **Major** findings.
+  - **Loop 1**: Address **ALL** findings (Critical, Major, Minor, Trivial).
+  - **Loop 2**: Address ONLY **Critical** and **Major** findings.
+  - **Loop 3**: Address ONLY **Critical** and **Major** findings.
 - **Command**: `coderabbit review --base main --prompt-only`
 - **Recommended Timeout**: 3600s (Agent-level `timeout` parameter)
 - **Prerequisites**: Must be logged in (`coderabbit auth login`). Current branch must have changes relative to `main`.
@@ -149,6 +149,7 @@ Commands for interacting with GitHub Actions, Projects, and Metadata.
 
 - **Goal**: Interact with Project V2 boards via GraphQL.
 - **List Projects (Organization)**:
+
 ```bash
 gh api graphql -f query='
   query($org: String!) {
@@ -159,7 +160,9 @@ gh api graphql -f query='
     }
   }' -f org="<ORG_NAME>"
 ```
+
 - **List Projects (User)**:
+
 ```bash
 gh api graphql -f query='
   query($user: String!) {
@@ -170,7 +173,9 @@ gh api graphql -f query='
     }
   }' -f user="nathanlong85"
 ```
+
 - **List Items in Project**:
+
 ```bash
 gh api graphql -f query='
   query($id: ID!) {
@@ -186,7 +191,9 @@ gh api graphql -f query='
     }
   }' -f id="<PROJECT_ID>"
 ```
+
 - **Update Project Item Field**:
+
 ```bash
 gh api graphql -f query='
   mutation($project: ID!, $item: ID!, $field: ID!, $value: String!) {
@@ -195,6 +202,7 @@ gh api graphql -f query='
     }
   }' -f project="<PROJECT_ID>" -f item="<ITEM_ID>" -f field="<FIELD_ID>" -f value="<NEW_VALUE>"
 ```
+
 - **Pitfalls**: Always use `ProjectV2` queries. Legacy Project queries will fail. Field types (text, number, date, singleSelect) require different input structures in the GraphQL mutation.
 
 ### 3. Pull Requests & Issues
@@ -212,11 +220,11 @@ parameter for these.
 
 ### 1. Verified Slow Command Patterns
 
-| Tool | Recommended Timeout | Notes |
-| :--- | :--- | :--- |
-| CodeRabbit Review | 3600s | `coderabbit review --base main --prompt-only` |
-| Playwright (Full) | 600s | `npx playwright test --project=chromium` |
-| Playwright (Single) | 180s | `npx playwright test <FILE> --project=chromium` |
-| Vitest (Full) | 120s | `npx vitest run` |
-| Supabase Start | 180s | Initial Docker image pulls can be slow. |
-| Sleep (>60s) | [Duration] + 10s | e.g., `sleep 70` needs `timeout: 80` |
+| Tool                | Recommended Timeout | Notes                                           |
+| :------------------ | :------------------ | :---------------------------------------------- |
+| CodeRabbit Review   | 3600s               | `coderabbit review --base main --prompt-only`   |
+| Playwright (Full)   | 600s                | `npx playwright test --project=chromium`        |
+| Playwright (Single) | 180s                | `npx playwright test <FILE> --project=chromium` |
+| Vitest (Full)       | 120s                | `npx vitest run`                                |
+| Supabase Start      | 180s                | Initial Docker image pulls can be slow.         |
+| Sleep (>60s)        | [Duration] + 10s    | e.g., `sleep 70` needs `timeout: 80`            |

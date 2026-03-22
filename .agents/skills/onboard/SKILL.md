@@ -63,7 +63,7 @@ Output a single reply that includes all of the following, in order:
 3. **Questions or concerns**: If there are any questions, unclear points, or design/risk/edge-case concerns, present them in an easy-to-answer way:
    - **If this environment has a questions UI** (e.g. `ask_user`): use it to pose each question so the user can answer via the UI.
    - **Otherwise**: list them as **numbered items** (1., 2., 3., …) and add one short line inviting the user to answer by number (e.g. "You can reply by number: 1: …, 2: …").
-   If there are none, say "No concerns."
+     If there are none, say "No concerns."
 4. **Readiness**: One sentence that you understand and are ready to work when the user is ready.
 5. **Explicit wait**: One sentence stating that you will not start implementation or edit any files until the user explicitly says to start.
 
@@ -89,7 +89,7 @@ I've read [Issue #123 / the pasted content / doc/handover.md].
 
 **Summary:** [2–4 sentences: goals, state, next steps.]
 
-**Questions / concerns:**  
+**Questions / concerns:**
 1. [Question or concern 1]
 2. [Question or concern 2]
 You can reply by number (e.g. 1: …, 2: …).
