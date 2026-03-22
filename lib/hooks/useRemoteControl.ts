@@ -192,8 +192,15 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
       // Ignore standard MIDI clock/active sensing
       if (status >= 248) return;
 
-      // For switches, we care about Note On or Control Change
-      if (data2 === 0 && status >= 144 && status <= 159) {
+      // Filter out all release-side messages:
+      // 1. Note Off: 128-143
+      // 2. Note On with velocity 0: 144-159 AND data2 === 0
+      // 3. Control Change release/value 0: 176-191 AND data2 === 0
+      const isNoteOff = status >= 128 && status <= 143;
+      const isNoteOnVelocityZero = status >= 144 && status <= 159 && data2 === 0;
+      const isCCValueZero = status >= 176 && status <= 191 && data2 === 0;
+
+      if (isNoteOff || isNoteOnVelocityZero || isCCValueZero) {
         return;
       }
 
@@ -232,7 +239,7 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
       }
     };
 
-    midiAccess.onstatechange = (e: MIDIConnectionEvent) => {
+    const handleStateChange = (e: MIDIConnectionEvent) => {
       const port = e.port;
       if (port && port.type === 'input') {
         const midiInput = port as MIDIInput;
@@ -247,9 +254,10 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
 
     // Initial setup
     refreshMidiState();
+    midiAccess.addEventListener('statechange', handleStateChange as EventListener);
 
     return () => {
-      midiAccess.onstatechange = null;
+      midiAccess.removeEventListener('statechange', handleStateChange as EventListener);
       const inputs = midiAccess.inputs.values();
       for (let input = inputs.next(); input && !input.done; input = inputs.next()) {
         input.value.onmidimessage = null;

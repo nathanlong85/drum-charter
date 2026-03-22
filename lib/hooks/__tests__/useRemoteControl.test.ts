@@ -44,6 +44,24 @@ const createMockKeyboardEvent = (key: string, isInteractive = false) => {
   return event;
 };
 
+interface MidiInputMock {
+  id: string;
+  name: string;
+  type: 'input';
+  state: string;
+  onmidimessage: ((event: any) => void) | null;
+}
+
+interface MidiAccessMock {
+  inputs: {
+    size: number;
+    values: () => IterableIterator<MidiInputMock>;
+  };
+  addEventListener: (type: string, handler: EventListener) => void;
+  removeEventListener: (type: string, handler: EventListener) => void;
+  onstatechange: null;
+}
+
 describe('useRemoteControl', () => {
   const mockOnAction = vi.fn();
 
@@ -171,13 +189,17 @@ describe('useRemoteControl', () => {
   });
 
   describe('Web MIDI', () => {
-    let mockInputs: Map<string, any>;
-    let mockMidiAccess: any;
+    let mockInputs: Map<string, MidiInputMock>;
+    let mockMidiAccess: MidiAccessMock;
 
     beforeEach(() => {
       vi.useRealTimers();
       mockInputs = new Map();
-      const mockInput = {
+      const mockInput: MidiInputMock = {
+        id: 'input1',
+        name: 'Mock MIDI Input',
+        type: 'input',
+        state: 'connected',
         onmidimessage: null,
       };
       mockInputs.set('input1', mockInput);
@@ -189,6 +211,8 @@ describe('useRemoteControl', () => {
           },
           values: vi.fn(() => mockInputs.values()),
         },
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
         onstatechange: null,
       };
 
@@ -203,7 +227,7 @@ describe('useRemoteControl', () => {
         useRemoteControl({ onAction: mockOnAction, isActive: true }),
       );
 
-      const mockInput = mockInputs.get('input1');
+      const mockInput = mockInputs.get('input1')!;
       await waitFor(() => {
         expect(mockInput.onmidimessage).toBeInstanceOf(Function);
       });
@@ -218,7 +242,7 @@ describe('useRemoteControl', () => {
 
       // Simulate Note On (144) for Note 36 with velocity 100
       act(() => {
-        mockInput.onmidimessage({
+        mockInput.onmidimessage!({
           data: new Uint8Array([144, 36, 100]),
         });
       });
@@ -228,7 +252,7 @@ describe('useRemoteControl', () => {
 
       // Now trigger the action via MIDI
       act(() => {
-        mockInput.onmidimessage({
+        mockInput.onmidimessage!({
           data: new Uint8Array([144, 36, 127]), // Same note, different velocity
         });
       });
@@ -236,12 +260,12 @@ describe('useRemoteControl', () => {
       expect(mockOnAction).toHaveBeenCalledWith('next_section');
     });
 
-    it('ignores Note Off messages for mapping', async () => {
+    it('ignores Note Off and release-side messages', async () => {
       const { result } = renderHook(() =>
         useRemoteControl({ onAction: mockOnAction, isActive: true }),
       );
 
-      const mockInput = mockInputs.get('input1');
+      const mockInput = mockInputs.get('input1')!;
       await waitFor(() => {
         expect(mockInput.onmidimessage).toBeInstanceOf(Function);
       });
@@ -250,14 +274,28 @@ describe('useRemoteControl', () => {
         result.current.listenForMap('next_section');
       });
 
-      // Simulate Note Off (velocity 0)
+      // 1. Simulate Note Off (128)
       act(() => {
-        mockInput.onmidimessage({
+        mockInput.onmidimessage!({
+          data: new Uint8Array([128, 36, 0]),
+        });
+      });
+      expect(result.current.isListeningForMap).toBe('next_section');
+
+      // 2. Simulate Note On with velocity 0 (144)
+      act(() => {
+        mockInput.onmidimessage!({
           data: new Uint8Array([144, 36, 0]),
         });
       });
+      expect(result.current.isListeningForMap).toBe('next_section');
 
-      // Should still be listening, Note Off was ignored
+      // 3. Simulate CC release/value 0 (176)
+      act(() => {
+        mockInput.onmidimessage!({
+          data: new Uint8Array([176, 64, 0]),
+        });
+      });
       expect(result.current.isListeningForMap).toBe('next_section');
     });
   });

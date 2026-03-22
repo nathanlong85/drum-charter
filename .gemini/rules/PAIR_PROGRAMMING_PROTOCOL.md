@@ -1,7 +1,9 @@
 ## PAIR PROGRAMMING PROTOCOL
 
 ### 1. Work Initialization (Mandatory)
+
 Before starting ANY new work on an issue or task:
+
 1. **Switch to Main**: Ensure you are on the `main` branch (`git checkout main`).
 2. **Pull Remote Changes**: Ensure `main` is up-to-date with all remote changes (`git pull origin main`).
 3. **Branch**: Switch to a new, appropriately-named branch for the task (e.g., `git checkout -b feature/issue-number-description`).
