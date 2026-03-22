@@ -44,12 +44,16 @@ const createMockKeyboardEvent = (key: string, isInteractive = false) => {
   return event;
 };
 
+interface MidiMessageMock {
+  data: Uint8Array;
+}
+
 interface MidiInputMock {
   id: string;
   name: string;
   type: 'input';
-  state: string;
-  onmidimessage: ((event: any) => void) | null;
+  state: 'connected' | 'disconnected';
+  onmidimessage: ((event: MidiMessageMock) => void) | null;
 }
 
 interface MidiAccessMock {
@@ -57,8 +61,8 @@ interface MidiAccessMock {
     size: number;
     values: () => IterableIterator<MidiInputMock>;
   };
-  addEventListener: (type: string, handler: EventListener) => void;
-  removeEventListener: (type: string, handler: EventListener) => void;
+  addEventListener: (type: 'statechange', handler: EventListener) => void;
+  removeEventListener: (type: 'statechange', handler: EventListener) => void;
   onstatechange: null;
 }
 
@@ -99,6 +103,25 @@ describe('useRemoteControl', () => {
     expect(result.current.config.midi['144:36']).toContain('prev_section');
 
     // Default mapping still exists (deep merge)
+    expect(result.current.config.keyboard.arrowright).toContain('next_section');
+  });
+
+  it('filters invalid actions when loading from local storage', () => {
+    const corruptedConfig = {
+      keyboard: {
+        j: ['next_section', 'invalid_action' as any],
+        k: 'invalid_string' as any,
+      },
+    };
+    localStorage.setItem('drumcharter_remote_config', JSON.stringify(corruptedConfig));
+
+    const { result } = renderHook(() =>
+      useRemoteControl({ onAction: mockOnAction, isActive: true }),
+    );
+
+    // Valid action preserved
+    expect(result.current.config.keyboard.j).toEqual(['next_section']);
+    // Invalid action filtered out, default preserved
     expect(result.current.config.keyboard.arrowright).toContain('next_section');
   });
 
@@ -227,12 +250,16 @@ describe('useRemoteControl', () => {
         useRemoteControl({ onAction: mockOnAction, isActive: true }),
       );
 
+      // Verify midiSupported is true (async state update)
+      await waitFor(() => {
+        expect(result.current.midiSupported).toBe(true);
+      });
+
       const mockInput = mockInputs.get('input1')!;
       await waitFor(() => {
         expect(mockInput.onmidimessage).toBeInstanceOf(Function);
       });
 
-      expect(result.current.midiSupported).toBe(true);
       expect(result.current.midiConnected).toBe(true);
 
       // Simulate mapping a MIDI event
@@ -297,6 +324,52 @@ describe('useRemoteControl', () => {
         });
       });
       expect(result.current.isListeningForMap).toBe('next_section');
+    });
+
+    it('updates midiConnected and rewires on statechange', async () => {
+      const { result } = renderHook(() =>
+        useRemoteControl({ onAction: mockOnAction, isActive: true }),
+      );
+
+      await waitFor(() => {
+        expect(mockMidiAccess.addEventListener).toHaveBeenCalledWith(
+          'statechange',
+          expect.any(Function),
+        );
+      });
+
+      const stateChangeHandler = vi.mocked(mockMidiAccess.addEventListener).mock.calls[0][1] as (
+        e: any,
+      ) => void;
+
+      // Simulate device disconnection
+      mockInputs.clear();
+      act(() => {
+        stateChangeHandler({
+          port: { id: 'input1', type: 'input', state: 'disconnected' },
+        });
+      });
+
+      expect(result.current.midiConnected).toBe(false);
+
+      // Simulate device connection
+      const newInput: MidiInputMock = {
+        id: 'input2',
+        name: 'New Input',
+        type: 'input',
+        state: 'connected',
+        onmidimessage: null,
+      };
+      mockInputs.set('input2', newInput);
+
+      act(() => {
+        stateChangeHandler({
+          port: newInput,
+        });
+      });
+
+      expect(result.current.midiConnected).toBe(true);
+      expect(newInput.onmidimessage).toBeInstanceOf(Function);
     });
   });
 });
