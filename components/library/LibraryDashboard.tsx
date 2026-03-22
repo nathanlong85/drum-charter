@@ -96,16 +96,16 @@ export default function LibraryDashboard({
     try {
       if (type === 'song') {
         await supabaseService.deleteSongChart(id);
-        setSongs(songs.filter((s) => s.id !== id));
+        setSongs((prev) => prev.filter((s) => s.id !== id));
       } else if (type === 'notebook') {
         await supabaseService.deleteNotebook(id);
-        setNotebooks(notebooks.filter((n) => n.id !== id));
+        setNotebooks((prev) => prev.filter((n) => n.id !== id));
       } else if (type === 'snippet') {
         await supabaseService.deleteGrooveSnippet(id);
-        setSnippets(snippets.filter((s) => s.id !== id));
+        setSnippets((prev) => prev.filter((s) => s.id !== id));
       } else if (type === 'setlist') {
         await supabaseService.deleteSetlist(id);
-        setSetlists(setlists.filter((s) => s.id !== id));
+        setSetlists((prev) => prev.filter((s) => s.id !== id));
       }
     } catch (error) {
       if (isSupabaseError(error)) {
@@ -126,16 +126,16 @@ export default function LibraryDashboard({
       let duplicated;
       if (type === 'song') {
         duplicated = await supabaseService.duplicateSongChart(id);
-        setSongs([duplicated, ...songs]);
+        setSongs((prev) => [duplicated, ...prev]);
       } else if (type === 'notebook') {
         duplicated = await supabaseService.duplicateNotebook(id);
-        setNotebooks([duplicated, ...notebooks]);
+        setNotebooks((prev) => [duplicated, ...prev]);
       } else if (type === 'snippet') {
         duplicated = await supabaseService.duplicateGrooveSnippet(id);
-        setSnippets([duplicated, ...snippets]);
+        setSnippets((prev) => [duplicated, ...prev]);
       } else if (type === 'setlist') {
         duplicated = await supabaseService.duplicateSetlist(id);
-        setSetlists([duplicated, ...setlists]);
+        setSetlists((prev) => [duplicated, ...prev]);
       }
 
       // Optional: redirect to the new item

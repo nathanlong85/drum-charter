@@ -61,17 +61,23 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
 
   const saveToSupabase = saveToSupabaseRef.current;
 
+  // Autosave when setlist changes
+  useEffect(() => {
+    // Skip the first render to avoid redundant save
+    if (setlist !== initialSetlist) {
+      saveToSupabase(setlist);
+    }
+  }, [setlist, saveToSupabase, initialSetlist]);
+
   // Cleanup the debounced function on unmount
   useEffect(() => {
     return () => {
-      saveToSupabase.cancel();
+      saveToSupabase.flush();
     };
   }, [saveToSupabase]);
 
   const updateSetlist = (updates: Partial<Setlist>) => {
-    const updated = { ...setlist, ...updates };
-    setSetlist(updated);
-    saveToSupabase(updated);
+    setSetlist((prev) => ({ ...prev, ...updates }));
   };
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -257,7 +263,7 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                     {getSongTitle(song.songId)}
                   </div>
 
-                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => moveSong(idx, 'up')}
                       disabled={idx === 0}

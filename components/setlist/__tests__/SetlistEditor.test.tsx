@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { debounce } from 'lodash';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { SetlistEditor } from '../SetlistEditor';
@@ -8,7 +9,7 @@ vi.mock('lodash', async (importOriginal) => {
   return {
     ...actual,
     debounce: vi.fn((fn) => {
-      const debounced = (...args: any[]) => fn(...args);
+      const debounced = (...args: unknown[]) => fn(...args);
       debounced.cancel = vi.fn();
       debounced.flush = vi.fn();
       return debounced;
@@ -62,7 +63,10 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
     const titleInput = screen.getByDisplayValue('My Setlist');
-    fireEvent.change(titleInput, { target: { value: 'New Setlist Title' } });
+
+    await act(async () => {
+      fireEvent.change(titleInput, { target: { value: 'New Setlist Title' } });
+    });
 
     expect(screen.getByDisplayValue('New Setlist Title')).toBeDefined();
 
@@ -77,7 +81,10 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
     const visibilityButton = screen.getByText('Private');
-    fireEvent.click(visibilityButton);
+
+    await act(async () => {
+      fireEvent.click(visibilityButton);
+    });
 
     expect(screen.getByText('Public')).toBeDefined();
 
@@ -91,16 +98,21 @@ describe('SetlistEditor', () => {
   it('adds a song to the setlist', async () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
+    // Wait for initial load
+    await waitFor(() => {
+      expect(screen.getByText('First Song')).toBeDefined();
+    });
+
     // Open song selector
     fireEvent.click(screen.getByText('Add Song'));
 
-    // Wait for available songs
-    await waitFor(() => {
-      expect(screen.getByText('Third Song')).toBeDefined();
-    });
+    // Wait for available songs in selector
+    const songButton = await screen.findByText('Third Song');
 
     // Click to add
-    fireEvent.click(screen.getByText('Third Song'));
+    await act(async () => {
+      fireEvent.click(songButton);
+    });
 
     // Should now be in the list
     expect(screen.getAllByText('Third Song').length).toBeGreaterThan(0);
@@ -122,7 +134,10 @@ describe('SetlistEditor', () => {
     });
 
     const removeButtons = screen.getAllByTitle('Remove from Setlist');
-    fireEvent.click(removeButtons[0]);
+
+    await act(async () => {
+      fireEvent.click(removeButtons[0]);
+    });
 
     // "First Song" should be removed
     expect(screen.queryByText('First Song')).toBeNull();
@@ -146,8 +161,11 @@ describe('SetlistEditor', () => {
     });
 
     const moveUpButtons = screen.getAllByTitle('Move Up');
+
     // Button for first item is disabled, we click the second one
-    fireEvent.click(moveUpButtons[1]);
+    await act(async () => {
+      fireEvent.click(moveUpButtons[1]);
+    });
 
     await waitFor(() => {
       expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
@@ -169,8 +187,11 @@ describe('SetlistEditor', () => {
     });
 
     const moveDownButtons = screen.getAllByTitle('Move Down');
+
     // Click move down on the first item
-    fireEvent.click(moveDownButtons[0]);
+    await act(async () => {
+      fireEvent.click(moveDownButtons[0]);
+    });
 
     await waitFor(() => {
       expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
@@ -190,7 +211,10 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
     const titleInput = screen.getByDisplayValue('My Setlist');
-    fireEvent.change(titleInput, { target: { value: 'New Setlist Title' } });
+
+    await act(async () => {
+      fireEvent.change(titleInput, { target: { value: 'New Setlist Title' } });
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Failed to save changes')).toBeDefined();
@@ -201,6 +225,10 @@ describe('SetlistEditor', () => {
     vi.mocked(supabaseService).listSongCharts.mockResolvedValueOnce([]);
 
     render(<SetlistEditor initialSetlist={mockSetlist} />);
+
+    await waitFor(() => {
+      expect(screen.queryByText('Add Song')).toBeDefined();
+    });
 
     fireEvent.click(screen.getByText('Add Song'));
 
@@ -213,9 +241,20 @@ describe('SetlistEditor', () => {
     const emptySetlist = { ...mockSetlist, songs: [] };
     render(<SetlistEditor initialSetlist={emptySetlist} />);
 
-    // Wait for the useEffect to finish loading available songs
     await waitFor(() => {
       expect(screen.getByText(/No songs in this setlist yet/i)).toBeDefined();
     });
+  });
+
+  it('flushes pending saves on unmount', () => {
+    const { unmount } = render(<SetlistEditor initialSetlist={mockSetlist} />);
+
+    // We need to capture the debounced instance created during render
+    const debounceMock = vi.mocked(debounce);
+    const debouncedFunction = debounceMock.mock.results[0].value;
+
+    unmount();
+
+    expect(debouncedFunction.flush).toHaveBeenCalled();
   });
 });

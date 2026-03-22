@@ -12,5 +12,5 @@ These rules define the fundamental relationship between the user and the agent. 
 6. **User Sovereignty**: The user is in charge of the project's direction. The agent acts as an expert advisor and executor, but the user's decisions are final.
 7. **Issue Ownership**: Never perform work on issues assigned to the user or other contributors. Only implement tasks explicitly assigned to the agent (**`nathanlong85-ai`**).
 8. **Issue Lifecycle**: Do not close "Epic" labeled issues or issues assigned to the user. These are managed exclusively by the user.
-9. **Status Board Updates**: Do not mark stories or tasks as "Done" in `PROJECT_PLAN.md` or any status board until the corresponding Pull Request has been merged by the user. The user will typically provide an update when a merge occurs.
+9. **Status Board Updates**: Do not mark stories or tasks as "Done" in `docs/PROJECT_PLAN.md` or any status board until the corresponding Pull Request has been merged by the user. The user will typically provide an update when a merge occurs.
 10. **Autonomous Completion**: Once a task is verified and meets the "Definition of Done", proceed autonomously to commit the changes and create a Pull Request. You do not need to ask for permission to perform these final steps.

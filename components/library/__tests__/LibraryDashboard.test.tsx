@@ -163,7 +163,15 @@ describe('LibraryDashboard', () => {
         data: { user: { id: 'test-user-id' } },
         error: null,
       });
-      vi.mocked(supabaseService).saveSetlist.mockResolvedValue({ id: 'new-setlist-id' } as any);
+      vi.mocked(supabaseService).saveSetlist.mockResolvedValue({
+        id: 'new-setlist-id',
+        title: 'Untitled Setlist',
+        owner_id: 'test-user-id',
+        is_public: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        songs: [],
+      });
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-setlist'));

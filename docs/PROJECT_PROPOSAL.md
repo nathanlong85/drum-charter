@@ -26,8 +26,20 @@ I would like to build a web app (and maybe some day a mobile app) that is tailor
 - A stretch goal would be the ability to play the grooves created in the grid or drum staff
 - It should be user-based, so when I log in, I should see my library of charts, my tags, etc.
 - There should be some concept of "sharing" between users. For example, either:
-  - Users can add charts to a "Shared Library" that all users can access - Users would be able to view and print those charts - Users would not be able to modify them directly - A user could "copy" or "clone" a shared chart to their personal library to make modifications - They could then either suggest the chart as an update to the existing one or add it as a completely separate chart
-  - The app has a concept of "public" and "private" charts: - Users could mark a chart as private if they don't want other users to be able to search for it or see it - Users could leave a chart "public" and set permissions on it: - Read-only - Other users could read it, but not make edits - Other users could copy (clone) it to their library if they want to make edits to their own copy - Edit - Other users can read and make edits, possibly with the concept of an edit history - Other users could still create their own copy and make edits to that
+  - Users can add charts to a "Shared Library" that all users can access
+    - Users would be able to view and print those charts
+    - Users would not be able to modify them directly
+    - A user could "copy" or "clone" a shared chart to their personal library to make modifications
+    - They could then either suggest the chart as an update to the existing one or add it as a completely separate chart
+  - The app has a concept of "public" and "private" charts:
+    - Users could mark a chart as private if they don't want other users to be able to search for it or see it
+    - Users could leave a chart "public" and set permissions on it:
+      - Read-only
+        - Other users could read it, but not make edits
+        - Other users could copy (clone) it to their library if they want to make edits to their own copy
+      - Edit
+        - Other users can read and make edits, possibly with the concept of an edit history
+        - Other users could still create their own copy and make edits to that
 - There should be excellent printing support. Charts should be printable on standard US Letter-sized paper
 - We should be able to export to PDF
 - As mentioned earlier, I'd like to have support for "groove snippets". This could also be referred to as a "pattern library" or "beat library" or "groove library"

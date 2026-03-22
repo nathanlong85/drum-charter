@@ -101,7 +101,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done
 
-- [x] [Feature] Setlist Management (#38) `✓`
+- [ ] [Feature] Setlist Management (#38)
 - [x] [Feature] Keyboard Modifiers for Rapid Editing (#36) `✓`
 - [x] [Feature] Multi-cell Selection & Copy/Paste (#35) `✓`
 - [x] [Feature] Quick Clear Grid/Row functionality (#34) `✓`

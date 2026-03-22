@@ -112,7 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - **Audio Sample Mapping**: Corrected drum sample mapping to support symbol-specific hits (e.g., Rim Shot, Bell, Flams).
-- **Git Attribution**: Rewrote historical commits to correctly attribute authorship to `Nathan Long <nathanlong85@gmail.com>` and removed co-author tags.
+- **Git Attribution**: Rewrote historical commits to correctly attribute authorship to `Nathan Long (nathanlong85)` and removed co-author tags.
 
 ## [0.1.5-alpha] - 2026-03-12
 
