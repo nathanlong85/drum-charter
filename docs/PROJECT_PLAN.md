@@ -94,7 +94,6 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ### 🔵 In Progress
 
 - [ ] [Epic] Live Mode (#44)
-  - [ ] [Task] Section Markers: Clear visual indicators for song sections in Live Mode (#49)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
@@ -102,6 +101,8 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done
 
+- [ ] [Feature] Section Markers: Clear visual indicators for song sections in Live Mode (#49)
+- [ ] [Documentation] Create Comprehensive User Manual (#48)
 - [x] [Feature] Remote Control Support (Foot Switch/MIDI) (#39) `✓`
 - [x] [Feature] Setlist Management (#38) `✓`
 - [x] [Feature] Keyboard Modifiers for Rapid Editing (#36) `✓`
