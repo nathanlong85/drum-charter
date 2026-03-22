@@ -395,10 +395,9 @@ export const supabaseService = {
 
     const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original;
 
-    // Construct new object without ID or audit fields to satisfy TypeScript
-    // and rely on saveSongChart/Supabase to handle ID generation and user_id.
     const duplicate: SongChart = {
       ...rest,
+      id: crypto.randomUUID(),
       userId: userData.user.id,
       createdAt: null,
       updatedAt: null,
@@ -427,6 +426,7 @@ export const supabaseService = {
 
     const duplicate: Notebook = {
       ...rest,
+      id: crypto.randomUUID(),
       userId: userData.user.id,
       createdAt: null,
       updatedAt: null,
@@ -452,6 +452,7 @@ export const supabaseService = {
 
     const duplicate: GrooveSnippet = {
       ...rest,
+      id: crypto.randomUUID(),
       userId: userData.user.id,
       createdAt: null,
       updatedAt: null,
@@ -642,6 +643,7 @@ export const supabaseService = {
 
     const duplicate: Setlist = {
       ...rest,
+      id: crypto.randomUUID(),
       userId: user.id,
       createdAt: null,
       updatedAt: null,

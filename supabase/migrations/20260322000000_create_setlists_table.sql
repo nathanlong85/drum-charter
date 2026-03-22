@@ -34,7 +34,8 @@ ON "public"."setlists"
 AS PERMISSIVE
 FOR UPDATE
 TO public
-USING ((auth.uid() = user_id));
+USING ((auth.uid() = user_id))
+WITH CHECK ((auth.uid() = user_id));
 
 CREATE POLICY "Users can view public or own setlists."
 ON "public"."setlists"

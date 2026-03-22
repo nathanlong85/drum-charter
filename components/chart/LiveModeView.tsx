@@ -40,10 +40,23 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger navigation if an interactive element has focus
+      const activeEl = document.activeElement as HTMLElement | null;
+      const isInteractive =
+        activeEl &&
+        (activeEl.tagName === 'BUTTON' ||
+          activeEl.tagName === 'INPUT' ||
+          activeEl.tagName === 'TEXTAREA' ||
+          activeEl.tagName === 'SELECT' ||
+          activeEl.tagName === 'A' ||
+          activeEl.isContentEditable);
+
       if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        if (isInteractive && e.key === ' ') return;
         e.preventDefault();
         nextSection();
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        if (isInteractive) return;
         e.preventDefault();
         prevSection();
       } else if (e.key === 'Escape') {
@@ -51,6 +64,7 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
           onExit();
         }
       } else if (e.key === 'f') {
+        if (isInteractive) return;
         toggleFullscreen();
       }
     };
