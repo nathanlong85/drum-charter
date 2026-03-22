@@ -55,6 +55,13 @@ export function AuthStatus() {
     <div className="flex gap-6 items-center">
       <div className="flex gap-4 items-center">
         <a
+          href="/manual"
+          className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors"
+        >
+          Manual
+        </a>
+        <span className="w-px h-4 bg-gray-300"></span>
+        <a
           href="/library"
           className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors"
         >

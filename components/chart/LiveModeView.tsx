@@ -125,6 +125,14 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
           </div>
 
           <div className="flex gap-4 items-center">
+            <a
+              href="/manual"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold text-zinc-500 hover:text-white uppercase tracking-widest transition-colors mr-2"
+            >
+              Manual
+            </a>
             <RemoteControlSettings {...remoteSettingsProps} />
             <button
               onClick={toggleFullscreen}
@@ -149,11 +157,32 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       <main className="flex-1 flex flex-col p-8 lg:p-12 overflow-y-auto">
         <div className="max-w-6xl mx-auto w-full">
           <div className="flex justify-between items-end mb-8 border-b-4 border-yellow-400 pb-4">
-            <h2 className="text-6xl font-black uppercase text-white leading-none">
-              {activeSection.name}
-            </h2>
-            <div className="text-4xl font-mono text-zinc-500 font-bold">
-              {activeSectionIdx + 1} / {chart.sections.length}
+            <div className="flex flex-col">
+              <h2 className="text-6xl font-black uppercase text-white leading-none">
+                {activeSection.name}
+              </h2>
+              {activeSection.measuresCount > 0 && (
+                <div
+                  className="text-2xl font-bold text-yellow-400 mt-3 tracking-widest uppercase"
+                  data-testid="section-measures-count"
+                >
+                  {activeSection.measuresCount} Measures
+                </div>
+              )}
+            </div>
+            <div className="flex flex-col items-end">
+              <div className="text-4xl font-mono text-zinc-500 font-bold mb-2">
+                {activeSectionIdx + 1} / {chart.sections.length}
+              </div>
+              {activeSectionIdx < chart.sections.length - 1 && (
+                <div
+                  className="text-xl font-bold text-zinc-400 uppercase tracking-wider"
+                  data-testid="next-section-preview"
+                >
+                  Next:{' '}
+                  <span className="text-white">{chart.sections[activeSectionIdx + 1].name}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -187,8 +216,16 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
                     key={sub.id}
                     className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800"
                   >
-                    <h4 className="text-2xl font-bold text-white mb-4 uppercase">
-                      {sub.name} ({sub.measuresCount}M)
+                    <h4 className="text-2xl font-bold text-white mb-4 uppercase flex justify-between items-center">
+                      <span>{sub.name}</span>
+                      {sub.measuresCount > 0 && (
+                        <span
+                          className="text-xl text-yellow-400 font-black tracking-widest bg-yellow-400/10 px-3 py-1 rounded-md border border-yellow-400/20"
+                          data-testid={`subsection-measures-${sub.id}`}
+                        >
+                          {sub.measuresCount}M
+                        </span>
+                      )}
                     </h4>
                     {sub.grid && <GrooveGridEditor initialGrid={sub.grid} readOnly />}
                     {sub.notes && sub.notes.length > 0 && (

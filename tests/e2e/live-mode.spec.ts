@@ -50,8 +50,9 @@ test.describe('Live Mode', () => {
 
   test('should enter and exit live mode from editor', async ({ page }) => {
     // Small delay to ensure button click works
-    await page.waitForTimeout(1000);
-    await page.getByTestId('go-live-button').click({ force: true });
+    const goLiveBtn = page.getByTestId('go-live-button');
+    await goLiveBtn.waitFor({ state: 'visible' });
+    await goLiveBtn.click({ force: true });
 
     // Verify live mode is active
     await expect(page.getByTestId('exit-live-mode-btn')).toBeVisible({ timeout: 15000 });
@@ -63,8 +64,9 @@ test.describe('Live Mode', () => {
   });
 
   test('should navigate between sections via keyboard', async ({ page }) => {
-    await page.waitForTimeout(1000);
-    await page.getByTestId('go-live-button').click({ force: true });
+    const goLiveBtn = page.getByTestId('go-live-button');
+    await goLiveBtn.waitFor({ state: 'visible' });
+    await goLiveBtn.click({ force: true });
 
     // Verify live mode is active
     await expect(page.getByTestId('exit-live-mode-btn')).toBeVisible({ timeout: 15000 });
@@ -82,8 +84,9 @@ test.describe('Live Mode', () => {
   });
 
   test('should toggle fullscreen with F key', async ({ page }) => {
-    await page.waitForTimeout(1000);
-    await page.getByTestId('go-live-button').click({ force: true });
+    const goLiveBtn = page.getByTestId('go-live-button');
+    await goLiveBtn.waitFor({ state: 'visible' });
+    await goLiveBtn.click({ force: true });
 
     // Header should be visible initially
     await expect(page.locator('header')).toBeVisible();
@@ -97,5 +100,23 @@ test.describe('Live Mode', () => {
     // Toggle back with F
     await page.keyboard.press('f');
     await expect(page.locator('header')).toBeVisible();
+  });
+
+  test('should display section markers and next section preview', async ({ page }) => {
+    // Navigate to live mode
+    const goLiveBtn = page.getByTestId('go-live-button');
+    await goLiveBtn.waitFor({ state: 'visible' });
+    await goLiveBtn.click({ force: true });
+
+    // Section 1 markers
+    await expect(page.getByTestId('section-measures-count')).toBeVisible();
+    await expect(page.getByTestId('next-section-preview')).toContainText(/Next: Section 2/i);
+
+    // Go to last section
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 2');
+
+    // Next section preview should be hidden on last section
+    await expect(page.getByTestId('next-section-preview')).toBeHidden();
   });
 });
