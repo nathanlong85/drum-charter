@@ -3,6 +3,7 @@
 DrumCharter is a web application tailored for drummers to create, manage, and share drum charts, practice exercises, and groove snippets. It aims to replace cumbersome word processor templates with a streamlined, interactive tool.
 
 ## Core Vision
+
 - **Interactive Groove Grid**: A visual, editable grid for drum patterns.
 - **Song Charts**: Structured song documents with headers, sections, sub-sections, and inline grooves.
 - [x] **Comprehensive Library**: A central place for song charts, notebooks (routines/ideas), and snippets. `✓`
@@ -17,6 +18,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ---
 
 ## Tech Stack
+
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS 4
@@ -30,6 +32,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ---
 
 ## V1 Feature Scope
+
 - [x] **Project Foundation**:
   - [x] Next.js 16 Initial Setup `✓`
   - [x] Tailwind 4 Configuration `✓`
@@ -72,6 +75,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ---
 
 ## V2 Feature Scope (In Planning)
+
 - [x] **Advanced Grid Ergonomics**:
   - [x] **Multi-cell Interaction**: Implement selection box (drag-to-select), multi-cell clear, and multi-cell symbol application. (#35) `✓`
   - [x] **Grid Clipboard**: Support copy/pasting single or multiple cells within and across grids. (#35) `✓`
@@ -88,12 +92,16 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## Status Board (Kanban)
 
 ### 🔵 In Progress
+
+- [ ] [Epic] Live Mode (#44)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
 - [ ] [Chore] Expand E2E test coverage for all core UI flows (#22)
 
 ### 🟢 Done
+
+- [ ] [Feature] Setlist Management (#38)
 - [x] [Feature] Keyboard Modifiers for Rapid Editing (#36) `✓`
 - [x] [Feature] Multi-cell Selection & Copy/Paste (#35) `✓`
 - [x] [Feature] Quick Clear Grid/Row functionality (#34) `✓`
@@ -156,5 +164,6 @@ To ensure high-quality collaboration and maintain the stability of the DrumChart
 ---
 
 ## Instructions for Agents
+
 - **Read Before Work**: This file MUST be read before any work is done.
 - **Update After Work**: This file MUST be updated after every task is completed.

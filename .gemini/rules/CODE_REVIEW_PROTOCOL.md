@@ -1,6 +1,7 @@
 ## Code Review Protocol
 
 ### 1. CodeRabbit Review Protocol
+
 - **Feedback Review Loop**:
   - CodeRabbit is our primary feedback mechanism for this project.
   - Do not automatically trigger feedback loops. Only trigger when explicitly asked.
@@ -12,6 +13,7 @@
   - Introduces unnecessary complexity or "code smells."
 
 #### 1.1 Local CodeRabbit Feedback Review Loop
+
 - **Local Review Loop**: Always use the `code-review` agent skill (running `cr review --prompt-only --base main`) locally to perform the review loops.
 - **Code Quality**: Always lint and ensure all related tests pass before kicking off the next run in the review loop.
 - **Reporting Requirements**: At the start of every review run, you MUST explicitly state:
@@ -25,6 +27,7 @@
   4. **Post-Termination**: Once the loop has been terminated, the review cycle is complete. Push the final verified state and notify the user.
 
 #### 1.2 Remote CodeRabbit Feedback Review Loop
+
 - **Asynchronous Feedback**: Once a Pull Request is opened or a push is made to an existing PR, CodeRabbit will automatically scan the code.
 - **Manual Check**: Only check for remote CodeRabbit feedback when explicitly asked (e.g., "Check CodeRabbit," "Is the review done?").
 - **Review Status Check**:

@@ -4,13 +4,13 @@ Extra input patterns and reply shapes for the agent. For full workflow, see [SKI
 
 ## User input patterns (when to apply)
 
-| User says | Input type | Action |
-|-----------|------------|--------|
-| `/onboard #123` | Single issue/PR | Fetch #123. If it has linked items, fetch those too. |
-| `/onboard #123 Focus on AC` | Issue + instructions | Fetch #123, emphasize AC in analysis. |
-| `/onboard #123 #124` | Multiple items | Fetch both. |
-| `/onboard doc/handover.md` | Path | Read file at that path. |
-| User pastes handover and says "onboard with this" | Pasted | Use pasted text as context. |
+| User says                                         | Input type           | Action                                               |
+| ------------------------------------------------- | -------------------- | ---------------------------------------------------- |
+| `/onboard #123`                                   | Single issue/PR      | Fetch #123. If it has linked items, fetch those too. |
+| `/onboard #123 Focus on AC`                       | Issue + instructions | Fetch #123, emphasize AC in analysis.                |
+| `/onboard #123 #124`                              | Multiple items       | Fetch both.                                          |
+| `/onboard doc/handover.md`                        | Path                 | Read file at that path.                              |
+| User pastes handover and says "onboard with this" | Pasted               | Use pasted text as context.                          |
 
 ## Reply shape (required elements)
 

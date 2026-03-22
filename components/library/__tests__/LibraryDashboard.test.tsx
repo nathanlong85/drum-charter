@@ -23,12 +23,15 @@ vi.mock('@/lib/services/supabase-service', () => ({
     saveSongChart: vi.fn(),
     saveNotebook: vi.fn(),
     saveGrooveSnippet: vi.fn(),
+    saveSetlist: vi.fn(),
     deleteSongChart: vi.fn().mockResolvedValue({}),
     deleteNotebook: vi.fn().mockResolvedValue({}),
     deleteGrooveSnippet: vi.fn().mockResolvedValue({}),
+    deleteSetlist: vi.fn().mockResolvedValue({}),
     duplicateSongChart: vi.fn().mockResolvedValue({ id: 's2', title: 'Song 2', tags: [] }),
     duplicateNotebook: vi.fn().mockResolvedValue({ id: 'n2', title: 'Notebook 2', tags: [] }),
     duplicateGrooveSnippet: vi.fn().mockResolvedValue({ id: 'sn2', title: 'Snippet 2', tags: [] }),
+    duplicateSetlist: vi.fn().mockResolvedValue({ id: 'set2', title: 'Setlist 2', tags: [] }),
   },
 }));
 
@@ -50,6 +53,7 @@ const mockProps = {
   initialSongs: [{ id: 's1', title: 'Song 1', tags: ['rock'] }],
   initialNotebooks: [{ id: 'n1', title: 'Notebook 1', tags: ['practice'] }],
   initialSnippets: [{ id: 'sn1', title: 'Snippet 1', tags: ['funk'] }],
+  initialSetlists: [{ id: 'set1', title: 'Setlist 1', tags: ['live'] }],
 };
 
 interface AuthMock {
@@ -72,6 +76,9 @@ describe('LibraryDashboard', () => {
 
       fireEvent.click(screen.getByTestId('tab-snippet'));
       expect(screen.getByText('Snippet 1')).toBeDefined();
+
+      fireEvent.click(screen.getByTestId('tab-setlist'));
+      expect(screen.getByText('Setlist 1')).toBeDefined();
     });
 
     it('filters items by search query', () => {
@@ -148,6 +155,31 @@ describe('LibraryDashboard', () => {
       await waitFor(() => {
         expect(supabaseService.saveGrooveSnippet).toHaveBeenCalled();
         expect(window.location.assign).toHaveBeenCalledWith('/snippets/new-snip-id');
+      });
+    });
+
+    it('successfully creates a new setlist and redirects', async () => {
+      getAuthMock().getUser.mockResolvedValue({
+        data: { user: { id: 'test-user-id' } },
+        error: null,
+      });
+      vi.mocked(supabaseService).saveSetlist.mockResolvedValue({
+        id: 'new-setlist-id',
+        title: 'Untitled Setlist',
+        owner_id: 'test-user-id',
+        is_public: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        songs: [],
+      });
+
+      render(<LibraryDashboard {...mockProps} />);
+      fireEvent.click(screen.getByTestId('tab-setlist'));
+      fireEvent.click(screen.getByText(/New Setlist/i));
+
+      await waitFor(() => {
+        expect(supabaseService.saveSetlist).toHaveBeenCalled();
+        expect(window.location.assign).toHaveBeenCalledWith('/setlists/new-setlist-id');
       });
     });
 
@@ -238,6 +270,16 @@ describe('LibraryDashboard', () => {
       await waitFor(() => expect(screen.queryByText('Snippet 1')).toBeNull());
     });
 
+    it('deletes setlist', async () => {
+      vi.spyOn(window, 'confirm').mockReturnValue(true);
+      render(<LibraryDashboard {...mockProps} />);
+
+      fireEvent.click(screen.getByTestId('tab-setlist'));
+      fireEvent.click(screen.getAllByTitle(/Delete/i)[0]);
+      expect(supabaseService.deleteSetlist).toHaveBeenCalledWith('set1');
+      await waitFor(() => expect(screen.queryByText('Setlist 1')).toBeNull());
+    });
+
     it('handles item duplication for all types', async () => {
       render(<LibraryDashboard {...mockProps} />);
 
@@ -262,6 +304,14 @@ describe('LibraryDashboard', () => {
       await waitFor(() => {
         expect(supabaseService.duplicateGrooveSnippet).toHaveBeenCalledWith('sn1');
         expect(screen.getByText('Snippet 2')).toBeDefined();
+      });
+
+      // 4. Duplicate Setlist
+      fireEvent.click(screen.getByTestId('tab-setlist'));
+      fireEvent.click(screen.getAllByTitle(/Duplicate/i)[0]);
+      await waitFor(() => {
+        expect(supabaseService.duplicateSetlist).toHaveBeenCalledWith('set1');
+        expect(screen.getByText('Setlist 2')).toBeDefined();
       });
     });
 

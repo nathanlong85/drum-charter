@@ -17,14 +17,14 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 Everything you need to know about the project structure, development, and administration.
 
-| Document | Description |
-| :--- | :--- |
-| **[Admin & Dev Guide](docs/ADMIN_GUIDE.md)** | **Start here.** Overview of the tech stack, how to run tests, and manage the local server. |
-| **[Project Plan](docs/PROJECT_PLAN.md)** | Current roadmap, V1/V2 features, and the live status of all tasks. |
-| **[UI Workflows](docs/UI_WORKFLOWS.md)** | Visual guide to the app's components and user flows. |
-| **[Development Workflow](docs/DEV_WORKFLOW.md)** | Branching strategies, PR protocols, and local-first development rules. |
-| **[Secrets Management](docs/SECRETS_MANAGEMENT.md)** | Security protocols for handling API keys and environment variables. |
-| **[Grid Specification](docs/DRUM_AWARE_GRID_SPEC.md)** | Technical breakdown of the drum-aware data model and playback engine. |
+| Document                                               | Description                                                                                |
+| :----------------------------------------------------- | :----------------------------------------------------------------------------------------- |
+| **[Admin & Dev Guide](docs/ADMIN_GUIDE.md)**           | **Start here.** Overview of the tech stack, how to run tests, and manage the local server. |
+| **[Project Plan](docs/PROJECT_PLAN.md)**               | Current roadmap, V1/V2 features, and the live status of all tasks.                         |
+| **[UI Workflows](docs/UI_WORKFLOWS.md)**               | Visual guide to the app's components and user flows.                                       |
+| **[Development Workflow](docs/DEV_WORKFLOW.md)**       | Branching strategies, PR protocols, and local-first development rules.                     |
+| **[Secrets Management](docs/SECRETS_MANAGEMENT.md)**   | Security protocols for handling API keys and environment variables.                        |
+| **[Grid Specification](docs/DRUM_AWARE_GRID_SPEC.md)** | Technical breakdown of the drum-aware data model and playback engine.                      |
 
 ---
 
@@ -44,4 +44,4 @@ This project uses a **strict pair programming protocol** with an AI agent. If yo
 
 ---
 
-*Built with Next.js, Supabase, Tailwind CSS, and 🥁.*
+_Built with Next.js, Supabase, Tailwind CSS, and 🥁._

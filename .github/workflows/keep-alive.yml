@@ -30,7 +30,7 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           echo "Pinging Supabase at ${SUPABASE_URL}..."
-          
+
           # 1. Basic Health Check (check if host is resolvable/up)
           if ! curl -Is --connect-timeout 5 "${SUPABASE_URL}" > /dev/null; then
             echo "Warning: Base URL health check failed. Instance might be paused or down."

@@ -7,13 +7,14 @@ import {
   createDefaultDrumInstruments,
   type GrooveSnippet,
   type Notebook,
+  type Setlist,
   type SongChart,
 } from '@/lib/types/groove';
 import { LibraryCard } from './LibraryCard';
 
 const supabase = createClient();
 
-type ItemType = 'song' | 'notebook' | 'snippet';
+type ItemType = 'song' | 'notebook' | 'snippet' | 'setlist';
 
 export interface LibraryItemData {
   id: string;
@@ -29,6 +30,7 @@ interface LibraryDashboardProps {
   initialSongs: LibraryItemData[];
   initialNotebooks: LibraryItemData[];
   initialSnippets: LibraryItemData[];
+  initialSetlists: LibraryItemData[];
 }
 
 interface SupabaseErrorLike {
@@ -51,6 +53,7 @@ export default function LibraryDashboard({
   initialSongs,
   initialNotebooks,
   initialSnippets,
+  initialSetlists,
 }: LibraryDashboardProps) {
   const [activeTab, setActiveTab] = useState<ItemType>('song');
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,6 +61,7 @@ export default function LibraryDashboard({
   const [songs, setSongs] = useState(initialSongs);
   const [notebooks, setNotebooks] = useState(initialNotebooks);
   const [snippets, setSnippets] = useState(initialSnippets);
+  const [setlists, setSetlists] = useState(initialSetlists);
 
   const allAvailableTags = Array.from(
     new Set([
@@ -68,6 +72,9 @@ export default function LibraryDashboard({
         (n.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
       ),
       ...snippets.flatMap((s) =>
+        (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
+      ),
+      ...setlists.flatMap((s) =>
         (s.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
       ),
     ]),
@@ -89,13 +96,16 @@ export default function LibraryDashboard({
     try {
       if (type === 'song') {
         await supabaseService.deleteSongChart(id);
-        setSongs(songs.filter((s) => s.id !== id));
+        setSongs((prev) => prev.filter((s) => s.id !== id));
       } else if (type === 'notebook') {
         await supabaseService.deleteNotebook(id);
-        setNotebooks(notebooks.filter((n) => n.id !== id));
+        setNotebooks((prev) => prev.filter((n) => n.id !== id));
       } else if (type === 'snippet') {
         await supabaseService.deleteGrooveSnippet(id);
-        setSnippets(snippets.filter((s) => s.id !== id));
+        setSnippets((prev) => prev.filter((s) => s.id !== id));
+      } else if (type === 'setlist') {
+        await supabaseService.deleteSetlist(id);
+        setSetlists((prev) => prev.filter((s) => s.id !== id));
       }
     } catch (error) {
       if (isSupabaseError(error)) {
@@ -113,19 +123,22 @@ export default function LibraryDashboard({
 
   const handleDuplicate = async (id: string, type: ItemType) => {
     try {
-      let duplicated;
+      let duplicated: LibraryItemData;
       if (type === 'song') {
         duplicated = await supabaseService.duplicateSongChart(id);
-        setSongs([duplicated, ...songs]);
+        setSongs((prev) => [duplicated, ...prev]);
       } else if (type === 'notebook') {
         duplicated = await supabaseService.duplicateNotebook(id);
-        setNotebooks([duplicated, ...notebooks]);
+        setNotebooks((prev) => [duplicated, ...prev]);
       } else if (type === 'snippet') {
         duplicated = await supabaseService.duplicateGrooveSnippet(id);
-        setSnippets([duplicated, ...snippets]);
+        setSnippets((prev) => [duplicated, ...prev]);
+      } else if (type === 'setlist') {
+        duplicated = await supabaseService.duplicateSetlist(id);
+        setSetlists((prev) => [duplicated, ...prev]);
+      } else {
+        throw new Error(`Unsupported type for duplication: ${type}`);
       }
-
-      // Optional: redirect to the new item
       // window.location.href = `/${type}s/${duplicated.id}`;
     } catch (error) {
       if (isSupabaseError(error)) {
@@ -165,6 +178,7 @@ export default function LibraryDashboard({
     { id: 'song', label: 'Song Charts', count: songs.length },
     { id: 'notebook', label: 'Notebooks', count: notebooks.length },
     { id: 'snippet', label: 'Snippets', count: snippets.length },
+    { id: 'setlist', label: 'Setlists', count: setlists.length },
   ];
 
   const currentItems =
@@ -172,7 +186,9 @@ export default function LibraryDashboard({
       ? filterItems(songs)
       : activeTab === 'notebook'
         ? filterItems(notebooks)
-        : filterItems(snippets);
+        : activeTab === 'snippet'
+          ? filterItems(snippets)
+          : filterItems(setlists);
 
   const handleCreateNew = async () => {
     try {
@@ -257,6 +273,23 @@ export default function LibraryDashboard({
           window.location.assign(`/snippets/${saved.id}`);
         } else {
           throw new Error('Snippet creation failed - no ID returned');
+        }
+      } else if (activeTab === 'setlist') {
+        const newSetlist: Setlist = {
+          id: crypto.randomUUID(),
+          userId,
+          title: 'Untitled Setlist',
+          songs: [],
+          isPublic: false,
+          createdAt: null,
+          updatedAt: null,
+        };
+        const saved = await supabaseService.saveSetlist(newSetlist);
+        if (saved?.id) {
+          console.log('Created setlist:', saved.id);
+          window.location.assign(`/setlists/${saved.id}`);
+        } else {
+          throw new Error('Setlist creation failed - no ID returned');
         }
       }
     } catch (error) {

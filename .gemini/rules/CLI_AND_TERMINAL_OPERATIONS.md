@@ -1,5 +1,7 @@
 ## 🛠️ CLI & TERMINAL OPERATIONS
+
 In order to minimize repeated failed CLI commands (which wastes time and resources):
+
 - **Source of Truth**: Always check `.gemini/CLI_REFERENCE.md` before running ANY non-trivial CLI command.
 - **Update Reference**: If running a command fails due to a syntax error or incorrect usage, you **must** update the reference.
   - **Be Accurate**: Research official docs first, then add the verified command to the reference BEFORE executing it.

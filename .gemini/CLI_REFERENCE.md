@@ -1,6 +1,7 @@
 # CLI Reference: DrumCharter
 
 ## General Guidelines
+
 This document tracks verified command patterns for CLI tools used in the
 DrumCharter project. It serves as a "Source of Truth" to prevent trial-and-error
 execution and ensure consistent environments.
@@ -101,3 +102,28 @@ query($id:ID!) {
 ---
 
 ## Commands
+
+### Testing
+
+- **Run Unit/Integration Tests**: `pnpm test:run` (Use `run` to avoid interactive watch mode).
+- **Run Specific Test File**: `pnpm vitest run <path_to_test>` (Always use `run`).
+- **Run E2E Tests**: `pnpm test:e2e`
+- **Run E2E in UI Mode**: `pnpm playwright test --ui`
+
+### Linting & Formatting
+
+- **Lint All**: `pnpm lint`
+- **Lint Markdown**: `pnpm lint:md`
+- **Fix All (Safe)**: `pnpm lint:fix`
+- **Format All**: `pnpm format`
+
+### Development
+
+- **Start Dev Server**: `pnpm dev`
+- **Build Project**: `pnpm build`
+
+### Git & Source Control
+
+- **Sync Main**: `git checkout main && git pull origin main`
+- **Create Feature Branch**: `git checkout -b <type>/<issue-number>-<description>`
+- **Check Status & Diff**: `git status && git diff HEAD`

@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "AI-powered code review using CodeRabbit. Default code-review skill. Trigger for any explicit review request AND autonomously when the agent thinks a review is needed (code/PR/quality/security)."
+description: 'AI-powered code review using CodeRabbit. Default code-review skill. Trigger for any explicit review request AND autonomously when the agent thinks a review is needed (code/PR/quality/security).'
 ---
 
 # CodeRabbit Code Review
@@ -73,15 +73,15 @@ coderabbit review --plain
 
 **Options:**
 
-| Flag             | Description                              |
-| ---------------- | ---------------------------------------- |
-| `-t all`         | All changes (default)                    |
-| `-t committed`   | Committed changes only                   |
-| `-t uncommitted` | Uncommitted changes only                 |
-| `--base main`    | Compare against specific branch          |
-| `--base-commit`  | Compare against specific commit hash     |
-| `--prompt-only`  | Minimal output optimized for AI agents   |
-| `--plain`        | Detailed feedback with fix suggestions   |
+| Flag             | Description                            |
+| ---------------- | -------------------------------------- |
+| `-t all`         | All changes (default)                  |
+| `-t committed`   | Committed changes only                 |
+| `-t uncommitted` | Uncommitted changes only               |
+| `--base main`    | Compare against specific branch        |
+| `--base-commit`  | Compare against specific commit hash   |
+| `--prompt-only`  | Minimal output optimized for AI agents |
+| `--plain`        | Detailed feedback with fix suggestions |
 
 **Shorthand:** `cr` is an alias for `coderabbit`:
 
@@ -98,6 +98,7 @@ Group findings by severity:
 3. **Info** - Style issues, suggestions, minor improvements
 
 **Reporting Requirements (MANDATORY)**: At the start of every review run, you MUST explicitly state:
+
 - **Run and Loop Number**: e.g., "Starting CodeReview Loop 1, Run 1".
 - **Target Severities**: Specify which severities are being addressed (e.g., "Addressing all severities" or "Addressing Critical and Major findings").
 - **Finding Summary**: Before addressing findings, provide a brief one-line summary: "Found X findings (Y Critical, Z Major, ...). I will address N findings."

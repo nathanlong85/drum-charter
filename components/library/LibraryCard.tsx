@@ -5,13 +5,13 @@ interface LibraryCardProps {
   item: {
     id: string;
     title: string;
-    type: 'song' | 'notebook' | 'snippet';
+    type: 'song' | 'notebook' | 'snippet' | 'setlist';
     bpm?: number;
     tags?: string[];
     createdAt: string;
   };
-  onDelete: (id: string, type: 'song' | 'notebook' | 'snippet') => void;
-  onDuplicate: (id: string, type: 'song' | 'notebook' | 'snippet') => void;
+  onDelete: (id: string, type: 'song' | 'notebook' | 'snippet' | 'setlist') => void;
+  onDuplicate: (id: string, type: 'song' | 'notebook' | 'snippet' | 'setlist') => void;
 }
 
 export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDuplicate }) => {
@@ -19,6 +19,7 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
     song: { label: 'Song', color: 'bg-blue-100 text-blue-800' },
     notebook: { label: 'Notebook', color: 'bg-purple-100 text-purple-800' },
     snippet: { label: 'Snippet', color: 'bg-amber-100 text-amber-800' },
+    setlist: { label: 'Setlist', color: 'bg-emerald-100 text-emerald-800' },
   };
 
   return (

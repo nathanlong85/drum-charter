@@ -5,6 +5,7 @@ GitHub CLI commands for the CodeRabbit Autofix skill.
 ## Prerequisites
 
 **GitHub CLI (`gh`):**
+
 - Install: `brew install gh` or [cli.github.com](https://cli.github.com/)
 - Authenticate: `gh auth login`
 - Verify: `gh auth status`
@@ -55,6 +56,7 @@ gh api graphql \
 
 **Pagination Loop**:
 The GraphQL query should be executed in a loop.
+
 1. Start with `$cursor` set to `null`.
 2. Execute the query.
 3. If `pageInfo.hasNextPage` is `true`, store `pageInfo.endCursor` and use it as the `$cursor` variable for the next iteration.
@@ -62,13 +64,13 @@ The GraphQL query should be executed in a loop.
 5. Accumulate all nodes into a single list before processing.
 
 Filter criteria:
+
 - `isResolved == false`
 - root comment author is one of: `coderabbitai`, `coderabbit[bot]`, `coderabbitai[bot]`
 
 Use the root comment body for the issue prompt.
 
 ### 3. Post Summary Comment
-
 
 ```bash
 gh pr comment <pr-number> --body "$(cat <<'EOF'
@@ -110,10 +112,12 @@ gh pr create --title '<title>' --body '<body>'
 ## Error Handling
 
 **Missing `gh` CLI:**
+
 - Inform user and provide install instructions
 - Exit skill
 
 **API failures:**
+
 - Log error and continue
 - Don't abort for comment posting failures
 
