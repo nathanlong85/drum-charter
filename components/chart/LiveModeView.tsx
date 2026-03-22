@@ -125,6 +125,14 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
           </div>
 
           <div className="flex gap-4 items-center">
+            <a
+              href="/manual"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs font-bold text-zinc-500 hover:text-white uppercase tracking-widest transition-colors mr-2"
+            >
+              Manual
+            </a>
             <RemoteControlSettings {...remoteSettingsProps} />
             <button
               onClick={toggleFullscreen}

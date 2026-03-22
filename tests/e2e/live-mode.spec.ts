@@ -50,8 +50,9 @@ test.describe('Live Mode', () => {
 
   test('should enter and exit live mode from editor', async ({ page }) => {
     // Small delay to ensure button click works
-    await page.waitForTimeout(1000);
-    await page.getByTestId('go-live-button').click({ force: true });
+    const goLiveBtn = page.getByTestId('go-live-button');
+    await goLiveBtn.waitFor({ state: 'visible' });
+    await goLiveBtn.click({ force: true });
 
     // Verify live mode is active
     await expect(page.getByTestId('exit-live-mode-btn')).toBeVisible({ timeout: 15000 });
@@ -63,8 +64,9 @@ test.describe('Live Mode', () => {
   });
 
   test('should navigate between sections via keyboard', async ({ page }) => {
-    await page.waitForTimeout(1000);
-    await page.getByTestId('go-live-button').click({ force: true });
+    const goLiveBtn = page.getByTestId('go-live-button');
+    await goLiveBtn.waitFor({ state: 'visible' });
+    await goLiveBtn.click({ force: true });
 
     // Verify live mode is active
     await expect(page.getByTestId('exit-live-mode-btn')).toBeVisible({ timeout: 15000 });
@@ -82,8 +84,9 @@ test.describe('Live Mode', () => {
   });
 
   test('should toggle fullscreen with F key', async ({ page }) => {
-    await page.waitForTimeout(1000);
-    await page.getByTestId('go-live-button').click({ force: true });
+    const goLiveBtn = page.getByTestId('go-live-button');
+    await goLiveBtn.waitFor({ state: 'visible' });
+    await goLiveBtn.click({ force: true });
 
     // Header should be visible initially
     await expect(page.locator('header')).toBeVisible();
@@ -101,8 +104,9 @@ test.describe('Live Mode', () => {
 
   test('should display section markers and next section preview', async ({ page }) => {
     // Navigate to live mode
-    await page.waitForTimeout(1000);
-    await page.getByTestId('go-live-button').click({ force: true });
+    const goLiveBtn = page.getByTestId('go-live-button');
+    await goLiveBtn.waitFor({ state: 'visible' });
+    await goLiveBtn.click({ force: true });
 
     // Section 1 markers
     await expect(page.getByTestId('section-measures-count')).toBeVisible();
