@@ -2,8 +2,10 @@
 
 import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { type RemoteAction, useRemoteControl } from '@/lib/hooks/useRemoteControl';
 import type { SongChart } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../groove/GrooveGridEditor';
+import { RemoteControlSettings } from './RemoteControlSettings';
 
 interface LiveModeViewProps {
   chart: SongChart;
@@ -45,6 +47,36 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
     onExit();
   }, [onExit]);
 
+  const handleRemoteAction = useCallback(
+    (action: RemoteAction) => {
+      switch (action) {
+        case 'next_section':
+          nextSection();
+          break;
+        case 'prev_section':
+          prevSection();
+          break;
+        case 'toggle_fullscreen':
+          toggleFullscreen();
+          break;
+        case 'exit_live_mode':
+          handleExit();
+          break;
+      }
+    },
+    [nextSection, prevSection, toggleFullscreen, handleExit],
+  );
+
+  const { config: _config, ...remoteSettingsProps } = useRemoteControl({
+    onAction: handleRemoteAction,
+    isActive: true,
+  });
+
+  const fullscreenMapping = remoteSettingsProps.getMappingForAction('toggle_fullscreen');
+  const fullscreenShortcut = fullscreenMapping.keyboard[0]
+    ? ` (${fullscreenMapping.keyboard[0].toUpperCase()})`
+    : '';
+
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -55,48 +87,6 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
   }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!e.key) return;
-      const key = e.key.toLowerCase();
-
-      // Don't trigger navigation if an interactive element has focus
-      const activeEl = document.activeElement as HTMLElement | null;
-      const isInteractive =
-        activeEl &&
-        (activeEl.tagName === 'BUTTON' ||
-          activeEl.tagName === 'INPUT' ||
-          activeEl.tagName === 'TEXTAREA' ||
-          activeEl.tagName === 'SELECT' ||
-          activeEl.tagName === 'A' ||
-          activeEl.isContentEditable ||
-          activeEl.getAttribute('role') === 'textbox');
-
-      if (key === 'arrowright' || key === 'pagedown' || key === ' ') {
-        if (isInteractive) return; // Space also triggers buttons, don't hijack
-        e.preventDefault();
-        nextSection();
-      } else if (key === 'arrowleft' || key === 'pageup') {
-        if (isInteractive) return;
-        e.preventDefault();
-        prevSection();
-      } else if (key === 'escape') {
-        if (!document.fullscreenElement) {
-          handleExit();
-        }
-      } else if (key === 'f') {
-        if (isInteractive) return;
-        toggleFullscreen();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [nextSection, prevSection, handleExit, toggleFullscreen]);
 
   if (!activeSection) {
     return (
@@ -134,13 +124,15 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center">
+            <RemoteControlSettings {...remoteSettingsProps} />
             <button
               onClick={toggleFullscreen}
               data-testid="live-mode-fullscreen-btn"
               className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-sm font-bold uppercase transition-colors border border-zinc-700"
             >
-              {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen (F)'}
+              {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+              {fullscreenShortcut}
             </button>
             <button
               onClick={handleExit}

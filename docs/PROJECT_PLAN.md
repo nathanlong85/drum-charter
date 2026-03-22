@@ -47,7 +47,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [ ] **Drum-Aware Grid Architecture** (Next Phase):
   - [x] **Data Model Overhaul**: Transition from flat `instrumentId` to a structured `DrumInstrument` (Category, Preset Variety, Custom Name). `✓`
   - [x] **Symbol Filtering**: Restrict available symbols in the `SymbolPicker` based on the drum category (e.g., Snare vs. Kick). `✓`
-  - [ ] **Sample Matrix**: Implement a `PresetVariety + Symbol` audio mapping for high-fidelity playback. (#30)
+  - [ ] **Sample Matrix**: Implement a `PresetVariety + Symbol` audio mapping for high-fidelity playback. Include **Volume Fallback** logic (e.g., scale `standard.wav` volume for Ghost/Accent if specific files are missing). (#30)
   - [x] **Dynamic Instrument Management**: Support adding custom varieties based on presets with auto-incrementing default names. `✓`
   - [x] **Optional Hit Control**: Add a toggle to enable/disable playback of optional hits during practice. `✓`
 - [x] **Song Charts**:
@@ -94,6 +94,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ### 🔵 In Progress
 
 - [ ] [Epic] Live Mode (#44)
+  - [ ] [Task] Live Mode Navigation: Smooth transitions and transport controls during performance (#39)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
@@ -101,7 +102,8 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done
 
-- [ ] [Feature] Setlist Management (#38)
+- [x] [Feature] Remote Control Support (Foot Switch/MIDI) (#39) `✓`
+- [x] [Feature] Setlist Management (#38) `✓`
 - [x] [Feature] Keyboard Modifiers for Rapid Editing (#36) `✓`
 - [x] [Feature] Multi-cell Selection & Copy/Paste (#35) `✓`
 - [x] [Feature] Quick Clear Grid/Row functionality (#34) `✓`
