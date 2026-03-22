@@ -98,4 +98,21 @@ test.describe('Live Mode', () => {
     await page.keyboard.press('f');
     await expect(page.locator('header')).toBeVisible();
   });
+
+  test('should display section markers and next section preview', async ({ page }) => {
+    // Navigate to live mode
+    await page.waitForTimeout(1000);
+    await page.getByTestId('go-live-button').click({ force: true });
+
+    // Section 1 markers
+    await expect(page.getByTestId('section-measures-count')).toBeVisible();
+    await expect(page.getByTestId('next-section-preview')).toContainText(/Next: Section 2/i);
+
+    // Go to last section
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 2');
+
+    // Next section preview should be hidden on last section
+    await expect(page.getByTestId('next-section-preview')).toBeHidden();
+  });
 });

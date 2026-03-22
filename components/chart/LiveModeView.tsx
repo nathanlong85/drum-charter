@@ -154,7 +154,10 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
                 {activeSection.name}
               </h2>
               {activeSection.measuresCount > 0 && (
-                <div className="text-2xl font-bold text-yellow-400 mt-3 tracking-widest uppercase">
+                <div
+                  className="text-2xl font-bold text-yellow-400 mt-3 tracking-widest uppercase"
+                  data-testid="section-measures-count"
+                >
                   {activeSection.measuresCount} Measures
                 </div>
               )}
@@ -164,7 +167,10 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
                 {activeSectionIdx + 1} / {chart.sections.length}
               </div>
               {activeSectionIdx < chart.sections.length - 1 && (
-                <div className="text-xl font-bold text-zinc-400 uppercase tracking-wider">
+                <div
+                  className="text-xl font-bold text-zinc-400 uppercase tracking-wider"
+                  data-testid="next-section-preview"
+                >
                   Next:{' '}
                   <span className="text-white">{chart.sections[activeSectionIdx + 1].name}</span>
                 </div>
@@ -205,7 +211,10 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
                     <h4 className="text-2xl font-bold text-white mb-4 uppercase flex justify-between items-center">
                       <span>{sub.name}</span>
                       {sub.measuresCount > 0 && (
-                        <span className="text-xl text-yellow-400 font-black tracking-widest bg-yellow-400/10 px-3 py-1 rounded-md border border-yellow-400/20">
+                        <span
+                          className="text-xl text-yellow-400 font-black tracking-widest bg-yellow-400/10 px-3 py-1 rounded-md border border-yellow-400/20"
+                          data-testid={`subsection-measures-${sub.id}`}
+                        >
                           {sub.measuresCount}M
                         </span>
                       )}
