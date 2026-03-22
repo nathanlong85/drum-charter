@@ -143,12 +143,7 @@ export async function fetchWithRetry<T>(
     const errorObj = err as { code?: string | number; status?: string | number };
     const code = String(errorObj.code);
     const status = Number(errorObj.status);
-    return (
-      ['PGRST116', '22P02', '401', '403', '404'].includes(code) ||
-      status === 404 ||
-      status === 401 ||
-      status === 403
-    );
+    return ['22P02', '401', '403'].includes(code) || status === 401 || status === 403;
   };
 
   if (error) {
@@ -156,9 +151,6 @@ export async function fetchWithRetry<T>(
       return null;
     }
     console.warn(`[supabaseService] Initial fetch error for ${typeName} ${id}:`, error);
-  } else if (!data) {
-    // Definitive "not found" (null data, null error) - bail immediately
-    return null;
   }
 
   while (!data && attempts < maxAttempts) {
@@ -177,9 +169,6 @@ export async function fetchWithRetry<T>(
         return null;
       }
       console.error(`[supabaseService] Retry error for ${typeName} ${id}:`, error);
-    } else if (!data) {
-      // Definitive "not found" on retry - bail immediately
-      return null;
     }
 
     if (data) {

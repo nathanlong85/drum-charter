@@ -50,6 +50,13 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       setIsFullscreen(!!document.fullscreenElement);
     };
 
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!e.key) return;
       const key = e.key.toLowerCase();
@@ -84,11 +91,9 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       }
     };
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [nextSection, prevSection, handleExit, toggleFullscreen]);

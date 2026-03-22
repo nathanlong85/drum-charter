@@ -465,10 +465,11 @@ describe('supabaseService', () => {
       expect(result.id).toBe('sl2');
 
       // Assert payload sent to upsert
-      const upsertCall = mockSupabase.upsert.mock.calls.find(
-        (call: any[]) => call[0].title === 'Orig (Copy)',
+      const upsertCall = (mockSupabase.upsert.mock.calls as unknown[][]).find(
+        (call) => (call[0] as { title: string }).title === 'Orig (Copy)',
       );
-      expect(upsertCall[0]).toMatchObject({
+      expect(upsertCall).toBeDefined();
+      expect((upsertCall as any[])[0]).toMatchObject({
         title: 'Orig (Copy)',
         is_public: false,
         user_id: 'u1',
@@ -514,18 +515,24 @@ describe('supabaseService', () => {
       fetchFn.mockReset();
     });
 
-    it('bails immediately on 404 error', async () => {
+    it('retries on 404 error', async () => {
       fetchFn.mockResolvedValue({ data: null, error: { status: 404 } });
-      const result = await fetchWithRetry(fetchFn, '1', 'Test');
+      const promise = fetchWithRetry(fetchFn, '1', 'Test', 2, 100);
+      await vi.advanceTimersByTimeAsync(150);
+      await vi.advanceTimersByTimeAsync(150);
+      const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(1);
+      expect(fetchFn).toHaveBeenCalledTimes(3);
     });
 
-    it('bails on specific error codes like PGRST116', async () => {
+    it('retries on specific error codes like PGRST116', async () => {
       fetchFn.mockResolvedValue({ data: null, error: { code: 'PGRST116' } });
-      const result = await fetchWithRetry(fetchFn, '1', 'Test');
+      const promise = fetchWithRetry(fetchFn, '1', 'Test', 2, 100);
+      await vi.advanceTimersByTimeAsync(150);
+      await vi.advanceTimersByTimeAsync(150);
+      const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(1);
+      expect(fetchFn).toHaveBeenCalledTimes(3);
     });
 
     it('bails on 401/403 status', async () => {
@@ -535,17 +542,20 @@ describe('supabaseService', () => {
       expect(fetchFn).toHaveBeenCalledTimes(1);
     });
 
-    it('bails immediately if data is null and no error (definitive not found)', async () => {
+    it('retries if data is null and no error initially', async () => {
       fetchFn.mockResolvedValue({ data: null, error: null });
-      const result = await fetchWithRetry(fetchFn, '1', 'Test');
+      const promise = fetchWithRetry(fetchFn, '1', 'Test', 2, 100);
+      await vi.advanceTimersByTimeAsync(150);
+      await vi.advanceTimersByTimeAsync(150);
+      const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(1);
+      expect(fetchFn).toHaveBeenCalledTimes(3);
     });
 
     it('retries on transient errors and bails if error becomes bailable during retry', async () => {
       fetchFn
         .mockResolvedValueOnce({ data: null, error: { message: 'Timeout', code: '500' } })
-        .mockResolvedValueOnce({ data: null, error: { status: 404 } });
+        .mockResolvedValueOnce({ data: null, error: { status: 401 } });
 
       const promise = fetchWithRetry(fetchFn, '1', 'Test', 3, 100);
       await vi.advanceTimersByTimeAsync(150);
@@ -555,17 +565,21 @@ describe('supabaseService', () => {
       expect(fetchFn).toHaveBeenCalledTimes(2);
     });
 
-    it('retries on transient errors and bails if no data found on retry', async () => {
+    it('retries on transient errors and eventually returns null after all attempts', async () => {
       fetchFn
         .mockResolvedValueOnce({ data: null, error: { message: 'Timeout', code: '500' } })
+        .mockResolvedValueOnce({ data: null, error: null })
+        .mockResolvedValueOnce({ data: null, error: null })
         .mockResolvedValueOnce({ data: null, error: null });
 
       const promise = fetchWithRetry(fetchFn, '1', 'Test', 3, 100);
       await vi.advanceTimersByTimeAsync(150);
+      await vi.advanceTimersByTimeAsync(150);
+      await vi.advanceTimersByTimeAsync(150);
 
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(2);
+      expect(fetchFn).toHaveBeenCalledTimes(4); // Initial + 3 retries
     });
 
     it('retries on transient errors and succeeds', async () => {
