@@ -61,8 +61,8 @@ interface MidiAccessMock {
     size: number;
     values: () => IterableIterator<MidiInputMock>;
   };
-  addEventListener: (type: 'statechange', handler: EventListener) => void;
-  removeEventListener: (type: 'statechange', handler: EventListener) => void;
+  addEventListener: (type: string, handler: EventListener) => void;
+  removeEventListener: (type: string, handler: EventListener) => void;
   onstatechange: null;
 }
 
@@ -109,8 +109,8 @@ describe('useRemoteControl', () => {
   it('filters invalid actions when loading from local storage', () => {
     const corruptedConfig = {
       keyboard: {
-        j: ['next_section', 'invalid_action' as any],
-        k: 'invalid_string' as any,
+        j: ['next_section', 'invalid_action'],
+        k: 'invalid_string',
       },
     };
     localStorage.setItem('drumcharter_remote_config', JSON.stringify(corruptedConfig));
@@ -241,7 +241,13 @@ describe('useRemoteControl', () => {
 
       Object.defineProperty(navigator, 'requestMIDIAccess', {
         writable: true,
-        value: vi.fn().mockResolvedValue(mockMidiAccess),
+        value: vi.fn().mockReturnValue({
+          // biome-ignore lint/suspicious/noThenProperty: Manual thenable is required for synchronous MIDI mock in tests.
+          then: (resolve: (access: any) => void) => {
+            resolve(mockMidiAccess);
+            return { catch: vi.fn() };
+          },
+        }),
       });
     });
 
@@ -326,8 +332,8 @@ describe('useRemoteControl', () => {
       expect(result.current.isListeningForMap).toBe('next_section');
     });
 
-    it('updates midiConnected and rewires on statechange', async () => {
-      const { result } = renderHook(() =>
+    it('updates midiConnected and rewires on statechange and cleans up on unmount', async () => {
+      const { result, unmount } = renderHook(() =>
         useRemoteControl({ onAction: mockOnAction, isActive: true }),
       );
 
@@ -370,6 +376,14 @@ describe('useRemoteControl', () => {
 
       expect(result.current.midiConnected).toBe(true);
       expect(newInput.onmidimessage).toBeInstanceOf(Function);
+
+      // Verify unmount cleanup
+      unmount();
+      expect(mockMidiAccess.removeEventListener).toHaveBeenCalledWith(
+        'statechange',
+        stateChangeHandler,
+      );
+      expect(newInput.onmidimessage).toBeNull();
     });
   });
 });

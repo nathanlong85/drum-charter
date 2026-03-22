@@ -47,7 +47,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [ ] **Drum-Aware Grid Architecture** (Next Phase):
   - [x] **Data Model Overhaul**: Transition from flat `instrumentId` to a structured `DrumInstrument` (Category, Preset Variety, Custom Name). `✓`
   - [x] **Symbol Filtering**: Restrict available symbols in the `SymbolPicker` based on the drum category (e.g., Snare vs. Kick). `✓`
-  - [ ] **Sample Matrix**: Implement a `PresetVariety + Symbol` audio mapping for high-fidelity playback. (#30)
+  - [ ] **Sample Matrix**: Implement a `PresetVariety + Symbol` audio mapping for high-fidelity playback. Include **Volume Fallback** logic (e.g., scale `standard.wav` volume for Ghost/Accent if specific files are missing). (#30)
   - [x] **Dynamic Instrument Management**: Support adding custom varieties based on presets with auto-incrementing default names. `✓`
   - [x] **Optional Hit Control**: Add a toggle to enable/disable playback of optional hits during practice. `✓`
 - [x] **Song Charts**:
