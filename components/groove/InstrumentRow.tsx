@@ -22,6 +22,7 @@ interface InstrumentRowProps {
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onClear?: () => void;
+  readOnly?: boolean;
 }
 
 export const InstrumentRow: React.FC<InstrumentRowProps> = ({
@@ -38,6 +39,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   onMoveUp,
   onMoveDown,
   onClear,
+  readOnly = false,
 }) => {
   const { timeSignature, resolution } = grid;
   const notesPerBeat = resolution / timeSignature.beatValue;
@@ -49,7 +51,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
       data-testid={`instrument-row-${instrument.customName.toLowerCase().replace(/\s+/g, '-')}`}
     >
       <div className="w-32 h-8 flex items-center px-2 bg-gray-50 dark:bg-gray-900 font-medium text-sm text-gray-700 dark:text-gray-300 border-r border-gray-400 dark:border-gray-600 select-none relative group">
-        {isEditing ? (
+        {isEditing && !readOnly ? (
           <div className="flex items-center gap-1 w-full">
             <div className="flex flex-col">
               {onMoveUp && (
@@ -142,6 +144,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
               isBeat={isBeat}
               isMeasureBoundary={isMeasureBoundary}
               isSelected={isSelected}
+              readOnly={readOnly}
             />
           );
         })}

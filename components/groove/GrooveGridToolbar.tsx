@@ -49,6 +49,7 @@ export interface GrooveGridToolbarProps {
   onToggleEditInstruments?: () => void;
   onToggleOptionalHits?: (enabled: boolean) => void;
   onClearGrid?: () => void;
+  readOnly?: boolean;
 }
 
 export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
@@ -68,6 +69,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
   onToggleEditInstruments,
   onToggleOptionalHits,
   onClearGrid,
+  readOnly = false,
 }) => {
   const [showMetronomeSettings, setShowMetronomeSettings] = useState(false);
 
@@ -199,23 +201,27 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
       <div className={lastGroupClass}>
         <span className={mutedLabelClass}>Measures:</span>
         <div className={controlBoxClass}>
-          <button
-            onClick={() => updateMeasures(-1)}
-            className={`${controlBtnClass} border-r border-gray-300 dark:border-gray-700`}
-            title="Decrease measures"
-          >
-            <Minus size={14} />
-          </button>
+          {!readOnly && (
+            <button
+              onClick={() => updateMeasures(-1)}
+              className={`${controlBtnClass} border-r border-gray-300 dark:border-gray-700`}
+              title="Decrease measures"
+            >
+              <Minus size={14} />
+            </button>
+          )}
           <span className="px-3 py-1 font-bold min-w-[2rem] text-center text-gray-900 dark:text-gray-100">
             {state.measures}
           </span>
-          <button
-            onClick={() => updateMeasures(1)}
-            className={controlBtnClass}
-            title="Increase measures"
-          >
-            <Plus size={14} />
-          </button>
+          {!readOnly && (
+            <button
+              onClick={() => updateMeasures(1)}
+              className={controlBtnClass}
+              title="Increase measures"
+            >
+              <Plus size={14} />
+            </button>
+          )}
         </div>
       </div>
 
@@ -225,12 +231,15 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           {[4, 8, 16].map((res) => (
             <button
               key={res}
+              disabled={readOnly}
               onClick={() => updateResolution(res as BeatResolution)}
-              className={`px-3 py-1 border-r last:border-r-0 border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 ${
+              className={`px-3 py-1 border-r last:border-r-0 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 ${
                 state.resolution === res
                   ? 'bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-700'
-                  : ''
-              }`}
+                  : !readOnly
+                    ? 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    : ''
+              } ${readOnly && state.resolution !== res ? 'opacity-50 grayscale' : ''}`}
             >
               {res}
             </button>
@@ -244,21 +253,23 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           <input
             type="number"
             value={state.timeSignature.beatsPerMeasure}
+            disabled={readOnly}
             onChange={(e) => {
               const val = parseInt(e.target.value, 10);
               if (Number.isNaN(val)) return;
               updateTimeSignature(Math.max(1, val), state.timeSignature.beatValue);
             }}
-            className={`${borderedInputClass} w-12`}
+            className={`${borderedInputClass} w-12 disabled:bg-transparent disabled:border-none`}
             min="1"
           />
           <span className="text-gray-400 dark:text-gray-500">/</span>
           <select
             value={state.timeSignature.beatValue}
+            disabled={readOnly}
             onChange={(e) =>
               updateTimeSignature(state.timeSignature.beatsPerMeasure, parseInt(e.target.value, 10))
             }
-            className="px-2 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-bold"
+            className="px-2 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-bold disabled:bg-transparent disabled:border-none disabled:appearance-none"
           >
             {[2, 4, 8, 16].map((v) => (
               <option key={v} value={v}>
@@ -272,18 +283,20 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
       <div className="flex-1" />
 
       <div className={lastGroupClass}>
-        <button
-          onClick={() => {
-            if (window.confirm('Clear all notes in the grid?')) {
-              onClearGrid?.();
-            }
-          }}
-          className={`${iconButtonClass} bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400`}
-          title="Clear Grid"
-          data-testid="clear-grid-button"
-        >
-          <Trash2 size={18} />
-        </button>
+        {!readOnly && (
+          <button
+            onClick={() => {
+              if (window.confirm('Clear all notes in the grid?')) {
+                onClearGrid?.();
+              }
+            }}
+            className={`${iconButtonClass} bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400`}
+            title="Clear Grid"
+            data-testid="clear-grid-button"
+          >
+            <Trash2 size={18} />
+          </button>
+        )}
 
         <button
           onClick={() => onToggleOptionalHits?.(state.playbackOptionalHits === false)}
@@ -297,17 +310,19 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           <Layers size={18} />
         </button>
 
-        <button
-          onClick={() => onToggleEditInstruments?.()}
-          className={`${iconButtonClass} ${
-            isEditingInstruments
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
-          }`}
-          title={isEditingInstruments ? 'Finish Editing' : 'Edit Instruments'}
-        >
-          <Settings2 size={18} />
-        </button>
+        {!readOnly && (
+          <button
+            onClick={() => onToggleEditInstruments?.()}
+            className={`${iconButtonClass} ${
+              isEditingInstruments
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+            }`}
+            title={isEditingInstruments ? 'Finish Editing' : 'Edit Instruments'}
+          >
+            <Settings2 size={18} />
+          </button>
+        )}
       </div>
     </div>
   );

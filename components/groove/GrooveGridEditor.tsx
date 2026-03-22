@@ -26,6 +26,7 @@ interface GrooveGridEditorProps {
   onMetronomeToggle?: (enabled: boolean) => void;
   metronomeVolume?: number;
   onMetronomeVolumeChange?: (volume: number) => void;
+  readOnly?: boolean;
 }
 
 export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
@@ -37,6 +38,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   onMetronomeToggle,
   metronomeVolume: parentMetronomeVolume,
   onMetronomeVolumeChange,
+  readOnly = false,
 }) => {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
   const [pickerPos, setPickerPos] = useState<{
@@ -126,15 +128,17 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
 
   const wrappedDispatch = useCallback(
     (action: GrooveAction) => {
+      if (readOnly) return;
       dispatch(action);
       // Note: This is a bit tricky because useReducer's state isn't updated yet.
       // We should ideally use the reducer function directly to get the next state for the callback.
       onChange?.(grooveReducer(state, action));
     },
-    [onChange, state],
+    [onChange, state, readOnly],
   );
 
   const handleNoteClick = (id: string, noteIndex: number, e: React.MouseEvent) => {
+    if (readOnly) return;
     if (selectionRange) {
       const instIdx = state.instruments.findIndex((i) => i.id === id);
       const isSameCell =
@@ -168,6 +172,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   };
 
   const handleNoteMouseDown = (instIdx: number, noteIdx: number, e: React.MouseEvent) => {
+    if (readOnly) return;
     if (e.button !== 0) return; // Only left click
     setSelectionRange({
       start: { instIdx, noteIdx },
@@ -177,6 +182,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   };
 
   const handleNoteMouseEnter = (instIdx: number, noteIdx: number) => {
+    if (readOnly) return;
     if (isDragging && selectionRange) {
       setSelectionRange({
         ...selectionRange,
@@ -186,6 +192,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   };
 
   const handleNoteContextMenu = (id: string, noteIndex: number, e: React.MouseEvent) => {
+    if (readOnly) return;
     e.preventDefault();
 
     // If context menu is opened outside current selection, clear it
@@ -266,6 +273,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     };
 
     const handleKeyDown = async (e: KeyboardEvent) => {
+      if (readOnly) return;
       // Don't trigger global actions if user is typing in an input/textarea
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
@@ -304,6 +312,18 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     };
 
     const handlePaste = async (e: ClipboardEvent) => {
+      if (readOnly) return;
+      // Don't paste if user is typing in an input/textarea
+      const activeEl = document.activeElement as HTMLElement | null;
+      if (
+        activeEl &&
+        (activeEl.tagName === 'INPUT' ||
+          activeEl.tagName === 'TEXTAREA' ||
+          activeEl.isContentEditable)
+      ) {
+        return;
+      }
+
       if (!selectionRange) return;
       const text = e.clipboardData?.getData('text');
       if (!text) return;
@@ -334,7 +354,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('paste', handlePaste);
     };
-  }, [selectionRange, state.instruments, wrappedDispatch]);
+  }, [selectionRange, state.instruments, wrappedDispatch, readOnly]);
 
   const updateMeasures = (delta: number) => {
     const newMeasures = Math.max(1, state.measures + delta);
@@ -451,6 +471,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
           })
         }
         onClearGrid={() => wrappedDispatch({ type: 'CLEAR_GRID' })}
+        readOnly={readOnly}
       />
 
       <div
@@ -479,6 +500,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                 wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'down' })
               }
               onClear={() => wrappedDispatch({ type: 'CLEAR_ROW', id: inst.id })}
+              readOnly={readOnly}
             />
           ))}
 

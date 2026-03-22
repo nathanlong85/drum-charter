@@ -7,6 +7,15 @@ please let the user know and we will adjust these. Otherwise, please follow the 
 - **Secondary**: `gh pr view` and `gh issue view`.
 - **Comments**: Access via `mcp_GitHub_pull_request_read(method="get_comments")` or `gh pr view --comments`.
 
+### Issue Creation Rules
+- **Labels**: Always set at least one relevant label (e.g., `feature`, `documentation`, `chore`, `bug`).
+- **Hierarchy**: If multiple issues are related, link them to a parent issue (using "Part of #ISSUE" in the body).
+
+### Pull Request Rules
+- **Linking**: Always link the PR to the appropriate issue(s) (e.g., "Closes #ISSUE").
+- **Assignee**: Always assign the PR to yourself (`nathanlong85-ai`).
+- **Projects**: Always link the PR to the "DrumCharter" project (ID `PVT_kwHOAXHd784BRkBi`).
+
 ## 🧪 GitHub Actions & Logs
 - **Primary**: Use the `gh` CLI.
 - **Logs**: `gh run view <RUN_ID> --log` for completed runs. For in-progress runs, poll until completion (20s delay).

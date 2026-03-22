@@ -77,11 +77,11 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
   - [x] **Grid Clipboard**: Support copy/pasting single or multiple cells within and across grids. (#35) `✓`
   - [x] **Modifier Clicks**: Support `Shift + Click` for optional hits and other keyboard + click combos for rapid articulation entry. (#36) `✓`
   - [x] **Quick Clear**: Add "Clear Grid" and "Clear Row" functions for rapid resets. (#34) `✓`
-- [ ] **Performance & Live Mode**:
-  - [ ] **Live Mode UI**: High-contrast, fullscreen-optimized view for stage use. (#37)
+- [x] **Performance & Live Mode**:
+  - [x] **Live Mode UI**: High-contrast, fullscreen-optimized view for stage use. (#37) `✓`
   - [ ] **Remote Control Integration**: Support for Bluetooth foot switches and MIDI controllers for hands-free page turning. (#39)
-  - [ ] **Setlist Management**: Create, reorder, and save lists of songs for seamless performance transitions. (#38)
-  - [ ] **Continuous Playback**: Auto-advance to the next song in a setlist after the current one finishes or on a manual trigger. (#38)
+  - [x] **Setlist Management**: Create, reorder, and save lists of songs for seamless performance transitions. (#38) `✓`
+  - [x] **Continuous Playback**: Auto-advance to the next song in a setlist after the current one finishes or on a manual trigger. (#38) `✓`
 
 ---
 
