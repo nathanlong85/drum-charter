@@ -86,6 +86,9 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
   - [x] **Remote Control Integration**: Support for Bluetooth foot switches and MIDI controllers for hands-free page turning. (#39) `✓`
   - [x] **Setlist Management**: Create, reorder, and save lists of songs for seamless performance transitions. (#38) `✓`
   - [x] **Continuous Playback**: Auto-advance to the next song in a setlist after the current one finishes or on a manual trigger. (#38) `✓`
+  - [x] **Section Markers**: High-visibility markers and measure countdowns for stage use. (#49) `✓`
+- [x] **Documentation**:
+  - [x] **User Manual**: Comprehensive in-app and standalone guide for users. (#48) `✓`
 
 ---
 
@@ -97,12 +100,13 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
-- [ ] [Chore] Expand E2E test coverage for all core UI flows (#22)
+- [ ] [Task] PNG Fallback Icons for PWA (#13)
 
 ### 🟢 Done
 
-- [ ] [Feature] Section Markers: Clear visual indicators for song sections in Live Mode (#49)
-- [ ] [Documentation] Create Comprehensive User Manual (#48)
+- [x] [Chore] Expand E2E test coverage for all core UI flows (#22) `✓`
+- [x] [Feature] Section Markers: Clear visual indicators for song sections in Live Mode (#49) `✓`
+- [x] [Documentation] Create Comprehensive User Manual (#48) `✓`
 - [x] [Feature] Remote Control Support (Foot Switch/MIDI) (#39) `✓`
 - [x] [Feature] Setlist Management (#38) `✓`
 - [x] [Feature] Keyboard Modifiers for Rapid Editing (#36) `✓`

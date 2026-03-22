@@ -22,9 +22,11 @@ DrumCharter is a specialized tool designed by drummers, for drummers. It replace
 The heart of DrumCharter is the Groove Grid. Unlike generic sequencers, it is optimized for drum notation.
 
 ### Adding Notes
+
 Click any cell in the grid to toggle a drum hit. Each instrument (Kick, Snare, Hi-Hat, etc.) has its own row.
 
 ### Articulations & Symbols
+
 - **Standard Hit**: A regular click.
 - **Accent**: A louder, emphasized hit.
 - **Ghost Note**: A soft, subtle tap.
@@ -32,12 +34,12 @@ Click any cell in the grid to toggle a drum hit. Each instrument (Kick, Snare, H
 
 ### Rapid Editing (Keyboard Shortcuts)
 
-| Shortcut | Action |
-| :--- | :--- |
-| **Shift + Click** | Toggle "Optional" status (ghosted in UI) |
-| **Alt + Click** | Open Symbol Picker for specific articulations |
-| **Drag across cells** | Multi-select cells for batch operations |
-| **Delete / Backspace** | Clear selected cells |
+| Shortcut               | Action                                        |
+| :--------------------- | :-------------------------------------------- |
+| **Shift + Click**      | Toggle "Optional" status (ghosted in UI)      |
+| **Alt + Click**        | Open Symbol Picker for specific articulations |
+| **Drag across cells**  | Multi-select cells for batch operations       |
+| **Delete / Backspace** | Clear selected cells                          |
 
 ---
 
@@ -46,11 +48,13 @@ Click any cell in the grid to toggle a drum hit. Each instrument (Kick, Snare, H
 Enter Live Mode from any Song Chart or Setlist to get a high-contrast stage view.
 
 ### Navigation
+
 - Use the **Arrow Keys** or **Page Up/Down** to navigate between song sections.
 - Press **F** to toggle Fullscreen mode.
 - Press **ESC** to exit Live Mode.
 
 ### Pedal & MIDI Support
+
 DrumCharter supports Bluetooth page-turner pedals (like AirTurn) and MIDI controllers for hands-free operation.
 
 1. Open the **Remote Control Settings** (gear icon) in Live Mode.
@@ -73,10 +77,13 @@ All your creations are stored in **My Library**. You can search by title or filt
 ## Troubleshooting
 
 ### No Sound?
+
 Browsers often block audio until you interact with the page. If you don't hear anything, try clicking anywhere on the screen or toggling the playback button.
 
 ### MIDI Device Not Working?
+
 Ensure your device is connected before opening the browser. You may need to refresh the page or check your browser's site permissions to allow "MIDI devices".
 
 ### Offline Use?
+
 On supported browsers, you can "Install" DrumCharter as an app. This ensures all your charts and the audio engine are available even when you have no signal.
