@@ -22,6 +22,7 @@ async function generateIcons() {
       console.log(`Generated ${outputFile}`);
     } catch (err) {
       console.error(`Error generating ${outputFile}:`, err);
+      process.exit(1);
     }
   }
 }
