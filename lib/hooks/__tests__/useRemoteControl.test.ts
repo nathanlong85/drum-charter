@@ -1,6 +1,21 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
+import { debounce } from 'lodash';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useRemoteControl } from '../useRemoteControl';
+
+// Mock lodash debounce to be synchronous
+vi.mock('lodash', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('lodash')>();
+  return {
+    ...actual,
+    debounce: vi.fn((fn: (...args: unknown[]) => void) => {
+      const debounced = (...args: unknown[]) => fn(...args);
+      debounced.cancel = vi.fn();
+      debounced.flush = vi.fn();
+      return debounced;
+    }),
+  };
+});
 
 // Mock localStorage
 const mockLocalStorage = (() => {
@@ -48,26 +63,24 @@ describe('useRemoteControl', () => {
     const { result } = renderHook(() =>
       useRemoteControl({ onAction: mockOnAction, isActive: true }),
     );
-    expect(result.current.config.keyboard.arrowright).toBe('next_section');
+    expect(result.current.config.keyboard.arrowright).toContain('next_section');
   });
 
   it('loads config from local storage and deep merges with defaults', () => {
     const customConfig = {
-      keyboard: { j: 'next_section' },
-      midi: { '144:36': 'prev_section' },
+      keyboard: { j: ['next_section'] },
+      midi: { '144:36': ['prev_section'] },
     };
     localStorage.setItem('drumcharter_remote_config', JSON.stringify(customConfig));
 
-    const { result } = renderHook(() =>
-      useRemoteControl({ onAction: mockOnAction, isActive: true }),
-    );
+    const { result } = renderHook(() => useRemoteControl({ onAction: mockOnAction, isActive: true }));
 
     // Custom mapping exists
-    expect(result.current.config.keyboard.j).toBe('next_section');
-    expect(result.current.config.midi['144:36']).toBe('prev_section');
+    expect(result.current.config.keyboard.j).toContain('next_section');
+    expect(result.current.config.midi['144:36']).toContain('prev_section');
 
     // Default mapping still exists (deep merge)
-    expect(result.current.config.keyboard.arrowright).toBe('next_section');
+    expect(result.current.config.keyboard.arrowright).toContain('next_section');
   });
 
   it('triggers onAction for default mapped keys', () => {
@@ -124,16 +137,15 @@ describe('useRemoteControl', () => {
     });
 
     expect(result.current.isListeningForMap).toBe(null);
-    expect(result.current.config.keyboard.k).toBe('next_section');
+    expect(result.current.config.keyboard.k).toContain('next_section');
     expect(result.current.lastEventMsg).toBe('Keyboard: k');
 
-    // Original arrowright should have been removed since it was remapped?
-    // Actually the logic removes the action from other keys.
-    expect(result.current.config.keyboard.arrowright).toBeUndefined();
+    // Original arrowright should still exist (multi-value list)
+    expect(result.current.config.keyboard.arrowright).toContain('next_section');
 
     // Check local storage
     const stored = JSON.parse(localStorage.getItem('drumcharter_remote_config') || '{}');
-    expect(stored.keyboard.k).toBe('next_section');
+    expect(stored.keyboard.k).toContain('next_section');
   });
 
   it('resets config to default', () => {
@@ -153,7 +165,7 @@ describe('useRemoteControl', () => {
       result.current.resetConfig();
     });
 
-    expect(result.current.config.keyboard.arrowright).toBe('next_section');
+    expect(result.current.config.keyboard.arrowright).toContain('next_section');
     expect(result.current.config.keyboard.k).toBeUndefined();
   });
 
@@ -171,29 +183,22 @@ describe('useRemoteControl', () => {
 
       mockMidiAccess = {
         inputs: {
+          get size() {
+            return mockInputs.size;
+          },
           values: vi.fn(() => mockInputs.values()),
         },
-        set onstatechange(_cb: (...args: any[]) => void) {
-          // just mock setter
-        },
+        onstatechange: null,
       };
 
       Object.defineProperty(navigator, 'requestMIDIAccess', {
         writable: true,
-        value: vi.fn().mockReturnValue({
-          // biome-ignore lint/suspicious/noThenProperty: Manual thenable is required for synchronous MIDI mock in tests.
-          then: (resolve: (access: any) => void) => {
-            resolve(mockMidiAccess);
-            return { catch: vi.fn() };
-          },
-        }),
+        value: vi.fn().mockResolvedValue(mockMidiAccess),
       });
     });
 
     it('sets up MIDI listeners and handles messages', async () => {
-      const { result } = renderHook(() =>
-        useRemoteControl({ onAction: mockOnAction, isActive: true }),
-      );
+      const { result } = renderHook(() => useRemoteControl({ onAction: mockOnAction, isActive: true }));
 
       const mockInput = mockInputs.get('input1');
       await waitFor(() => {
@@ -216,7 +221,7 @@ describe('useRemoteControl', () => {
       });
 
       expect(result.current.isListeningForMap).toBe(null);
-      expect(result.current.config.midi['144:36']).toBe('next_section');
+      expect(result.current.config.midi['144:36']).toContain('next_section');
 
       // Now trigger the action via MIDI
       act(() => {
@@ -229,9 +234,7 @@ describe('useRemoteControl', () => {
     });
 
     it('ignores Note Off messages for mapping', async () => {
-      const { result } = renderHook(() =>
-        useRemoteControl({ onAction: mockOnAction, isActive: true }),
-      );
+      const { result } = renderHook(() => useRemoteControl({ onAction: mockOnAction, isActive: true }));
 
       const mockInput = mockInputs.get('input1');
       await waitFor(() => {

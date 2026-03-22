@@ -60,11 +60,8 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
           toggleFullscreen();
           break;
         case 'exit_live_mode':
-          if (!document.fullscreenElement) {
-            handleExit();
-          }
-          break;
-      }
+          handleExit();
+          break;      }
     },
     [nextSection, prevSection, toggleFullscreen, handleExit],
   );
@@ -73,6 +70,11 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
     onAction: handleRemoteAction,
     isActive: true,
   });
+
+  const fullscreenMapping = remoteSettingsProps.getMappingForAction('toggle_fullscreen');
+  const fullscreenShortcut = fullscreenMapping.keyboard[0]
+    ? ` (${fullscreenMapping.keyboard[0].toUpperCase()})`
+    : '';
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -128,7 +130,8 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
               data-testid="live-mode-fullscreen-btn"
               className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-sm font-bold uppercase transition-colors border border-zinc-700"
             >
-              {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen (F)'}
+              {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+              {fullscreenShortcut}
             </button>
             <button
               onClick={handleExit}

@@ -34,7 +34,11 @@ export const RemoteControlSettings: React.FC<RemoteControlSettingsProps> = ({
   ];
 
   return (
-    <Dialog.Root>
+    <Dialog.Root
+      onOpenChange={(open) => {
+        if (!open) cancelListen();
+      }}
+    >
       <Dialog.Trigger asChild>
         <button
           className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-full transition-colors"
