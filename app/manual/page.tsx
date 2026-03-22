@@ -89,7 +89,7 @@ export default function ManualPage() {
                 <tr>
                   <td className="py-2 border-b border-zinc-100 font-mono">Shift + Click</td>
                   <td className="py-2 border-b border-zinc-100">
-                    Toggle "Optional" status (ghosted in UI)
+                    Toggle &quot;Optional&quot; status (ghosted in UI)
                   </td>
                 </tr>
                 <tr>
@@ -136,7 +136,7 @@ export default function ManualPage() {
                 Open the <strong>Remote Control Settings</strong> (gear icon) in Live Mode.
               </li>
               <li>
-                Click <strong>Map</strong> next to an action (e.g., "Next Section").
+                Click <strong>Map</strong> next to an action (e.g., &quot;Next Section&quot;).
               </li>
               <li>Press your pedal or trigger a MIDI note/button.</li>
               <li>The mapping is saved automatically to your device.</li>
@@ -145,7 +145,7 @@ export default function ManualPage() {
             <h2>Managing Your Library</h2>
             <p>
               All your creations are stored in <strong>My Library</strong>. You can search by title
-              or filter by tags (e.g., "Worship", "Funk", "Practice").
+              or filter by tags (e.g., &quot;Worship&quot;, &quot;Funk&quot;, &quot;Practice&quot;).
             </p>
             <ul>
               <li>
@@ -163,18 +163,19 @@ export default function ManualPage() {
             <h2>Troubleshooting</h2>
             <h3>No Sound?</h3>
             <p>
-              Browsers often block audio until you interact with the page. If you don't hear
+              Browsers often block audio until you interact with the page. If you don&apos;t hear
               anything, try clicking anywhere on the screen or toggling the playback button.
             </p>
             <h3>MIDI Device Not Working?</h3>
             <p>
               Ensure your device is connected before opening the browser. You may need to refresh
-              the page or check your browser's site permissions to allow "MIDI devices".
+              the page or check your browser&apos;s site permissions to allow &quot;MIDI
+              devices&quot;.
             </p>
             <h3>Offline Use?</h3>
             <p>
-              On supported browsers, you can "Install" DrumCharter as an app. This ensures all your
-              charts and the audio engine are available even when you have no signal.
+              On supported browsers, you can &quot;Install&quot; DrumCharter as an app. This ensures
+              all your charts and the audio engine are available even when you have no signal.
             </p>
           </div>
         </div>
