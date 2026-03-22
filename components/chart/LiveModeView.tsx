@@ -34,12 +34,26 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
     }
   }, []);
 
+  const handleExit = useCallback(async () => {
+    if (document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+      } catch (err) {
+        console.error('Error exiting fullscreen on close:', err);
+      }
+    }
+    onExit();
+  }, [onExit]);
+
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!e.key) return;
+      const key = e.key.toLowerCase();
+
       // Don't trigger navigation if an interactive element has focus
       const activeEl = document.activeElement as HTMLElement | null;
       const isInteractive =
@@ -52,19 +66,19 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
           activeEl.isContentEditable ||
           activeEl.getAttribute('role') === 'textbox');
 
-      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+      if (key === 'arrowright' || key === 'pagedown' || key === ' ') {
         if (isInteractive) return; // Space also triggers buttons, don't hijack
         e.preventDefault();
         nextSection();
-      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      } else if (key === 'arrowleft' || key === 'pageup') {
         if (isInteractive) return;
         e.preventDefault();
         prevSection();
-      } else if (e.key === 'Escape') {
+      } else if (key === 'escape') {
         if (!document.fullscreenElement) {
-          onExit();
+          handleExit();
         }
-      } else if (e.key === 'f') {
+      } else if (key === 'f') {
         if (isInteractive) return;
         toggleFullscreen();
       }
@@ -77,14 +91,14 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [nextSection, prevSection, onExit, toggleFullscreen]);
+  }, [nextSection, prevSection, handleExit, toggleFullscreen]);
 
   if (!activeSection) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-black text-yellow-400 gap-8">
         <p className="text-2xl font-bold text-center">No sections found in this chart.</p>
         <button
-          onClick={onExit}
+          onClick={handleExit}
           data-testid="exit-live-mode-empty-btn"
           className="px-8 py-4 bg-red-900 text-red-100 rounded-xl font-black uppercase tracking-tighter hover:bg-red-800 transition-all shadow-2xl"
         >
@@ -124,7 +138,7 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
               {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen (F)'}
             </button>
             <button
-              onClick={onExit}
+              onClick={handleExit}
               data-testid="exit-live-mode-btn"
               className="px-4 py-2 bg-red-900/50 hover:bg-red-900 text-red-200 rounded text-sm font-bold uppercase transition-colors border border-red-800"
             >
@@ -225,17 +239,21 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
             </div>
           </button>
 
-          <div className="flex gap-2">
-            {chart.sections.map((_, idx) => (
+          <div className="flex gap-2" role="list" aria-label="Song sections progress">
+            {chart.sections.map((section, idx) => (
               <div
-                key={idx}
+                key={section.id}
+                role="listitem"
+                aria-label={`Section ${idx + 1} of ${chart.sections.length}: ${section.name}${
+                  idx === activeSectionIdx ? ', current section' : ''
+                }`}
+                aria-current={idx === activeSectionIdx ? 'step' : undefined}
                 className={`h-2 rounded-full transition-all ${
                   idx === activeSectionIdx ? 'w-8 bg-yellow-400' : 'w-2 bg-zinc-800'
                 }`}
               />
             ))}
           </div>
-
           <button
             disabled={activeSectionIdx === chart.sections.length - 1}
             onClick={nextSection}
