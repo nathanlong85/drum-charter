@@ -1,23 +1,27 @@
 # Next-Browser Usage Guide
 
-`@vercel/next-browser` is an experimental CLI tool designed for AI agents to inspect, debug, and interact with running Next.js applications. It translates visual browser data into structured text that agents can parse.
+**⚠️ EXPERIMENTAL: This tool is currently in an early experimental phase. APIs are unstable and subject to breaking changes. Requires Node.js >= 20.**
+
+`@vercel/next-browser` is a CLI tool designed for AI agents to inspect, debug, and interact with running Next.js applications. It translates visual browser data into structured text that agents can parse.
 
 ## Installation
 
-The recommended way to use `next-browser` is by adding it as an agent skill:
+### As an Agent Skill (Recommended)
+
+To add `next-browser` capabilities to your agent, use the `skills` CLI:
 
 ```bash
-npx skills add vercel-labs/next-browser
+npx skills add vercel-labs/agent-browser
 ```
 
-Once added, you can typically invoke it within your agent's chat using `/next-browser`.
+Once added, you can typically invoke it within your agent's chat using `/agent-browser`.
 
-### Manual Installation (Alternative)
+### Global NPM Package (Standalone)
 
-For manual scripting or standalone use:
+For manual scripting or standalone use without an agent:
 
 ```bash
-# Install the CLI globally (or as a dev dependency)
+# Install the CLI globally
 pnpm add -g @vercel/next-browser
 
 # Install the required browser engine
