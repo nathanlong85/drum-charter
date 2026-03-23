@@ -12,7 +12,10 @@ please let the user know and we will adjust these. Otherwise, please follow the 
 ### Issue Creation Rules
 
 - **Labels**: Always set at least one relevant label (e.g., `feature`, `documentation`, `chore`, `bug`).
-- **Hierarchy**: If multiple issues are related, link them to a parent issue (using "Part of #ISSUE" in the body).
+- **Hierarchy**: If multiple issues are related, create them as **Sub-issues** of the parent issue using the `mcp_github_sub_issue_write` tool.
+  - To do this, you must first create the child issue, then retrieve its **database ID** (not the issue number or GraphQL node ID) using `gh api repos/{owner}/{repo}/issues/{number} --jq .id`.
+  - Then call `mcp_github_sub_issue_write(method="add", issue_number=PARENT_NUMBER, sub_issue_id=CHILD_DATABASE_ID)`.
+  - Using a Markdown checklist in the parent description is **NOT** a substitute for actual GitHub Sub-issues.
 
 ### Pull Request Rules
 
