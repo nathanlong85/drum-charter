@@ -96,15 +96,19 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🔵 In Progress
 
-- [ ] [Epic] Live Mode (#44)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
-- [ ] [Task] PNG Fallback Icons for PWA (#13)
 
 ### 🟢 Done
 
+- [x] [Epic] Upgrade to Next.js 16.2 & AI Agent Optimization (#52) `✓`
+  - [x] [Task] Upgrade next and eslint-config-next to 16.2.1 (#53) `✓`
+  - [x] [Task] Setup AGENTS.md and CLAUDE.md for AI Optimization (#54) `✓`
+  - [x] [Task] Enable browser-to-terminal logging in Next.js config (#55) `✓`
+  - [x] [Task] Document next-browser usage for the project (#56) `✓`
 - [x] [Chore] Expand E2E test coverage for all core UI flows (#22) `✓`
+- [x] [Task] PNG Fallback Icons for PWA (#13) `✓`
 - [x] [Feature] Section Markers: Clear visual indicators for song sections in Live Mode (#49) `✓`
 - [x] [Documentation] Create Comprehensive User Manual (#48) `✓`
 - [x] [Feature] Remote Control Support (Foot Switch/MIDI) (#39) `✓`

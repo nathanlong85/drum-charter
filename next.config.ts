@@ -12,4 +12,7 @@ const withSerwist = withSerwistInit({
 
 export default withSerwist({
   outputFileTracingRoot: path.resolve(process.cwd()),
+  logging: {
+    browserToTerminal: true,
+  },
 });
