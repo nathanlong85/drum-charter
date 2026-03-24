@@ -96,6 +96,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🔵 In Progress
 
+- [ ] [Epic] Apply UI Redesign from Stitch Exports (#70)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
