@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { Filter, LayoutGrid, Plus, Search } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -55,7 +57,23 @@ export default function LibraryDashboard({
   initialSnippets,
   initialSetlists,
 }: LibraryDashboardProps) {
-  const [activeTab, setActiveTab] = useState<ItemType>('song');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const queryTab = searchParams.get('tab') as ItemType | null;
+  const [activeTab, setActiveTab] = useState<ItemType>(queryTab || 'song');
+
+  useEffect(() => {
+    if (queryTab && queryTab !== activeTab) {
+      setActiveTab(queryTab);
+    }
+  }, [queryTab, activeTab]);
+
+  const handleTabChange = (tab: ItemType) => {
+    setActiveTab(tab);
+    router.push(`/library?tab=${tab}`);
+  };
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [songs, setSongs] = useState(initialSongs);
@@ -139,7 +157,6 @@ export default function LibraryDashboard({
       } else {
         throw new Error(`Unsupported type for duplication: ${type}`);
       }
-      // window.location.href = `/${type}s/${duplicated.id}`;
     } catch (error) {
       if (isSupabaseError(error)) {
         console.error('Error duplicating item:', {
@@ -192,7 +209,6 @@ export default function LibraryDashboard({
 
   const handleCreateNew = async () => {
     try {
-      // Get current user to avoid RLS violation 42501
       const {
         data: { user },
         error: authError,
@@ -205,7 +221,6 @@ export default function LibraryDashboard({
       }
 
       const userId = user.id;
-      console.log('Creating new item...', { activeTab, userId });
 
       if (activeTab === 'song') {
         const newSong: SongChart = {
@@ -224,12 +239,7 @@ export default function LibraryDashboard({
           updatedAt: null,
         };
         const saved = await supabaseService.saveSongChart(newSong);
-        if (saved?.id) {
-          console.log('Created song:', saved.id);
-          window.location.assign(`/songs/${saved.id}`);
-        } else {
-          throw new Error('Song creation failed - no ID returned');
-        }
+        if (saved?.id) window.location.assign(`/songs/${saved.id}`);
       } else if (activeTab === 'notebook') {
         const newNotebook: Notebook = {
           id: crypto.randomUUID(),
@@ -242,12 +252,7 @@ export default function LibraryDashboard({
           updatedAt: null,
         };
         const saved = await supabaseService.saveNotebook(newNotebook);
-        if (saved?.id) {
-          console.log('Created notebook:', saved.id);
-          window.location.assign(`/notebooks/${saved.id}`);
-        } else {
-          throw new Error('Notebook creation failed - no ID returned');
-        }
+        if (saved?.id) window.location.assign(`/notebooks/${saved.id}`);
       } else if (activeTab === 'snippet') {
         const newSnippet: GrooveSnippet = {
           id: crypto.randomUUID(),
@@ -264,16 +269,10 @@ export default function LibraryDashboard({
             measures: 1,
           }),
           createdAt: null,
-
           updatedAt: null,
         };
         const saved = await supabaseService.saveGrooveSnippet(newSnippet);
-        if (saved?.id) {
-          console.log('Created snippet:', saved.id);
-          window.location.assign(`/snippets/${saved.id}`);
-        } else {
-          throw new Error('Snippet creation failed - no ID returned');
-        }
+        if (saved?.id) window.location.assign(`/snippets/${saved.id}`);
       } else if (activeTab === 'setlist') {
         const newSetlist: Setlist = {
           id: crypto.randomUUID(),
@@ -285,161 +284,134 @@ export default function LibraryDashboard({
           updatedAt: null,
         };
         const saved = await supabaseService.saveSetlist(newSetlist);
-        if (saved?.id) {
-          console.log('Created setlist:', saved.id);
-          window.location.assign(`/setlists/${saved.id}`);
-        } else {
-          throw new Error('Setlist creation failed - no ID returned');
-        }
+        if (saved?.id) window.location.assign(`/setlists/${saved.id}`);
       }
     } catch (error) {
       if (isSupabaseError(error)) {
-        console.error('Error creating new item:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-          fullError: error,
-        });
+        console.error('Error creating new item:', error);
         alert(`Failed to create item: ${error.message}`);
-      } else {
-        console.error('Unknown error creating new item:', error);
-        alert('Failed to create new item. Check console for details.');
       }
     }
   };
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="flex bg-zinc-100 p-1 rounded-lg">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as ItemType)}
-                data-testid={`tab-${tab.id}`}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-zinc-500 hover:text-zinc-700'
-                }`}
-              >
-                {tab.label}
-                <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-zinc-200 text-zinc-600 rounded-full">
-                  {tab.count}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <div className="relative w-full md:w-64">
-            <form role="search" aria-label="Library search" onSubmit={(e) => e.preventDefault()}>
-              <input
-                type="text"
-                placeholder="Search by title or tag..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Search library by title or tag"
-                className="w-full pl-10 pr-4 py-2 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-              />
-            </form>
-            <svg
-              className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+      {/* Controls Bar */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex gap-2 p-1 bg-surface-container-low rounded-xl">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => handleTabChange(tab.id as ItemType)}
+              data-testid={`tab-${tab.id}`}
+              className={`px-4 py-2 text-sm font-headline font-bold uppercase tracking-widest rounded-lg transition-all ${
+                activeTab === tab.id
+                  ? 'bg-surface-container-highest text-primary shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
+              {tab.label}
+              <span className="ml-2 opacity-50 text-[10px]">{tab.count}</span>
+            </button>
+          ))}
         </div>
 
-        {allAvailableTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mr-2">
-              Filter by Tags:
-            </span>
-            {allAvailableTags.map((tag) => {
-              const isActive = selectedTags.includes(tag);
-              return (
-                <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  aria-pressed={isActive}
-                  aria-label={`Filter by ${tag} tag`}
-                  className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-tighter transition-all ${
-                    isActive
-                      ? 'bg-zinc-800 text-white shadow-md scale-105'
-                      : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
-                  }`}
-                >
-                  {tag}
-                </button>
-              );
-            })}
-            {selectedTags.length > 0 && (
+        <div className="flex gap-4">
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4" />
+            <input
+              type="text"
+              placeholder="FILTER LIST..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-surface-container border-none text-[10px] font-headline tracking-widest w-full md:w-64 pl-10 pr-4 py-3 rounded-full focus:ring-1 focus:ring-primary/50 text-on-surface placeholder:text-on-surface-variant/50 outline-none"
+            />
+          </div>
+          <button
+            onClick={handleCreateNew}
+            className="bg-gradient-to-br from-primary to-primary-dim text-on-primary font-headline text-[11px] font-bold tracking-widest uppercase px-6 py-3 rounded-full shadow-[0_4px_20px_rgba(129,236,255,0.3)] hover:opacity-90 transition-all flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            New {activeTab}
+          </button>
+        </div>
+      </div>
+
+      {allAvailableTags.length > 0 && (
+        <div className="flex flex-wrap gap-2 items-center">
+          <Filter className="w-4 h-4 text-on-surface-variant mr-1" />
+          {allAvailableTags.map((tag) => {
+            const isActive = selectedTags.includes(tag);
+            return (
               <button
-                onClick={() => setSelectedTags([])}
-                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 uppercase tracking-widest ml-2"
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`px-3 py-1 rounded-full text-[10px] font-headline font-bold uppercase tracking-widest transition-all ${
+                  isActive
+                    ? 'bg-primary/20 text-primary border border-primary/50'
+                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                }`}
               >
-                Clear Filters
+                {tag}
               </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <button
-          onClick={handleCreateNew}
-          className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-zinc-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all group"
-        >
-          <div className="w-12 h-12 bg-zinc-100 rounded-full flex items-center justify-center mb-3 group-hover:bg-blue-100">
-            <svg
-              className="w-6 h-6 text-zinc-400 group-hover:text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            );
+          })}
+          {selectedTags.length > 0 && (
+            <button
+              onClick={() => setSelectedTags([])}
+              className="text-[10px] font-headline font-bold text-error hover:text-error-dim uppercase tracking-widest ml-2"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-          </div>
-          <span className="text-sm font-semibold text-zinc-500 group-hover:text-blue-600">
-            New {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
-          </span>
-        </button>
+              Clear Filters
+            </button>
+          )}
+        </div>
+      )}
 
-        {currentItems.map((item) => (
-          <LibraryCard
-            key={item.id}
-            item={{
-              id: item.id,
-              title: item.title,
-              type: activeTab,
-              bpm: item.bpm ?? undefined,
-              tags: item.tags ?? undefined,
-              createdAt: item.created_at || item.createdAt || '',
-            }}
-            onDelete={handleDelete}
-            onDuplicate={handleDuplicate}
-          />
-        ))}
-      </div>
+      {/* Grid */}
+      <section className="space-y-6">
+        <div className="flex items-center gap-3">
+          <LayoutGrid className="w-5 h-5 text-primary" />
+          <h3 className="font-headline font-bold text-lg tracking-tight">
+            Active {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}s
+          </h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <button
+            onClick={handleCreateNew}
+            className="aspect-[4/3] bg-surface-container flex flex-col items-center justify-center p-8 rounded-xl border border-dashed border-outline-variant/30 hover:border-primary/50 hover:bg-surface-container-high transition-all group"
+          >
+            <div className="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:text-primary transition-colors text-on-surface-variant">
+              <Plus className="w-6 h-6" />
+            </div>
+            <span className="text-xs font-headline font-bold tracking-widest uppercase text-on-surface-variant group-hover:text-primary transition-colors">
+              Create New
+            </span>
+          </button>
+
+          {currentItems.map((item) => (
+            <LibraryCard
+              key={item.id}
+              item={{
+                id: item.id,
+                title: item.title,
+                type: activeTab,
+                bpm: item.bpm ?? undefined,
+                tags: item.tags ?? undefined,
+                createdAt: item.created_at || item.createdAt || '',
+              }}
+              onDelete={handleDelete}
+              onDuplicate={handleDuplicate}
+            />
+          ))}
+        </div>
+      </section>
 
       {currentItems.length === 0 && searchQuery && (
-        <div className="text-center py-12">
-          <p className="text-zinc-400">No results found for &quot;{searchQuery}&quot;</p>
+        <div className="text-center py-20 bg-surface-container rounded-xl">
+          <p className="text-on-surface-variant font-headline tracking-widest text-sm uppercase">
+            No results found for &quot;{searchQuery}&quot;
+          </p>
         </div>
       )}
     </div>

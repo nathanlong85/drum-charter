@@ -1,3 +1,14 @@
+import {
+  Activity,
+  Clock,
+  Copy,
+  FileText,
+  Hash,
+  Library,
+  ListMusic,
+  Music,
+  Trash2,
+} from 'lucide-react';
 import type React from 'react';
 import { formatDate } from '@/lib/utils/format';
 
@@ -15,42 +26,40 @@ interface LibraryCardProps {
 }
 
 export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDuplicate }) => {
-  const typeLabels = {
-    song: { label: 'Song', color: 'bg-blue-100 text-blue-800' },
-    notebook: { label: 'Notebook', color: 'bg-purple-100 text-purple-800' },
-    snippet: { label: 'Snippet', color: 'bg-amber-100 text-amber-800' },
-    setlist: { label: 'Setlist', color: 'bg-emerald-100 text-emerald-800' },
+  const typeIcons = {
+    song: Music,
+    notebook: FileText,
+    snippet: Library,
+    setlist: ListMusic,
   };
+  const Icon = typeIcons[item.type];
 
   return (
     <div
       data-testid="library-card"
-      className="group relative bg-white border border-zinc-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-all hover:border-blue-200"
+      className="group relative bg-surface-container rounded-xl p-6 hover:bg-surface-container-high hover:-translate-y-1 transition-all cursor-pointer overflow-hidden border border-transparent hover:border-outline-variant/30"
     >
-      <div className="flex justify-between items-start mb-3">
-        <span
-          className={`text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full ${typeLabels[item.type].color}`}
-        >
-          {typeLabels[item.type].label}
-        </span>
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all z-10">
+      <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-primary to-primary-container opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <div className="flex justify-between items-start mb-6">
+        <div className="flex items-center gap-2 text-on-surface-variant">
+          <Icon className="w-4 h-4 text-primary" />
+          <span className="text-[10px] font-headline tracking-[0.2em] uppercase font-bold">
+            {item.type}
+          </span>
+        </div>
+
+        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all z-10 translate-x-4 group-hover:translate-x-0">
           <button
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onDuplicate(item.id, item.type);
             }}
-            className="p-1.5 text-zinc-400 hover:text-blue-500 transition-all rounded-md hover:bg-blue-50"
+            className="p-1.5 text-on-surface-variant hover:text-primary transition-all rounded-md hover:bg-primary/10"
             title="Duplicate"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
-              />
-            </svg>
+            <Copy className="w-4 h-4" />
           </button>
           <button
             onClick={(e) => {
@@ -58,57 +67,40 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
               e.stopPropagation();
               onDelete(item.id, item.type);
             }}
-            className="p-1.5 text-zinc-400 hover:text-red-500 transition-all rounded-md hover:bg-red-50"
+            className="p-1.5 text-on-surface-variant hover:text-error transition-all rounded-md hover:bg-error/10"
             title="Delete"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      <h3 className="text-lg font-bold text-zinc-900 mb-1 line-clamp-1 pr-6 group-hover:text-blue-600 transition-colors">
+      <h3 className="text-xl font-headline font-bold text-on-surface mb-2 line-clamp-1 group-hover:text-primary transition-colors">
         {item.title}
       </h3>
 
-      <div className="flex flex-wrap gap-3 items-center text-sm text-zinc-500 mb-4">
+      <div className="flex flex-wrap gap-4 items-center mb-6">
         {item.bpm && (
-          <div className="flex items-center gap-1">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+          <div className="flex items-center gap-1.5 text-primary text-xs font-bold font-headline">
+            <Activity className="w-3.5 h-3.5" />
             {item.bpm} BPM
           </div>
         )}
-        <div className="flex items-center gap-1">
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
+        <div className="flex items-center gap-1.5 text-on-surface-variant text-[10px] font-headline uppercase tracking-wider">
+          <Clock className="w-3 h-3" />
           {formatDate(item.createdAt)}
         </div>
       </div>
 
       {item.tags && item.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-auto pt-2 border-t border-zinc-50">
+        <div className="flex flex-wrap gap-2 mt-auto">
           {item.tags.map((tag) => (
-            <span key={tag} className="text-[11px] text-zinc-400 font-medium">
-              #{tag}
+            <span
+              key={tag}
+              className="flex items-center gap-1 text-[10px] font-headline font-bold tracking-widest uppercase px-2.5 py-1 rounded-md bg-surface-container-highest text-on-surface-variant"
+            >
+              <Hash className="w-3 h-3 text-primary/70" />
+              {tag}
             </span>
           ))}
         </div>
