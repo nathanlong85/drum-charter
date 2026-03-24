@@ -59,3 +59,5 @@ next-env.d.ts
 table_stats.json
 coderabbit_full_review.txt
 .output.txt
+
+tmp/
