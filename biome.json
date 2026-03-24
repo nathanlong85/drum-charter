@@ -15,7 +15,8 @@
       "!node_modules",
       "!.next",
       "!public/sw.js",
-      "!playwright-report"
+      "!playwright-report",
+      "!tmp"
     ]
   },
   "formatter": {

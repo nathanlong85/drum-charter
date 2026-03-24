@@ -12,10 +12,10 @@
 
 ## 3. Iterative Page Refactoring
 We will surgically implement the redesign page-by-page, matching the Stitch mockups:
-1.  **Dashboard / Library View:** Update the navigation strategy (e.g., persistent sidebar), card styling, tabs, and "Empty States".
-2.  **Song Chart & Notebook Editors:** Revamp the header, section blocks, and the critical **Groove Grid** interface. The Grid will receive high-contrast active states, better hit-type indications, and touch-friendly controls.
-3.  **Live Mode:** Implement the high-visibility, "bulletproof" Live stage view as designed.
-4.  **User Manual:** Apply the new typography and surface hierarchy for long-form reading.
+1. **Dashboard / Library View:** Update the navigation strategy (e.g., persistent sidebar), card styling, tabs, and "Empty States".
+2. **Song Chart & Notebook Editors:** Revamp the header, section blocks, and the critical **Groove Grid** interface. The Grid will receive high-contrast active states, better hit-type indications, and touch-friendly controls.
+3. **Live Mode:** Implement the high-visibility, "bulletproof" Live stage view as designed.
+4. **User Manual:** Apply the new typography and surface hierarchy for long-form reading.
 
 ## 4. Extrapolation & Consistency Check
 - For features not explicitly mocked by Stitch (e.g., granular settings modals, edge-case error states, or the public sharing view), we will intelligently extrapolate the design language.
