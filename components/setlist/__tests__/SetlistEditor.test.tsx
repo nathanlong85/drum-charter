@@ -4,6 +4,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { SetlistEditor } from '../SetlistEditor';
 
+// Mock next/navigation
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+  useSearchParams: () => ({
+    get: vi.fn().mockReturnValue(null),
+  }),
+}));
+
 // Mock debounce to be synchronous but expose cancel/flush
 vi.mock('lodash', async (importOriginal) => {
   const actual = await importOriginal<typeof import('lodash')>();
@@ -50,13 +61,13 @@ describe('SetlistEditor', () => {
   it('renders initial setlist data', async () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
-    expect(screen.getByDisplayValue('My Setlist')).toBeDefined();
-    expect(screen.getByText('PRIVATE')).toBeDefined();
+    expect(screen.getByDisplayValue('My Setlist')).toBeInTheDocument();
+    expect(screen.getByText('PRIVATE')).toBeInTheDocument();
 
     // Wait for songs to load and display titles
     await waitFor(() => {
-      expect(screen.getByText('First Song')).toBeDefined();
-      expect(screen.getByText('Second Song')).toBeDefined();
+      expect(screen.getByText('First Song')).toBeInTheDocument();
+      expect(screen.getByText('Second Song')).toBeInTheDocument();
     });
   });
 
@@ -69,7 +80,7 @@ describe('SetlistEditor', () => {
       fireEvent.change(titleInput, { target: { value: 'New Setlist Title' } });
     });
 
-    expect(screen.getByDisplayValue('New Setlist Title')).toBeDefined();
+    expect(screen.getByDisplayValue('New Setlist Title')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
@@ -87,7 +98,7 @@ describe('SetlistEditor', () => {
       fireEvent.click(visibilityButton);
     });
 
-    expect(screen.getByText('PUBLIC')).toBeDefined();
+    expect(screen.getByText('PUBLIC')).toBeInTheDocument();
 
     await waitFor(() => {
       expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
@@ -101,7 +112,7 @@ describe('SetlistEditor', () => {
 
     // Wait for initial load
     await waitFor(() => {
-      expect(screen.getByText('First Song')).toBeDefined();
+      expect(screen.getByText('First Song')).toBeInTheDocument();
     });
 
     // Open song selector
@@ -131,7 +142,7 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
     await waitFor(() => {
-      expect(screen.getByText('First Song')).toBeDefined();
+      expect(screen.getByText('First Song')).toBeInTheDocument();
     });
 
     const removeButtons = screen.getAllByTitle('Remove from Setlist');
@@ -158,7 +169,7 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Second Song')).toBeDefined();
+      expect(screen.getByText('Second Song')).toBeInTheDocument();
     });
 
     const moveUpButtons = screen.getAllByTitle('Move Up');
@@ -192,7 +203,7 @@ describe('SetlistEditor', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Failed to save changes')).toBeDefined();
+      expect(screen.getByText('Failed to save changes')).toBeInTheDocument();
     });
   });
 
@@ -201,13 +212,13 @@ describe('SetlistEditor', () => {
 
     render(<SetlistEditor initialSetlist={mockSetlist} />);
     await waitFor(() => {
-      expect(screen.queryByText('Add Composition')).toBeDefined();
+      expect(screen.getByText('Add Composition')).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByText('Add Composition'));
 
     await waitFor(() => {
-      expect(screen.getByText('No compositions found in your library.')).toBeDefined();
+      expect(screen.getByText('No compositions found in your library.')).toBeInTheDocument();
     });
   });
 
@@ -216,7 +227,7 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={emptySetlist} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Initial set is empty/i)).toBeDefined();
+      expect(screen.getByText(/Initial set is empty/i)).toBeInTheDocument();
     });
   });
 

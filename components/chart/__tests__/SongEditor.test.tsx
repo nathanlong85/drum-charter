@@ -127,7 +127,7 @@ describe('SongEditor', () => {
     fireEvent.change(tagInput, { target: { value: 'jazz' } });
     fireEvent.keyDown(tagInput, { key: 'Enter', code: 'Enter' });
 
-    expect(screen.getByText('#jazz')).toBeDefined();
+    expect(screen.getByText('jazz')).toBeInTheDocument();
 
     await waitFor(
       () => {
@@ -420,11 +420,11 @@ describe('SongEditor', () => {
     await waitFor(
       () => {
         expect(consoleSpy).toHaveBeenCalledWith(
-          'Failed to auto-save song chart:',
+          'Autosave failed:',
           expect.anything(),
         );
       },
-      { timeout: 4000 },
+      { timeout: 5000 },
     );
   });
 

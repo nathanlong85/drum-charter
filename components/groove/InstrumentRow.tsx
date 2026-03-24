@@ -47,10 +47,10 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
 
   return (
     <div
-      className="flex border-b border-gray-300 dark:border-gray-700 group/row"
+      className="flex border-b border-outline-variant/10 group/row"
       data-testid={`instrument-row-${instrument.customName.toLowerCase().replace(/\s+/g, '-')}`}
     >
-      <div className="w-32 h-8 flex items-center px-2 bg-gray-50 dark:bg-gray-900 font-medium text-sm text-gray-700 dark:text-gray-300 border-r border-gray-400 dark:border-gray-600 select-none relative group">
+      <div className="w-32 h-8 flex items-center px-2 bg-surface-container-low font-headline font-bold text-[10px] uppercase tracking-widest text-on-surface-variant border-r border-outline-variant/20 select-none relative group">
         {isEditing && !readOnly ? (
           <div className="flex items-center gap-1 w-full">
             <div className="flex flex-col">
@@ -58,22 +58,22 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
                 <button
                   type="button"
                   onClick={onMoveUp}
-                  className="p-0.5 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-blue-500"
+                  className="p-0.5 hover:bg-surface-container-highest rounded transition-colors text-on-surface-variant/40 hover:text-primary"
                   title="Move Up"
                   aria-label="Move instrument up"
                 >
-                  <ChevronUp size={12} strokeWidth={3} />
+                  <ChevronUp size={10} strokeWidth={4} />
                 </button>
               )}
               {onMoveDown && (
                 <button
                   type="button"
                   onClick={onMoveDown}
-                  className="p-0.5 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-blue-500"
+                  className="p-0.5 hover:bg-surface-container-highest rounded transition-colors text-on-surface-variant/40 hover:text-primary"
                   title="Move Down"
                   aria-label="Move instrument down"
                 >
-                  <ChevronDown size={12} strokeWidth={3} />
+                  <ChevronDown size={10} strokeWidth={4} />
                 </button>
               )}
             </div>
@@ -84,11 +84,11 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
               <button
                 type="button"
                 onClick={onSettingsClick}
-                className="p-1 hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors text-gray-400 hover:text-blue-600"
+                className="p-1 hover:bg-surface-container-highest rounded transition-colors text-on-surface-variant/40 hover:text-primary"
                 title="Edit Settings"
                 aria-label="Edit instrument settings"
               >
-                <Settings2 size={14} />
+                <Settings2 size={12} />
               </button>
             )}
             {onClear && (
@@ -99,12 +99,12 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
                     onClear();
                   }
                 }}
-                className="p-1 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors text-gray-400 hover:text-red-600"
+                className="p-1 hover:bg-error/10 rounded transition-colors text-on-surface-variant/40 hover:text-error"
                 title="Clear Row"
                 aria-label={`Clear all notes for ${instrument.customName}`}
                 data-testid={`clear-row-${instrument.id}`}
               >
-                <Trash2 size={14} />
+                <Trash2 size={12} />
               </button>
             )}
           </div>
@@ -130,6 +130,22 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
             const minNote = Math.min(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
             const maxNote = Math.max(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
             isSelected = instIdx >= minInst && instIdx <= maxInst && i >= minNote && i <= maxNote;
+          }
+
+          if (isBeat && instIdx === 0) {
+            return (
+              <div
+                key={i}
+                data-testid={`beat-label-${i / notesPerBeat + 1}`}
+                className={`
+                  w-8 h-8 flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/20 select-none bg-surface-container-highest
+                  ${isMeasureBoundary ? 'border-r-2 border-r-outline' : ''}
+                  ${i === 0 ? 'text-primary' : 'text-on-surface-variant'}
+                `}
+              >
+                {i / notesPerBeat + 1}
+              </div>
+            );
           }
 
           return (

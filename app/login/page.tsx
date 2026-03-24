@@ -110,6 +110,9 @@ export default function LoginPage() {
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
                 <input
                   id="email"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
                   className="w-full bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl pl-12 pr-4 py-4 text-on-surface placeholder:text-on-surface-variant/30 outline-none transition-all"
                   name="email"
                   placeholder="name@studio.com"
@@ -183,6 +186,9 @@ export default function LoginPage() {
 
           {message && (
             <div
+              role="status"
+              aria-live={messageType === 'error' ? 'assertive' : 'polite'}
+              aria-atomic="true"
               className={`mt-6 p-4 border rounded-xl text-[10px] font-headline font-bold uppercase tracking-widest text-center animate-shake ${
                 messageType === 'error'
                   ? 'bg-error/10 border-error/20 text-error'

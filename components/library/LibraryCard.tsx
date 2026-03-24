@@ -49,7 +49,7 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
           </span>
         </div>
 
-        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all z-10 translate-x-4 group-hover:translate-x-0">
+        <div className="flex gap-2 z-10">
           <button
             onClick={(e) => {
               e.preventDefault();
@@ -58,6 +58,8 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
             }}
             className="p-1.5 text-on-surface-variant hover:text-primary transition-all rounded-md hover:bg-primary/10"
             title="Duplicate"
+            aria-label={`Duplicate ${item.type}: ${item.title}`}
+            type="button"
           >
             <Copy className="w-4 h-4" />
           </button>
@@ -69,6 +71,8 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
             }}
             className="p-1.5 text-on-surface-variant hover:text-error transition-all rounded-md hover:bg-error/10"
             title="Delete"
+            aria-label={`Delete ${item.type}: ${item.title}`}
+            type="button"
           >
             <Trash2 className="w-4 h-4" />
           </button>

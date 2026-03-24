@@ -9,7 +9,7 @@ test.describe('Playback & Metronome', () => {
 
     // Create new snippet for a clean grid
     await page.getByTestId('tab-snippet').click();
-    await page.click('text=New Snippet');
+    await page.click('text=New snippet');
     await expect(page).toHaveURL(/\/snippets\//);
   });
 
@@ -19,17 +19,17 @@ test.describe('Playback & Metronome', () => {
 
     // Initial state
     await expect(playButton).toHaveText(/Play/i);
-    await expect(playButton).toHaveClass(/bg-green-600/);
+    await expect(playButton).toHaveClass(/bg-primary/);
 
     // Start
     await playButton.click();
     await expect(playButton).toHaveText(/Stop/i);
-    await expect(playButton).toHaveClass(/bg-red-600/);
+    await expect(playButton).toHaveClass(/bg-error/);
 
     // Stop
     await playButton.click();
     await expect(playButton).toHaveText(/Play/i);
-    await expect(playButton).toHaveClass(/bg-green-600/);
+    await expect(playButton).toHaveClass(/bg-primary/);
   });
 
   test('should manage metronome settings', async ({ page }) => {
@@ -75,14 +75,14 @@ test.describe('Playback & Metronome', () => {
   test('should show beat labels and measure boundaries', async ({ page }) => {
     const grid = page.getByTestId('groove-grid');
 
-    // Default 4/4 should have labels 1, 2, 3, 4
-    await expect(grid.locator('text=1').first()).toBeVisible();
-    await expect(grid.locator('text=2').first()).toBeVisible();
-    await expect(grid.locator('text=3').first()).toBeVisible();
-    await expect(grid.locator('text=4').first()).toBeVisible();
+    // Verify beat labels are visible
+    await expect(grid.getByTestId('beat-label-1')).toBeVisible();
+    await expect(grid.getByTestId('beat-label-2')).toBeVisible();
+    await expect(grid.getByTestId('beat-label-3')).toBeVisible();
+    await expect(grid.getByTestId('beat-label-4')).toBeVisible();
 
-    // Beat 1 should have text-blue-600
-    await expect(grid.locator('div', { hasText: /^1$/ }).first()).toHaveClass(/text-blue-600/);
+    // Beat 1 should have text-primary (from redesigned InstrumentRow beat label)
+    await expect(grid.getByTestId('beat-label-1').first()).toHaveClass(/text-primary/);
 
     // Add a second measure
     const toolbar = page.getByTestId('groove-toolbar');

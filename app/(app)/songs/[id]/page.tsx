@@ -41,35 +41,32 @@ export default async function SongPage({ params }: SongPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <nav className="bg-white border-b border-zinc-200 py-4 px-8">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-6">
+    <div className="max-w-[1400px] mx-auto p-8 space-y-12">
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4">
+        <div>
+          <div className="flex items-center gap-3 text-primary font-headline text-xs font-bold uppercase tracking-[0.3em] mb-4">
             <Link
               href="/library"
-              className="text-sm font-bold text-zinc-500 hover:text-zinc-900 flex items-center gap-2 transition-colors"
+              className="hover:text-primary-dim flex items-center gap-2 transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth="3"
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
               BACK TO LIBRARY
             </Link>
-            <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest hidden sm:block">
+            <div className="text-on-surface-variant/40 hidden sm:block">
               DrumCharter / Song / {id.slice(0, 8)}
             </div>
           </div>
-          <AuthStatus />
         </div>
-      </nav>
+      </section>
 
-      <main className="py-8">
-        <SongEditor initialSong={rawChart} />
-      </main>
+      <SongEditor initialSong={rawChart} />
     </div>
   );
 }

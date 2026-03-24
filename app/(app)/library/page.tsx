@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import LibraryDashboard from '@/components/library/LibraryDashboard';
 import { createClient } from '@/lib/supabase/server';
 
@@ -51,12 +52,14 @@ export default async function LibraryPage() {
         </div>
       </section>
 
-      <LibraryDashboard
-        initialSongs={songsRes.data || []}
-        initialNotebooks={notebooksRes.data || []}
-        initialSnippets={snippetsRes.data || []}
-        initialSetlists={setlistsRes.data || []}
-      />
+      <Suspense fallback={<div className="animate-pulse bg-surface-container h-96 rounded-3xl" />}>
+        <LibraryDashboard
+          initialSongs={songsRes.data || []}
+          initialNotebooks={notebooksRes.data || []}
+          initialSnippets={snippetsRes.data || []}
+          initialSetlists={setlistsRes.data || []}
+        />
+      </Suspense>
     </div>
   );
 }

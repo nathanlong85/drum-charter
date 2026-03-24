@@ -51,6 +51,12 @@ function isSupabaseError(error: unknown): error is SupabaseErrorLike {
   );
 }
 
+const VALID_TABS: ItemType[] = ['song', 'notebook', 'snippet', 'setlist'];
+
+function isValidItemType(tab: string | null): tab is ItemType {
+  return tab !== null && VALID_TABS.includes(tab as ItemType);
+}
+
 export default function LibraryDashboard({
   initialSongs,
   initialNotebooks,
@@ -60,11 +66,13 @@ export default function LibraryDashboard({
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const queryTab = searchParams.get('tab') as ItemType | null;
-  const [activeTab, setActiveTab] = useState<ItemType>(queryTab || 'song');
+  const queryTab = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState<ItemType>(
+    isValidItemType(queryTab) ? queryTab : 'song',
+  );
 
   useEffect(() => {
-    if (queryTab && queryTab !== activeTab) {
+    if (isValidItemType(queryTab) && queryTab !== activeTab) {
       setActiveTab(queryTab);
     }
   }, [queryTab, activeTab]);
@@ -239,7 +247,11 @@ export default function LibraryDashboard({
           updatedAt: null,
         };
         const saved = await supabaseService.saveSongChart(newSong);
-        if (saved?.id) window.location.assign(`/songs/${saved.id}`);
+        if (saved?.id) {
+          window.location.assign(`/songs/${saved.id}`);
+        } else {
+          throw new Error('Failed to create song - no ID returned');
+        }
       } else if (activeTab === 'notebook') {
         const newNotebook: Notebook = {
           id: crypto.randomUUID(),
@@ -252,7 +264,11 @@ export default function LibraryDashboard({
           updatedAt: null,
         };
         const saved = await supabaseService.saveNotebook(newNotebook);
-        if (saved?.id) window.location.assign(`/notebooks/${saved.id}`);
+        if (saved?.id) {
+          window.location.assign(`/notebooks/${saved.id}`);
+        } else {
+          throw new Error('Failed to create notebook - no ID returned');
+        }
       } else if (activeTab === 'snippet') {
         const newSnippet: GrooveSnippet = {
           id: crypto.randomUUID(),
@@ -272,7 +288,11 @@ export default function LibraryDashboard({
           updatedAt: null,
         };
         const saved = await supabaseService.saveGrooveSnippet(newSnippet);
-        if (saved?.id) window.location.assign(`/snippets/${saved.id}`);
+        if (saved?.id) {
+          window.location.assign(`/snippets/${saved.id}`);
+        } else {
+          throw new Error('Failed to create snippet - no ID returned');
+        }
       } else if (activeTab === 'setlist') {
         const newSetlist: Setlist = {
           id: crypto.randomUUID(),
@@ -284,13 +304,21 @@ export default function LibraryDashboard({
           updatedAt: null,
         };
         const saved = await supabaseService.saveSetlist(newSetlist);
-        if (saved?.id) window.location.assign(`/setlists/${saved.id}`);
+        if (saved?.id) {
+          window.location.assign(`/setlists/${saved.id}`);
+        } else {
+          throw new Error('Failed to create setlist - no ID returned');
+        }
       }
     } catch (error) {
-      if (isSupabaseError(error)) {
-        console.error('Error creating new item:', error);
-        alert(`Failed to create item: ${error.message}`);
+      console.error('Error creating new item:', error);
+      let message = 'Unknown error occurred';
+      if (error instanceof Error) {
+        message = error.message;
+      } else if (isSupabaseError(error)) {
+        message = error.message;
       }
+      alert(`Failed to create item: ${message}`);
     }
   };
 
@@ -324,6 +352,7 @@ export default function LibraryDashboard({
               placeholder="FILTER LIST..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              data-testid="search-library-input"
               className="bg-surface-container border-none text-[10px] font-headline tracking-widest w-full md:w-64 pl-10 pr-4 py-3 rounded-full focus:ring-1 focus:ring-primary/50 text-on-surface placeholder:text-on-surface-variant/50 outline-none"
             />
           </div>
@@ -347,6 +376,7 @@ export default function LibraryDashboard({
                 key={tag}
                 onClick={() => toggleTag(tag)}
                 aria-label={`Filter by ${tag} tag`}
+                data-testid={`tag-filter-${tag}`}
                 className={`px-3 py-1 rounded-full text-[10px] font-headline font-bold uppercase tracking-widest transition-all ${
                   isActive
                     ? 'bg-primary/20 text-primary border border-primary/50'

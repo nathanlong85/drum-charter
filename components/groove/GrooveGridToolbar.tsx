@@ -15,22 +15,23 @@ import { useState } from 'react';
 import type { BeatResolution, GrooveGrid } from '@/lib/types/groove';
 
 const toolbarContainerClass =
-  'flex items-center bg-gray-50 dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-800 text-sm no-print';
+  'flex items-center bg-surface-container-low p-2 rounded-xl border border-outline-variant/10 text-sm no-print shadow-sm';
 const controlGroupClass =
-  'flex items-center gap-2 pr-4 border-r border-gray-300 dark:border-gray-700';
+  'flex items-center gap-2 pr-4 border-r border-outline-variant/10';
 const subGroupClass =
-  'flex items-center gap-1 border-r border-gray-300 dark:border-gray-700 pr-4 relative';
+  'flex items-center gap-1 border-r border-outline-variant/10 pr-4 relative';
 const lastGroupClass = 'flex items-center gap-2';
-const mutedLabelClass = 'text-gray-600 dark:text-gray-400 font-medium';
+const mutedLabelClass =
+  'text-on-surface-variant font-headline font-bold text-[10px] uppercase tracking-widest';
 const borderedInputClass =
-  'w-16 px-2 py-1 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded text-center font-bold';
-const iconButtonClass = 'p-1.5 rounded transition-colors';
+  'w-16 px-2 py-1 border border-outline-variant/20 bg-surface-container-highest text-on-surface rounded-lg text-center font-bold font-headline focus:ring-1 focus:ring-primary/50 outline-none transition-all';
+const iconButtonClass = 'p-1.5 rounded-lg transition-all';
 const panelClass =
-  'absolute top-full left-0 mt-2 z-50 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded shadow-lg p-3 min-w-[120px]';
+  'absolute top-full left-0 mt-2 z-50 bg-surface-container-low border border-outline-variant/20 rounded-2xl shadow-2xl p-4 min-w-[160px] animate-in fade-in slide-in-from-top-2';
 const controlBoxClass =
-  'flex items-center border border-gray-300 dark:border-gray-700 rounded overflow-hidden bg-white dark:bg-gray-800';
+  'flex items-center border border-outline-variant/20 rounded-lg overflow-hidden bg-surface-container-highest';
 const controlBtnClass =
-  'px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300';
+  'px-2 py-1 hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-colors';
 
 export interface GrooveGridToolbarProps {
   state: GrooveGrid;
@@ -78,20 +79,20 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
       <div className={controlGroupClass}>
         <button
           onClick={togglePlayback}
-          className={`flex items-center gap-2 px-4 py-1.5 rounded font-bold transition-colors ${
+          className={`flex items-center gap-2 px-4 py-1.5 rounded-lg font-black font-headline uppercase tracking-tighter transition-all ${
             isPlaying
-              ? 'bg-red-600 text-white hover:bg-red-700'
-              : 'bg-green-600 text-white hover:bg-green-700'
+              ? 'bg-error text-on-error hover:opacity-90'
+              : 'bg-primary text-on-primary hover:opacity-90 shadow-[0_0_15px_var(--color-primary-dim)]'
           }`}
         >
           {isPlaying ? (
             <>
-              <Square size={16} fill="currentColor" />
+              <Square size={14} fill="currentColor" />
               Stop
             </>
           ) : (
             <>
-              <Play size={16} fill="currentColor" />
+              <Play size={14} fill="currentColor" />
               Play
             </>
           )}
@@ -164,7 +165,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
                 step="0.05"
                 value={metronomeVolume}
                 onChange={(e) => onMetronomeVolumeChange(parseFloat(e.target.value))}
-                className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:accent-blue-400"
+                className="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary"
                 data-testid="metronome-volume-slider"
               />
               <div className="flex justify-between mt-1">
@@ -232,12 +233,13 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
             <button
               key={res}
               disabled={readOnly}
+              data-testid={`resolution-button-${res}`}
               onClick={() => updateResolution(res as BeatResolution)}
-              className={`px-3 py-1 border-r last:border-r-0 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 ${
+              className={`px-3 py-1 border-r last:border-r-0 border-outline-variant/10 text-on-surface-variant font-headline font-bold ${
                 state.resolution === res
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:hover:bg-blue-700'
+                  ? 'bg-primary text-on-primary'
                   : !readOnly
-                    ? 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'hover:bg-primary/10 hover:text-primary'
                     : ''
               } ${readOnly && state.resolution !== res ? 'opacity-50 grayscale' : ''}`}
             >
@@ -302,8 +304,8 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           onClick={() => onToggleOptionalHits?.(state.playbackOptionalHits === false)}
           className={`${iconButtonClass} ${
             state.playbackOptionalHits !== false
-              ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+              ? 'bg-primary/10 text-primary hover:bg-primary/20'
+              : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface'
           }`}
           title={state.playbackOptionalHits !== false ? 'Hide Optional Hits' : 'Play Optional Hits'}
         >
@@ -315,8 +317,8 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
             onClick={() => onToggleEditInstruments?.()}
             className={`${iconButtonClass} ${
               isEditingInstruments
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+                ? 'bg-primary text-on-primary shadow-[0_0_10px_var(--color-primary-dim)]'
+                : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface'
             }`}
             title={isEditingInstruments ? 'Finish Editing' : 'Edit Instruments'}
           >

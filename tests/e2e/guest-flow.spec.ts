@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForSave } from './test-utils';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -24,14 +25,14 @@ test.describe('Guest Access & Library Flow', () => {
     await expect(page).toHaveURL(/\/library/);
 
     // Should show Guest Mode indicator
-    await expect(page.locator('text=Guest Mode')).toBeVisible({
+    await expect(page.getByTestId('guest-mode-indicator')).toBeVisible({
       timeout: 15000,
     });
 
     // Library should show item categories
-    await expect(page.getByText('Songs')).toBeVisible();
-    await expect(page.getByText('Notebooks')).toBeVisible();
-    await expect(page.getByText('Snippets')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Songs' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Notebooks' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Snippets' })).toBeVisible();
   });
 
   test('should allow creating a new notebook and navigating to editor', async ({ page }) => {
@@ -45,7 +46,7 @@ test.describe('Guest Access & Library Flow', () => {
 
     // Explicitly wait for the redirect and the page to be ready
     await page.waitForURL(/\/library/, { timeout: 30000 });
-    await expect(page.getByText('My Library')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'My Library' })).toBeVisible();
 
     // Switch to Notebooks tab
     await page
@@ -53,12 +54,12 @@ test.describe('Guest Access & Library Flow', () => {
       .first()
       .click();
 
-    // Click "New Notebook" and wait for creation response
+    // Click "New notebook" and wait for creation response
     const createPromise = page.waitForResponse(
       (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
-    const newNotebookBtn = page.getByRole('button', { name: /New Notebook/i });
+    const newNotebookBtn = page.getByRole('button', { name: /New notebook/i });
     await expect(newNotebookBtn).toBeVisible();
     await newNotebookBtn.click();
     await createPromise;
@@ -72,8 +73,8 @@ test.describe('Guest Access & Library Flow', () => {
     await expect(titleInput).toBeVisible();
     await titleInput.fill('My Practice Routine');
 
-    // Should show "SAVED"
-    await expect(page.locator('text=SAVED')).toBeVisible({ timeout: 20000 });
+    // Should show "Saved"
+    await expect(page.locator('text=Saved')).toBeVisible({ timeout: 20000 });
   });
 
   test('should persist data after reload', async ({ page }) => {
@@ -86,12 +87,12 @@ test.describe('Guest Access & Library Flow', () => {
     await authPromise;
 
     await page.waitForURL(/\/library/, { timeout: 30000 });
-    await expect(page.getByText('My Library')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'My Library' })).toBeVisible();
 
     // Switch to Snippets tab and wait for it to be active
     const snippetTab = page.getByRole('button', { name: /Snippets/i }).first();
     await snippetTab.click();
-    await expect(snippetTab).toHaveClass(/bg-white text-blue-600/);
+    await expect(snippetTab).toHaveClass(/bg-surface-container-highest/);
 
     // Create new snippet
     const createPromise = page.waitForResponse(
@@ -99,7 +100,7 @@ test.describe('Guest Access & Library Flow', () => {
         resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
-    await page.getByRole('button', { name: /New Snippet/i }).click();
+    await page.getByRole('button', { name: /New snippet/i }).click();
     await createPromise;
 
     // Wait for redirect
@@ -110,9 +111,8 @@ test.describe('Guest Access & Library Flow', () => {
     const uniqueTitle = `Unique Snippet ${Date.now()}`;
     await titleInput.fill(uniqueTitle);
 
-    // Wait for save - need to wait for SAVING then SAVED to ensure debounce + save completed
-    await expect(page.getByText(/SAVING/)).toBeVisible();
-    await expect(page.getByText(/SAVED/)).toBeVisible({ timeout: 20000 });
+    // Wait for save
+    await waitForSave(page);
 
     // Additional wait to ensure DB is truly updated
     await page.waitForTimeout(2000);
@@ -121,9 +121,8 @@ test.describe('Guest Access & Library Flow', () => {
     await page.reload({ waitUntil: 'networkidle' });
 
     // Check if title persisted
-    await expect(page.locator(`input[value="${uniqueTitle}"]`)).toBeVisible({
-      timeout: 20000,
-    });
+    const reloadedTitleInput = page.getByPlaceholder(/Snippet Title/i);
+    await expect(reloadedTitleInput).toHaveValue(uniqueTitle, { timeout: 20000 });
   });
 
   test('Guest Access - Library -> Create -> Edit', async ({ page }) => {
@@ -135,15 +134,14 @@ test.describe('Guest Access & Library Flow', () => {
     // Switch to Notebooks tab and wait for it to be active
     const notebookTab = page.getByRole('button', { name: /Notebooks/i }).first();
     await notebookTab.click();
-    await expect(notebookTab).toHaveClass(/bg-white text-blue-600/);
+    await expect(notebookTab).toHaveClass(/bg-surface-container-highest/);
 
     // Create new notebook
     const createPromise = page.waitForResponse(
       (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
-    await page.click('button:has-text("NEW")');
-    await page.click('button:has-text("Notebook")');
+    await page.click('button:has-text("New notebook")');
     await createPromise;
 
     // Wait for redirect
@@ -151,7 +149,7 @@ test.describe('Guest Access & Library Flow', () => {
     await expect(page).toHaveURL(/\/notebooks\/.+/);
 
     // Check for "Guest Mode" indicator
-    await expect(page.getByText(/Guest Mode/i)).toBeVisible();
+    await expect(page.getByTestId('guest-mode-indicator').first()).toBeVisible();
 
     // Edit title
     const titleInput = page.getByPlaceholder(/Notebook Title/i);
@@ -160,7 +158,6 @@ test.describe('Guest Access & Library Flow', () => {
     await titleInput.fill(uniqueTitle);
 
     // Wait for auto-save
-    await expect(page.getByText(/SAVING/)).toBeVisible();
-    await expect(page.getByText(/SAVED/)).toBeVisible({ timeout: 20000 });
+    await waitForSave(page);
   });
 });

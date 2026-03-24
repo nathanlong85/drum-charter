@@ -6,7 +6,7 @@ test.describe('Instrument Customization', () => {
     await page.goto('/library');
     // Switch to Snippets tab
     await page.getByTestId('tab-snippet').click();
-    await page.click('button:has-text("New Snippet")');
+    await page.click('button:has-text("New snippet")');
     await expect(page).toHaveURL(/\/snippets\/.+/);
   });
 

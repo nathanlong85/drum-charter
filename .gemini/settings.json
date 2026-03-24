@@ -1,4 +1,7 @@
 {
+  "experimental": {
+    "enableAgents": true
+  },
   "mcpServers": {
     "next-devtools-mcp": {
       "command": "npx",

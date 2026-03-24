@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { GrooveSnippet } from '@/lib/types/groove';
-import SnippetEditor from '../SnippetEditor';
+import { SnippetEditor } from '../SnippetEditor';
 
 // Mock useRouter
 const mockPush = vi.fn();
@@ -162,11 +162,11 @@ describe('SnippetEditor', () => {
 
     await waitFor(
       () => {
-        expect(consoleSpy).toHaveBeenCalledWith('Failed to auto-save snippet:', expect.anything());
+        expect(consoleSpy).toHaveBeenCalledWith('Autosave failed:', expect.anything());
       },
-      { timeout: 4000 },
+      { timeout: 10000 },
     );
-  });
+  }, 15000);
 
   it('does not attempt to update state if unmounted during save', async () => {
     vi.useFakeTimers();

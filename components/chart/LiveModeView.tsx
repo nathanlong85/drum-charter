@@ -113,7 +113,10 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
     >
       {/* Header - Hidden in Fullscreen */}
       {!isFullscreen && (
-        <header className="p-6 bg-surface-container-low border-b border-outline-variant/10 flex justify-between items-center transition-all duration-300">
+        <header
+          className="p-6 bg-surface-container-low border-b border-outline-variant/10 flex justify-between items-center transition-all duration-300"
+          data-testid="live-mode-header"
+        >
           <div>
             <h1 className="text-3xl font-headline font-black uppercase tracking-tighter text-primary">
               {chart.header.title}

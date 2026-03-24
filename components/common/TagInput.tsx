@@ -109,7 +109,6 @@ export function TagInput({
           }}
           placeholder={placeholder}
           className="flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 min-w-[120px] placeholder-zinc-400 font-medium"
-          aria-label={placeholder}
         />
       </div>
 

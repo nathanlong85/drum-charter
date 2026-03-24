@@ -1,10 +1,10 @@
 'use client';
 
-import { debounce } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { useAutosave } from '@/lib/hooks/useAutosave';
 import { supabaseService } from '@/lib/services/supabase-service';
 import {
   createDefaultDrumInstruments,
@@ -77,74 +77,31 @@ interface NotebookEditorProps {
   initialNotebook: Notebook;
 }
 
-export default function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
+export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
   const [state, dispatch] = useReducer(notebookReducer, initialNotebook);
-  const [isSaving, setIsSaving] = useState(false);
-  const isMountedRef = useRef(true);
-  const pendingSaveRef = useRef<Promise<any> | null>(null);
   const router = useRouter();
-
-  const debouncedSave = useCallback(
-    debounce(async (notebook: Notebook) => {
-      if (!isMountedRef.current) return;
-      setIsSaving(true);
-      const savePromise = supabaseService.saveNotebook(notebook);
-      pendingSaveRef.current = savePromise;
-      try {
-        await savePromise;
-      } catch (error) {
-        console.error('Failed to auto-save notebook:', error);
-      } finally {
-        if (isMountedRef.current) {
-          setIsSaving(false);
-        }
-        if (pendingSaveRef.current === savePromise) {
-          pendingSaveRef.current = null;
-        }
-      }
-    }, 2000),
-    [],
-  );
-
-  const settleAutosave = useCallback(async () => {
-    debouncedSave.flush();
-    if (pendingSaveRef.current) {
-      await pendingSaveRef.current;
-    }
-  }, [debouncedSave]);
-
-  // CodeRabbit: Use ref to skip initial render save
   const isInitialRender = useRef(true);
+
+  const { isSaving, triggerSave, settleAutosave } = useAutosave<Notebook>(
+    async (notebook) => {
+      await supabaseService.saveNotebook(notebook);
+    },
+    2000
+  );
 
   useEffect(() => {
     if (isInitialRender.current) {
       isInitialRender.current = false;
       return;
     }
-
-    setIsSaving(true);
-    debouncedSave(state);
-  }, [state, debouncedSave]);
-
-  // Separate cleanup effect that only runs on unmount
-  useEffect(() => {
-    return () => {
-      debouncedSave.flush();
-    };
-  }, [debouncedSave]);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+    triggerSave(state);
+  }, [state, triggerSave]);
 
   return (
     <div data-testid="notebook-editor-root" className="min-h-screen bg-surface">
-      <div data-testid="notebook-editor-container" className="flex flex-col h-full">
+      <div data-testid="notebook-editor-container" className="flex flex-col h-full relative">
         {/* Top Actions */}
-        <div className="absolute top-4 right-8 no-print flex gap-2 z-50">
+        <div className="sticky top-0 right-0 p-4 no-print flex justify-end gap-2 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10">
           {state.isPublic && (
             <>
               <button

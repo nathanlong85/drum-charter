@@ -22,20 +22,20 @@ test.describe('Public Sharing Workflows', () => {
       .first()
       .click();
     const createPromise = page.waitForResponse((resp) => resp.url().includes('/rest/v1/notebooks'));
-    await page.getByRole('button', { name: /New Notebook/i }).click();
+    await page.getByRole('button', { name: /New notebook/i }).click();
     const response = await createPromise;
     expect(response.ok()).toBe(true);
     await page.waitForURL(/\/notebooks\/.+/);
     const notebookId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
-    await page.getByLabel(/Public/i).check();
-    await expect(page.locator('text=SAVED')).toBeVisible();
+    await page.getByTestId('toggle-public-button').click();
+    await expect(page.locator('text=Saved')).toBeVisible();
     // Increase buffer for local Supabase propagation to public views
     await page.waitForTimeout(3000);
 
     // 4. View public page
     await page.goto(`http://localhost:3001/public/notebooks/${notebookId}`);
     // Wait for the specific heading that confirms the public view is loaded
-    await expect(page.getByText(/DrumCharter Public View/i).first()).toBeVisible({
+    await expect(page.getByText(/Public Notebook View/i).first()).toBeVisible({
       timeout: 20000,
     });
     await expect(page.getByText(/Untitled Notebook/i)).toBeVisible();
@@ -60,20 +60,20 @@ test.describe('Public Sharing Workflows', () => {
     const createPromise = page.waitForResponse((resp) =>
       resp.url().includes('/rest/v1/groove_snippets'),
     );
-    await page.getByRole('button', { name: /New Snippet/i }).click();
+    await page.getByRole('button', { name: /New snippet/i }).click();
     const response = await createPromise;
     expect(response.ok()).toBe(true);
     await page.waitForURL(/\/snippets\/.+/);
     const snippetId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
-    await page.getByLabel(/Public/i).check();
-    await expect(page.locator('text=SAVED')).toBeVisible();
+    await page.getByTestId('toggle-public-button').click();
+    await expect(page.locator('text=Saved')).toBeVisible();
     // Increase buffer for local Supabase propagation to public views
     await page.waitForTimeout(3000);
 
     // 4. View public page
     await page.goto(`http://localhost:3001/public/snippets/${snippetId}`);
     // Wait for the specific heading that confirms the public view is loaded
-    await expect(page.getByText(/DrumCharter Public View/i).first()).toBeVisible({
+    await expect(page.getByText(/Atomic Snippet View/i).first()).toBeVisible({
       timeout: 20000,
     });
     await expect(page.getByText(/Untitled Snippet/i)).toBeVisible();

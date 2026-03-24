@@ -1,10 +1,10 @@
 'use client';
 
-import { debounce } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { useAutosave } from '@/lib/hooks/useAutosave';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { GrooveGrid, GrooveSnippet } from '@/lib/types/groove';
 
@@ -75,73 +75,31 @@ interface SnippetEditorProps {
   initialSnippet: GrooveSnippet;
 }
 
-export default function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
+export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
   const [state, dispatch] = useReducer(snippetReducer, initialSnippet);
-  const [isSaving, setIsSaving] = useState(false);
-  const isMountedRef = useRef(true);
-  const pendingSaveRef = useRef<Promise<any> | null>(null);
   const router = useRouter();
-
-  const debouncedSave = useCallback(
-    debounce(async (snippet: GrooveSnippet) => {
-      if (!isMountedRef.current) return;
-      setIsSaving(true);
-      const savePromise = supabaseService.saveGrooveSnippet(snippet);
-      pendingSaveRef.current = savePromise;
-      try {
-        await savePromise;
-      } catch (error) {
-        console.error('Failed to auto-save snippet:', error);
-      } finally {
-        if (isMountedRef.current) {
-          setIsSaving(false);
-        }
-        if (pendingSaveRef.current === savePromise) {
-          pendingSaveRef.current = null;
-        }
-      }
-    }, 2000),
-    [],
-  );
-
-  const settleAutosave = useCallback(async () => {
-    debouncedSave.flush();
-    if (pendingSaveRef.current) {
-      await pendingSaveRef.current;
-    }
-  }, [debouncedSave]);
-
   const isInitialRender = useRef(true);
+
+  const { isSaving, triggerSave, settleAutosave } = useAutosave<GrooveSnippet>(
+    async (snippet) => {
+      await supabaseService.saveGrooveSnippet(snippet);
+    },
+    2000
+  );
 
   useEffect(() => {
     if (isInitialRender.current) {
       isInitialRender.current = false;
       return;
     }
-
-    setIsSaving(true);
-    debouncedSave(state);
-  }, [state, debouncedSave]);
-
-  // Separate cleanup effect that only runs on unmount
-  useEffect(() => {
-    return () => {
-      debouncedSave.flush();
-    };
-  }, [debouncedSave]);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+    triggerSave(state);
+  }, [state, triggerSave]);
 
   return (
     <div data-testid="snippet-editor-root" className="min-h-screen bg-surface">
-      <div data-testid="snippet-editor-container" className="flex flex-col h-full">
+      <div data-testid="snippet-editor-container" className="flex flex-col h-full relative">
         {/* Top Actions */}
-        <div className="absolute top-4 right-8 no-print flex gap-2 z-50">
+        <div className="sticky top-0 right-0 p-4 no-print flex justify-end gap-2 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10">
           {state.isPublic && (
             <>
               <button

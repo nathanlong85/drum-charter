@@ -6,8 +6,8 @@ test.describe('Dark Mode Support', () => {
 
     // Check background and foreground colors from globals.css
     const body = page.locator('body');
-    await expect(body).toHaveCSS('background-color', 'rgb(255, 255, 255)');
-    await expect(body).toHaveCSS('color', 'rgb(23, 23, 23)');
+    await expect(body).toHaveCSS('background-color', 'rgb(245, 247, 248)');
+    await expect(body).toHaveCSS('color', 'rgb(44, 47, 48)');
   });
 
   test('should respect system dark mode preference', async ({ page }) => {
@@ -16,10 +16,9 @@ test.describe('Dark Mode Support', () => {
     await page.goto('/');
 
     const body = page.locator('body');
-    // #0a0a0a = rgb(10, 10, 10)
-    await expect(body).toHaveCSS('background-color', 'rgb(10, 10, 10)');
-    // #ededed = rgb(237, 237, 237)
-    await expect(body).toHaveCSS('color', 'rgb(237, 237, 237)');
+    // Dark mode: --background: #0e0e0e = rgb(14, 14, 14), --on-background: #ffffff = rgb(255, 255, 255)
+    await expect(body).toHaveCSS('background-color', 'rgb(14, 14, 14)');
+    await expect(body).toHaveCSS('color', 'rgb(255, 255, 255)');
   });
 
   test('should toggle body background in dark mode', async ({ page }) => {
@@ -31,8 +30,8 @@ test.describe('Dark Mode Support', () => {
     // Initial check (Light Mode)
     const body = page.locator('body');
     let bgColor = await body.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-    // Light mode background is white (rgb(255, 255, 255))
-    expect(bgColor).toBe('rgb(255, 255, 255)');
+    // Light mode background is (rgb(245, 247, 248))
+    expect(bgColor).toBe('rgb(245, 247, 248)');
 
     // Switch to Dark Mode
     await page.emulateMedia({ colorScheme: 'dark' });
@@ -40,8 +39,8 @@ test.describe('Dark Mode Support', () => {
     // Check for a dark background
     await expect(async () => {
       bgColor = await body.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-      // Dark mode background (bg-zinc-950/bg-black)
-      expect(['rgb(9, 9, 11)', 'rgb(0, 0, 0)', 'rgb(10, 10, 10)']).toContain(bgColor);
+      // Dark mode background
+      expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
     }).toPass();
   });
 
@@ -56,7 +55,7 @@ test.describe('Dark Mode Support', () => {
     await snippetsTab.click();
 
     // The selector needs to be more specific to the toolbar in the editor
-    await page.getByRole('button', { name: /New Snippet/i }).click();
+    await page.getByRole('button', { name: /New snippet/i }).click();
     await page.waitForURL(/\/snippets\/.+/);
 
     // Check GrooveGridEditor toolbar background

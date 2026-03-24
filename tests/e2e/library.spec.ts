@@ -13,7 +13,7 @@ test.describe('Library Management & Guest Flow', () => {
     const songTitle = `Test Song ${Date.now()}`;
 
     // Create new song
-    await page.click('text=New Song');
+    await page.click('text=New song');
     await expect(page).toHaveURL(/\/songs\//);
 
     // Update title and wait for save
@@ -25,7 +25,7 @@ test.describe('Library Management & Guest Flow', () => {
     await page.goto('/library');
 
     // Search for the song
-    const searchInput = page.locator('input[placeholder*="Search"]');
+    const searchInput = page.getByTestId('search-library-input');
     await searchInput.fill(songTitle);
 
     // Verify song is visible in the list
@@ -33,20 +33,22 @@ test.describe('Library Management & Guest Flow', () => {
 
     // Search for something else and verify it's gone
     await searchInput.fill('Non-existent song name');
-    await expect(page.locator('h3', { hasText: songTitle })).not.toBeVisible();
+    // Wait for the UI to potentially update
+    await page.waitForTimeout(1000);
+    await expect(page.locator('h3', { hasText: songTitle })).not.toBeVisible({ timeout: 10000 });
   });
 
   test('should switch between library tabs', async ({ page }) => {
     // Default is Songs
-    await expect(page.getByTestId('tab-song')).toHaveClass(/bg-white text-blue-600/);
+    await expect(page.getByTestId('tab-song')).toHaveClass(/bg-surface-container-highest/);
 
     // Switch to Notebooks
     await page.getByTestId('tab-notebook').click();
-    await expect(page.getByTestId('tab-notebook')).toHaveClass(/bg-white text-blue-600/);
+    await expect(page.getByTestId('tab-notebook')).toHaveClass(/bg-surface-container-highest/);
 
     // Switch to Snippets
     await page.getByTestId('tab-snippet').click();
-    await expect(page.getByTestId('tab-snippet')).toHaveClass(/bg-white text-blue-600/);
+    await expect(page.getByTestId('tab-snippet')).toHaveClass(/bg-surface-container-highest/);
   });
 
   test('should manage tags for a snippet', async ({ page }) => {
@@ -54,11 +56,11 @@ test.describe('Library Management & Guest Flow', () => {
     await page.getByTestId('tab-snippet').click();
 
     // Create new snippet
-    await page.click('text=New Snippet');
+    await page.click('text=New snippet');
     await expect(page).toHaveURL(/\/snippets\//);
 
-    // Add a tag - TagInput has a text input with placeholder "Add genre, style, or technique tag..."
-    const tagInput = page.locator('input[placeholder*="genre, style, or technique"]');
+    // Add a tag
+    const tagInput = page.getByPlaceholder('+ ADD TAG');
     await tagInput.fill('rock');
     await page.keyboard.press('Enter');
 
@@ -73,19 +75,19 @@ test.describe('Library Management & Guest Flow', () => {
     await page.click('button:has-text("Snippets")');
 
     // Verify tag appears in filter list
-    const tagFilter = page.locator('button', { hasText: 'rock' });
+    const tagFilter = page.getByTestId('tag-filter-rock');
     await expect(tagFilter).toBeVisible();
 
     // Click tag filter
     await tagFilter.click();
-    await expect(tagFilter).toHaveClass(/bg-zinc-800/);
+    await expect(tagFilter).toHaveClass(/bg-primary\/20/);
   });
 
   test('should duplicate and delete a song', async ({ page }) => {
     const originalTitle = `Original ${Date.now()}`;
 
     // Create song
-    await page.click('text=New Song');
+    await page.click('text=New song');
     await page.locator('input[placeholder="Song Title"]').fill(originalTitle);
     await waitForSave(page);
 

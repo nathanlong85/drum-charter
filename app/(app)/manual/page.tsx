@@ -201,6 +201,44 @@ export default function ManualPage() {
             </div>
           </section>
 
+          <section id="library" className="scroll-mt-24 space-y-8">
+            <h3 className="text-2xl font-headline font-black text-on-surface uppercase tracking-[0.2em] border-l-4 border-primary pl-6">
+              Managing Your Library
+            </h3>
+            <div className="bg-surface-container p-8 rounded-[32px] border border-outline-variant/10 space-y-6 font-body text-on-surface-variant leading-relaxed">
+              <p>
+                All your creations are stored in <strong>My Library</strong>. You can search by
+                title or filter by tags (e.g., &quot;Rock&quot;, &quot;Practice&quot;).
+              </p>
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                  <h4 className="text-primary font-headline font-black uppercase text-[10px] tracking-widest mb-2">Duplicate</h4>
+                  <p className="text-xs">Create a copy of any item to use as a template for new variations.</p>
+                </div>
+                <div className="p-4 bg-surface-container-low rounded-xl border border-outline-variant/10">
+                  <h4 className="text-error font-headline font-black uppercase text-[10px] tracking-widest mb-2">Delete</h4>
+                  <p className="text-xs">Remove items permanently from your cloud repository.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="trouble" className="scroll-mt-24 space-y-8">
+            <h3 className="text-2xl font-headline font-black text-on-surface uppercase tracking-[0.2em] border-l-4 border-primary pl-6">
+              Troubleshooting
+            </h3>
+            <div className="bg-surface-container p-8 rounded-[32px] border border-outline-variant/10 space-y-6 font-body text-on-surface-variant leading-relaxed">
+              <div className="space-y-4">
+                <h4 className="text-on-surface font-headline font-bold uppercase text-sm">No Sound?</h4>
+                <p className="text-sm">Browsers often block audio until you interact with the page. If you don&apos;t hear anything, try clicking anywhere or toggling the playback button.</p>
+              </div>
+              <div className="space-y-4">
+                <h4 className="text-on-surface font-headline font-bold uppercase text-sm">MIDI Not Working?</h4>
+                <p className="text-sm">Ensure your device is connected before opening the browser. You may need to refresh or check site permissions for &quot;MIDI devices&quot;.</p>
+              </div>
+            </div>
+          </section>
+
           <section id="privacy" className="scroll-mt-24 space-y-8">
             <h3 className="text-2xl font-headline font-black text-on-surface uppercase tracking-[0.2em] border-l-4 border-primary pl-6">
               Privacy Policy

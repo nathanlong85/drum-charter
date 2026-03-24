@@ -2,6 +2,7 @@
 
 import { debounce } from 'lodash';
 import { Plus, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { Setlist, SetlistItem } from '@/lib/types/groove';
@@ -11,10 +12,12 @@ interface SetlistEditorProps {
 }
 
 export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
+  const router = useRouter();
   const [setlist, setSetlist] = useState<Setlist>(initialSetlist);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const isMounted = useRef(true);
+  const skipFlushOnUnmountRef = useRef(false);
 
   // Available songs to add to the setlist
   const [availableSongs, setAvailableSongs] = useState<{ id: string; title: string }[]>([]);
@@ -35,6 +38,9 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
     loadSongs();
     return () => {
       isMounted.current = false;
+      if (!skipFlushOnUnmountRef.current) {
+        saveToSupabase.flush();
+      }
     };
   }, []);
 
@@ -165,9 +171,12 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
             onClick={async () => {
               if (confirm('Are you sure you want to delete this setlist?')) {
                 try {
+                  skipFlushOnUnmountRef.current = true;
+                  saveToSupabase.cancel();
                   await supabaseService.deleteSetlist(setlist.id);
                   router.push('/library');
                 } catch (error) {
+                  skipFlushOnUnmountRef.current = false;
                   console.error('Failed to delete setlist:', error);
                   alert('Failed to delete setlist.');
                 }
@@ -280,52 +289,38 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                         {getSongTitle(song.songId)}
                       </div>
 
-                      <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all">
+                      <div className="flex items-center gap-3 z-10">
                         <button
                           onClick={() => moveSong(idx, 'up')}
                           disabled={idx === 0}
-                          className="p-2 text-on-surface-variant hover:text-primary disabled:opacity-10 rounded-xl bg-surface-container-highest transition-all"
+                          className="p-2 text-on-surface-variant hover:text-primary disabled:opacity-10 rounded-xl bg-surface-container-highest transition-all focus:ring-2 focus:ring-primary outline-none"
                           title="Move Up"
+                          aria-label={`Move ${getSongTitle(song.songId)} up`}
+                          type="button"
                         >
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2.5"
-                              d="M5 15l7-7 7 7"
-                            />
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7" />
                           </svg>
                         </button>
                         <button
                           onClick={() => moveSong(idx, 'down')}
                           disabled={idx === setlist.songs.length - 1}
-                          className="p-2 text-on-surface-variant hover:text-primary disabled:opacity-10 rounded-xl bg-surface-container-highest transition-all"
+                          className="p-2 text-on-surface-variant hover:text-primary disabled:opacity-10 rounded-xl bg-surface-container-highest transition-all focus:ring-2 focus:ring-primary outline-none"
                           title="Move Down"
+                          aria-label={`Move ${getSongTitle(song.songId)} down`}
+                          type="button"
                         >
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2.5"
-                              d="M19 9l-7 7-7-7"
-                            />
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                           </svg>
                         </button>
                         <div className="w-[1px] h-6 bg-outline-variant/20 mx-1"></div>
                         <button
                           onClick={() => removeSong(idx)}
-                          className="p-2 text-on-surface-variant hover:text-error rounded-xl bg-surface-container-highest transition-all"
+                          className="p-2 text-on-surface-variant hover:text-error rounded-xl bg-surface-container-highest transition-all focus:ring-2 focus:ring-error outline-none"
                           title="Remove from Setlist"
+                          aria-label={`Remove ${getSongTitle(song.songId)} from setlist`}
+                          type="button"
                         >
                           <Trash2 size={18} />
                         </button>

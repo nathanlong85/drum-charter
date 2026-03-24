@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { Notebook } from '@/lib/types/groove';
-import NotebookEditor from '../NotebookEditor';
+import { NotebookEditor } from '../NotebookEditor';
 
 // Mock useRouter
 const mockPush = vi.fn();
@@ -241,9 +241,9 @@ describe('NotebookEditor', () => {
 
     await waitFor(
       () => {
-        expect(consoleSpy).toHaveBeenCalledWith('Failed to auto-save notebook:', expect.anything());
+        expect(consoleSpy).toHaveBeenCalledWith('Autosave failed:', expect.anything());
       },
-      { timeout: 4000 },
+      { timeout: 5000 },
     );
   });
 

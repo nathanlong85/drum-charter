@@ -1,9 +1,23 @@
 'use client';
 
-import { ArrowRight, Cloud, Layers, Music, Play, ShieldCheck, Zap } from 'lucide-react';
+import {
+  ArrowRight,
+  Cloud,
+  Layers,
+  Music,
+  Play,
+  RefreshCw,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react';
 import Link from 'next/link';
 import { AuthStatus } from '@/components/auth/AuthStatus';
 import { GrooveDemo } from '@/components/demo/GrooveDemo';
+
+const ACCENT_CLASS_MAP: Record<string, string> = {
+  primary: 'text-primary',
+  tertiary: 'text-tertiary',
+};
 
 export default function Home() {
   return (
@@ -74,7 +88,7 @@ export default function Home() {
               className="group relative px-10 py-5 bg-primary text-on-primary font-headline font-black text-xs uppercase tracking-widest rounded-2xl transition-all shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1"
             >
               <span className="flex items-center gap-3">
-                Initialize Console
+                Start Creating (Guest Mode)
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
             </Link>
@@ -106,7 +120,7 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="flex items-center gap-3 px-3 py-1 bg-surface-container-highest rounded-lg text-[9px] font-headline font-bold text-on-surface-variant">
-                  <RefreshCwIcon />
+                  <RefreshCw className="w-3 h-3 animate-spin-slow" />
                   REAL-TIME SYNC
                 </div>
               </div>
@@ -174,10 +188,8 @@ export default function Home() {
                 key={i}
                 className="group p-8 bg-surface rounded-[32px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-primary/5"
               >
-                <div
-                  className={`w-14 h-14 bg-surface-container-highest flex items-center justify-center rounded-2xl mb-8 group-hover:scale-110 transition-transform`}
-                >
-                  <feature.icon className={`w-7 h-7 text-primary`} />
+                <div className="w-14 h-14 bg-surface-container-highest flex items-center justify-center rounded-2xl mb-8 group-hover:scale-110 transition-transform">
+                  <feature.icon className={`w-7 h-7 ${ACCENT_CLASS_MAP[feature.accent]}`} />
                 </div>
                 <h3 className="text-xl font-headline font-black text-on-surface uppercase tracking-tight mb-4">
                   {feature.title}
@@ -230,20 +242,3 @@ export default function Home() {
   );
 }
 
-function RefreshCwIcon() {
-  return (
-    <svg
-      className="w-3 h-3 animate-spin-slow"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={3}
-        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-      />
-    </svg>
-  );
-}

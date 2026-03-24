@@ -255,7 +255,7 @@ describe('GrooveGridEditor', () => {
 
     await waitFor(() => {
       const button = screen.getByRole('button', { name: '8' });
-      expect(button).toHaveClass('bg-blue-600');
+      expect(button).toHaveClass('bg-primary');
     });
   });
 

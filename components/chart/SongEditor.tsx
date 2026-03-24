@@ -1,9 +1,10 @@
 'use client';
 
-import { debounce } from 'lodash';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { TagInput } from '@/components/common/TagInput';
+import { useAutosave } from '@/lib/hooks/useAutosave';
 import { supabaseService } from '@/lib/services/supabase-service';
 import {
   createDefaultDrumInstruments,
@@ -163,75 +164,33 @@ interface SongEditorProps {
 
 export default function SongEditor({ initialSong }: SongEditorProps) {
   const [state, dispatch] = useReducer(songReducer, initialSong);
-  const [isSaving, setIsSaving] = useState(false);
   const [isLiveMode, setIsLiveMode] = useState(false);
-  const isMountedRef = useRef(true);
-  const pendingSaveRef = useRef<Promise<any> | null>(null);
   const router = useRouter();
-
-  const debouncedSave = useCallback(
-    debounce(async (song: SongChart) => {
-      if (!isMountedRef.current) return;
-      setIsSaving(true);
-      const savePromise = supabaseService.saveSongChart(song);
-      pendingSaveRef.current = savePromise;
-      try {
-        await savePromise;
-      } catch (error) {
-        console.error('Failed to auto-save song chart:', error);
-      } finally {
-        if (isMountedRef.current) {
-          setIsSaving(false);
-        }
-        if (pendingSaveRef.current === savePromise) {
-          pendingSaveRef.current = null;
-        }
-      }
-    }, 2000),
-    [],
-  );
-
-  const settleAutosave = useCallback(async () => {
-    debouncedSave.flush();
-    if (pendingSaveRef.current) {
-      await pendingSaveRef.current;
-    }
-  }, [debouncedSave]);
-
   const isInitialRender = useRef(true);
+
+  const { isSaving, triggerSave, settleAutosave } = useAutosave<SongChart>(
+    async (song) => {
+      await supabaseService.saveSongChart(song);
+    },
+    2000
+  );
 
   useEffect(() => {
     if (isInitialRender.current) {
       isInitialRender.current = false;
       return;
     }
-
-    setIsSaving(true);
-    debouncedSave(state);
-  }, [state, debouncedSave]);
-
-  // Separate cleanup effect that only runs on unmount
-  useEffect(() => {
-    return () => {
-      debouncedSave.flush();
-    };
-  }, [debouncedSave]);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+    triggerSave(state);
+  }, [state, triggerSave]);
 
   return (
     <div data-testid="song-editor-root" className="min-h-screen bg-surface">
       {isLiveMode ? (
         <LiveModeView chart={state} onExit={() => setIsLiveMode(false)} />
       ) : (
-        <div data-testid="song-editor-container" className="flex flex-col h-full">
+        <div data-testid="song-editor-container" className="flex flex-col h-full relative">
           {/* Top Actions */}
-          <div className="absolute top-4 right-8 no-print flex gap-2 z-50">
+          <div className="sticky top-0 right-0 p-4 no-print flex justify-end gap-2 z-[45] bg-surface border-b border-outline-variant/10 shadow-sm">
             {state.isPublic && (
               <>
                 <button
@@ -295,7 +254,10 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             </button>
             <div className="w-[1px] h-8 bg-outline-variant/20 mx-2" />
             <button
-              onClick={() => setIsLiveMode(true)}
+              onClick={() => {
+                window.scrollTo(0, 0);
+                setIsLiveMode(true);
+              }}
               data-testid="go-live-button"
               className="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg font-black hover:bg-primary-dim transition-all text-sm shadow-lg shadow-primary/20 uppercase tracking-tighter"
             >
@@ -362,31 +324,12 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                   placeholder="Song Title"
                 />
 
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {state.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                  <input
-                    type="text"
+                <div className="mt-4">
+                  <TagInput
+                    tags={state.tags}
+                    onChange={(tags) => dispatch({ type: 'UPDATE_TAGS', tags })}
+                    suggestions={['rock', 'funk', 'jazz', 'metal', 'latin', 'pop', 'worship']}
                     placeholder="+ ADD TAG"
-                    className="text-[10px] font-headline font-bold tracking-widest uppercase text-on-surface-variant bg-transparent border-none focus:ring-0 w-24 p-0"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        const input = e.currentTarget;
-                        if (input.value.trim()) {
-                          dispatch({
-                            type: 'UPDATE_TAGS',
-                            tags: [...state.tags, input.value.trim()],
-                          });
-                          input.value = '';
-                        }
-                      }
-                    }}
                   />
                 </div>
               </div>
@@ -399,6 +342,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                   <input
                     type="number"
                     value={state.header.bpm || ''}
+                    data-testid="bpm-input"
                     onChange={(e) => {
                       const val = parseInt(e.target.value, 10);
                       dispatch({
@@ -417,6 +361,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                     <input
                       type="number"
                       value={state.header.timeSignature.beatsPerMeasure}
+                      data-testid="time-signature-beats"
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
                         dispatch({
@@ -431,12 +376,15 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                     <input
                       type="number"
                       value={state.header.timeSignature.beatValue}
+                      data-testid="time-signature-value"
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
+                        const validBeatValues = [1, 2, 4, 8, 16, 32];
+                        const beatValue = Number.isNaN(val) ? 4 : validBeatValues.includes(val) ? val : 4;
                         dispatch({
                           type: 'UPDATE_TIME_SIGNATURE',
                           beatsPerMeasure: state.header.timeSignature.beatsPerMeasure,
-                          beatValue: Number.isNaN(val) ? 4 : Math.max(1, Math.min(val, 32)),
+                          beatValue,
                         });
                       }}
                       className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-8"
@@ -498,7 +446,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                 >
                   <button
                     onClick={() => dispatch({ type: 'REMOVE_SECTION', sectionId: section.id })}
-                    className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 p-2 text-on-surface-variant hover:text-error transition-all no-print"
+                    className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 focus:opacity-100 p-2 text-on-surface-variant hover:text-error transition-all no-print outline-none"
                     title="Remove Section"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -529,13 +477,12 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                       <input
                         type="number"
                         value={section.measuresCount}
+                        data-testid="song-editor-measures-input"
                         onChange={(e) =>
                           dispatch({
                             type: 'UPDATE_SECTION',
                             sectionId: section.id,
-                            updates: {
-                              measuresCount: Math.max(1, parseInt(e.target.value, 10) || 1),
-                            },
+                            updates: { measuresCount: Math.max(1, parseInt(e.target.value, 10) || 1) },
                           })
                         }
                         className="w-8 text-center bg-transparent border-none p-0 focus:ring-0 font-bold text-on-surface"
