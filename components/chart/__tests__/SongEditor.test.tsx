@@ -122,7 +122,7 @@ describe('SongEditor', () => {
 
   it('adds a tag on Enter', async () => {
     render(<SongEditor initialSong={mockSong} />);
-    const tagInput = screen.getByPlaceholderText('Add tag...');
+    const tagInput = screen.getByPlaceholderText('+ ADD TAG');
 
     fireEvent.change(tagInput, { target: { value: 'jazz' } });
     fireEvent.keyDown(tagInput, { key: 'Enter', code: 'Enter' });
@@ -145,7 +145,7 @@ describe('SongEditor', () => {
     render(<SongEditor initialSong={mockSong} />);
 
     // Add grid first
-    const addGridButton = screen.getByText('+ ADD GRID');
+    const addGridButton = screen.getByText('+ Add Grid');
     fireEvent.click(addGridButton);
 
     const toggle = screen.getByLabelText('Enable Metronome');
@@ -167,7 +167,7 @@ describe('SongEditor', () => {
     render(<SongEditor initialSong={mockSong} />);
 
     // Add grid first
-    const addGridButton = screen.getByText('+ ADD GRID');
+    const addGridButton = screen.getByText('+ Add Grid');
     fireEvent.click(addGridButton);
 
     const settingsButton = screen.getByLabelText('Metronome Settings');
@@ -190,7 +190,7 @@ describe('SongEditor', () => {
 
   it('duplicates the song', async () => {
     render(<SongEditor initialSong={mockSong} />);
-    const duplicateBtn = screen.getByText(/duplicate/i);
+    const duplicateBtn = screen.getByText(/Duplicate/i);
     fireEvent.click(duplicateBtn);
 
     await waitFor(() => {
@@ -208,7 +208,7 @@ describe('SongEditor', () => {
     Object.assign(navigator, { clipboard: { writeText } });
     vi.spyOn(window, 'alert').mockImplementation(() => {});
 
-    const copyBtn = screen.getByText(/COPY PUBLIC LINK/i);
+    const copyBtn = screen.getByText(/Copy Link/i);
     fireEvent.click(copyBtn);
 
     await waitFor(() => {
@@ -223,13 +223,13 @@ describe('SongEditor', () => {
     const publicSong = { ...mockSong, isPublic: true };
     render(<SongEditor initialSong={publicSong} />);
 
-    const viewBtn = screen.getByText(/VIEW PUBLIC/i);
+    const viewBtn = screen.getByText(/View Public/i);
     expect(viewBtn).toHaveAttribute('href', '/public/songs/song-1');
   });
 
   it('adds and removes sub-sections', () => {
     render(<SongEditor initialSong={mockSong} />);
-    const addSubBtn = screen.getByText(/\+ ADD SUBSECTION/i);
+    const addSubBtn = screen.getByText(/\+ Add Variation/i);
     fireEvent.click(addSubBtn);
 
     expect(screen.getByDisplayValue('New Subsection')).toBeDefined();
@@ -242,10 +242,10 @@ describe('SongEditor', () => {
 
   it('toggles public state', async () => {
     render(<SongEditor initialSong={mockSong} />);
-    const toggleBtn = screen.getByText(/PRIVATE/);
+    const toggleBtn = screen.getByTestId('toggle-public-button');
     fireEvent.click(toggleBtn);
 
-    expect(screen.getByText(/● PUBLIC/)).toBeDefined();
+    expect(screen.getAllByText(/PUBLIC/i).length).toBeGreaterThan(0);
     await waitFor(
       () => {
         expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
@@ -299,7 +299,7 @@ describe('SongEditor', () => {
 
   it('adds a grid to a section', async () => {
     render(<SongEditor initialSong={mockSong} />);
-    const addGridBtn = screen.getByText(/\+ ADD GRID/i);
+    const addGridBtn = screen.getByText(/\+ Add Grid/i);
     fireEvent.click(addGridBtn);
 
     await waitFor(
@@ -390,7 +390,7 @@ describe('SongEditor', () => {
     vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     render(<SongEditor initialSong={mockSong} />);
-    fireEvent.click(screen.getByText(/duplicate/i));
+    fireEvent.click(screen.getByText(/Duplicate/i));
 
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith('Failed to duplicate song chart.');
@@ -403,7 +403,7 @@ describe('SongEditor', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     render(<SongEditor initialSong={mockSong} />);
-    fireEvent.click(screen.getByText(/delete/i));
+    fireEvent.click(screen.getByText(/Delete/i));
 
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith('Failed to delete song chart.');

@@ -128,196 +128,221 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
   };
 
   return (
-    <div className="space-y-8 pb-32">
-      {/* Header */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-zinc-200">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-          <div className="flex-1 w-full">
-            <input
-              type="text"
-              value={setlist.title}
-              onChange={handleTitleChange}
-              placeholder="Setlist Title"
-              className="w-full text-3xl font-black text-zinc-900 bg-transparent border-0 border-b-2 border-transparent hover:border-zinc-200 focus:border-blue-500 focus:ring-0 px-0 mb-2 transition-colors placeholder:text-zinc-300 outline-none"
-            />
-          </div>
-
-          <div className="flex items-center gap-4">
-            {saveError ? (
-              <span className="text-red-500 text-sm">{saveError}</span>
-            ) : isSaving ? (
-              <span className="text-zinc-400 text-sm flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Saving...
-              </span>
-            ) : (
-              <span className="text-emerald-500 text-sm font-medium">Saved</span>
-            )}
-
-            <button
-              onClick={handleVisibilityToggle}
-              className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors flex items-center gap-1.5 ${
-                setlist.isPublic
-                  ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-              }`}
-            >
-              {setlist.isPublic ? (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                  Public
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                    />
-                  </svg>
-                  Private
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Setlist Songs */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-zinc-900">Songs</h2>
+    <div data-testid="setlist-editor-root" className="min-h-screen bg-surface">
+      <div data-testid="setlist-editor-container" className="flex flex-col h-full">
+        {/* Top Actions */}
+        <div className="absolute top-4 right-8 no-print flex gap-2 z-50">
+          {setlist.isPublic && (
+            <>
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      `${window.location.origin}/public/setlists/${setlist.id}`,
+                    );
+                    alert('Public link copied to clipboard!');
+                  } catch (_err) {
+                    alert(
+                      `Failed to copy link. Here it is: ${window.location.origin}/public/setlists/${setlist.id}`,
+                    );
+                  }
+                }}
+                className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
+              >
+                Copy Link
+              </button>
+              <a
+                href={`/public/setlists/${setlist.id}`}
+                target="_blank"
+                className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
+                rel="noopener noreferrer"
+              >
+                View Public
+              </a>
+            </>
+          )}
           <button
-            onClick={() => setIsSelectingSong(!isSelectingSong)}
-            className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors bg-blue-50 px-3 py-1.5 rounded-md"
+            onClick={async () => {
+              if (confirm('Are you sure you want to delete this setlist?')) {
+                try {
+                  await supabaseService.deleteSetlist(setlist.id);
+                  router.push('/library');
+                } catch (error) {
+                  console.error('Failed to delete setlist:', error);
+                  alert('Failed to delete setlist.');
+                }
+              }
+            }}
+            className="flex items-center gap-2 bg-surface-container-highest text-error px-4 py-2 rounded-lg font-bold hover:bg-error/10 transition-all text-[10px] uppercase tracking-widest"
           >
-            <Plus size={16} />
-            Add Song
+            Delete
           </button>
         </div>
 
-        {isSelectingSong && (
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-zinc-200">
-            <h3 className="text-sm font-semibold text-zinc-500 uppercase tracking-wider mb-3">
-              Select a Song
-            </h3>
-            {availableSongs.length === 0 ? (
-              <p className="text-sm text-zinc-500">No songs found in your library.</p>
-            ) : (
-              <div className="grid gap-2 grid-cols-1 md:grid-cols-2">
-                {availableSongs.map((song) => (
-                  <button
-                    key={song.id}
-                    onClick={() => addSong(song.id)}
-                    className="text-left px-4 py-3 rounded-md border border-zinc-200 hover:border-blue-300 hover:bg-blue-50 transition-colors text-sm font-medium text-zinc-800"
-                  >
-                    {song.title}
-                  </button>
-                ))}
+        {/* Setlist Header Section */}
+        <section className="p-8 pb-4 pt-16 md:pt-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-2 w-full max-w-2xl">
+              <div className="flex items-center gap-4 text-secondary font-headline uppercase tracking-[0.2em] text-xs font-bold">
+                <span>Setlist</span>
+                <span className="w-1 h-1 rounded-full bg-secondary/40"></span>
+                <span className="text-on-surface-variant flex gap-2 items-center">
+                  {saveError ? (
+                    <span className="text-error">{saveError}</span>
+                  ) : isSaving ? (
+                    <span className="animate-pulse">Saving...</span>
+                  ) : (
+                    <span>Saved</span>
+                  )}
+                </span>
+                <span className="w-1 h-1 rounded-full bg-secondary/40"></span>
+                <button
+                  onClick={handleVisibilityToggle}
+                  data-testid="toggle-public-button"
+                  className={setlist.isPublic ? 'text-green-400' : 'text-on-surface-variant'}
+                >
+                  {setlist.isPublic ? 'PUBLIC' : 'PRIVATE'}
+                </button>
+              </div>
+              <input
+                type="text"
+                value={setlist.title}
+                onChange={handleTitleChange}
+                className="text-5xl lg:text-6xl font-headline font-bold tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0"
+                placeholder="Setlist Title"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Setlist Content */}
+        <section className="flex-1 p-8 pt-4">
+          <div className="max-w-5xl mx-auto space-y-8">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-headline font-bold text-on-surface uppercase tracking-tight">
+                Set Sequence
+              </h2>
+              <button
+                onClick={() => setIsSelectingSong(!isSelectingSong)}
+                className="flex items-center gap-2 text-[10px] font-headline font-bold text-primary hover:text-primary-dim uppercase tracking-widest bg-primary/10 px-4 py-2 rounded-full transition-all"
+              >
+                <Plus size={14} />
+                Add Composition
+              </button>
+            </div>
+
+            {isSelectingSong && (
+              <div className="bg-surface-container-low p-6 rounded-3xl border border-outline-variant/10 shadow-xl animate-in fade-in slide-in-from-top-4">
+                <h3 className="text-[10px] font-headline font-black text-on-surface-variant uppercase tracking-[0.3em] mb-6 ml-1">
+                  Select Repository Item
+                </h3>
+                {availableSongs.length === 0 ? (
+                  <p className="text-sm text-on-surface-variant font-body p-4 italic text-center">
+                    No compositions found in your library.
+                  </p>
+                ) : (
+                  <div className="grid gap-3 grid-cols-1 md:grid-cols-2">
+                    {availableSongs.map((song) => (
+                      <button
+                        key={song.id}
+                        onClick={() => addSong(song.id)}
+                        className="text-left px-6 py-4 rounded-2xl bg-surface-container-highest border border-transparent hover:border-primary/30 hover:bg-surface-bright transition-all text-sm font-headline font-bold text-on-surface flex items-center justify-between group"
+                      >
+                        {song.title}
+                        <Plus className="w-4 h-4 opacity-0 group-hover:opacity-100 text-primary transition-opacity" />
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
 
-        <div className="bg-white rounded-lg shadow-sm border border-zinc-200 overflow-hidden">
-          {setlist.songs.length === 0 ? (
-            <div className="p-8 text-center text-zinc-500">
-              No songs in this setlist yet. Click &quot;Add Song&quot; to get started.
-            </div>
-          ) : (
-            <div className="divide-y divide-zinc-100">
-              {setlist.songs.map((song, idx) => (
-                <div
-                  key={`${song.songId}-${idx}`}
-                  className="flex items-center p-4 hover:bg-zinc-50 group transition-colors"
-                >
-                  <div className="flex items-center gap-3 w-16 text-zinc-400">
-                    <span className="text-sm font-mono font-medium">{idx + 1}.</span>
-                  </div>
-
-                  <div className="flex-1 font-semibold text-zinc-900">
-                    {getSongTitle(song.songId)}
-                  </div>
-
-                  <div className="flex items-center gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => moveSong(idx, 'up')}
-                      disabled={idx === 0}
-                      className="p-1.5 text-zinc-400 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-zinc-400 rounded transition-colors"
-                      title="Move Up"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M5 15l7-7 7 7"
-                        />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => moveSong(idx, 'down')}
-                      disabled={idx === setlist.songs.length - 1}
-                      className="p-1.5 text-zinc-400 hover:text-blue-600 disabled:opacity-30 disabled:hover:text-zinc-400 rounded transition-colors"
-                      title="Move Down"
-                    >
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </button>
-                    <div className="w-px h-5 bg-zinc-200 mx-1"></div>
-                    <button
-                      onClick={() => removeSong(idx)}
-                      className="p-1.5 text-zinc-400 hover:text-red-600 rounded transition-colors"
-                      title="Remove from Setlist"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
+            <div className="bg-surface-container rounded-[32px] border border-outline-variant/10 overflow-hidden shadow-sm">
+              {setlist.songs.length === 0 ? (
+                <div className="p-20 text-center text-on-surface-variant font-headline uppercase tracking-widest text-xs opacity-40">
+                  Initial set is empty. <br />
+                  Add compositions to begin.
                 </div>
-              ))}
+              ) : (
+                <div className="divide-y divide-outline-variant/5">
+                  {setlist.songs.map((song, idx) => (
+                    <div
+                      key={`${song.songId}-${idx}`}
+                      className="flex items-center p-6 hover:bg-surface-container-high group transition-all"
+                    >
+                      <div className="flex items-center gap-4 w-20">
+                        <span className="text-xs font-headline font-black text-primary/40 group-hover:text-primary transition-colors">
+                          {String(idx + 1).padStart(2, '0')}
+                        </span>
+                      </div>
+
+                      <div className="flex-1 font-headline font-bold text-lg text-on-surface group-hover:translate-x-1 transition-transform">
+                        {getSongTitle(song.songId)}
+                      </div>
+
+                      <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all">
+                        <button
+                          onClick={() => moveSong(idx, 'up')}
+                          disabled={idx === 0}
+                          className="p-2 text-on-surface-variant hover:text-primary disabled:opacity-10 rounded-xl bg-surface-container-highest transition-all"
+                          title="Move Up"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2.5"
+                              d="M5 15l7-7 7 7"
+                            />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => moveSong(idx, 'down')}
+                          disabled={idx === setlist.songs.length - 1}
+                          className="p-2 text-on-surface-variant hover:text-primary disabled:opacity-10 rounded-xl bg-surface-container-highest transition-all"
+                          title="Move Down"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2.5"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </button>
+                        <div className="w-[1px] h-6 bg-outline-variant/20 mx-1"></div>
+                        <button
+                          onClick={() => removeSong(idx)}
+                          className="p-2 text-on-surface-variant hover:text-error rounded-xl bg-surface-container-highest transition-all"
+                          title="Remove from Setlist"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        </section>
+
+        <footer className="mt-24 pb-12 text-center">
+          <p className="text-[10px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.3em]">
+            DrumCharter Setlist Module v1.0
+          </p>
+        </footer>
       </div>
     </div>
   );

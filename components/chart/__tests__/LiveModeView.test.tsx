@@ -79,13 +79,14 @@ describe('LiveModeView', () => {
     render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
 
     const nextPreview = screen.getByTestId('next-section-preview');
-    expect(nextPreview).toHaveTextContent(/Next: Chorus/i);
+    expect(nextPreview).toHaveTextContent(/Up Next/i);
+    expect(nextPreview).toHaveTextContent(/Chorus/i);
   });
 
   it('hides the "Next Up" preview on the last section', () => {
     render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
 
-    const nextBtn = screen.getByText('Next').closest('button')!;
+    const nextBtn = screen.getByText('NEXT').closest('button')!;
     fireEvent.click(nextBtn);
 
     expect(screen.getByText('Chorus')).toBeDefined();

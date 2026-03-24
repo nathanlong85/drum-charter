@@ -131,7 +131,7 @@ describe('NotebookEditor', () => {
 
   it('updates tags', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const tagsInput = screen.getByPlaceholderText('Add tag...');
+    const tagsInput = screen.getByPlaceholderText('+ ADD TAG');
 
     fireEvent.change(tagsInput, { target: { value: 'rudiments' } });
     fireEvent.keyDown(tagsInput, { key: 'Enter', code: 'Enter' });
@@ -152,7 +152,7 @@ describe('NotebookEditor', () => {
 
   it('duplicates the notebook', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const duplicateBtn = screen.getByText(/duplicate/i);
+    const duplicateBtn = screen.getByText(/Duplicate/i);
     fireEvent.click(duplicateBtn);
 
     await waitFor(() => {
@@ -188,14 +188,14 @@ describe('NotebookEditor', () => {
     const publicNb = { ...mockNotebook, isPublic: true };
     render(<NotebookEditor initialNotebook={publicNb} />);
 
-    const viewBtn = screen.getByText(/View/i);
+    const viewBtn = screen.getByText(/View Public/i);
     expect(viewBtn).toHaveAttribute('href', '/public/notebooks/notebook-1');
   });
 
   it('toggles public state', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const checkbox = screen.getByLabelText(/Public/i);
-    fireEvent.click(checkbox);
+    const toggleBtn = screen.getByTestId('toggle-public-button');
+    fireEvent.click(toggleBtn);
 
     await waitFor(
       () => {
@@ -212,7 +212,7 @@ describe('NotebookEditor', () => {
     vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    fireEvent.click(screen.getByText(/duplicate/i));
+    fireEvent.click(screen.getByText(/Duplicate/i));
 
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith('Failed to duplicate notebook.');
@@ -225,7 +225,7 @@ describe('NotebookEditor', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    fireEvent.click(screen.getByText(/delete/i));
+    fireEvent.click(screen.getByText(/Delete/i));
 
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith('Failed to delete notebook.');
@@ -279,7 +279,7 @@ describe('NotebookEditor', () => {
     vi.spyOn(supabaseService, 'deleteNotebook').mockResolvedValueOnce({} as any);
 
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const deleteBtn = screen.getByText(/delete/i);
+    const deleteBtn = screen.getByText(/Delete/i);
     fireEvent.click(deleteBtn);
 
     await waitFor(

@@ -1,136 +1,249 @@
 'use client';
 
+import { ArrowRight, Cloud, Layers, Music, Play, ShieldCheck, Zap } from 'lucide-react';
+import Link from 'next/link';
 import { AuthStatus } from '@/components/auth/AuthStatus';
 import { GrooveDemo } from '@/components/demo/GrooveDemo';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors">
-      {/* Header/Nav */}
-      <header className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-              <span className="text-white font-black text-xl">D</span>
+    <main className="min-h-screen bg-surface font-body selection:bg-primary/30 selection:text-primary transition-colors overflow-x-hidden">
+      {/* Dynamic Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-3 group cursor-pointer">
+            <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-xl shadow-[0_0_20px_var(--color-primary-dim)] group-hover:scale-110 transition-transform duration-500">
+              <Music className="w-6 h-6 text-on-primary" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              DrumCharter
-            </span>
+            <div className="flex flex-col leading-none">
+              <span className="text-xl font-headline font-black tracking-tighter text-on-surface uppercase">
+                DrumCharter
+              </span>
+              <span className="text-[9px] font-headline font-bold tracking-[0.3em] text-primary uppercase mt-0.5">
+                Sonic Architect
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-8 text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant">
+              <a href="#features" className="hover:text-primary transition-colors">
+                Features
+              </a>
+              <a href="#demo" className="hover:text-primary transition-colors">
+                Live Engine
+              </a>
+              <Link href="/manual" className="hover:text-primary transition-colors">
+                Manual
+              </Link>
+            </nav>
+            <div className="h-6 w-px bg-outline-variant/20 hidden md:block"></div>
             <AuthStatus />
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="pt-20 pb-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl sm:text-6xl font-black text-zinc-900 dark:text-zinc-50 mb-6 tracking-tight">
-            Drum Charts That{' '}
-            <span className="text-blue-600 dark:text-blue-500">Work Like You Do.</span>
-          </h1>
-          <p className="text-xl text-zinc-600 dark:text-zinc-400 mb-10 leading-relaxed max-w-2xl mx-auto">
-            Create interactive song charts, practice routines, and groove libraries in minutes. No
-            more rigid templates. Just the rhythms you need.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <a
-              href="/login"
-              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-200 dark:hover:shadow-blue-900/20 hover:-translate-y-0.5"
-            >
-              Start Creating (Guest Mode)
-            </a>
-            <a
-              href="/library"
-              className="px-8 py-4 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border-2 border-zinc-200 dark:border-zinc-700 font-bold rounded-xl hover:border-zinc-300 dark:hover:border-zinc-600 transition-all"
-            >
-              View My Library
-            </a>
+      {/* Cinematic Hero Section */}
+      <section className="relative pt-40 pb-24 px-6 overflow-hidden">
+        {/* Background Ambience */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -z-10 translate-x-1/3 -translate-y-1/3 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-tertiary/5 rounded-full blur-[100px] -z-10 -translate-x-1/4 translate-y-1/4"></div>
+
+        <div className="max-w-5xl mx-auto text-center relative">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-highest/50 rounded-full border border-outline-variant/10 mb-8 animate-fade-in">
+            <Zap className="w-3.5 h-3.5 text-primary" />
+            <span className="text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant">
+              V1.0 ALPHA REDESIGN NOW LIVE
+            </span>
           </div>
 
-          {/* Live Demo Container */}
-          <div className="relative">
-            <div className="absolute -inset-4 bg-blue-600/5 blur-3xl rounded-full -z-10" />
-            <GrooveDemo />
+          <h1 className="text-6xl md:text-8xl font-headline font-black text-on-surface mb-8 tracking-tight uppercase leading-[0.9]">
+            The Workspace <br />
+            <span className="bg-gradient-to-r from-primary to-primary-dim bg-clip-text text-transparent">
+              Built For Rhythm.
+            </span>
+          </h1>
+
+          <p className="text-xl md:text-2xl text-on-surface-variant mb-12 leading-relaxed max-w-3xl mx-auto font-body">
+            Orchestrate complex song charts, modular practice routines, and high-fidelity groove
+            libraries. A DAW-inspired environment for the modern percussionist.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-24">
+            <Link
+              href="/login"
+              className="group relative px-10 py-5 bg-primary text-on-primary font-headline font-black text-xs uppercase tracking-widest rounded-2xl transition-all shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1"
+            >
+              <span className="flex items-center gap-3">
+                Initialize Console
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </Link>
+            <Link
+              href="/library"
+              className="px-10 py-5 bg-surface-container-highest text-on-surface font-headline font-black text-xs uppercase tracking-widest rounded-2xl border border-outline-variant/20 hover:bg-surface-bright transition-all"
+            >
+              Access Library
+            </Link>
+          </div>
+
+          {/* Interactive Engine Preview */}
+          <div
+            id="demo"
+            className="relative group p-1 bg-gradient-to-br from-outline-variant/20 to-transparent rounded-[40px]"
+          >
+            <div className="bg-surface-container-low rounded-[38px] p-4 md:p-8 shadow-3xl border border-white/5 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="flex gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-red-500/50"></div>
+                    <div className="w-2 h-2 rounded-full bg-yellow-500/50"></div>
+                    <div className="w-2 h-2 rounded-full bg-green-500/50"></div>
+                  </div>
+                  <div className="h-4 w-px bg-outline-variant/20 mx-2"></div>
+                  <span className="text-[10px] font-headline font-black text-primary uppercase tracking-[0.3em]">
+                    Live Audio Engine
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 px-3 py-1 bg-surface-container-highest rounded-lg text-[9px] font-headline font-bold text-on-surface-variant">
+                  <RefreshCwIcon />
+                  REAL-TIME SYNC
+                </div>
+              </div>
+              <GrooveDemo />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Feature Pillars */}
-      <section className="py-24 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Song Charts */}
-            <div className="space-y-4">
-              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Song Charts</h3>
-              <p className="text-zinc-600 dark:text-zinc-400">
-                Structure performance-ready documents with BPM, sections, and integrated groove
-                grids.
+      {/* Tech Stack / Features Grid */}
+      <section
+        id="features"
+        className="py-32 relative bg-surface-container-lowest border-y border-outline-variant/10"
+      >
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+            <div className="max-w-2xl">
+              <h2 className="text-4xl md:text-5xl font-headline font-black text-on-surface uppercase tracking-tight mb-6">
+                Modular Architectural <br />
+                <span className="text-primary">Design Systems.</span>
+              </h2>
+              <p className="text-lg text-on-surface-variant font-body">
+                DrumCharter isn&apos;t just a charting tool. It&apos;s a scalable infrastructure for
+                your entire musical repertoire.
               </p>
             </div>
+            <div className="flex gap-4">
+              <div className="flex flex-col items-center p-4 bg-surface-container rounded-2xl border border-outline-variant/10 w-24">
+                <Cloud className="w-6 h-6 text-primary mb-2" />
+                <span className="text-[8px] font-headline font-black text-on-surface-variant uppercase tracking-widest">
+                  Cloud
+                </span>
+              </div>
+              <div className="flex flex-col items-center p-4 bg-surface-container rounded-2xl border border-outline-variant/10 w-24">
+                <ShieldCheck className="w-6 h-6 text-primary mb-2" />
+                <span className="text-[8px] font-headline font-black text-on-surface-variant uppercase tracking-widest">
+                  Safe
+                </span>
+              </div>
+            </div>
+          </div>
 
-            {/* Practice Notebooks */}
-            <div className="space-y-4">
-              <div className="w-12 h-12 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  />
-                </svg>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                title: 'High-Fidelity Charts',
+                desc: 'Structured song documents with dynamic sections, measure counts, and integrated performance notes.',
+                icon: Layers,
+                accent: 'primary',
+              },
+              {
+                title: 'Drum-Aware Engine',
+                desc: 'A specialized sequencer that understands ghost notes, rimshots, and complex percussive articulations.',
+                icon: Music,
+                accent: 'tertiary',
+              },
+              {
+                title: 'Stage-Ready Performance',
+                desc: 'Enter Live Mode for a distraction-free, high-contrast interface optimized for tablets and MIDI control.',
+                icon: Play,
+                accent: 'primary',
+              },
+            ].map((feature, i) => (
+              <div
+                key={i}
+                className="group p-8 bg-surface rounded-[32px] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 shadow-sm hover:shadow-2xl hover:shadow-primary/5"
+              >
+                <div
+                  className={`w-14 h-14 bg-surface-container-highest flex items-center justify-center rounded-2xl mb-8 group-hover:scale-110 transition-transform`}
+                >
+                  <feature.icon className={`w-7 h-7 text-primary`} />
+                </div>
+                <h3 className="text-xl font-headline font-black text-on-surface uppercase tracking-tight mb-4">
+                  {feature.title}
+                </h3>
+                <p className="text-on-surface-variant leading-relaxed font-body text-sm">
+                  {feature.desc}
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                Practice Notebooks
-              </h3>
-              <p className="text-zinc-600 dark:text-zinc-400">
-                Flexible routines for technical drills, brainstorming, and technical exercises.
-              </p>
-            </div>
-
-            {/* Groove Snippets */}
-            <div className="space-y-4">
-              <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                Groove Snippets
-              </h3>
-              <p className="text-zinc-600 dark:text-zinc-400">
-                A searchable repository of individual fills and beats to reuse across your projects.
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-zinc-50 dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-sm text-zinc-400 dark:text-zinc-500">
-            © {new Date().getFullYear()} DrumCharter. Built for drummers, by drummers.
-          </p>
+      <footer className="py-20 bg-surface px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary/20 flex items-center justify-center rounded-lg">
+                <Music className="w-5 h-5 text-primary" />
+              </div>
+              <span className="text-lg font-headline font-black tracking-tighter text-on-surface uppercase">
+                DrumCharter
+              </span>
+            </div>
+            <p className="text-xs font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.3em]">
+              © {new Date().getFullYear()} Sonic Architect Console v1.0-alpha
+            </p>
+          </div>
+
+          <nav className="flex gap-12 text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant">
+            <Link href="/manual#privacy" className="hover:text-primary transition-colors">
+              Privacy
+            </Link>
+            <Link href="/manual#terms" className="hover:text-primary transition-colors">
+              Terms
+            </Link>
+            <a
+              href="https://github.com/nathanlong85/drum-charter"
+              target="_blank"
+              className="hover:text-primary transition-colors"
+              rel="noopener noreferrer"
+            >
+              Source
+            </a>
+          </nav>
         </div>
       </footer>
     </main>
+  );
+}
+
+function RefreshCwIcon() {
+  return (
+    <svg
+      className="w-3 h-3 animate-spin-slow"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={3}
+        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+      />
+    </svg>
   );
 }

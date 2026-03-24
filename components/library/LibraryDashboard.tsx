@@ -346,6 +346,7 @@ export default function LibraryDashboard({
               <button
                 key={tag}
                 onClick={() => toggleTag(tag)}
+                aria-label={`Filter by ${tag} tag`}
                 className={`px-3 py-1 rounded-full text-[10px] font-headline font-bold uppercase tracking-widest transition-all ${
                   isActive
                     ? 'bg-primary/20 text-primary border border-primary/50'

@@ -51,7 +51,7 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
     expect(screen.getByDisplayValue('My Setlist')).toBeDefined();
-    expect(screen.getByText('Private')).toBeDefined();
+    expect(screen.getByText('PRIVATE')).toBeDefined();
 
     // Wait for songs to load and display titles
     await waitFor(() => {
@@ -81,13 +81,13 @@ describe('SetlistEditor', () => {
   it('toggles visibility and saves', async () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
-    const visibilityButton = screen.getByText('Private');
+    const visibilityButton = screen.getByText('PRIVATE');
 
     await act(async () => {
       fireEvent.click(visibilityButton);
     });
 
-    expect(screen.getByText('Public')).toBeDefined();
+    expect(screen.getByText('PUBLIC')).toBeDefined();
 
     await waitFor(() => {
       expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
@@ -105,7 +105,7 @@ describe('SetlistEditor', () => {
     });
 
     // Open song selector
-    fireEvent.click(screen.getByText('Add Song'));
+    fireEvent.click(screen.getByText('Add Composition'));
 
     // Wait for available songs in selector
     const songButton = await screen.findByText('Third Song');
@@ -200,15 +200,14 @@ describe('SetlistEditor', () => {
     vi.mocked(supabaseService).listSongCharts.mockResolvedValueOnce([]);
 
     render(<SetlistEditor initialSetlist={mockSetlist} />);
-
     await waitFor(() => {
-      expect(screen.queryByText('Add Song')).toBeDefined();
+      expect(screen.queryByText('Add Composition')).toBeDefined();
     });
 
-    fireEvent.click(screen.getByText('Add Song'));
+    fireEvent.click(screen.getByText('Add Composition'));
 
     await waitFor(() => {
-      expect(screen.getByText('No songs found in your library.')).toBeDefined();
+      expect(screen.getByText('No compositions found in your library.')).toBeDefined();
     });
   });
 
@@ -217,7 +216,7 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={emptySetlist} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/No songs in this setlist yet/i)).toBeDefined();
+      expect(screen.getByText(/Initial set is empty/i)).toBeDefined();
     });
   });
 

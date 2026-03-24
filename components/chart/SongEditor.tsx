@@ -225,19 +225,79 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
   }, []);
 
   return (
-    <div data-testid="song-editor-root" className="min-h-screen">
+    <div data-testid="song-editor-root" className="min-h-screen bg-surface">
       {isLiveMode ? (
         <LiveModeView chart={state} onExit={() => setIsLiveMode(false)} />
       ) : (
-        <div
-          className="max-w-4xl mx-auto p-8 bg-white min-h-screen relative"
-          data-testid="song-editor-container"
-        >
-          <div className="absolute top-8 right-8 no-print flex gap-2">
+        <div data-testid="song-editor-container" className="flex flex-col h-full">
+          {/* Top Actions */}
+          <div className="absolute top-4 right-8 no-print flex gap-2 z-50">
+            {state.isPublic && (
+              <>
+                <button
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(
+                        `${window.location.origin}/public/songs/${state.id}`,
+                      );
+                      alert('Public link copied to clipboard!');
+                    } catch (_err) {
+                      alert(
+                        `Failed to copy link. Here it is: ${window.location.origin}/public/songs/${state.id}`,
+                      );
+                    }
+                  }}
+                  className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
+                >
+                  Copy Link
+                </button>
+                <a
+                  href={`/public/songs/${state.id}`}
+                  target="_blank"
+                  className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
+                  rel="noopener noreferrer"
+                >
+                  View Public
+                </a>
+              </>
+            )}
+            <button
+              onClick={async () => {
+                try {
+                  await settleAutosave();
+                  const duplicated = await supabaseService.duplicateSongChart(state.id);
+                  router.push(`/songs/${duplicated.id}`);
+                } catch (error) {
+                  console.error('Failed to duplicate song chart:', error);
+                  alert('Failed to duplicate song chart.');
+                }
+              }}
+              className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
+            >
+              Duplicate
+            </button>
+            <button
+              onClick={async () => {
+                if (confirm('Are you sure you want to delete this song?')) {
+                  try {
+                    await settleAutosave();
+                    await supabaseService.deleteSongChart(state.id);
+                    router.push('/library');
+                  } catch (error) {
+                    console.error('Failed to delete song chart:', error);
+                    alert('Failed to delete song chart.');
+                  }
+                }
+              }}
+              className="flex items-center gap-2 bg-surface-container-highest text-error px-4 py-2 rounded-lg font-bold hover:bg-error/10 transition-all text-[10px] uppercase tracking-widest"
+            >
+              Delete
+            </button>
+            <div className="w-[1px] h-8 bg-outline-variant/20 mx-2" />
             <button
               onClick={() => setIsLiveMode(true)}
               data-testid="go-live-button"
-              className="flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-lg font-black hover:bg-yellow-300 transition-all text-sm shadow-lg shadow-yellow-100 uppercase tracking-tighter"
+              className="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg font-black hover:bg-primary-dim transition-all text-sm shadow-lg shadow-primary/20 uppercase tracking-tighter"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -257,7 +317,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             </button>
             <button
               onClick={() => window.print()}
-              className="flex items-center gap-2 bg-zinc-900 text-white px-4 py-2 rounded-lg font-bold hover:bg-zinc-800 transition-all text-sm shadow-lg shadow-zinc-200"
+              className="flex items-center gap-2 bg-surface-container-highest text-on-surface px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-sm shadow-lg"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
@@ -270,431 +330,428 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
               PRINT
             </button>
           </div>
-          <header className="mb-12 border-b-2 border-zinc-800 pb-6">
-            <div className="flex justify-between items-start mb-4">
-              <input
-                type="text"
-                value={state.header.title}
-                onChange={(e) => dispatch({ type: 'UPDATE_TITLE', title: e.target.value })}
-                className="text-4xl font-black uppercase tracking-tighter text-zinc-900 bg-transparent border-none focus:ring-0 w-full placeholder-zinc-300"
-                placeholder="Song Title"
-              />
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => dispatch({ type: 'TOGGLE_PUBLIC' })}
-                  className={`text-[10px] font-bold px-2 py-1 rounded transition-colors no-print ${
-                    state.isPublic
-                      ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                      : 'bg-zinc-100 text-zinc-500 hover:bg-zinc-200'
-                  }`}
-                >
-                  {state.isPublic ? '● PUBLIC' : '○ PRIVATE'}
-                </button>
-                {isSaving ? (
-                  <span className="text-xs font-mono text-blue-500 animate-pulse bg-blue-50 px-2 py-1 rounded no-print">
-                    SAVING...
-                  </span>
-                ) : (
-                  <span className="text-xs font-mono text-emerald-500 bg-emerald-50 px-2 py-1 rounded no-print">
-                    SAVED
-                  </span>
-                )}
-                <div className="text-right">
-                  <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
-                    Type
-                  </p>
-                  <p className="text-sm font-bold text-zinc-900 uppercase">Song Chart</p>
-                </div>
-              </div>
-            </div>
 
-            <div className="flex gap-8 mb-6">
-              <div className="flex items-center">
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest mr-2">
-                  BPM
-                </span>
+          {/* Song Header Section */}
+          <section className="p-8 pb-4 pt-16 md:pt-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div className="space-y-2 w-full max-w-2xl">
+                <div className="flex items-center gap-4 text-primary font-headline uppercase tracking-[0.2em] text-xs font-bold">
+                  <span>DrumChart</span>
+                  <span className="w-1 h-1 rounded-full bg-primary/40"></span>
+                  <span className="text-on-surface-variant flex gap-2 items-center">
+                    {isSaving ? (
+                      <span className="animate-pulse">Saving...</span>
+                    ) : (
+                      <span>Saved</span>
+                    )}
+                  </span>
+                  <span className="w-1 h-1 rounded-full bg-primary/40"></span>
+                  <button
+                    onClick={() => dispatch({ type: 'TOGGLE_PUBLIC' })}
+                    data-testid="toggle-public-button"
+                    className={state.isPublic ? 'text-green-400' : 'text-on-surface-variant'}
+                  >
+                    {state.isPublic ? 'PUBLIC' : 'PRIVATE'}
+                  </button>
+                </div>
                 <input
-                  type="number"
-                  value={state.header.bpm || ''}
-                  onChange={(e) => {
-                    const val = parseInt(e.target.value, 10);
-                    dispatch({
-                      type: 'UPDATE_BPM',
-                      bpm: Number.isNaN(val) ? 120 : Math.max(1, Math.min(val, 999)),
-                    });
-                  }}
-                  className="w-16 text-lg font-bold text-zinc-700 bg-zinc-50 border border-zinc-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                  placeholder="0"
+                  type="text"
+                  value={state.header.title}
+                  onChange={(e) => dispatch({ type: 'UPDATE_TITLE', title: e.target.value })}
+                  className="text-5xl lg:text-6xl font-headline font-bold tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0"
+                  placeholder="Song Title"
                 />
-              </div>
-              <div className="flex items-center">
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest mr-2">
-                  Time
-                </span>
-                <div className="flex items-center gap-1 bg-zinc-50 border border-zinc-200 rounded px-2 py-1">
+
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {state.tags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
                   <input
-                    type="number"
-                    value={state.header.timeSignature.beatsPerMeasure}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value, 10);
-                      dispatch({
-                        type: 'UPDATE_TIME_SIGNATURE',
-                        beatsPerMeasure: Number.isNaN(val) ? 4 : Math.max(1, Math.min(val, 32)),
-                        beatValue: state.header.timeSignature.beatValue,
-                      });
+                    type="text"
+                    placeholder="+ ADD TAG"
+                    className="text-[10px] font-headline font-bold tracking-widest uppercase text-on-surface-variant bg-transparent border-none focus:ring-0 w-24 p-0"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        const input = e.currentTarget;
+                        if (input.value.trim()) {
+                          dispatch({
+                            type: 'UPDATE_TAGS',
+                            tags: [...state.tags, input.value.trim()],
+                          });
+                          input.value = '';
+                        }
+                      }
                     }}
-                    className="w-8 text-lg font-bold text-zinc-700 bg-transparent border-none p-0 focus:ring-0 text-center"
-                  />
-                  <span className="text-zinc-400">/</span>
-                  <input
-                    type="number"
-                    value={state.header.timeSignature.beatValue}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value, 10);
-                      dispatch({
-                        type: 'UPDATE_TIME_SIGNATURE',
-                        beatsPerMeasure: state.header.timeSignature.beatsPerMeasure,
-                        beatValue: Number.isNaN(val) ? 4 : Math.max(1, Math.min(val, 32)),
-                      });
-                    }}
-                    className="w-8 text-lg font-bold text-zinc-700 bg-transparent border-none p-0 focus:ring-0 text-center"
                   />
                 </div>
               </div>
-            </div>
 
-            <div className="flex flex-wrap gap-2 no-print">
-              {state.isPublic && (
-                <button
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(
-                        `${window.location.origin}/public/songs/${state.id}`,
-                      );
-                      alert('Public link copied to clipboard!');
-                    } catch (_err) {
-                      alert(
-                        `Failed to copy link. Here it is: ${window.location.origin}/public/songs/${state.id}`,
-                      );
-                    }
-                  }}
-                  className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest mr-4"
-                >
-                  COPY PUBLIC LINK
-                </button>
-              )}
-              {state.isPublic && (
-                <a
-                  href={`/public/songs/${state.id}`}
-                  target="_blank"
-                  className="text-[10px] font-bold text-blue-600 hover:underline uppercase tracking-widest mr-4"
-                  rel="noopener noreferrer"
-                >
-                  VIEW PUBLIC
-                </a>
-              )}
-              <button
-                onClick={async () => {
-                  if (confirm('Are you sure you want to delete this song?')) {
-                    try {
-                      await settleAutosave();
-                      await supabaseService.deleteSongChart(state.id);
-                      router.push('/library');
-                    } catch (error) {
-                      console.error('Failed to delete song chart:', error);
-                      alert('Failed to delete song chart.');
-                    }
-                  }
-                }}
-                className="text-[10px] font-bold text-red-500 hover:text-red-600 uppercase tracking-widest mr-4"
-              >
-                DELETE
-              </button>
-              <button
-                onClick={async () => {
-                  try {
-                    await settleAutosave();
-                    const duplicated = await supabaseService.duplicateSongChart(state.id);
-                    router.push(`/songs/${duplicated.id}`);
-                  } catch (error) {
-                    console.error('Failed to duplicate song chart:', error);
-                    alert('Failed to duplicate song chart.');
-                  }
-                }}
-                className="text-[10px] font-bold text-zinc-500 hover:text-blue-600 uppercase tracking-widest mr-4"
-              >
-                DUPLICATE
-              </button>
-              {state.tags.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="bg-zinc-100 text-zinc-600 px-2 py-1 rounded text-xs font-medium"
-                >
-                  #{tag}
-                </span>
-              ))}
-              <input
-                type="text"
-                placeholder="Add tag..."
-                className="text-xs text-zinc-400 bg-transparent border-none focus:ring-0 w-24 p-0"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    const input = e.currentTarget;
-                    if (input.value.trim()) {
+              <div className="flex gap-4">
+                <div className="bg-surface-container-low p-4 rounded-xl flex flex-col items-center min-w-[100px] border border-outline-variant/10 shadow-sm">
+                  <span className="font-label text-[10px] uppercase text-on-surface-variant tracking-widest">
+                    BPM
+                  </span>
+                  <input
+                    type="number"
+                    value={state.header.bpm || ''}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
                       dispatch({
-                        type: 'UPDATE_TAGS',
-                        tags: [...state.tags, input.value.trim()],
+                        type: 'UPDATE_BPM',
+                        bpm: Number.isNaN(val) ? 120 : Math.max(1, Math.min(val, 999)),
                       });
-                      input.value = '';
-                    }
-                  }
-                }}
-              />
+                    }}
+                    className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-full"
+                  />
+                </div>
+                <div className="bg-surface-container-low p-4 rounded-xl flex flex-col items-center min-w-[100px] border border-outline-variant/10 shadow-sm">
+                  <span className="font-label text-[10px] uppercase text-on-surface-variant tracking-widest">
+                    Time
+                  </span>
+                  <div className="flex items-center justify-center">
+                    <input
+                      type="number"
+                      value={state.header.timeSignature.beatsPerMeasure}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        dispatch({
+                          type: 'UPDATE_TIME_SIGNATURE',
+                          beatsPerMeasure: Number.isNaN(val) ? 4 : Math.max(1, Math.min(val, 32)),
+                          beatValue: state.header.timeSignature.beatValue,
+                        });
+                      }}
+                      className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-8"
+                    />
+                    <span className="text-primary text-2xl font-bold">/</span>
+                    <input
+                      type="number"
+                      value={state.header.timeSignature.beatValue}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        dispatch({
+                          type: 'UPDATE_TIME_SIGNATURE',
+                          beatsPerMeasure: state.header.timeSignature.beatsPerMeasure,
+                          beatValue: Number.isNaN(val) ? 4 : Math.max(1, Math.min(val, 32)),
+                        });
+                      }}
+                      className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-8"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-          </header>
+          </section>
 
-          <div className="space-y-12">
-            {state.sections.map((section) => (
-              <section key={section.id} className="relative group">
+          {/* Song Flow Container */}
+          <section className="flex-1 p-8 pt-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Sidebar: Section List */}
+            <div className="lg:col-span-3 space-y-6 hidden lg:block">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-headline uppercase text-xs font-bold tracking-widest text-on-surface-variant">
+                  Song Sections
+                </h3>
                 <button
-                  onClick={() => dispatch({ type: 'REMOVE_SECTION', sectionId: section.id })}
-                  className="absolute -left-10 top-0 opacity-0 group-hover:opacity-100 p-2 text-zinc-300 hover:text-red-500 transition-all no-print"
-                  title="Remove Section"
+                  onClick={() => dispatch({ type: 'ADD_SECTION' })}
+                  className="text-primary hover:text-primary-container transition-colors"
+                  title="Add Section"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
                 </button>
+              </div>
+              <div className="space-y-3 sticky top-24">
+                {state.sections.map((section) => (
+                  <div
+                    key={section.id}
+                    className="bg-surface-container p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-high transition-colors cursor-pointer border-l-4 border-transparent"
+                  >
+                    <div>
+                      <p className="font-headline font-bold text-on-surface truncate w-32">
+                        {section.name || 'Untitled'}
+                      </p>
+                      <p className="text-[10px] font-label text-on-surface-variant">
+                        {section.measuresCount} Measures
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                <div className="flex items-center gap-4 mb-4">
-                  <input
-                    type="text"
-                    value={section.name}
-                    onChange={(e) =>
-                      dispatch({
-                        type: 'UPDATE_SECTION',
-                        sectionId: section.id,
-                        updates: { name: e.target.value },
-                      })
-                    }
-                    className="text-xl font-bold uppercase text-zinc-800 bg-zinc-100 px-3 py-1 rounded border-none focus:ring-2 focus:ring-blue-500/20"
-                    placeholder="Section Name"
-                  />
-                  <div className="flex items-center text-zinc-400 font-medium">
-                    <span className="mr-1">(</span>
+            {/* Main Workspace */}
+            <div className="lg:col-span-9 flex flex-col gap-6">
+              {state.sections.map((section) => (
+                <section
+                  key={section.id}
+                  className="relative group bg-surface-container rounded-2xl p-6 border border-outline-variant/10 shadow-sm"
+                >
+                  <button
+                    onClick={() => dispatch({ type: 'REMOVE_SECTION', sectionId: section.id })}
+                    className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 p-2 text-on-surface-variant hover:text-error transition-all no-print"
+                    title="Remove Section"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+
+                  <div className="flex items-center gap-4 mb-6">
                     <input
-                      type="number"
-                      value={section.measuresCount}
+                      type="text"
+                      value={section.name}
                       onChange={(e) =>
                         dispatch({
                           type: 'UPDATE_SECTION',
                           sectionId: section.id,
-                          updates: { measuresCount: parseInt(e.target.value, 10) || 0 },
+                          updates: { name: e.target.value },
                         })
                       }
-                      className="w-8 text-center bg-transparent border-none p-0 focus:ring-0 font-bold text-zinc-600"
+                      className="text-2xl font-headline font-bold uppercase text-on-surface bg-transparent border-b border-transparent focus:border-primary px-0 py-1 focus:ring-0 transition-colors w-1/2"
+                      placeholder="Section Name"
                     />
-                    <span>M)</span>
-                  </div>
-                </div>
-
-                <div className="ml-4 space-y-6">
-                  <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h4 className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
-                        Groove Grid
-                      </h4>
-                      {!section.grid && (
-                        <button
-                          onClick={() =>
-                            dispatch({
-                              type: 'UPDATE_SECTION',
-                              sectionId: section.id,
-                              updates: {
-                                grid: {
-                                  timeSignature: state.header.timeSignature,
-                                  resolution: 16,
-                                  measures: 1,
-                                  instruments: createDefaultDrumInstruments({
-                                    timeSignature: state.header.timeSignature,
-                                    resolution: 16,
-                                    measures: 1,
-                                  }),
-                                },
-                              },
-                            })
-                          }
-                          className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest no-print"
-                        >
-                          + ADD GRID
-                        </button>
-                      )}
-                    </div>
-                    {section.grid && (
-                      <GrooveGridEditor
-                        initialGrid={section.grid}
-                        onChange={(grid) =>
+                    <div className="flex items-center text-on-surface-variant font-headline text-sm tracking-widest bg-surface-container-highest px-3 py-1 rounded-full">
+                      <input
+                        type="number"
+                        value={section.measuresCount}
+                        onChange={(e) =>
                           dispatch({
                             type: 'UPDATE_SECTION',
                             sectionId: section.id,
-                            updates: { grid },
+                            updates: {
+                              measuresCount: Math.max(1, parseInt(e.target.value, 10) || 1),
+                            },
                           })
                         }
-                        bpm={state.header.bpm}
-                        onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
-                        metronomeEnabled={state.header.metronomeEnabled}
-                        onMetronomeToggle={(enabled) =>
-                          dispatch({ type: 'UPDATE_METRONOME', enabled })
-                        }
-                        metronomeVolume={state.header.metronomeVolume}
-                        onMetronomeVolumeChange={(volume) =>
-                          dispatch({ type: 'UPDATE_METRONOME', volume })
-                        }
+                        className="w-8 text-center bg-transparent border-none p-0 focus:ring-0 font-bold text-on-surface"
                       />
-                    )}
+                      <span className="ml-1 text-[10px]">MEASURES</span>
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <h4 className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">
-                      Notes
-                    </h4>
-                    <textarea
-                      value={section.notes?.join('\n') || ''}
-                      onChange={(e) =>
-                        dispatch({
-                          type: 'UPDATE_SECTION',
-                          sectionId: section.id,
-                          updates: { notes: e.target.value.split('\n') },
-                        })
-                      }
-                      placeholder="Bullet points (one per line)..."
-                      className="w-full h-24 text-sm text-zinc-700 bg-transparent border border-zinc-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-zinc-200 resize-none transition-all"
-                    />
-                  </div>
-
-                  {/* Subsections */}
-                  <div className="space-y-4">
-                    {(section.subSections || []).map((sub) => (
-                      <div
-                        key={sub.id}
-                        className="border-l-4 border-zinc-200 pl-4 relative group/sub"
-                      >
-                        <button
-                          onClick={() =>
-                            dispatch({
-                              type: 'REMOVE_SUBSECTION',
-                              sectionId: section.id,
-                              subSectionId: sub.id,
-                            })
-                          }
-                          className="absolute -right-8 top-0 opacity-0 group-hover/sub:opacity-100 p-1 text-zinc-300 hover:text-red-500 transition-all no-print"
-                          data-testid="remove-subsection-btn"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M6 18L18 6M6 6l12 12"
-                            />
-                          </svg>
-                        </button>
-                        <div className="flex items-center gap-3 mb-2">
-                          <input
-                            type="text"
-                            value={sub.name}
-                            onChange={(e) =>
+                  <div className="space-y-6">
+                    <div className="glass-panel border border-white/5 rounded-xl p-6 bg-surface-container-low/50">
+                      <div className="flex justify-between items-center mb-4">
+                        <h4 className="text-[10px] font-headline font-bold text-on-surface-variant uppercase tracking-[0.2em]">
+                          Main Groove
+                        </h4>
+                        {!section.grid && (
+                          <button
+                            onClick={() =>
                               dispatch({
-                                type: 'UPDATE_SUBSECTION',
+                                type: 'UPDATE_SECTION',
                                 sectionId: section.id,
-                                subSectionId: sub.id,
-                                updates: { name: e.target.value },
+                                updates: {
+                                  grid: {
+                                    timeSignature: state.header.timeSignature,
+                                    resolution: 16,
+                                    measures: 1,
+                                    instruments: createDefaultDrumInstruments({
+                                      timeSignature: state.header.timeSignature,
+                                      resolution: 16,
+                                      measures: 1,
+                                    }),
+                                  },
+                                },
                               })
                             }
-                            className="text-lg font-semibold text-zinc-700 bg-transparent border-none p-0 focus:ring-0"
-                            placeholder="Subsection Name"
-                          />
-                          <div className="flex items-center text-zinc-400 text-sm">
-                            <span className="mr-1">(</span>
-                            <input
-                              type="number"
-                              value={sub.measuresCount}
-                              onChange={(e) =>
-                                dispatch({
-                                  type: 'UPDATE_SUBSECTION',
-                                  sectionId: section.id,
-                                  subSectionId: sub.id,
-                                  updates: {
-                                    measuresCount: parseInt(e.target.value, 10) || 0,
-                                  },
-                                })
-                              }
-                              className="w-6 text-center bg-transparent border-none p-0 focus:ring-0 font-bold text-zinc-500"
-                            />
-                            <span>M)</span>
-                          </div>
-                        </div>
-                        {sub.grid && (
-                          <div className="mb-3">
-                            <GrooveGridEditor
-                              initialGrid={sub.grid}
-                              onChange={(grid) =>
-                                dispatch({
-                                  type: 'UPDATE_SUBSECTION',
-                                  sectionId: section.id,
-                                  subSectionId: sub.id,
-                                  updates: { grid },
-                                })
-                              }
-                              bpm={state.header.bpm}
-                              onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
-                              metronomeEnabled={state.header.metronomeEnabled}
-                              onMetronomeToggle={(enabled) =>
-                                dispatch({ type: 'UPDATE_METRONOME', enabled })
-                              }
-                              metronomeVolume={state.header.metronomeVolume}
-                              onMetronomeVolumeChange={(volume) =>
-                                dispatch({ type: 'UPDATE_METRONOME', volume })
-                              }
-                            />
-                          </div>
+                            className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase hover:bg-primary/20 transition-colors"
+                          >
+                            + Add Grid
+                          </button>
                         )}
                       </div>
-                    ))}
+                      {section.grid && (
+                        <GrooveGridEditor
+                          initialGrid={section.grid}
+                          onChange={(grid) =>
+                            dispatch({
+                              type: 'UPDATE_SECTION',
+                              sectionId: section.id,
+                              updates: { grid },
+                            })
+                          }
+                          bpm={state.header.bpm}
+                          onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
+                          metronomeEnabled={state.header.metronomeEnabled}
+                          onMetronomeToggle={(enabled) =>
+                            dispatch({ type: 'UPDATE_METRONOME', enabled })
+                          }
+                          metronomeVolume={state.header.metronomeVolume}
+                          onMetronomeVolumeChange={(volume) =>
+                            dispatch({ type: 'UPDATE_METRONOME', volume })
+                          }
+                        />
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="text-[10px] font-headline font-bold text-on-surface-variant uppercase tracking-[0.2em]">
+                        Performance Notes
+                      </h4>
+                      <textarea
+                        value={section.notes?.join('\n') || ''}
+                        onChange={(e) =>
+                          dispatch({
+                            type: 'UPDATE_SECTION',
+                            sectionId: section.id,
+                            updates: { notes: e.target.value.split('\n') },
+                          })
+                        }
+                        placeholder="Add specific cues, dynamics, or fill ideas..."
+                        className="w-full h-24 text-sm text-on-surface bg-surface-container-highest border border-transparent rounded-lg p-4 focus:outline-none focus:border-primary/50 resize-none transition-all placeholder:text-on-surface-variant/50 font-body"
+                      />
+                    </div>
+
+                    {/* Subsections */}
+                    {section.subSections && section.subSections.length > 0 && (
+                      <div className="space-y-4 pt-4 border-t border-outline-variant/10">
+                        <h4 className="text-[10px] font-headline font-bold text-on-surface-variant uppercase tracking-[0.2em]">
+                          Variations & Fills
+                        </h4>
+                        {(section.subSections || []).map((sub) => (
+                          <div
+                            key={sub.id}
+                            className="bg-surface-container-highest rounded-xl p-4 relative group/sub"
+                          >
+                            <button
+                              onClick={() =>
+                                dispatch({
+                                  type: 'REMOVE_SUBSECTION',
+                                  sectionId: section.id,
+                                  subSectionId: sub.id,
+                                })
+                              }
+                              className="absolute right-3 top-3 opacity-0 group-hover/sub:opacity-100 p-1 text-on-surface-variant hover:text-error transition-all no-print"
+                              data-testid="remove-subsection-btn"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                            <div className="flex items-center gap-3 mb-4">
+                              <input
+                                type="text"
+                                value={sub.name}
+                                onChange={(e) =>
+                                  dispatch({
+                                    type: 'UPDATE_SUBSECTION',
+                                    sectionId: section.id,
+                                    subSectionId: sub.id,
+                                    updates: { name: e.target.value },
+                                  })
+                                }
+                                className="text-sm font-headline font-bold text-on-surface bg-transparent border-b border-transparent focus:border-primary p-0 focus:ring-0 w-48"
+                                placeholder="Subsection Name"
+                              />
+                              <div className="flex items-center text-on-surface-variant text-[10px] font-headline tracking-widest uppercase bg-surface-container-low px-2 py-0.5 rounded">
+                                <input
+                                  type="number"
+                                  value={sub.measuresCount}
+                                  onChange={(e) =>
+                                    dispatch({
+                                      type: 'UPDATE_SUBSECTION',
+                                      sectionId: section.id,
+                                      subSectionId: sub.id,
+                                      updates: {
+                                        measuresCount: Math.max(
+                                          1,
+                                          parseInt(e.target.value, 10) || 1,
+                                        ),
+                                      },
+                                    })
+                                  }
+                                  className="w-6 text-center bg-transparent border-none p-0 focus:ring-0 font-bold text-on-surface"
+                                />
+                                <span className="ml-1">M</span>
+                              </div>
+                            </div>
+                            {sub.grid && (
+                              <div className="bg-surface-container-low/50 rounded-lg p-4 border border-white/5">
+                                <GrooveGridEditor
+                                  initialGrid={sub.grid}
+                                  onChange={(grid) =>
+                                    dispatch({
+                                      type: 'UPDATE_SUBSECTION',
+                                      sectionId: section.id,
+                                      subSectionId: sub.id,
+                                      updates: { grid },
+                                    })
+                                  }
+                                  bpm={state.header.bpm}
+                                  onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
+                                  metronomeEnabled={state.header.metronomeEnabled}
+                                  onMetronomeToggle={(enabled) =>
+                                    dispatch({ type: 'UPDATE_METRONOME', enabled })
+                                  }
+                                  metronomeVolume={state.header.metronomeVolume}
+                                  onMetronomeVolumeChange={(volume) =>
+                                    dispatch({ type: 'UPDATE_METRONOME', volume })
+                                  }
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     <button
                       onClick={() => dispatch({ type: 'ADD_SUBSECTION', sectionId: section.id })}
-                      className="text-[10px] font-bold text-zinc-400 hover:text-zinc-600 uppercase tracking-widest pl-4 no-print"
+                      className="text-[10px] font-headline font-bold text-primary hover:text-primary-dim uppercase tracking-[0.2em] transition-colors"
                     >
-                      + ADD SUBSECTION
+                      + Add Variation
                     </button>
                   </div>
-                </div>
-              </section>
-            ))}
+                </section>
+              ))}
 
-            <button
-              onClick={() => dispatch({ type: 'ADD_SECTION' })}
-              className="w-full py-4 border-2 border-dashed border-zinc-100 rounded-xl text-zinc-400 font-bold uppercase tracking-widest hover:border-blue-200 hover:bg-blue-50 hover:text-blue-500 transition-all no-print"
-            >
-              Add New Section
-            </button>
-          </div>
-
-          <footer className="mt-16 pt-8 border-t border-zinc-100 text-center">
-            <p className="text-[10px] font-mono text-zinc-400 uppercase tracking-[0.2em]">
-              DrumCharter Song Editor v1.0
-            </p>
-          </footer>
+              <button
+                onClick={() => dispatch({ type: 'ADD_SECTION' })}
+                className="w-full py-8 border border-dashed border-outline-variant/30 rounded-2xl text-on-surface-variant font-headline font-bold uppercase tracking-widest hover:border-primary/50 hover:bg-primary/5 hover:text-primary transition-all no-print flex flex-col items-center justify-center gap-2 group"
+              >
+                <svg
+                  className="w-6 h-6 group-hover:scale-110 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Add New Section
+              </button>
+            </div>
+          </section>
         </div>
       )}
     </div>

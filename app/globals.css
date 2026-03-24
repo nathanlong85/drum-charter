@@ -167,6 +167,14 @@
   --font-body: var(--font-inter), sans-serif;
   --font-label: var(--font-space-grotesk), sans-serif;
   
+  --animate-spin-slow: spin 3s linear infinite;
+  --animate-fade-in: fade-in 0.5s ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
   /* Fallback aliases for any existing classes temporarily */
   --color-muted: var(--surface-variant);
   --color-muted-foreground: var(--on-surface-variant);

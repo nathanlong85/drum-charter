@@ -75,7 +75,7 @@ describe('SnippetEditor', () => {
 
   it('adds a tag on Enter', async () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
-    const tagInput = screen.getByPlaceholderText('Add tag...');
+    const tagInput = screen.getByPlaceholderText('+ ADD TAG');
 
     fireEvent.change(tagInput, { target: { value: 'linear' } });
     fireEvent.keyDown(tagInput, { key: 'Enter', code: 'Enter' });
@@ -96,7 +96,7 @@ describe('SnippetEditor', () => {
 
   it('duplicates the snippet', async () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
-    const duplicateBtn = screen.getByText(/duplicate/i);
+    const duplicateBtn = screen.getByText(/Duplicate/i);
     fireEvent.click(duplicateBtn);
 
     await waitFor(() => {
@@ -107,8 +107,8 @@ describe('SnippetEditor', () => {
 
   it('handles public state toggle', async () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
-    const checkbox = screen.getByLabelText(/Public/i);
-    fireEvent.click(checkbox);
+    const toggleBtn = screen.getByTestId('toggle-public-button');
+    fireEvent.click(toggleBtn);
 
     await waitFor(
       () => {
@@ -124,7 +124,7 @@ describe('SnippetEditor', () => {
     const publicSnippet = { ...mockSnippet, isPublic: true };
     render(<SnippetEditor initialSnippet={publicSnippet} />);
 
-    const viewBtn = screen.getByText(/View/i);
+    const viewBtn = screen.getByText(/View Public/i);
     expect(viewBtn).toHaveAttribute('href', '/public/snippets/snippet-1');
   });
 
@@ -133,7 +133,7 @@ describe('SnippetEditor', () => {
     vi.spyOn(window, 'alert').mockImplementation(() => {});
 
     render(<SnippetEditor initialSnippet={mockSnippet} />);
-    fireEvent.click(screen.getByText(/duplicate/i));
+    fireEvent.click(screen.getByText(/Duplicate/i));
 
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith('Failed to duplicate snippet.');
@@ -146,7 +146,7 @@ describe('SnippetEditor', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
 
     render(<SnippetEditor initialSnippet={mockSnippet} />);
-    fireEvent.click(screen.getByText(/delete/i));
+    fireEvent.click(screen.getByText(/Delete/i));
 
     await waitFor(() => {
       expect(window.alert).toHaveBeenCalledWith('Failed to delete snippet.');
@@ -195,7 +195,7 @@ describe('SnippetEditor', () => {
     supabaseService.deleteGrooveSnippet = vi.fn().mockResolvedValue({});
 
     render(<SnippetEditor initialSnippet={mockSnippet} />);
-    const deleteBtn = screen.getByText(/delete/i);
+    const deleteBtn = screen.getByText(/Delete/i);
     fireEvent.click(deleteBtn);
 
     await waitFor(

@@ -4,6 +4,16 @@ import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/client';
 import LibraryDashboard from '../LibraryDashboard';
 
+// Mock next/navigation
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+  useSearchParams: () => ({
+    get: vi.fn().mockReturnValue(null),
+  }),
+}));
+
 // Mock the Supabase client - Define EVERYTHING inside to avoid hoisting issues
 vi.mock('@/lib/supabase/client', () => {
   const auth = {
@@ -83,7 +93,7 @@ describe('LibraryDashboard', () => {
 
     it('filters items by search query', () => {
       render(<LibraryDashboard {...mockProps} />);
-      const searchInput = screen.getByPlaceholderText(/Search/i);
+      const searchInput = screen.getByPlaceholderText(/FILTER LIST.../i);
 
       fireEvent.change(searchInput, { target: { value: 'non-existent' } });
       expect(screen.queryByText('Song 1')).toBeNull();
@@ -96,10 +106,13 @@ describe('LibraryDashboard', () => {
     it('filters items by tags', () => {
       render(<LibraryDashboard {...mockProps} />);
 
+      // Switch to snippet tab since funk tag belongs to Snippet 1
+      fireEvent.click(screen.getByTestId('tab-snippet'));
+
       // Toggle a tag filter
-      const rockTag = screen.getByLabelText(/Filter by rock tag/i);
-      fireEvent.click(rockTag);
-      expect(screen.getByText('Song 1')).toBeDefined();
+      const funkTag = screen.getByRole('button', { name: /Filter by funk tag/i });
+      fireEvent.click(funkTag);
+      expect(screen.getByText('Snippet 1')).toBeDefined();
 
       // Clear filters
       fireEvent.click(screen.getByText(/Clear Filters/i));
@@ -116,7 +129,7 @@ describe('LibraryDashboard', () => {
       vi.mocked(supabaseService).saveSongChart.mockResolvedValue({ id: 'new-song-id' } as any);
 
       render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByText(/New Song/i));
+      fireEvent.click(screen.getByText(/New song/i));
 
       await waitFor(() => {
         expect(supabaseService.saveSongChart).toHaveBeenCalled();
@@ -133,7 +146,7 @@ describe('LibraryDashboard', () => {
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-notebook'));
-      fireEvent.click(screen.getByText(/New Notebook/i));
+      fireEvent.click(screen.getByText(/New notebook/i));
 
       await waitFor(() => {
         expect(supabaseService.saveNotebook).toHaveBeenCalled();
@@ -150,7 +163,7 @@ describe('LibraryDashboard', () => {
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-snippet'));
-      fireEvent.click(screen.getByText(/New Snippet/i));
+      fireEvent.click(screen.getByText(/New snippet/i));
 
       await waitFor(() => {
         expect(supabaseService.saveGrooveSnippet).toHaveBeenCalled();
@@ -175,7 +188,7 @@ describe('LibraryDashboard', () => {
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-setlist'));
-      fireEvent.click(screen.getByText(/New Setlist/i));
+      fireEvent.click(screen.getByText(/New setlist/i));
 
       await waitFor(() => {
         expect(supabaseService.saveSetlist).toHaveBeenCalled();
@@ -190,7 +203,7 @@ describe('LibraryDashboard', () => {
       });
 
       render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByText(/New Song/i));
+      fireEvent.click(screen.getByText(/New song/i));
 
       await waitFor(() => {
         expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Please log in'));
@@ -206,7 +219,7 @@ describe('LibraryDashboard', () => {
       vi.mocked(supabaseService).saveSongChart.mockRejectedValue(error);
 
       render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByText(/New Song/i));
+      fireEvent.click(screen.getByText(/New song/i));
 
       await waitFor(() => {
         expect(window.alert).toHaveBeenCalledWith(
@@ -221,7 +234,7 @@ describe('LibraryDashboard', () => {
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-notebook'));
-      fireEvent.click(screen.getByText(/New Notebook/i));
+      fireEvent.click(screen.getByText(/New notebook/i));
       await waitFor(() =>
         expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Failed to create item')),
       );
@@ -233,7 +246,7 @@ describe('LibraryDashboard', () => {
 
       render(<LibraryDashboard {...mockProps} />);
       fireEvent.click(screen.getByTestId('tab-snippet'));
-      fireEvent.click(screen.getByText(/New Snippet/i));
+      fireEvent.click(screen.getByText(/New snippet/i));
       await waitFor(() =>
         expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Failed to create item')),
       );

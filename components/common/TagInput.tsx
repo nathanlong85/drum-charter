@@ -107,9 +107,9 @@ export function TagInput({
               removeTag(tags[tags.length - 1]);
             }
           }}
-          placeholder={tags.length === 0 ? placeholder : 'Add tag...'}
+          placeholder={placeholder}
           className="flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 min-w-[120px] placeholder-zinc-400 font-medium"
-          aria-label={tags.length === 0 ? placeholder : 'Add tag'}
+          aria-label={placeholder}
         />
       </div>
 

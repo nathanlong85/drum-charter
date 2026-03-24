@@ -1,20 +1,19 @@
 'use client';
 
-import { ReactNode } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  Music, 
-  FileText, 
-  Library, 
-  ListMusic, 
-  BookOpen, 
-  Settings, 
-  Cloud, 
+import {
+  BookOpen,
+  Cloud,
+  FileText,
+  Library,
+  ListMusic,
+  Music,
   RefreshCw,
   Search,
-  Plus
+  Settings,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { AuthStatus } from '@/components/auth/AuthStatus';
 
 interface AppShellProps {
@@ -23,12 +22,14 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get('tab');
 
   const navItems = [
-    { name: 'Songs', href: '/library?tab=song', icon: Music },
-    { name: 'Notebooks', href: '/library?tab=notebook', icon: FileText },
-    { name: 'Snippets', href: '/library?tab=snippet', icon: Library },
-    { name: 'Set Lists', href: '/library?tab=setlist', icon: ListMusic },
+    { name: 'Songs', href: '/library?tab=song', icon: Music, tab: 'song' },
+    { name: 'Notebooks', href: '/library?tab=notebook', icon: FileText, tab: 'notebook' },
+    { name: 'Snippets', href: '/library?tab=snippet', icon: Library, tab: 'snippet' },
+    { name: 'Set Lists', href: '/library?tab=setlist', icon: ListMusic, tab: 'setlist' },
   ];
 
   return (
@@ -52,7 +53,9 @@ export function AppShell({ children }: AppShellProps) {
 
           <nav className="space-y-2 font-headline text-sm tracking-tight">
             {navItems.map((item) => {
-              const isActive = pathname === item.href || (pathname === '/library' && item.name === 'Songs'); // Simplified for now
+              const isActive =
+                pathname === '/library' &&
+                (currentTab === item.tab || (!currentTab && item.tab === 'song'));
               const Icon = item.icon;
               return (
                 <Link
@@ -69,7 +72,7 @@ export function AppShell({ children }: AppShellProps) {
                 </Link>
               );
             })}
-            
+
             <div className="pt-10">
               <Link
                 href="/manual"
@@ -103,10 +106,10 @@ export function AppShell({ children }: AppShellProps) {
         <div className="flex items-center gap-6">
           <div className="relative group hidden md:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4" />
-            <input 
-              className="bg-surface-container-low border-none text-[10px] font-headline tracking-widest w-64 pl-10 pr-4 py-2 rounded-full focus:ring-1 focus:ring-primary/50 text-on-surface placeholder:text-on-surface-variant/50 outline-none" 
-              placeholder="SEARCH LIBRARY..." 
-              type="text" 
+            <input
+              className="bg-surface-container-low border-none text-[10px] font-headline tracking-widest w-64 pl-10 pr-4 py-2 rounded-full focus:ring-1 focus:ring-primary/50 text-on-surface placeholder:text-on-surface-variant/50 outline-none"
+              placeholder="SEARCH LIBRARY..."
+              type="text"
             />
           </div>
           <div className="flex items-center gap-4 text-on-surface-variant">
@@ -130,11 +133,15 @@ export function AppShell({ children }: AppShellProps) {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
-            <span className="text-[9px] font-headline font-bold text-on-surface-variant tracking-widest uppercase">System Online</span>
+            <span className="text-[9px] font-headline font-bold text-on-surface-variant tracking-widest uppercase">
+              System Online
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-2 text-primary">
-          <span className="text-[9px] font-headline font-bold tracking-widest uppercase">v0.1.0-alpha</span>
+          <span className="text-[9px] font-headline font-bold tracking-widest uppercase">
+            v0.1.0-alpha
+          </span>
         </div>
       </footer>
     </div>

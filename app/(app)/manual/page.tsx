@@ -1,202 +1,253 @@
+import {
+  ArrowLeft,
+  BookOpen,
+  FileText,
+  HelpCircle,
+  Layers,
+  Music,
+  PlayCircle,
+  Settings,
+  ShieldCheck,
+  Zap,
+} from 'lucide-react';
 import Link from 'next/link';
-import { AuthStatus } from '@/components/auth/AuthStatus';
 
 export default function ManualPage() {
   return (
-    <main className="min-h-screen bg-zinc-50 py-12 px-6">
-      <div className="max-w-4xl mx-auto">
-        <header className="flex justify-between items-end mb-12">
-          <div>
-            <h1 className="text-4xl font-black text-zinc-900 tracking-tight mb-2 uppercase">
-              User Manual
-            </h1>
-            <p className="text-zinc-500">Master the art of digital drum charting.</p>
+    <div className="max-w-5xl mx-auto p-8 space-y-12">
+      {/* Hero Header Section */}
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4">
+        <div>
+          <div className="flex items-center gap-3 text-primary font-headline text-xs font-bold uppercase tracking-[0.3em] mb-4">
+            <BookOpen className="w-4 h-4" />
+            <span>Documentation</span>
           </div>
-          <AuthStatus />
-        </header>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 overflow-hidden mb-12">
-          <div className="p-8 md:p-12 prose prose-zinc max-w-none prose-headings:uppercase prose-headings:tracking-tighter prose-headings:font-black prose-h2:border-b prose-h2:pb-2 prose-h2:mt-12">
-            <h2>Welcome to DrumCharter</h2>
-            <p className="lead text-xl text-zinc-600">
-              DrumCharter is a specialized tool designed by drummers, for drummers. It replaces
-              cumbersome word processor templates with a streamlined, interactive environment for
-              creating, managing, and performing with high-quality drum charts.
-            </p>
-
-            <h2>Core Features</h2>
-            <ul>
-              <li>
-                <strong>Song Charts</strong>: Structured song documents with headers, sections
-                (Verse, Chorus, etc.), and measure counts.
-              </li>
-              <li>
-                <strong>Drum-Aware Groove Grid</strong>: A specialized sequencer that understands
-                drum categories, symbols, and articulations.
-              </li>
-              <li>
-                <strong>Setlists</strong>: Organize your songs into performance-ready lists.
-              </li>
-              <li>
-                <strong>Live Mode</strong>: A high-contrast, distraction-free stage view optimized
-                for performance.
-              </li>
-              <li>
-                <strong>Notebooks</strong>: A flexible space for practice routines, sketches, and
-                loose ideas.
-              </li>
-              <li>
-                <strong>Offline Support (PWA)</strong>: Use DrumCharter even without an internet
-                connection.
-              </li>
-            </ul>
-
-            <h2>The Groove Grid</h2>
-            <p>
-              The heart of DrumCharter is the Groove Grid. Unlike generic sequencers, it is
-              optimized for drum notation.
-            </p>
-            <h3>Adding Notes</h3>
-            <p>
-              Click any cell in the grid to toggle a drum hit. Each instrument (Kick, Snare, Hi-Hat,
-              etc.) has its own row.
-            </p>
-            <h3>Articulations & Symbols</h3>
-            <ul>
-              <li>
-                <strong>Standard Hit</strong>: A regular click.
-              </li>
-              <li>
-                <strong>Accent</strong>: A louder, emphasized hit.
-              </li>
-              <li>
-                <strong>Ghost Note</strong>: A soft, subtle tap.
-              </li>
-              <li>
-                <strong>Articulations</strong>: Specific hits like Rim Shots, Cross Sticks, Cymbal
-                Bells, and Chokes.
-              </li>
-            </ul>
-            <h3>Rapid Editing (Keyboard Shortcuts)</h3>
-            <table className="min-w-full text-left border-collapse">
-              <thead>
-                <tr>
-                  <th className="py-2 border-b border-zinc-200">Shortcut</th>
-                  <th className="py-2 border-b border-zinc-200">Action</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                <tr>
-                  <td className="py-2 border-b border-zinc-100 font-mono">Shift + Click</td>
-                  <td className="py-2 border-b border-zinc-100">
-                    Toggle &quot;Optional&quot; status (ghosted in UI)
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-2 border-b border-zinc-100 font-mono">Alt + Click</td>
-                  <td className="py-2 border-b border-zinc-100">
-                    Open Symbol Picker for specific articulations
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-2 border-b border-zinc-100 font-mono">Drag across cells</td>
-                  <td className="py-2 border-b border-zinc-100">
-                    Multi-select cells for batch operations
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-2 border-b border-zinc-100 font-mono">Delete / Backspace</td>
-                  <td className="py-2 border-b border-zinc-100">Clear selected cells</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <h2>Live Mode & Remote Control</h2>
-            <p>Enter Live Mode from any Song Chart or Setlist to get a high-contrast stage view.</p>
-            <h3>Navigation</h3>
-            <ul>
-              <li>
-                Use the <strong>Arrow Keys</strong> or <strong>Page Up/Down</strong> to navigate
-                between song sections.
-              </li>
-              <li>
-                Press <strong>F</strong> to toggle Fullscreen mode.
-              </li>
-              <li>
-                Press <strong>ESC</strong> to exit Live Mode.
-              </li>
-            </ul>
-            <h3>Pedal & MIDI Support</h3>
-            <p>
-              DrumCharter supports Bluetooth page-turner pedals (like AirTurn) and MIDI controllers
-              for hands-free operation.
-            </p>
-            <ol>
-              <li>
-                Open the <strong>Remote Control Settings</strong> (gear icon) in Live Mode.
-              </li>
-              <li>
-                Click <strong>Map</strong> next to an action (e.g., &quot;Next Section&quot;).
-              </li>
-              <li>Press your pedal or trigger a MIDI note/button.</li>
-              <li>The mapping is saved automatically to your device.</li>
-            </ol>
-
-            <h2>Managing Your Library</h2>
-            <p>
-              All your creations are stored in <strong>My Library</strong>. You can search by title
-              or filter by tags (e.g., &quot;Worship&quot;, &quot;Funk&quot;, &quot;Practice&quot;).
-            </p>
-            <ul>
-              <li>
-                <strong>Duplicate</strong>: Create a copy of any item to use as a template.
-              </li>
-              <li>
-                <strong>Delete</strong>: Remove items permanently from your library.
-              </li>
-              <li>
-                <strong>Public/Private</strong>: Toggle the visibility of your charts. Public charts
-                can be shared via a unique URL.
-              </li>
-            </ul>
-
-            <h2>Troubleshooting</h2>
-            <h3>No Sound?</h3>
-            <p>
-              Browsers often block audio until you interact with the page. If you don&apos;t hear
-              anything, try clicking anywhere on the screen or toggling the playback button.
-            </p>
-            <h3>MIDI Device Not Working?</h3>
-            <p>
-              Ensure your device is connected before opening the browser. You may need to refresh
-              the page or check your browser&apos;s site permissions to allow &quot;MIDI
-              devices&quot;.
-            </p>
-            <h3>Offline Use?</h3>
-            <p>
-              On supported browsers, you can &quot;Install&quot; DrumCharter as an app. This ensures
-              all your charts and the audio engine are available even when you have no signal.
-            </p>
-          </div>
+          <h2 className="text-5xl lg:text-7xl font-headline font-black tracking-tighter text-on-surface uppercase mb-2">
+            User Manual
+          </h2>
+          <p className="text-on-surface-variant font-headline text-xs tracking-[0.3em] uppercase max-w-md">
+            Master the architecture of rhythm and digital notation.
+          </p>
         </div>
+      </section>
 
-        <footer className="text-center pb-12">
-          <Link
-            href="/library"
-            className="inline-flex items-center gap-2 text-blue-600 font-bold hover:text-blue-800 transition-colors uppercase tracking-widest text-sm"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="3"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Return to My Library
-          </Link>
-        </footer>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        {/* Navigation Sidebar */}
+        <aside className="lg:col-span-3 hidden lg:block">
+          <nav className="sticky top-24 space-y-1">
+            <p className="text-[10px] font-headline font-black text-primary uppercase tracking-[0.2em] mb-4 px-4">
+              Sections
+            </p>
+            {[
+              { id: 'welcome', label: 'Welcome', icon: Zap },
+              { id: 'features', label: 'Core Features', icon: Layers },
+              { id: 'grid', label: 'Groove Grid', icon: Music },
+              { id: 'live', label: 'Live Mode', icon: PlayCircle },
+              { id: 'library', label: 'Library', icon: Settings },
+              { id: 'privacy', label: 'Privacy', icon: ShieldCheck },
+              { id: 'terms', label: 'Terms', icon: FileText },
+              { id: 'trouble', label: 'Troubleshooting', icon: HelpCircle },
+            ].map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest rounded-xl transition-all font-headline font-bold text-sm uppercase tracking-tight"
+              >
+                <item.icon className="w-4 h-4" />
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <div className="lg:col-span-9 space-y-20 pb-24">
+          <section id="welcome" className="scroll-mt-24">
+            <div className="bg-surface-container-low p-8 md:p-12 rounded-[32px] border border-outline-variant/10 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-colors"></div>
+              <h3 className="text-3xl font-headline font-black text-on-surface uppercase tracking-tight mb-6">
+                Welcome to DrumCharter
+              </h3>
+              <p className="text-xl text-on-surface-variant leading-relaxed font-body">
+                DrumCharter is a high-fidelity workspace designed by drummers, for drummers. It
+                replaces cumbersome word processors with an architectural environment for creating,
+                managing, and performing with professional-grade drum charts.
+              </p>
+            </div>
+          </section>
+
+          <section id="features" className="scroll-mt-24 space-y-8">
+            <h3 className="text-2xl font-headline font-black text-on-surface uppercase tracking-[0.2em] border-l-4 border-primary pl-6">
+              Core Features
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {[
+                {
+                  title: 'Song Charts',
+                  desc: 'Structured documents with dynamic sections and measure counts.',
+                },
+                {
+                  title: 'Groove Grid',
+                  desc: 'A drum-aware sequencer with support for ghost notes and articulations.',
+                },
+                {
+                  title: 'Setlists',
+                  desc: 'Perform-ready collections for seamless gig transitions.',
+                },
+                {
+                  title: 'Live Mode',
+                  desc: 'A distraction-free, high-contrast stage view for tablet use.',
+                },
+                {
+                  title: 'Notebooks',
+                  desc: 'Modular scratchpads for practice routines and technical sketches.',
+                },
+                {
+                  title: 'Offline-First',
+                  desc: 'Full PWA support allows charting without an active connection.',
+                },
+              ].map((f, i) => (
+                <div
+                  key={i}
+                  className="bg-surface-container p-6 rounded-2xl border border-outline-variant/10"
+                >
+                  <h4 className="font-headline font-black text-primary uppercase tracking-widest text-xs mb-2">
+                    {f.title}
+                  </h4>
+                  <p className="text-on-surface-variant text-sm font-body">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section id="grid" className="scroll-mt-24 space-y-8">
+            <h3 className="text-2xl font-headline font-black text-on-surface uppercase tracking-[0.2em] border-l-4 border-primary pl-6">
+              The Groove Grid
+            </h3>
+            <div className="prose prose-invert max-w-none space-y-6">
+              <p className="text-on-surface-variant font-body leading-relaxed">
+                The heart of DrumCharter is the Groove Grid—an interactive canvas optimized for drum
+                notation.
+              </p>
+
+              <div className="bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant/10">
+                <table className="min-w-full text-left font-headline">
+                  <thead className="bg-surface-container-highest/50">
+                    <tr>
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-primary">
+                        Shortcut
+                      </th>
+                      <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] text-primary">
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-variant/10">
+                    {[
+                      { key: 'Shift + Click', action: 'Toggle "Optional" status (ghosted in UI)' },
+                      {
+                        key: 'Alt + Click',
+                        action: 'Open Symbol Picker for specific articulations',
+                      },
+                      { key: 'Drag Selection', action: 'Multi-select cells for batch operations' },
+                      { key: 'Delete / Back', action: 'Clear selected cells' },
+                    ].map((row, i) => (
+                      <tr
+                        key={i}
+                        className="hover:bg-surface-container-highest/30 transition-colors"
+                      >
+                        <td className="px-6 py-4 font-mono text-xs text-primary font-bold">
+                          {row.key}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-on-surface-variant">{row.action}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section id="live" className="scroll-mt-24 space-y-8">
+            <h3 className="text-2xl font-headline font-black text-on-surface uppercase tracking-[0.2em] border-l-4 border-primary pl-6">
+              Performance & MIDI
+            </h3>
+            <div className="bg-surface-container p-8 rounded-[32px] border border-outline-variant/10 space-y-6">
+              <div className="space-y-4 font-body">
+                <h4 className="text-lg font-headline font-bold text-on-surface uppercase">
+                  Remote Control Integration
+                </h4>
+                <p className="text-on-surface-variant">
+                  DrumCharter supports Bluetooth foot switches and MIDI controllers for hands-free
+                  navigation.
+                </p>
+                <ol className="list-decimal list-inside space-y-3 text-on-surface-variant text-sm">
+                  <li>
+                    Enter{' '}
+                    <strong className="text-primary uppercase tracking-tighter">Live Mode</strong>{' '}
+                    from any chart.
+                  </li>
+                  <li>
+                    Click the gear icon to open{' '}
+                    <strong className="text-on-surface">Remote Control Settings</strong>.
+                  </li>
+                  <li>
+                    Tap <strong className="text-primary">Map</strong> and trigger your external
+                    controller.
+                  </li>
+                  <li>Mappings are persisted locally to your device.</li>
+                </ol>
+              </div>
+            </div>
+          </section>
+
+          <section id="privacy" className="scroll-mt-24 space-y-8">
+            <h3 className="text-2xl font-headline font-black text-on-surface uppercase tracking-[0.2em] border-l-4 border-primary pl-6">
+              Privacy Policy
+            </h3>
+            <div className="bg-surface-container p-8 rounded-[32px] border border-outline-variant/10 space-y-4 font-body text-on-surface-variant leading-relaxed">
+              <p>
+                DrumCharter is designed with a privacy-first architecture. Your data is stored
+                securely in our cloud repository via Supabase.
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-sm">
+                <li>We do not sell your musical data or personal identity.</li>
+                <li>Public charts are only visible to those with the unique architect URL.</li>
+                <li>Guest sessions utilize anonymous identifiers and local persistence.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section id="terms" className="scroll-mt-24 space-y-8">
+            <h3 className="text-2xl font-headline font-black text-on-surface uppercase tracking-[0.2em] border-l-4 border-primary pl-6">
+              Terms of Service
+            </h3>
+            <div className="bg-surface-container p-8 rounded-[32px] border border-outline-variant/10 space-y-4 font-body text-on-surface-variant leading-relaxed">
+              <p>
+                By initializing the Sonic Architect Console, you agree to the following protocols:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-sm">
+                <li>Usage is intended for percussive notation and musical study.</li>
+                <li>We provide the architecture &quot;as-is&quot; during this alpha phase.</li>
+                <li>Ownership of all rhythms and charts remains with the architect.</li>
+              </ul>
+            </div>
+          </section>
+
+          <footer className="pt-12 border-t border-outline-variant/10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <Link
+              href="/library"
+              className="flex items-center gap-3 bg-surface-container-highest text-on-surface-variant px-6 py-3 rounded-full font-headline font-bold uppercase tracking-widest text-[10px] hover:text-primary hover:shadow-lg transition-all"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Return to Library
+            </Link>
+            <p className="text-[10px] font-headline font-bold text-on-surface-variant/30 uppercase tracking-[0.4em]">
+              DrumCharter Documentation v1.0-alpha
+            </p>
+          </footer>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
