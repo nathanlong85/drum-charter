@@ -165,11 +165,11 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
 
         {/* Setlist Header Section */}
         <section className="p-8 pb-4 pt-16 md:pt-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-2 w-full max-w-2xl">
-              <div className="flex items-center gap-4 text-secondary font-headline uppercase tracking-[0.2em] text-xs font-bold">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4 w-full max-w-2xl">
+              <div className="flex items-center gap-4 text-secondary font-label uppercase tracking-[0.3em] text-[10px] font-black">
                 <span>Setlist</span>
-                <span className="w-1 h-1 rounded-full bg-secondary/40"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary/40"></span>
                 <span className="text-on-surface-variant flex gap-2 items-center">
                   {saveError ? (
                     <span className="text-error">{saveError}</span>
@@ -179,11 +179,15 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                     <span>Saved</span>
                   )}
                 </span>
-                <span className="w-1 h-1 rounded-full bg-secondary/40"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary/40"></span>
                 <button
                   onClick={handleVisibilityToggle}
                   data-testid="toggle-public-button"
-                  className={setlist.isPublic ? 'text-green-400' : 'text-on-surface-variant'}
+                  className={
+                    setlist.isPublic
+                      ? 'text-secondary'
+                      : 'text-on-surface-variant/50 hover:text-on-surface-variant transition-colors'
+                  }
                 >
                   {setlist.isPublic ? 'PUBLIC' : 'PRIVATE'}
                 </button>
@@ -192,7 +196,7 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                 type="text"
                 value={setlist.title}
                 onChange={handleTitleChange}
-                className="text-5xl lg:text-6xl font-headline font-bold tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0"
+                className="text-5xl lg:text-6xl font-headline font-black tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0 leading-tight"
                 placeholder="Setlist Title"
               />
             </div>
