@@ -2,6 +2,15 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 
+interface MockLibraryItem {
+  id: string;
+  title: string;
+  type: string;
+  tags?: string[];
+  created_at: string;
+  bpm?: number;
+}
+
 // Use vi.hoisted to ensure these are available inside vi.mock factory
 const { mockGetUser, mockSupabase, navState, mockRouter } = vi.hoisted(() => {
   const getUser = vi.fn().mockResolvedValue({
@@ -75,7 +84,7 @@ vi.mock('@/lib/services/supabase-service', () => ({
 import LibraryDashboard from '../LibraryDashboard';
 
 describe('LibraryDashboard', () => {
-  const mockSongs = [
+  const mockSongs: MockLibraryItem[] = [
     {
       id: 's1',
       title: 'Song 1',
@@ -84,7 +93,7 @@ describe('LibraryDashboard', () => {
       created_at: new Date().toISOString(),
     },
   ];
-  const mockNotebooks = [
+  const mockNotebooks: MockLibraryItem[] = [
     {
       id: 'n1',
       title: 'Notebook 1',
@@ -93,7 +102,7 @@ describe('LibraryDashboard', () => {
       created_at: new Date().toISOString(),
     },
   ];
-  const mockSnippets = [
+  const mockSnippets: MockLibraryItem[] = [
     {
       id: 'sn1',
       title: 'Snippet 1',
@@ -102,15 +111,15 @@ describe('LibraryDashboard', () => {
       created_at: new Date().toISOString(),
     },
   ];
-  const mockSetlists = [
+  const mockSetlists: MockLibraryItem[] = [
     { id: 'set1', title: 'Setlist 1', type: 'setlist', created_at: new Date().toISOString() },
   ];
 
   const mockProps = {
-    initialSongs: mockSongs as any,
-    initialNotebooks: mockNotebooks as any,
-    initialSnippets: mockSnippets as any,
-    initialSetlists: mockSetlists as any,
+    initialSongs: mockSongs as any[],
+    initialNotebooks: mockNotebooks as any[],
+    initialSnippets: mockSnippets as any[],
+    initialSetlists: mockSetlists as any[],
   };
 
   beforeEach(() => {

@@ -83,7 +83,7 @@ describe('SnippetEditor', () => {
       ...mockSnippet,
       id: 'sn2',
       title: 'Test Snippet (Copy)',
-    } as any);
+    });
 
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate/i });

@@ -80,12 +80,10 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
   const router = useRouter();
   const isInitialRender = useRef(true);
 
-  const { isSaving, error, triggerSave, settleAutosave } = useAutosave<GrooveSnippet>(
-    async (snippet) => {
+  const { isSaving, error, triggerSave, settleAutosave, cancelAutosave } =
+    useAutosave<GrooveSnippet>(async (snippet) => {
       await supabaseService.saveGrooveSnippet(snippet);
-    },
-    2000,
-  );
+    }, 2000);
 
   useEffect(() => {
     if (isInitialRender.current) {
@@ -149,6 +147,7 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
             onClick={async () => {
               if (confirm('Are you sure you want to delete this snippet?')) {
                 try {
+                  cancelAutosave();
                   await settleAutosave();
                   await supabaseService.deleteGrooveSnippet(state.id);
                   router.push('/library');

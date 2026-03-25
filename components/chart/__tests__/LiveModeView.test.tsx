@@ -121,10 +121,16 @@ describe('LiveModeView', () => {
   it('navigates to next section on button click', () => {
     render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
 
+    // Assert initial active section is Verse
+    expect(screen.getByTestId('active-section-name')).toHaveTextContent('Verse');
+    // Chorus should only be in the preview initially
+    expect(screen.queryByTestId('active-section-name')).not.toHaveTextContent('Chorus');
+
     const nextBtn = screen.getByRole('button', { name: /NEXT/i });
     fireEvent.click(nextBtn);
 
-    expect(screen.getByText('Chorus')).toBeDefined();
+    // Now Chorus should be active
+    expect(screen.getByTestId('active-section-name')).toHaveTextContent('Chorus');
   });
 
   it('renders sub-section measure counts prominently', () => {

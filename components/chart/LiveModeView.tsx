@@ -170,7 +170,10 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
               <div className="text-primary font-headline font-bold text-xs uppercase tracking-[0.4em] mb-2">
                 Current Section
               </div>
-              <h2 className="text-7xl lg:text-8xl font-headline font-black uppercase text-on-surface leading-none tracking-tighter">
+              <h2
+                className="text-7xl lg:text-8xl font-headline font-black uppercase text-on-surface leading-none tracking-tighter"
+                data-testid="active-section-name"
+              >
                 {activeSection.name}
               </h2>
               {activeSection.measuresCount > 0 && (

@@ -114,11 +114,6 @@ test.describe('Grid Ergonomics', () => {
     await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute('alt', 'standard', {
       timeout: 15000,
     });
-
-    // Verify it changed back to standard
-    await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute('alt', 'standard', {
-      timeout: 15000,
-    });
   });
 
   test('should open symbol picker with Alt+Click', async ({ page }) => {

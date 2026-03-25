@@ -41,14 +41,16 @@ vi.mock('@/lib/services/supabase-service', () => ({
 describe('SongEditor', () => {
   const mockSong: SongChart = {
     id: 's1',
-    ownerId: 'u1',
+    userId: 'u1',
     header: {
       title: 'Test Song',
       bpm: 120,
       timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-      tags: [],
+      metronomeEnabled: false,
+      metronomeVolume: 0.5,
     },
     sections: [],
+    tags: [],
     isPublic: false,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -145,7 +147,7 @@ describe('SongEditor', () => {
       ...mockSong,
       id: 's2',
       header: { ...mockSong.header, title: 'Test Song (Copy)' },
-    } as any);
+    });
 
     render(<SongEditor initialSong={mockSong} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate/i });

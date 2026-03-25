@@ -93,7 +93,7 @@ export function AppShell({ children }: AppShellProps) {
             <span className="text-[10px] font-headline font-black text-on-surface uppercase tracking-tight">
               DrumCharter
             </span>
-            <span className="text-[8px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.2em]">
+            <span className="text-[10px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.2em]">
               v{version}
             </span>
           </div>

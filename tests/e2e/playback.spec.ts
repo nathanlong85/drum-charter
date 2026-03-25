@@ -71,8 +71,7 @@ test.describe('Playback & Metronome', () => {
     await expect(page.getByTestId('metronome-volume-value')).toHaveText('30%');
 
     // Close settings
-    await page.getByTestId('close-metronome-settings').dispatchEvent('click');
-    await page.waitForTimeout(500);
+    await page.getByTestId('close-metronome-settings').click();
     await expect(settingsPanel).not.toBeVisible({ timeout: 10000 });
   });
 

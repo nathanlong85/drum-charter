@@ -15,6 +15,7 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
   const router = useRouter();
   const [setlist, setSetlist] = useState<Setlist>(initialSetlist);
   const isMounted = useRef(true);
+  const isInitialRender = useRef(true);
 
   // Available songs to add to the setlist
   const [availableSongs, setAvailableSongs] = useState<{ id: string; title: string }[]>([]);
@@ -48,11 +49,12 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
 
   // Autosave when setlist changes
   useEffect(() => {
-    // Skip the first render to avoid redundant save
-    if (setlist !== initialSetlist) {
-      triggerSave(setlist);
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
     }
-  }, [setlist, triggerSave, initialSetlist]);
+    triggerSave(setlist);
+  }, [setlist, triggerSave]);
 
   const updateSetlist = (updates: Partial<Setlist>) => {
     setSetlist((prev) => ({ ...prev, ...updates }));

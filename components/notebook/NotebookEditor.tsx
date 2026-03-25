@@ -266,7 +266,11 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                       Practice Notes
                     </h4>
                     <textarea
-                      value={section.notes || ''}
+                      value={
+                        Array.isArray(section.notes)
+                          ? section.notes.join('\n')
+                          : section.notes || ''
+                      }
                       onChange={(e) =>
                         dispatch({
                           type: 'UPDATE_SECTION',

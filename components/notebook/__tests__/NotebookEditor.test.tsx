@@ -5,9 +5,10 @@ import type { Notebook } from '@/lib/types/groove';
 import { NotebookEditor } from '../NotebookEditor';
 
 // Mock next/navigation
+const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockPush,
   }),
 }));
 
@@ -23,7 +24,7 @@ vi.mock('@/lib/services/supabase-service', () => ({
 describe('NotebookEditor', () => {
   const mockNotebook: Notebook = {
     id: 'n1',
-    ownerId: 'u1',
+    userId: 'u1',
     title: 'Test Notebook',
     tags: [],
     isPublic: false,
@@ -34,6 +35,7 @@ describe('NotebookEditor', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockPush.mockClear();
   });
 
   it('renders the notebook title', () => {
@@ -144,7 +146,7 @@ describe('NotebookEditor', () => {
       ...mockNotebook,
       id: 'n2',
       title: 'Test Notebook (Copy)',
-    } as any);
+    });
 
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate/i });

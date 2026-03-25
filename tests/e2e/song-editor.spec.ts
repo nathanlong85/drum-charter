@@ -89,6 +89,7 @@ test.describe('Song Chart Editor', () => {
     await expect(picker).toBeVisible({ timeout: 10000 });
 
     // Select a different symbol (e.g., accent hit)
+    // Note: { force: true } is used because the sticky footer can intercept pointer events on small viewports
     await picker.locator('button[aria-label="Accent"]').click({ force: true });
 
     // Verify cell icon changed to accent

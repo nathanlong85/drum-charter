@@ -18,7 +18,10 @@ test.describe('Authentication and Core Flow', () => {
     await page.getByTestId('tab-snippet').click();
 
     // Create new snippet
-    await page.click('button:has-text("New snippet")');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
 
     // Should redirect to snippet editor
     await expect(page).toHaveURL(/\/snippets\/.+/);
