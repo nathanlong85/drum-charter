@@ -70,8 +70,27 @@ describe('LiveModeView', () => {
 
   it('renders the header with chart title', () => {
     render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
-    expect(screen.getByTestId('live-mode-header')).toBeDefined();
-    expect(screen.getByText('Test Song')).toBeDefined();
+    expect(screen.getByTestId('live-mode-header')).toBeInTheDocument();
+    expect(screen.getByText('Test Song')).toBeInTheDocument();
+  });
+
+  it('displays correct navigation labels based on section index', () => {
+    render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
+
+    // At first section (index 0)
+    const prevBtn = screen.getByTestId('live-mode-prev-btn');
+    expect(prevBtn).toHaveTextContent(/TOP/i);
+    expect(prevBtn).toHaveTextContent(/PREVIOUS/i);
+
+    const nextBtn = screen.getByTestId('live-mode-next-btn');
+    expect(nextBtn).toHaveTextContent(/Chorus/i);
+    expect(nextBtn).toHaveTextContent(/NEXT/i);
+
+    // Navigate to last section (index 1)
+    fireEvent.click(nextBtn);
+
+    expect(screen.getByTestId('live-mode-prev-btn')).toHaveTextContent(/Verse/i);
+    expect(screen.getByTestId('live-mode-next-btn')).toHaveTextContent(/FINISH/i);
   });
 
   it('renders the active section name and measure count', () => {
@@ -92,11 +111,20 @@ describe('LiveModeView', () => {
   it('hides the "Next Up" preview on the last section', () => {
     render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
 
-    const nextBtn = screen.getByText('NEXT').closest('button')!;
+    const nextBtn = screen.getByTestId('live-mode-next-btn');
     fireEvent.click(nextBtn);
 
     expect(screen.getByText('Chorus')).toBeDefined();
     expect(screen.queryByTestId('next-section-preview')).toBeNull();
+  });
+
+  it('navigates to next section on button click', () => {
+    render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
+
+    const nextBtn = screen.getByRole('button', { name: /NEXT/i });
+    fireEvent.click(nextBtn);
+
+    expect(screen.getByText('Chorus')).toBeDefined();
   });
 
   it('renders sub-section measure counts prominently', () => {

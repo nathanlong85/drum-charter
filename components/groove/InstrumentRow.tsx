@@ -132,9 +132,9 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
             isSelected = instIdx >= minInst && instIdx <= maxInst && i >= minNote && i <= maxNote;
           }
 
-          if (isBeat && instIdx === 0) {
-            return (
-              <div key={i} className="relative">
+          return (
+            <div key={i} className="relative">
+              {isBeat && instIdx === 0 && (
                 <div
                   data-testid={`beat-label-${i / notesPerBeat + 1}`}
                   className={`
@@ -145,36 +145,20 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
                 >
                   {i / notesPerBeat + 1}
                 </div>
-                <NoteCell
-                  symbol={symbol}
-                  velocity={velocity}
-                  onClick={(e) => onNoteClick(i, e)}
-                  onContextMenu={(e) => onNoteContextMenu(i, e)}
-                  onMouseDown={(e) => onNoteMouseDown?.(i, e)}
-                  onMouseEnter={() => onNoteMouseEnter?.(i)}
-                  isBeat={isBeat}
-                  isMeasureBoundary={isMeasureBoundary}
-                  isSelected={isSelected}
-                  readOnly={readOnly}
-                />
-              </div>
-            );
-          }
-
-          return (
-            <NoteCell
-              key={i}
-              symbol={symbol}
-              velocity={velocity}
-              onClick={(e) => onNoteClick(i, e)}
-              onContextMenu={(e) => onNoteContextMenu(i, e)}
-              onMouseDown={(e) => onNoteMouseDown?.(i, e)}
-              onMouseEnter={() => onNoteMouseEnter?.(i)}
-              isBeat={isBeat}
-              isMeasureBoundary={isMeasureBoundary}
-              isSelected={isSelected}
-              readOnly={readOnly}
-            />
+              )}
+              <NoteCell
+                symbol={symbol}
+                velocity={velocity}
+                onClick={(e) => onNoteClick(i, e)}
+                onContextMenu={(e) => onNoteContextMenu(i, e)}
+                onMouseDown={(e) => onNoteMouseDown?.(i, e)}
+                onMouseEnter={() => onNoteMouseEnter?.(i)}
+                isBeat={isBeat}
+                isMeasureBoundary={isMeasureBoundary}
+                isSelected={isSelected}
+                readOnly={readOnly}
+              />
+            </div>
           );
         })}
       </div>

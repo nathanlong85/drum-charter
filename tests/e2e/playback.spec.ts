@@ -9,7 +9,10 @@ test.describe('Playback & Metronome', () => {
 
     // Create new snippet for a clean grid
     await page.getByTestId('tab-snippet').click();
-    await page.click('text=New snippet');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/snippets\//);
   });
 

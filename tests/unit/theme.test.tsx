@@ -1,18 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { NoteCell } from '@/components/groove/NoteCell';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { NoteCell } from '@/components/groove/NoteCell';
 import { createDefaultDrumInstruments } from '@/lib/types/groove';
 
 describe('Theme Class Verification', () => {
   describe('NoteCell', () => {
     it('applies new design system tokens', () => {
       const { container } = render(
-        <NoteCell
-          symbol="standard"
-          onClick={() => {}}
-          onContextMenu={() => {}}
-        />
+        <NoteCell symbol="standard" onClick={() => {}} onContextMenu={() => {}} />,
       );
 
       const cell = container.firstChild as HTMLElement;
@@ -27,6 +23,7 @@ describe('Theme Class Verification', () => {
       measures: 1,
       resolution: 4 as const,
       timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+      playbackOptionalHits: [],
       instruments: createDefaultDrumInstruments({
         measures: 1,
         resolution: 4,

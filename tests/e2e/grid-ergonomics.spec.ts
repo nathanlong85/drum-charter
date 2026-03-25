@@ -9,7 +9,10 @@ test.describe('Grid Ergonomics', () => {
 
     // Create a new snippet
     await page.getByTestId('tab-snippet').click();
-    await page.click('text=New snippet');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/snippets\//);
   });
 
@@ -19,12 +22,8 @@ test.describe('Grid Ergonomics', () => {
     const firstCell = kickRow.getByTestId('note-cell').first();
 
     // Toggle a note to have something to clear
-    await page.waitForTimeout(500);
-    await firstCell.dispatchEvent('click');
-    await page.waitForTimeout(500);
-    await page.waitForTimeout(1000);
-    // In our new NoteCell, icon is in a wrapper
-    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 20000 });
+    await firstCell.click();
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 10000 });
 
     // Handle confirm dialog - register BEFORE trigger
     page.once('dialog', (dialog) => dialog.accept());
@@ -41,12 +40,9 @@ test.describe('Grid Ergonomics', () => {
     await snareRow.waitFor({ state: 'visible' });
     const firstCell = snareRow.getByTestId('note-cell').first();
 
-    // Toggle a note
-    await page.waitForTimeout(500);
-    await firstCell.dispatchEvent('click');
-    await page.waitForTimeout(500);
-    await page.waitForTimeout(500);
-    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 20000 });
+    // Add a note
+    await firstCell.click();
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 10000 });
 
     // Enter Edit mode
     await page.getByTitle('Edit Instruments').click({ force: true });
@@ -97,14 +93,12 @@ test.describe('Grid Ergonomics', () => {
     const firstCell = kickRow.getByTestId('note-cell').first();
 
     // Toggle note first (standard)
-    await page.waitForTimeout(500);
-    await firstCell.dispatchEvent('click');
-    await page.waitForTimeout(500);
-    await page.waitForTimeout(500);
-    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 20000 });
+    // Add a note first
+    await firstCell.click();
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 10000 });
+
     // Shift + Click to toggle optional
-    await firstCell.click({ force: true }, { shiftKey: true });
-    await page.waitForTimeout(1000);
+    await firstCell.click({ modifiers: ['Shift'] });
 
     // Verify it changed to standard_opt
     await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute(
@@ -116,8 +110,10 @@ test.describe('Grid Ergonomics', () => {
     );
 
     // Shift + Click again to toggle back
-    await firstCell.click({ force: true }, { shiftKey: true });
-    await page.waitForTimeout(1000);
+    await firstCell.click({ modifiers: ['Shift'] });
+    await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute('alt', 'standard', {
+      timeout: 15000,
+    });
 
     // Verify it changed back to standard
     await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute('alt', 'standard', {
@@ -135,7 +131,7 @@ test.describe('Grid Ergonomics', () => {
     await page.keyboard.up('Alt');
 
     // Verify Symbol Picker is visible
-    await expect(page.getByTestId('symbol-picker')).toBeVisible();
+    await expect(page.getByTestId('symbol-picker')).toBeVisible({ timeout: 10000 });
   });
 
   // TODO: Fix flakiness in redesigned UI. See Issue #73
@@ -145,15 +141,11 @@ test.describe('Grid Ergonomics', () => {
     const firstCell = kickRow.getByTestId('note-cell').first();
 
     // Add note
-    await page.waitForTimeout(500);
-    await firstCell.dispatchEvent('click');
-    await page.waitForTimeout(500);
-    await page.waitForTimeout(500);
-    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 20000 });
+    await firstCell.click();
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 10000 });
 
     // Select the cell via mousedown (which is what grid uses for selection start)
     await firstCell.dispatchEvent('mousedown');
-    await page.waitForTimeout(500);
 
     // Verify selection styling (using the data attribute)
     await expect(firstCell).toHaveAttribute('data-selected', 'true', { timeout: 15000 });
@@ -162,6 +154,6 @@ test.describe('Grid Ergonomics', () => {
     await page.keyboard.press('Delete');
 
     // Verify note is gone
-    await expect(firstCell.getByTestId('note-cell-icon')).not.toBeVisible();
+    await expect(firstCell.getByTestId('note-cell-icon')).not.toBeVisible({ timeout: 10000 });
   });
 });

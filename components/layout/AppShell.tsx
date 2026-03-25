@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { AuthStatus } from '@/components/auth/AuthStatus';
+import { version } from '@/package.json';
 
 interface AppShellProps {
   children: ReactNode;
@@ -62,7 +63,7 @@ export function AppShell({ children }: AppShellProps) {
                   key={item.name}
                   href={item.href}
                   data-active={isActive}
-                  aria-selected={isActive}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`flex items-center gap-3 rounded-lg p-3 transition-all duration-200 ${
                     isActive
                       ? 'bg-surface-container-highest text-primary shadow-[0_0_15px_rgba(0,0,0,0.2)]'
@@ -87,7 +88,15 @@ export function AppShell({ children }: AppShellProps) {
           </nav>
         </div>
 
-        <div className="mt-auto p-6 border-t border-outline-variant/10">
+        <div className="mt-auto p-6 border-t border-outline-variant/10 flex flex-col gap-4">
+          <div className="flex flex-col gap-1 px-1">
+            <span className="text-[10px] font-headline font-black text-on-surface uppercase tracking-tight">
+              DrumCharter
+            </span>
+            <span className="text-[8px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.2em]">
+              v{version}
+            </span>
+          </div>
           <AuthStatus />
         </div>
       </aside>
@@ -100,7 +109,8 @@ export function AppShell({ children }: AppShellProps) {
           </span>
           <div className="hidden md:block h-4 w-[1px] bg-outline-variant/30"></div>
           <div className="flex items-center gap-2 text-primary font-headline text-[10px] tracking-[0.2em]">
-            <Cloud className="w-4 h-4" />
+            <Cloud className="w-4 h-4 animate-pulse" />
+            {/* TODO: Wire this to actual sync status */}
             <span className="hidden sm:inline-block">SYNCED</span>
           </div>
         </div>

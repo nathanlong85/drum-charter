@@ -46,7 +46,10 @@ test.describe('Authentication and Core Flow', () => {
     await page.getByTestId('tab-notebook').click();
 
     // Create new notebook
-    await page.click('button:has-text("New notebook")');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
 
     // Should redirect to notebook editor
     await expect(page).toHaveURL(/\/notebooks\/.+/);

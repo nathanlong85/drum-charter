@@ -38,7 +38,7 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
       const newSection: NotebookSection = {
         id: crypto.randomUUID(),
         name: 'New Section',
-        notes: [],
+        notes: '',
       };
       return {
         ...state,
@@ -230,8 +230,9 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
               >
                 <button
                   onClick={() => dispatch({ type: 'REMOVE_SECTION', sectionId: section.id })}
-                  className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 p-2 text-on-surface-variant hover:text-error transition-all no-print"
+                  className="absolute right-4 top-4 opacity-0 group-hover:opacity-100 focus:opacity-100 focus-visible:opacity-100 active:opacity-100 p-2 text-on-surface-variant hover:text-error transition-all no-print outline-none"
                   title="Remove Section"
+                  aria-label="Remove Section"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -265,12 +266,12 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                       Practice Notes
                     </h4>
                     <textarea
-                      value={section.notes?.join('\n') || ''}
+                      value={section.notes || ''}
                       onChange={(e) =>
                         dispatch({
                           type: 'UPDATE_SECTION',
                           sectionId: section.id,
-                          updates: { notes: e.target.value.split('\n') },
+                          updates: { notes: e.target.value },
                         })
                       }
                       placeholder="Add notes, patterns, or exercises..."

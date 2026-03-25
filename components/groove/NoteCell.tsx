@@ -80,7 +80,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
       onContextMenu={readOnly ? (e) => e.preventDefault() : onContextMenu}
       onMouseDown={readOnly ? undefined : onMouseDown}
       onMouseEnter={readOnly ? undefined : onMouseEnter}
-      data-testid={isSelected ? 'note-cell selected-cell' : 'note-cell'}
+      data-testid="note-cell"
       data-selected={isSelected ? 'true' : 'false'}
       className={`
         note-cell w-8 h-8 flex items-center justify-center border-r border-outline-variant/20 
@@ -93,6 +93,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     >
       {iconPath && (
         <div className="w-full h-full flex items-center justify-center pointer-events-none select-none">
+          {/* biome-ignore lint/performance/noImgElement: intentional for E2E reliability (SVG transitions caused flakes) */}
           <img
             src={iconPath}
             alt={symbol}

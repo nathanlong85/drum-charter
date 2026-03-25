@@ -15,6 +15,11 @@ import {
 import type React from 'react';
 import { useState } from 'react';
 import type { BeatResolution, GrooveGrid, TimeSignature } from '@/lib/types/groove';
+import {
+  MAX_BEATS_PER_MEASURE,
+  MIN_BEATS_PER_MEASURE,
+  VALID_BEAT_VALUES,
+} from '@/lib/utils/constants';
 
 const toolbarContainerClass =
   'flex items-center bg-surface-container-low p-2 rounded-xl border border-outline-variant/10 text-sm no-print shadow-sm';
@@ -213,11 +218,15 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
               if (Number.isNaN(val)) return;
               updateTimeSignature({
                 ...state.timeSignature,
-                beatsPerMeasure: Math.max(1, val),
+                beatsPerMeasure: Math.min(
+                  Math.max(val, MIN_BEATS_PER_MEASURE),
+                  MAX_BEATS_PER_MEASURE,
+                ),
               });
             }}
             className="w-10 px-1 py-1 bg-transparent text-center font-bold font-headline focus:outline-none"
-            min="1"
+            min={MIN_BEATS_PER_MEASURE}
+            max={MAX_BEATS_PER_MEASURE}
             title="Beats per measure"
           />
           <span className="text-on-surface-variant/40">/</span>
@@ -232,7 +241,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
             className="bg-transparent px-1 py-1 font-bold font-headline focus:outline-none appearance-none cursor-pointer"
             title="Beat value"
           >
-            {[2, 4, 8, 16].map((v) => (
+            {VALID_BEAT_VALUES.map((v) => (
               <option key={v} value={v} className="bg-surface-container-low text-on-surface">
                 {v}
               </option>

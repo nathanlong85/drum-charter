@@ -187,7 +187,13 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                 <span>Snippet</span>
                 <span className="w-1 h-1 rounded-full bg-primary/40"></span>
                 <span className="text-on-surface-variant flex gap-2 items-center">
-                  {isSaving ? <span className="animate-pulse">Saving...</span> : <span>Saved</span>}
+                  {error ? (
+                    <span className="text-error">{error}</span>
+                  ) : isSaving ? (
+                    <span className="animate-pulse">Saving...</span>
+                  ) : (
+                    <span>Saved</span>
+                  )}
                 </span>
                 <span className="w-1 h-1 rounded-full bg-primary/40"></span>
                 <button

@@ -16,7 +16,10 @@ export default function Home() {
       {/* Dynamic Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3 group cursor-pointer">
+          <Link
+            href="/"
+            className="flex items-center gap-3 group transition-transform hover:scale-105 outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-lg p-1"
+          >
             <div className="w-10 h-10 bg-primary flex items-center justify-center rounded-xl shadow-[0_0_20px_var(--color-primary-dim)] group-hover:scale-110 transition-transform duration-500">
               <Music className="w-6 h-6 text-on-primary" />
             </div>
@@ -28,7 +31,7 @@ export default function Home() {
                 Sonic Architect
               </span>
             </div>
-          </div>
+          </Link>
           <div className="flex items-center gap-8">
             <nav className="hidden md:flex items-center gap-8 text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant">
               <a href="#features" className="hover:text-primary transition-colors">
@@ -94,7 +97,7 @@ export default function Home() {
           {/* Interactive Engine Preview */}
           <div
             id="demo"
-            className="relative group p-1 bg-gradient-to-br from-outline-variant/20 to-transparent rounded-[40px]"
+            className="relative group p-1 bg-gradient-to-br from-outline-variant/20 to-transparent rounded-[40px] scroll-mt-24"
           >
             <div className="bg-surface-container-low rounded-[38px] p-4 md:p-8 shadow-3xl border border-white/5 relative overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
@@ -124,7 +127,7 @@ export default function Home() {
       {/* Tech Stack / Features Grid */}
       <section
         id="features"
-        className="py-32 relative bg-surface-container-lowest border-y border-outline-variant/10"
+        className="py-32 relative bg-surface-container-lowest border-y border-outline-variant/10 scroll-mt-24"
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">

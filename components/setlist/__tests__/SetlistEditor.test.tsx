@@ -203,7 +203,7 @@ describe('SetlistEditor', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText('Failed to save changes')).toBeInTheDocument();
+      expect(screen.getByText('Save failed')).toBeInTheDocument();
     });
   });
 

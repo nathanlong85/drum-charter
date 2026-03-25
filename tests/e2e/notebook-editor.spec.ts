@@ -10,7 +10,10 @@ test.describe('Notebook Editor', () => {
 
     // Navigate to Notebooks tab and create new notebook
     await page.getByTestId('tab-notebook').click();
-    await page.click('text=New notebook');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/notebooks\//);
   });
 

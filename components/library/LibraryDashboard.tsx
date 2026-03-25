@@ -67,18 +67,9 @@ export default function LibraryDashboard({
   const router = useRouter();
 
   const queryTab = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState<ItemType>(
-    isValidItemType(queryTab) ? queryTab : 'song',
-  );
-
-  useEffect(() => {
-    if (isValidItemType(queryTab) && queryTab !== activeTab) {
-      setActiveTab(queryTab);
-    }
-  }, [queryTab, activeTab]);
+  const activeTab: ItemType = isValidItemType(queryTab) ? (queryTab as ItemType) : 'song';
 
   const handleTabChange = (tab: ItemType) => {
-    setActiveTab(tab);
     router.push(`/library?tab=${tab}`);
   };
 
@@ -360,6 +351,7 @@ export default function LibraryDashboard({
           </div>
           <button
             onClick={handleCreateNew}
+            data-testid="create-new-button"
             className="bg-gradient-to-br from-primary to-primary-dim text-on-primary font-headline text-[11px] font-bold tracking-widest uppercase px-6 py-3 rounded-full shadow-[0_4px_20px_rgba(129,236,255,0.3)] hover:opacity-90 transition-all flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />

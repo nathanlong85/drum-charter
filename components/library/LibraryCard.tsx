@@ -58,6 +58,7 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
             }}
             className="p-1.5 text-on-surface-variant hover:text-primary transition-all rounded-md hover:bg-primary/10"
             title="Duplicate"
+            data-testid={`duplicate-${item.type}-${item.id}`}
             aria-label={`Duplicate ${item.type}: ${item.title}`}
             type="button"
           >
@@ -71,6 +72,7 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
             }}
             className="p-1.5 text-on-surface-variant hover:text-error transition-all rounded-md hover:bg-error/10"
             title="Delete"
+            data-testid={`delete-${item.type}-${item.id}`}
             aria-label={`Delete ${item.type}: ${item.title}`}
             type="button"
           >

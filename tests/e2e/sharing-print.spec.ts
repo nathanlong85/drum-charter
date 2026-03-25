@@ -9,7 +9,10 @@ test.describe('Sharing & Public View', () => {
     await expect(page).toHaveURL('/library');
 
     await page.getByTestId('tab-snippet').click();
-    await page.click('text=New snippet');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/snippets\//);
 
     const snippetTitle = `Public Snippet ${Date.now()}`;
@@ -53,7 +56,8 @@ test.describe('Sharing & Public View', () => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
 
-    await page.click('text=New song');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, { timeout: 15000 });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/songs\//);
 
     // Add some content

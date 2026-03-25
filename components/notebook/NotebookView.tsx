@@ -55,7 +55,7 @@ export function NotebookView({ notebook }: NotebookViewProps) {
 
               {section.notes && section.notes.length > 0 && (
                 <div className="w-full text-zinc-700 bg-zinc-50 p-4 rounded-lg min-h-[50px] text-sm whitespace-pre-wrap">
-                  {section.notes.join('\n')}
+                  {section.notes}
                 </div>
               )}
             </div>

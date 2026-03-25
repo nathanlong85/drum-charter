@@ -1,9 +1,9 @@
 'use client';
 
-import { debounce } from 'lodash';
 import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useAutosave } from '@/lib/hooks/useAutosave';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { Setlist, SetlistItem } from '@/lib/types/groove';
 
@@ -14,37 +14,19 @@ interface SetlistEditorProps {
 export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
   const router = useRouter();
   const [setlist, setSetlist] = useState<Setlist>(initialSetlist);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const isMounted = useRef(true);
-  const skipFlushOnUnmountRef = useRef(false);
 
   // Available songs to add to the setlist
   const [availableSongs, setAvailableSongs] = useState<{ id: string; title: string }[]>([]);
   const [isSelectingSong, setIsSelectingSong] = useState(false);
 
-  const saveToSupabaseRef = useRef(
-    debounce(async (dataToSave: Setlist) => {
-      try {
-        if (isMounted.current) {
-          setIsSaving(true);
-          setSaveError(null);
-        }
-        await supabaseService.saveSetlist(dataToSave);
-      } catch (err) {
-        console.error('Failed to save setlist:', err);
-        if (isMounted.current) {
-          setSaveError('Failed to save changes');
-        }
-      } finally {
-        if (isMounted.current) {
-          setIsSaving(false);
-        }
-      }
-    }, 1000),
-  );
-
-  const saveToSupabase = saveToSupabaseRef.current;
+  const {
+    isSaving,
+    error: saveError,
+    triggerSave,
+    settleAutosave,
+    cancelAutosave,
+  } = useAutosave<Setlist>((dataToSave) => supabaseService.saveSetlist(dataToSave), 1000);
 
   useEffect(() => {
     isMounted.current = true;
@@ -61,26 +43,16 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
     loadSongs();
     return () => {
       isMounted.current = false;
-      if (!skipFlushOnUnmountRef.current) {
-        saveToSupabase.flush();
-      }
     };
-  }, [saveToSupabase.flush]);
+  }, []);
 
   // Autosave when setlist changes
   useEffect(() => {
     // Skip the first render to avoid redundant save
     if (setlist !== initialSetlist) {
-      saveToSupabase(setlist);
+      triggerSave(setlist);
     }
-  }, [setlist, saveToSupabase, initialSetlist]);
-
-  // Cleanup the debounced function on unmount
-  useEffect(() => {
-    return () => {
-      saveToSupabase.flush();
-    };
-  }, [saveToSupabase]);
+  }, [setlist, triggerSave, initialSetlist]);
 
   const updateSetlist = (updates: Partial<Setlist>) => {
     setSetlist((prev) => ({ ...prev, ...updates }));
@@ -171,19 +143,13 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
             onClick={async () => {
               if (confirm('Are you sure you want to delete this setlist?')) {
                 try {
-                  // Ensure any active or pending autosave settles before deleting
-                  saveToSupabase.flush();
-                  // We don't have direct access to the promise from ref.current easily without adding a ref for it
-                  // but flush() synchronously calls the debounced function.
-                  // Since saveToSupabase uses await inside its debounce, we might still have a race.
-                  // For now, let's just cancel and prevent the unmount flush.
-                  skipFlushOnUnmountRef.current = true;
-                  saveToSupabase.cancel();
+                  // Prevent any further autosaves
+                  cancelAutosave();
+                  await settleAutosave();
 
                   await supabaseService.deleteSetlist(setlist.id);
                   router.push('/library');
                 } catch (error) {
-                  skipFlushOnUnmountRef.current = false;
                   console.error('Failed to delete setlist:', error);
                   alert('Failed to delete setlist.');
                 }

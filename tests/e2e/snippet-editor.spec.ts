@@ -10,7 +10,10 @@ test.describe('Groove Snippet Editor', () => {
 
     // Navigate to Snippets tab and create new snippet
     await page.getByTestId('tab-snippet').click();
-    await page.click('text=New snippet');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/snippets\//);
   });
 
@@ -71,11 +74,8 @@ test.describe('Groove Snippet Editor', () => {
     const firstCell = page.getByTestId('note-cell').first();
 
     // Toggle a note
-    await page.waitForTimeout(500);
-    await firstCell.dispatchEvent('click');
-    await page.waitForTimeout(500);
-    await page.waitForTimeout(1000);
-    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 20000 });
+    await firstCell.click();
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 10000 });
 
     // Wait for auto-save
     await waitForSave(page);

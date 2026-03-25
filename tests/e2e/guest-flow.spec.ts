@@ -138,7 +138,10 @@ test.describe('Guest Access & Library Flow', () => {
       (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
-    await page.click('button:has-text("New notebook")');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await createPromise;
 
     // Wait for redirect

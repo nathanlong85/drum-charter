@@ -19,7 +19,10 @@ test.describe('Public Sharing Workflows', () => {
     // 2. Create a new notebook
     await page.getByTestId('tab-notebook').first().click();
     const createPromise = page.waitForResponse((resp) => resp.url().includes('/rest/v1/notebooks'));
-    await page.getByRole('button', { name: /New notebook/i }).click();
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     const response = await createPromise;
     expect(response.ok()).toBe(true);
     await page.waitForURL(/\/notebooks\/.+/);
@@ -54,7 +57,10 @@ test.describe('Public Sharing Workflows', () => {
     const createPromise = page.waitForResponse((resp) =>
       resp.url().includes('/rest/v1/groove_snippets'),
     );
-    await page.getByRole('button', { name: /New snippet/i }).click();
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     const response = await createPromise;
     expect(response.ok()).toBe(true);
     await page.waitForURL(/\/snippets\/.+/);

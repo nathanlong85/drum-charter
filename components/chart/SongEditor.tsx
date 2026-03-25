@@ -12,6 +12,11 @@ import {
   type SongSection,
   type SongSubSection,
 } from '@/lib/types/groove';
+import {
+  MAX_BEATS_PER_MEASURE,
+  MIN_BEATS_PER_MEASURE,
+  VALID_BEAT_VALUES,
+} from '@/lib/utils/constants';
 import { LiveModeView } from './LiveModeView';
 
 type SongAction =
@@ -361,35 +366,43 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                       data-testid="time-signature-beats"
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
+                        if (Number.isNaN(val)) return;
                         dispatch({
                           type: 'UPDATE_TIME_SIGNATURE',
-                          beatsPerMeasure: Number.isNaN(val) ? 4 : Math.max(1, Math.min(val, 32)),
+                          beatsPerMeasure: Math.min(
+                            Math.max(val, MIN_BEATS_PER_MEASURE),
+                            MAX_BEATS_PER_MEASURE,
+                          ),
                           beatValue: state.header.timeSignature.beatValue,
                         });
                       }}
                       className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-8"
+                      min={MIN_BEATS_PER_MEASURE}
+                      max={MAX_BEATS_PER_MEASURE}
                     />
                     <span className="text-primary text-2xl font-bold">/</span>
-                    <input
-                      type="number"
+                    <select
                       value={state.header.timeSignature.beatValue}
                       data-testid="time-signature-value"
                       onChange={(e) => {
-                        const val = parseInt(e.target.value, 10);
-                        const validBeatValues = [1, 2, 4, 8, 16, 32];
-                        const beatValue = Number.isNaN(val)
-                          ? 4
-                          : validBeatValues.includes(val)
-                            ? val
-                            : 4;
                         dispatch({
                           type: 'UPDATE_TIME_SIGNATURE',
                           beatsPerMeasure: state.header.timeSignature.beatsPerMeasure,
-                          beatValue,
+                          beatValue: parseInt(e.target.value, 10),
                         });
                       }}
-                      className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-8"
-                    />
+                      className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center cursor-pointer appearance-none outline-none"
+                    >
+                      {VALID_BEAT_VALUES.map((v) => (
+                        <option
+                          key={v}
+                          value={v}
+                          className="bg-surface-container-low text-on-surface text-sm"
+                        >
+                          {v}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>

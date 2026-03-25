@@ -9,7 +9,8 @@ test.describe('Song Chart Editor', () => {
     await expect(page).toHaveURL('/library');
 
     // Create new song
-    await page.click('text=New song');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, { timeout: 15000 });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/songs\//);
   });
 
@@ -23,7 +24,7 @@ test.describe('Song Chart Editor', () => {
 
     // Change Time Signature
     await page.getByTestId('time-signature-beats').fill('3');
-    await page.getByTestId('time-signature-value').fill('4');
+    await page.getByTestId('time-signature-value').selectOption('4');
 
     await waitForSave(page);
 
@@ -78,27 +79,20 @@ test.describe('Song Chart Editor', () => {
     const firstCell = kickRow.getByTestId('note-cell').first();
 
     // Toggle a note
-    await page.waitForTimeout(500);
-    await firstCell.dispatchEvent('click');
-    await page.waitForTimeout(500);
-    await page.waitForTimeout(500);
+    await firstCell.click();
     // Verify it's active (has symbol)
-    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 20000 });
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 10000 });
 
     // Right-click for symbol picker
     await firstCell.click({ button: 'right' });
-    // SymbolPicker uses a fixed/absolute positioning div
-    // Use a more flexible locator for the picker
     const picker = page.getByTestId('symbol-picker');
-    await expect(picker).toBeVisible();
+    await expect(picker).toBeVisible({ timeout: 10000 });
 
     // Select a different symbol (e.g., accent hit)
-    // The symbol buttons have aria-labels like "Accent"
-    // Use click({ force: true }) for all fixed overlay interactions to avoid viewport issues
     await picker.locator('button[aria-label="Accent"]').click({ force: true });
 
     // Verify cell icon changed to accent
-    await expect(firstCell.locator('img[alt="accent"]')).toBeVisible();
+    await expect(firstCell.locator('img[alt="accent"]')).toBeVisible({ timeout: 10000 });
 
     // Velocity adjustment buttons (GHOST/STD/ACCENT)
     const ghostVelBtn = picker.locator('button', { hasText: 'GHOST' });
@@ -106,7 +100,7 @@ test.describe('Song Chart Editor', () => {
     await ghostVelBtn.click({ force: true });
 
     // Verify velocity bar changed (ghost is 0.3, so width should be 30%)
-    await expect(firstCell.locator('div[style*="width: 30%"]')).toBeVisible();
+    await expect(firstCell.locator('div[style*="width: 30%"]')).toBeVisible({ timeout: 10000 });
 
     // Click Done
     await picker.locator('button', { hasText: 'Done' }).click({ force: true });

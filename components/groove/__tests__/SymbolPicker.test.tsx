@@ -118,7 +118,7 @@ describe('SymbolPicker', () => {
     );
 
     const backdrop = screen.getByTestId('symbolpicker-backdrop');
-    fireEvent.click(backdrop);
+    fireEvent.mouseDown(backdrop);
     expect(onClose).toHaveBeenCalled();
   });
 });

@@ -13,12 +13,9 @@ test.describe('Live Mode', () => {
     await page.waitForTimeout(500);
 
     // Click New song
-    const createBtn = page
-      .getByRole('button', { name: /^New song$/i })
-      .or(page.getByText(/^New song$/i))
-      .first();
+    const createBtn = page.getByTestId('create-new-button');
     await expect(createBtn).toBeVisible({ timeout: 15000 });
-    await createBtn.click({ force: true });
+    await createBtn.click();
 
     // Wait for redirect to a song ID
     await page.waitForURL(/\/songs\/[0-9a-f-]+/, { timeout: 30000 });

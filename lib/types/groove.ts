@@ -146,7 +146,7 @@ export interface NotebookSection {
   id: string;
   name: string;
   grid?: GrooveGrid;
-  notes?: string[];
+  notes?: string;
   bpm?: number;
 }
 

@@ -90,7 +90,7 @@ export function AuthStatus() {
             className="text-[10px] font-headline font-black text-on-surface uppercase tracking-tight truncate"
             data-testid="auth-user-email"
           >
-            {user.email}
+            {user.email || user.phone || 'No email provided'}
           </span>
           {/* TODO: Drive this from user account metadata when available */}
           <span className="text-[8px] font-headline font-bold text-on-surface-variant uppercase tracking-widest opacity-50">

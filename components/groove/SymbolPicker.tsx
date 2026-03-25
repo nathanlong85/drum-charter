@@ -106,7 +106,6 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
     <>
       <div
         className="fixed inset-0 z-40 bg-black/5 backdrop-blur-[1px]"
-        onClick={onClose}
         data-testid="symbolpicker-backdrop"
       />
       <div

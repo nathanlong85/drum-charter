@@ -13,7 +13,8 @@ test.describe('Library Management & Guest Flow', () => {
     const songTitle = `Test Song ${Date.now()}`;
 
     // Create new song
-    await page.click('text=New song');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, { timeout: 15000 });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/songs\//);
 
     // Update title and wait for save
@@ -56,7 +57,10 @@ test.describe('Library Management & Guest Flow', () => {
     await page.getByTestId('tab-snippet').click();
 
     // Create new snippet
-    await page.click('text=New snippet');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/snippets\//);
 
     // Add a tag
@@ -87,7 +91,8 @@ test.describe('Library Management & Guest Flow', () => {
     const originalTitle = `Original ${Date.now()}`;
 
     // Create song
-    await page.click('text=New song');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, { timeout: 15000 });
+    await page.getByTestId('create-new-button').click();
     await page.locator('input[placeholder="Song Title"]').fill(originalTitle);
     await waitForSave(page);
 
