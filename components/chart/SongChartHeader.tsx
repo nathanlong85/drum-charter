@@ -20,14 +20,14 @@ export const SongChartHeader: React.FC<SongChartHeaderProps> = ({ title, bpm, ti
           {bpm && (
             <div className="flex flex-col items-end">
               <span className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mb-1">
-                TEMPO_BPM
+                Tempo (BPM)
               </span>
               <span className="leading-none">{bpm}</span>
             </div>
           )}
           <div className="flex flex-col items-end">
             <span className="text-[10px] font-bold text-primary uppercase tracking-[0.3em] mb-1">
-              TIME_SIG
+              Time Sig
             </span>
             <span className="leading-none">
               {timeSignature.beatsPerMeasure}

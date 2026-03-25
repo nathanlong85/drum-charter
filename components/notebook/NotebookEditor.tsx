@@ -267,7 +267,7 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                 <div className="space-y-8">
                   <div className="space-y-3">
                     <h4 className="text-[10px] font-label font-black text-on-surface-variant/50 uppercase tracking-[0.2em]">
-                      PRACTICE_NOTES
+                      Practice Notes
                     </h4>
                     <textarea
                       value={

@@ -1,15 +1,14 @@
 'use client';
 
 import type React from 'react';
-import type { GrooveGrid, SongSection } from '@/lib/types/groove';
+import type { SongSection } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../groove/GrooveGridEditor';
 
 interface SongSectionViewProps {
   section: SongSection;
-  onGridChange?: (grid: GrooveGrid) => void;
 }
 
-export const SongSectionView: React.FC<SongSectionViewProps> = ({ section, onGridChange }) => {
+export const SongSectionView: React.FC<SongSectionViewProps> = ({ section }) => {
   return (
     <div className="mb-12 last:mb-0 print:mb-8">
       <div className="flex items-center gap-4 mb-6">
@@ -24,7 +23,7 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({ section, onGri
       <div className="ml-6 border-l border-outline-variant/10 pl-6 space-y-8">
         {section.grid && (
           <div className="mb-6">
-            <GrooveGridEditor initialGrid={section.grid} onChange={onGridChange} readOnly={true} />
+            <GrooveGridEditor initialGrid={section.grid} readOnly={true} />
           </div>
         )}
 

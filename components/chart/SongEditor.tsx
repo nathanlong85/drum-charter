@@ -417,12 +417,13 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             <div className="lg:col-span-3 space-y-6 hidden lg:block">
               <div className="flex items-center justify-between mb-4 border-b border-outline-variant/10 pb-2">
                 <h3 className="font-label font-black uppercase text-[10px] tracking-[0.2em] text-on-surface-variant/60">
-                  SONG_SECTIONS
+                  Song Sections
                 </h3>
                 <button
                   onClick={() => dispatch({ type: 'ADD_SECTION' })}
                   className="text-primary hover:text-primary-dim transition-colors"
                   title="Add Section"
+                  aria-label="Add section"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -438,7 +439,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                 {state.sections.map((section) => (
                   <div
                     key={section.id}
-                    className="bg-surface-container-low/50 p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-high transition-colors cursor-pointer border border-outline-variant/5 shadow-sm"
+                    className="bg-surface-container-low/50 p-4 rounded-xl flex items-center justify-between border border-outline-variant/5 shadow-sm"
                   >
                     <div>
                       <p className="font-headline font-black text-on-surface truncate w-32 tracking-tight">

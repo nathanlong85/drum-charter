@@ -227,7 +227,7 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={emptySetlist} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Initial set is empty/i)).toBeInTheDocument();
+      expect(screen.getByText(/Initial Set Empty/i)).toBeInTheDocument();
     });
   });
 

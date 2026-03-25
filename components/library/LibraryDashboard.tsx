@@ -353,7 +353,7 @@ export default function LibraryDashboard({
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40 w-4 h-4 transition-colors group-focus-within:text-primary" />
             <input
               type="text"
-              placeholder="FILTER_ENGINE_QUERY..."
+              placeholder="SEARCH LIBRARY..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               data-testid="search-library-input"
@@ -366,7 +366,7 @@ export default function LibraryDashboard({
             className="bg-primary text-on-primary font-headline text-[11px] font-black tracking-[0.2em] uppercase px-8 py-3.5 rounded-full shadow-[0_8px_25px_var(--color-primary-dim)] hover:translate-y-[-2px] hover:shadow-[0_12px_30px_var(--color-primary-dim)] transition-all flex items-center gap-3 active:translate-y-[1px]"
           >
             <Plus className="w-5 h-5 stroke-[3px]" />
-            NEW_{activeTab.toUpperCase()}
+            NEW {activeTab.toUpperCase()}
           </button>
         </div>
       </div>
@@ -397,7 +397,7 @@ export default function LibraryDashboard({
               onClick={() => setSelectedTags([])}
               className="text-[9px] font-label font-black text-error hover:text-error-dim uppercase tracking-[0.25em] ml-4 hover:underline underline-offset-4"
             >
-              RESET_FILTERS
+              RESET FILTERS
             </button>
           )}
         </div>
@@ -408,7 +408,7 @@ export default function LibraryDashboard({
         <div className="flex items-center gap-4">
           <div className="w-8 h-[2px] bg-primary/20" />
           <h3 className="font-headline font-black text-sm tracking-[0.3em] uppercase text-on-surface-variant/40">
-            {activeTab}s_Index
+            {activeTab}s Index
           </h3>
           <div className="flex-1 h-[1px] bg-outline-variant/10" />
         </div>
@@ -422,7 +422,7 @@ export default function LibraryDashboard({
               <Plus className="w-8 h-8 stroke-[1.5px] group-hover:rotate-90 transition-transform duration-500" />
             </div>
             <span className="text-[10px] font-label font-black tracking-[0.3em] uppercase text-on-surface-variant/40 group-hover:text-primary transition-colors">
-              ADD_NEW_{activeTab.toUpperCase()}
+              ADD NEW {activeTab.toUpperCase()}
             </span>
           </button>
 
