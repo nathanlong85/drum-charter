@@ -1,7 +1,7 @@
 'use client';
 
 import { debounce } from 'lodash';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * A generic hook for managing debounced autosave state.
@@ -15,28 +15,40 @@ export function useAutosave<T>(saveFn: (data: T) => Promise<any>, delay = 2000) 
   const pendingSaveRef = useRef<Promise<any> | null>(null);
   const skipFlushOnUnmountRef = useRef(false);
 
-  const debouncedSave = useRef(
-    debounce(async (data: T) => {
+  // Keep a stable ref to the latest saveFn to avoid recreating debounce too often if it changes
+  const saveFnRef = useRef(saveFn);
+  useEffect(() => {
+    saveFnRef.current = saveFn;
+  }, [saveFn]);
+
+  const debouncedSave = useMemo(() => {
+    const saver = debounce(async (data: T) => {
       if (!isMountedRef.current) return;
       setIsSaving(true);
       setError(null);
-      const savePromise = saveFn(data);
-      pendingSaveRef.current = savePromise;
+
+      const currentSavePromise = saveFnRef.current(data);
+      pendingSaveRef.current = currentSavePromise;
+
       try {
-        await savePromise;
+        await currentSavePromise;
       } catch (err) {
         console.error('Autosave failed:', err);
-        setError(err instanceof Error ? err.message : 'Failed to save changes');
-      } finally {
-        if (isMountedRef.current) {
-          setIsSaving(false);
+        // Only update error if this is still the latest save attempt
+        if (isMountedRef.current && pendingSaveRef.current === currentSavePromise) {
+          setError(err instanceof Error ? err.message : 'Failed to save changes');
         }
-        if (pendingSaveRef.current === savePromise) {
+      } finally {
+        // Only clear saving state if this is still the latest save attempt
+        if (isMountedRef.current && pendingSaveRef.current === currentSavePromise) {
+          setIsSaving(false);
           pendingSaveRef.current = null;
         }
       }
-    }, delay)
-  ).current;
+    }, delay);
+
+    return saver;
+  }, [delay]);
 
   const settleAutosave = useCallback(async () => {
     debouncedSave.flush();
@@ -57,6 +69,7 @@ export function useAutosave<T>(saveFn: (data: T) => Promise<any>, delay = 2000) 
         debouncedSave.flush();
       }
       isMountedRef.current = false;
+      debouncedSave.cancel();
     };
   }, [debouncedSave]);
 

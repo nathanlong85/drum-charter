@@ -301,7 +301,7 @@ describe('GrooveGridEditor', () => {
 
       fireEvent.click(clearBtn);
 
-      expect(confirmSpy).toHaveBeenCalledWith('Clear all notes in the grid?');
+      expect(confirmSpy).toHaveBeenCalledWith('Clear entire grid?');
       await waitFor(() => {
         expect(onChange).toHaveBeenCalledWith(
           expect.objectContaining({
@@ -364,9 +364,9 @@ describe('GrooveGridEditor', () => {
       fireEvent.mouseEnter(cells[1]);
       fireEvent.mouseUp(window);
 
-      expect(cells[0]).toHaveClass('bg-blue-200/50');
-      expect(cells[1]).toHaveClass('bg-blue-200/50');
-      expect(cells[2]).not.toHaveClass('bg-blue-200/50');
+      expect(cells[0]).toHaveClass('bg-primary/30');
+      expect(cells[1]).toHaveClass('bg-primary/30');
+      expect(cells[2]).not.toHaveClass('bg-primary/30');
     });
 
     it('clears selected cells with Delete key', async () => {
@@ -496,12 +496,12 @@ describe('GrooveGridEditor', () => {
 
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseUp(window);
-      expect(cells[0]).toHaveClass('bg-blue-200/50');
+      expect(cells[0]).toHaveClass('bg-primary/30');
 
       // Click another cell (not the same one)
       fireEvent.mouseDown(cells[1], { button: 0 });
       fireEvent.click(cells[1]);
-      expect(cells[0]).not.toHaveClass('bg-blue-200/50');
+      expect(cells[0]).not.toHaveClass('bg-primary/30');
     });
 
     it('applies velocity to all selected cells', async () => {
@@ -535,10 +535,10 @@ describe('GrooveGridEditor', () => {
 
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseUp(window);
-      expect(cells[0]).toHaveClass('bg-blue-200/50');
+      expect(cells[0]).toHaveClass('bg-primary/30');
 
       fireEvent.contextMenu(cells[2]);
-      expect(cells[0]).not.toHaveClass('bg-blue-200/50');
+      expect(cells[0]).not.toHaveClass('bg-primary/30');
     });
   });
 });

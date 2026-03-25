@@ -98,7 +98,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
             alt={symbol}
             data-testid="note-cell-icon"
             style={{ opacity, width: 24, height: 24 }}
-            className="select-none pointer-events-none transition-opacity dark:invert"
+            className="select-none pointer-events-none"
           />
         </div>
       )}

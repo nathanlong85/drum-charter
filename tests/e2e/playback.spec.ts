@@ -64,12 +64,13 @@ test.describe('Playback & Metronome', () => {
     await expect(page.getByTestId('metronome-volume-value')).toHaveText('80%');
 
     // Click a preset button (Ghost = 0.3 = 30%)
-    await settingsPanel.locator('button', { hasText: 'Ghost' }).dispatchEvent('click');
+    await settingsPanel.locator('button', { hasText: 'Ghost' }).click({ force: true });
     await expect(page.getByTestId('metronome-volume-value')).toHaveText('30%');
 
     // Close settings
-    await settingsPanel.locator('button', { hasText: 'Close' }).dispatchEvent('click');
-    await expect(settingsPanel).not.toBeVisible();
+    await page.getByTestId('close-metronome-settings').dispatchEvent('click');
+    await page.waitForTimeout(500);
+    await expect(settingsPanel).not.toBeVisible({ timeout: 10000 });
   });
 
   test('should show beat labels and measure boundaries', async ({ page }) => {

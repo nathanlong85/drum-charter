@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { useAutosave } from '@/lib/hooks/useAutosave';
@@ -82,11 +82,11 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
   const router = useRouter();
   const isInitialRender = useRef(true);
 
-  const { isSaving, triggerSave, settleAutosave } = useAutosave<Notebook>(
+  const { isSaving, error, triggerSave, settleAutosave } = useAutosave<Notebook>(
     async (notebook) => {
       await supabaseService.saveNotebook(notebook);
     },
-    2000
+    2000,
   );
 
   useEffect(() => {
@@ -376,6 +376,29 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
             DrumCharter Notebook Console v1.0
           </p>
         </footer>
+      </div>
+
+      {/* Floating Save Status */}
+      <div
+        className="fixed bottom-8 right-8 z-50 pointer-events-none"
+        data-testid="floating-save-status"
+      >
+        {isSaving && (
+          <div className="bg-surface-container-highest/80 backdrop-blur-md border border-outline-variant/20 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-bottom-4 flex items-center gap-2">
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+            <span className="text-[10px] font-headline font-black text-primary uppercase tracking-[0.2em]">
+              Saving...
+            </span>
+          </div>
+        )}
+        {error && (
+          <div className="bg-error/10 backdrop-blur-md border border-error/20 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-bottom-4 flex items-center gap-2">
+            <div className="w-2 h-2 bg-error rounded-full"></div>
+            <span className="text-[10px] font-headline font-black text-error uppercase tracking-[0.2em]">
+              {error}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

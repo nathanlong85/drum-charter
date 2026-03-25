@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { useAutosave } from '@/lib/hooks/useAutosave';
@@ -80,11 +80,11 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
   const router = useRouter();
   const isInitialRender = useRef(true);
 
-  const { isSaving, triggerSave, settleAutosave } = useAutosave<GrooveSnippet>(
+  const { isSaving, error, triggerSave, settleAutosave } = useAutosave<GrooveSnippet>(
     async (snippet) => {
       await supabaseService.saveGrooveSnippet(snippet);
     },
-    2000
+    2000,
   );
 
   useEffect(() => {
@@ -108,7 +108,8 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                     await navigator.clipboard.writeText(
                       `${window.location.origin}/public/snippets/${state.id}`,
                     );
-                    alert('Public link copied to clipboard!');
+                    // TODO: Replace with toast
+                    console.log('Public link copied to clipboard!');
                   } catch (_err) {
                     alert(
                       `Failed to copy link. Here it is: ${window.location.origin}/public/snippets/${state.id}`,
@@ -243,6 +244,29 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
             DrumCharter Snippet Module v1.0
           </p>
         </footer>
+      </div>
+
+      {/* Floating Save Status */}
+      <div
+        className="fixed bottom-8 right-8 z-50 pointer-events-none"
+        data-testid="floating-save-status"
+      >
+        {isSaving && (
+          <div className="bg-surface-container-highest/80 backdrop-blur-md border border-outline-variant/20 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-bottom-4 flex items-center gap-2">
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+            <span className="text-[10px] font-headline font-black text-primary uppercase tracking-[0.2em]">
+              Saving...
+            </span>
+          </div>
+        )}
+        {error && (
+          <div className="bg-error/10 backdrop-blur-md border border-error/20 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-bottom-4 flex items-center gap-2">
+            <div className="w-2 h-2 bg-error rounded-full"></div>
+            <span className="text-[10px] font-headline font-black text-error uppercase tracking-[0.2em]">
+              {error}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

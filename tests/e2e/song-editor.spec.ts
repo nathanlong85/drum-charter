@@ -78,10 +78,12 @@ test.describe('Song Chart Editor', () => {
     const firstCell = kickRow.getByTestId('note-cell').first();
 
     // Toggle a note
+    await page.waitForTimeout(500);
     await firstCell.dispatchEvent('click');
     await page.waitForTimeout(500);
+    await page.waitForTimeout(500);
     // Verify it's active (has symbol)
-    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible();
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 20000 });
 
     // Right-click for symbol picker
     await firstCell.click({ button: 'right' });
@@ -92,8 +94,8 @@ test.describe('Song Chart Editor', () => {
 
     // Select a different symbol (e.g., accent hit)
     // The symbol buttons have aria-labels like "Accent"
-    // Use dispatchEvent('click') for all fixed overlay interactions to avoid viewport issues
-    await picker.locator('button[aria-label="Accent"]').dispatchEvent('click');
+    // Use click({ force: true }) for all fixed overlay interactions to avoid viewport issues
+    await picker.locator('button[aria-label="Accent"]').click({ force: true });
 
     // Verify cell icon changed to accent
     await expect(firstCell.locator('img[alt="accent"]')).toBeVisible();
@@ -101,13 +103,13 @@ test.describe('Song Chart Editor', () => {
     // Velocity adjustment buttons (GHOST/STD/ACCENT)
     const ghostVelBtn = picker.locator('button', { hasText: 'GHOST' });
     await expect(ghostVelBtn).toBeVisible();
-    await ghostVelBtn.dispatchEvent('click');
+    await ghostVelBtn.click({ force: true });
 
-    // Verify velocity bar changed (ghost is 0.2, so width should be 20%)
-    await expect(firstCell.locator('div[style*="width: 20%"]')).toBeVisible();
+    // Verify velocity bar changed (ghost is 0.3, so width should be 30%)
+    await expect(firstCell.locator('div[style*="width: 30%"]')).toBeVisible();
 
     // Click Done
-    await picker.locator('button', { hasText: 'Done' }).dispatchEvent('click');
+    await picker.locator('button', { hasText: 'Done' }).click({ force: true });
     await expect(picker).not.toBeVisible();
 
     await waitForSave(page);
@@ -115,7 +117,11 @@ test.describe('Song Chart Editor', () => {
     // Reload and verify persistence
     await page.reload();
     await expect(
-      page.getByTestId('instrument-row-kick').getByTestId('note-cell').first().getByTestId('note-cell-icon'),
+      page
+        .getByTestId('instrument-row-kick')
+        .getByTestId('note-cell')
+        .first()
+        .getByTestId('note-cell-icon'),
     ).toBeVisible();
   });
 

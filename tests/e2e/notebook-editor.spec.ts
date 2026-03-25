@@ -108,9 +108,7 @@ test.describe('Notebook Editor', () => {
       .getByTestId('groove-toolbar');
 
     // First should still be 8th resolution
-    await expect(reloadedFirstToolbar.getByTestId('resolution-button-8')).toHaveClass(
-      /bg-primary/,
-    );
+    await expect(reloadedFirstToolbar.getByTestId('resolution-button-8')).toHaveClass(/bg-primary/);
 
     // Second should still have 2 measures
     await expect(

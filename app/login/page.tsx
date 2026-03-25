@@ -19,6 +19,7 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (guestLoading) return;
     setLoading(true);
     setMessage('');
     setMessageType('error');
@@ -148,14 +149,14 @@ export default function LoginPage() {
             <div className="flex flex-col gap-3 pt-2">
               <button
                 className="w-full bg-primary text-on-primary font-headline font-black text-xs uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all disabled:opacity-50"
-                disabled={loading}
+                disabled={loading || guestLoading}
               >
                 {loading ? 'Processing...' : 'Authenticate'}
               </button>
               <button
                 onClick={handleSignup}
                 className="w-full bg-surface-container-highest text-on-surface font-headline font-black text-xs uppercase tracking-widest py-4 rounded-2xl border border-outline-variant/10 hover:bg-surface-bright transition-all disabled:opacity-50"
-                disabled={loading}
+                disabled={loading || guestLoading}
                 type="button"
               >
                 Create Account

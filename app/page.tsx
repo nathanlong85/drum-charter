@@ -1,15 +1,6 @@
 'use client';
 
-import {
-  ArrowRight,
-  Cloud,
-  Layers,
-  Music,
-  Play,
-  RefreshCw,
-  ShieldCheck,
-  Zap,
-} from 'lucide-react';
+import { ArrowRight, Cloud, Layers, Music, Play, RefreshCw, ShieldCheck, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { AuthStatus } from '@/components/auth/AuthStatus';
 import { GrooveDemo } from '@/components/demo/GrooveDemo';
@@ -241,4 +232,3 @@ export default function Home() {
     </main>
   );
 }
-

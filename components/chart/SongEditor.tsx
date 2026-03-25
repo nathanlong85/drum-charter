@@ -1,9 +1,9 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { TagInput } from '@/components/common/TagInput';
+import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import { supabaseService } from '@/lib/services/supabase-service';
 import {
@@ -168,12 +168,9 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
   const router = useRouter();
   const isInitialRender = useRef(true);
 
-  const { isSaving, triggerSave, settleAutosave } = useAutosave<SongChart>(
-    async (song) => {
-      await supabaseService.saveSongChart(song);
-    },
-    2000
-  );
+  const { isSaving, error, triggerSave, settleAutosave } = useAutosave<SongChart>(async (chart) => {
+    await supabaseService.saveSongChart(chart);
+  }, 2000);
 
   useEffect(() => {
     if (isInitialRender.current) {
@@ -380,7 +377,11 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
                         const validBeatValues = [1, 2, 4, 8, 16, 32];
-                        const beatValue = Number.isNaN(val) ? 4 : validBeatValues.includes(val) ? val : 4;
+                        const beatValue = Number.isNaN(val)
+                          ? 4
+                          : validBeatValues.includes(val)
+                            ? val
+                            : 4;
                         dispatch({
                           type: 'UPDATE_TIME_SIGNATURE',
                           beatsPerMeasure: state.header.timeSignature.beatsPerMeasure,
@@ -482,7 +483,9 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                           dispatch({
                             type: 'UPDATE_SECTION',
                             sectionId: section.id,
-                            updates: { measuresCount: Math.max(1, parseInt(e.target.value, 10) || 1) },
+                            updates: {
+                              measuresCount: Math.max(1, parseInt(e.target.value, 10) || 1),
+                            },
                           })
                         }
                         className="w-8 text-center bg-transparent border-none p-0 focus:ring-0 font-bold text-on-surface"
@@ -571,7 +574,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                         <h4 className="text-[10px] font-headline font-bold text-on-surface-variant uppercase tracking-[0.2em]">
                           Variations & Fills
                         </h4>
-                        {(section.subSections || []).map((sub) => (
+                        {section.subSections.map((sub) => (
                           <div
                             key={sub.id}
                             className="bg-surface-container-highest rounded-xl p-4 relative group/sub"
@@ -701,6 +704,29 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
           </section>
         </div>
       )}
+
+      {/* Floating Save Status */}
+      <div
+        className="fixed bottom-8 right-8 z-50 pointer-events-none"
+        data-testid="floating-save-status"
+      >
+        {isSaving && (
+          <div className="bg-surface-container-highest/80 backdrop-blur-md border border-outline-variant/20 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-bottom-4 flex items-center gap-2">
+            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+            <span className="text-[10px] font-headline font-black text-primary uppercase tracking-[0.2em]">
+              Saving...
+            </span>
+          </div>
+        )}
+        {error && (
+          <div className="bg-error/10 backdrop-blur-md border border-error/20 px-4 py-2 rounded-full shadow-2xl animate-in fade-in slide-in-from-bottom-4 flex items-center gap-2">
+            <div className="w-2 h-2 bg-error rounded-full"></div>
+            <span className="text-[10px] font-headline font-black text-error uppercase tracking-[0.2em]">
+              {error}
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

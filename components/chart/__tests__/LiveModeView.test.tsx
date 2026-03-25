@@ -68,6 +68,12 @@ describe('LiveModeView', () => {
     vi.clearAllMocks();
   });
 
+  it('renders the header with chart title', () => {
+    render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
+    expect(screen.getByTestId('live-mode-header')).toBeDefined();
+    expect(screen.getByText('Test Song')).toBeDefined();
+  });
+
   it('renders the active section name and measure count', () => {
     render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
 

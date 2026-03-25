@@ -11,6 +11,7 @@ import {
   type DrumSymbol,
   type GrooveGrid,
   getVelocityForSymbol,
+  type TimeSignature,
 } from '@/lib/types/groove';
 import { GrooveGridToolbar } from './GrooveGridToolbar';
 import { InstrumentRow } from './InstrumentRow';
@@ -171,9 +172,9 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
   };
 
-  const handleNoteMouseDown = (instIdx: number, noteIdx: number, e: React.MouseEvent) => {
+  const handleNoteMouseDown = (instIdx: number, noteIdx: number, e?: React.MouseEvent) => {
     if (readOnly) return;
-    if (e.button !== 0) return; // Only left click
+    if (e && e.button !== 0) return; // Only left click
     setSelectionRange({
       start: { instIdx, noteIdx },
       end: { instIdx, noteIdx },
@@ -367,11 +368,11 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     wrappedDispatch({ type: 'SET_RESOLUTION', resolution: res });
   };
 
-  const updateTimeSignature = (beats: number, value: number) => {
+  const updateTimeSignature = (newTs: TimeSignature) => {
     wrappedDispatch({
       type: 'SET_TIME_SIGNATURE',
-      beatsPerMeasure: Math.max(1, beats),
-      beatValue: value,
+      beatsPerMeasure: Math.max(1, newTs.beatsPerMeasure),
+      beatValue: newTs.beatValue,
     });
   };
 
@@ -416,10 +417,10 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
         <div
           key={i}
           data-testid={activeStep === i ? 'active-step' : `step-${i}`}
-          className={`w-8 h-8 flex items-center justify-center text-xs font-bold border-r border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 select-none
-            ${subIndex === 0 ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'}
-            ${isMeasureBoundary ? 'border-r-2 border-r-gray-800 dark:border-r-gray-200' : ''}
-            ${activeStep === i ? 'bg-yellow-200 dark:bg-yellow-900' : ''}
+          className={`w-8 h-8 flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/20 bg-surface-container-highest select-none
+            ${subIndex === 0 ? 'text-primary' : 'text-on-surface-variant/40'}
+            ${isMeasureBoundary ? 'border-r-2 border-r-outline' : ''}
+            ${activeStep === i ? 'bg-primary/20' : ''}
           `}
         >
           {label}
@@ -428,15 +429,15 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     }
 
     return (
-      <div className="flex border-b-2 border-gray-400 dark:border-gray-600">
-        <div className="w-32 h-8 bg-gray-200 dark:bg-gray-800 border-r border-gray-400 dark:border-gray-600" />
+      <div className="flex border-b border-outline-variant/20">
+        <div className="w-32 h-8 bg-surface-container-low border-r border-outline-variant/20" />
         <div className="flex">{headers}</div>
       </div>
     );
   };
 
   return (
-    <div className="flex flex-col gap-2 print:gap-1 no-print-break" data-testid="groove-editor">
+    <div className="flex flex-col gap-4 print:gap-1 no-print-break" data-testid="groove-editor">
       <GrooveGridToolbar
         state={state}
         isPlaying={isPlaying}
@@ -475,45 +476,47 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       />
 
       <div
-        className="inline-block border border-gray-400 dark:border-gray-600 shadow-sm rounded-sm bg-white dark:bg-gray-950 overflow-x-auto max-w-full print:border-none print:shadow-none print:overflow-visible dark:print:bg-white dark:print:border-none"
+        className="inline-block border border-outline-variant/10 shadow-xl rounded-2xl bg-surface-container overflow-hidden max-w-full print:border-none print:shadow-none print:overflow-visible dark:print:bg-white dark:print:border-none"
         data-testid="groove-grid"
       >
-        {renderHeader()}
-        <div className="flex flex-col">
-          {state?.instruments.map((inst, instIdx) => (
-            <InstrumentRow
-              key={inst.id}
-              instrument={inst}
-              grid={state}
-              onNoteClick={(idx, e) => handleNoteClick(inst.id, idx, e)}
-              onNoteContextMenu={(idx, e) => handleNoteContextMenu(inst.id, idx, e)}
-              onNoteMouseDown={(idx, e) => handleNoteMouseDown(instIdx, idx, e)}
-              onNoteMouseEnter={(idx) => handleNoteMouseEnter(instIdx, idx)}
-              selectionRange={selectionRange}
-              instIdx={instIdx}
-              isEditing={isEditingInstruments}
-              onSettingsClick={() => setEditingInstrumentId(inst.id)}
-              onMoveUp={() =>
-                wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'up' })
-              }
-              onMoveDown={() =>
-                wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'down' })
-              }
-              onClear={() => wrappedDispatch({ type: 'CLEAR_ROW', id: inst.id })}
-              readOnly={readOnly}
-            />
-          ))}
+        <div className="overflow-x-auto">
+          {renderHeader()}
+          <div className="flex flex-col">
+            {state?.instruments.map((inst, instIdx) => (
+              <InstrumentRow
+                key={inst.id}
+                instrument={inst}
+                grid={state}
+                onNoteClick={(idx, e) => handleNoteClick(inst.id, idx, e)}
+                onNoteContextMenu={(idx, e) => handleNoteContextMenu(inst.id, idx, e)}
+                onNoteMouseDown={(idx, e) => handleNoteMouseDown(instIdx, idx, e)}
+                onNoteMouseEnter={(idx) => handleNoteMouseEnter(instIdx, idx)}
+                selectionRange={selectionRange}
+                instIdx={instIdx}
+                isEditing={isEditingInstruments}
+                onSettingsClick={() => setEditingInstrumentId(inst.id)}
+                onMoveUp={() =>
+                  wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'up' })
+                }
+                onMoveDown={() =>
+                  wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'down' })
+                }
+                onClear={() => wrappedDispatch({ type: 'CLEAR_ROW', id: inst.id })}
+                readOnly={readOnly}
+              />
+            ))}
 
-          {isEditingInstruments && (
-            <button
-              onClick={handleAddInstrument}
-              className="flex items-center justify-center h-8 w-full bg-gray-50 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold transition-colors uppercase tracking-wider"
-              data-testid="add-instrument-button"
-            >
-              <Plus size={14} className="mr-1" />
-              Add Instrument
-            </button>
-          )}
+            {isEditingInstruments && (
+              <button
+                onClick={handleAddInstrument}
+                className="flex items-center justify-center h-10 w-full bg-surface-container-low border-t border-outline-variant/10 hover:bg-primary/5 text-primary text-[10px] font-headline font-black transition-all uppercase tracking-[0.2em]"
+                data-testid="add-instrument-button"
+              >
+                <Plus size={14} className="mr-2" />
+                Add Instrument
+              </button>
+            )}
+          </div>
         </div>
 
         {pickerPos && (

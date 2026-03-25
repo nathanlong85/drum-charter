@@ -134,16 +134,29 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
 
           if (isBeat && instIdx === 0) {
             return (
-              <div
-                key={i}
-                data-testid={`beat-label-${i / notesPerBeat + 1}`}
-                className={`
-                  w-8 h-8 flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/20 select-none bg-surface-container-highest
-                  ${isMeasureBoundary ? 'border-r-2 border-r-outline' : ''}
-                  ${i === 0 ? 'text-primary' : 'text-on-surface-variant'}
-                `}
-              >
-                {i / notesPerBeat + 1}
+              <div key={i} className="relative">
+                <div
+                  data-testid={`beat-label-${i / notesPerBeat + 1}`}
+                  className={`
+                    absolute -top-8 left-0 w-8 h-8 flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/20 select-none bg-surface-container-highest pointer-events-none
+                    ${isMeasureBoundary ? 'border-r-2 border-r-outline' : ''}
+                    ${i === 0 ? 'text-primary' : 'text-on-surface-variant'}
+                  `}
+                >
+                  {i / notesPerBeat + 1}
+                </div>
+                <NoteCell
+                  symbol={symbol}
+                  velocity={velocity}
+                  onClick={(e) => onNoteClick(i, e)}
+                  onContextMenu={(e) => onNoteContextMenu(i, e)}
+                  onMouseDown={(e) => onNoteMouseDown?.(i, e)}
+                  onMouseEnter={() => onNoteMouseEnter?.(i)}
+                  isBeat={isBeat}
+                  isMeasureBoundary={isMeasureBoundary}
+                  isSelected={isSelected}
+                  readOnly={readOnly}
+                />
               </div>
             );
           }

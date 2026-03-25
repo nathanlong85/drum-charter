@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { AuthStatus } from '@/components/auth/AuthStatus';
 import SongEditor from '@/components/chart/SongEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';

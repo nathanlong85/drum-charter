@@ -1,7 +1,7 @@
 'use client';
 
-import { LogOut, Music, User as UserIcon } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
+import { LogOut, User as UserIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -36,7 +36,12 @@ export function AuthStatus() {
 
   const isGuest = user?.is_anonymous;
 
-  if (loading) return <div className="text-[10px] font-headline font-black text-on-surface-variant uppercase tracking-widest animate-pulse">Loading auth...</div>;
+  if (loading)
+    return (
+      <div className="text-[10px] font-headline font-black text-on-surface-variant uppercase tracking-widest animate-pulse">
+        Loading auth...
+      </div>
+    );
 
   if (!user) {
     return (
@@ -56,7 +61,10 @@ export function AuthStatus() {
       <div className="flex flex-col gap-3" data-testid="auth-status-guest">
         <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-xl border border-primary/20">
           <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--color-primary)]"></div>
-          <span className="text-[10px] font-headline font-black text-primary uppercase tracking-widest" data-testid="guest-mode-indicator">
+          <span
+            className="text-[10px] font-headline font-black text-primary uppercase tracking-widest"
+            data-testid="guest-mode-indicator"
+          >
             Guest Mode
           </span>
         </div>
@@ -78,9 +86,13 @@ export function AuthStatus() {
           <UserIcon size={16} />
         </div>
         <div className="flex flex-col min-w-0">
-          <span className="text-[10px] font-headline font-black text-on-surface uppercase tracking-tight truncate" data-testid="auth-user-email">
+          <span
+            className="text-[10px] font-headline font-black text-on-surface uppercase tracking-tight truncate"
+            data-testid="auth-user-email"
+          >
             {user.email}
           </span>
+          {/* TODO: Drive this from user account metadata when available */}
           <span className="text-[8px] font-headline font-bold text-on-surface-variant uppercase tracking-widest opacity-50">
             PRO ACCOUNT
           </span>

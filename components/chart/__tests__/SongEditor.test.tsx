@@ -419,10 +419,7 @@ describe('SongEditor', () => {
 
     await waitFor(
       () => {
-        expect(consoleSpy).toHaveBeenCalledWith(
-          'Autosave failed:',
-          expect.anything(),
-        );
+        expect(consoleSpy).toHaveBeenCalledWith('Autosave failed:', expect.anything());
       },
       { timeout: 5000 },
     );

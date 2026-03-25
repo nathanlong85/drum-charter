@@ -61,6 +61,8 @@ export function AppShell({ children }: AppShellProps) {
                 <Link
                   key={item.name}
                   href={item.href}
+                  data-active={isActive}
+                  aria-selected={isActive}
                   className={`flex items-center gap-3 rounded-lg p-3 transition-all duration-200 ${
                     isActive
                       ? 'bg-surface-container-highest text-primary shadow-[0_0_15px_rgba(0,0,0,0.2)]'

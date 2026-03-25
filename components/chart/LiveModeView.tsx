@@ -118,7 +118,10 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
           data-testid="live-mode-header"
         >
           <div>
-            <h1 className="text-3xl font-headline font-black uppercase tracking-tighter text-primary">
+            <h1
+              className="text-3xl font-headline font-black uppercase tracking-tighter text-primary"
+              data-testid="live-mode-title"
+            >
               {chart.header.title}
             </h1>
             <div className="flex gap-4 mt-1 text-on-surface-variant font-headline text-xs font-bold uppercase tracking-widest">

@@ -72,7 +72,7 @@ test.describe('Library Management & Guest Flow', () => {
 
     // Go back to library and check filter
     await page.goto('/library');
-    await page.click('button:has-text("Snippets")');
+    await page.getByTestId('tab-snippet').click();
 
     // Verify tag appears in filter list
     const tagFilter = page.getByTestId('tag-filter-rock');

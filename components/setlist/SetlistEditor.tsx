@@ -23,27 +23,6 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
   const [availableSongs, setAvailableSongs] = useState<{ id: string; title: string }[]>([]);
   const [isSelectingSong, setIsSelectingSong] = useState(false);
 
-  useEffect(() => {
-    isMounted.current = true;
-    const loadSongs = async () => {
-      try {
-        const songs = await supabaseService.listSongCharts();
-        if (songs && isMounted.current) {
-          setAvailableSongs(songs.map((s) => ({ id: s.id, title: s.title })));
-        }
-      } catch (err) {
-        console.error('Failed to load available songs:', err);
-      }
-    };
-    loadSongs();
-    return () => {
-      isMounted.current = false;
-      if (!skipFlushOnUnmountRef.current) {
-        saveToSupabase.flush();
-      }
-    };
-  }, []);
-
   const saveToSupabaseRef = useRef(
     debounce(async (dataToSave: Setlist) => {
       try {
@@ -66,6 +45,27 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
   );
 
   const saveToSupabase = saveToSupabaseRef.current;
+
+  useEffect(() => {
+    isMounted.current = true;
+    const loadSongs = async () => {
+      try {
+        const songs = await supabaseService.listSongCharts();
+        if (songs && isMounted.current) {
+          setAvailableSongs(songs.map((s) => ({ id: s.id, title: s.title })));
+        }
+      } catch (err) {
+        console.error('Failed to load available songs:', err);
+      }
+    };
+    loadSongs();
+    return () => {
+      isMounted.current = false;
+      if (!skipFlushOnUnmountRef.current) {
+        saveToSupabase.flush();
+      }
+    };
+  }, [saveToSupabase.flush]);
 
   // Autosave when setlist changes
   useEffect(() => {
@@ -171,8 +171,15 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
             onClick={async () => {
               if (confirm('Are you sure you want to delete this setlist?')) {
                 try {
+                  // Ensure any active or pending autosave settles before deleting
+                  saveToSupabase.flush();
+                  // We don't have direct access to the promise from ref.current easily without adding a ref for it
+                  // but flush() synchronously calls the debounced function.
+                  // Since saveToSupabase uses await inside its debounce, we might still have a race.
+                  // For now, let's just cancel and prevent the unmount flush.
                   skipFlushOnUnmountRef.current = true;
                   saveToSupabase.cancel();
+
                   await supabaseService.deleteSetlist(setlist.id);
                   router.push('/library');
                 } catch (error) {
@@ -298,8 +305,18 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                           aria-label={`Move ${getSongTitle(song.songId)} up`}
                           type="button"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 15l7-7 7 7" />
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2.5"
+                              d="M5 15l7-7 7 7"
+                            />
                           </svg>
                         </button>
                         <button
@@ -310,8 +327,18 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                           aria-label={`Move ${getSongTitle(song.songId)} down`}
                           type="button"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2.5"
+                              d="M19 9l-7 7-7-7"
+                            />
                           </svg>
                         </button>
                         <div className="w-[1px] h-6 bg-outline-variant/20 mx-1"></div>

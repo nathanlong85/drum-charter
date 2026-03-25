@@ -49,10 +49,7 @@ test.describe('Guest Access & Library Flow', () => {
     await expect(page.getByRole('heading', { name: 'My Library' })).toBeVisible();
 
     // Switch to Notebooks tab
-    await page
-      .getByRole('button', { name: /Notebooks/i })
-      .first()
-      .click();
+    await page.getByTestId('tab-notebook').first().click();
 
     // Click "New notebook" and wait for creation response
     const createPromise = page.waitForResponse(
@@ -90,9 +87,9 @@ test.describe('Guest Access & Library Flow', () => {
     await expect(page.getByRole('heading', { name: 'My Library' })).toBeVisible();
 
     // Switch to Snippets tab and wait for it to be active
-    const snippetTab = page.getByRole('button', { name: /Snippets/i }).first();
+    const snippetTab = page.getByTestId('tab-snippet');
     await snippetTab.click();
-    await expect(snippetTab).toHaveClass(/bg-surface-container-highest/);
+    await expect(snippetTab).toHaveAttribute('aria-selected', 'true');
 
     // Create new snippet
     const createPromise = page.waitForResponse(
@@ -132,9 +129,9 @@ test.describe('Guest Access & Library Flow', () => {
     await page.waitForURL('/library');
 
     // Switch to Notebooks tab and wait for it to be active
-    const notebookTab = page.getByRole('button', { name: /Notebooks/i }).first();
+    const notebookTab = page.getByTestId('tab-notebook');
     await notebookTab.click();
-    await expect(notebookTab).toHaveClass(/bg-surface-container-highest/);
+    await expect(notebookTab).toHaveAttribute('aria-selected', 'true');
 
     // Create new notebook
     const createPromise = page.waitForResponse(

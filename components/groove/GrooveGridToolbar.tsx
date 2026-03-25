@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Bell,
   BellOff,
@@ -12,14 +14,12 @@ import {
 } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
-import type { BeatResolution, GrooveGrid } from '@/lib/types/groove';
+import type { BeatResolution, GrooveGrid, TimeSignature } from '@/lib/types/groove';
 
 const toolbarContainerClass =
   'flex items-center bg-surface-container-low p-2 rounded-xl border border-outline-variant/10 text-sm no-print shadow-sm';
-const controlGroupClass =
-  'flex items-center gap-2 pr-4 border-r border-outline-variant/10';
-const subGroupClass =
-  'flex items-center gap-1 border-r border-outline-variant/10 pr-4 relative';
+const controlGroupClass = 'flex items-center gap-2 pr-4 border-r border-outline-variant/10';
+const subGroupClass = 'flex items-center gap-1 border-r border-outline-variant/10 pr-4 relative';
 const lastGroupClass = 'flex items-center gap-2';
 const mutedLabelClass =
   'text-on-surface-variant font-headline font-bold text-[10px] uppercase tracking-widest';
@@ -45,7 +45,7 @@ export interface GrooveGridToolbarProps {
   onMetronomeVolumeChange: (volume: number) => void;
   updateMeasures: (delta: number) => void;
   updateResolution: (res: BeatResolution) => void;
-  updateTimeSignature: (beats: number, value: number) => void;
+  updateTimeSignature: (ts: TimeSignature) => void;
   isEditingInstruments?: boolean;
   onToggleEditInstruments?: () => void;
   onToggleOptionalHits?: (enabled: boolean) => void;
@@ -98,7 +98,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           )}
         </button>
 
-        <div className="flex items-center gap-2 ml-2">
+        <div className="flex items-center gap-2">
           <span className={mutedLabelClass}>BPM:</span>
           <input
             type="number"
@@ -120,8 +120,8 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
           onClick={() => onMetronomeToggle(!metronomeEnabled)}
           className={`${iconButtonClass} ${
             metronomeEnabled
-              ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600'
+              ? 'bg-primary/10 text-primary hover:bg-primary/20'
+              : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface'
           }`}
           title={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
           aria-label={metronomeEnabled ? 'Disable Metronome' : 'Enable Metronome'}
@@ -132,8 +132,10 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
 
         <button
           onClick={() => setShowMetronomeSettings(!showMetronomeSettings)}
-          className={`${iconButtonClass} hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${
-            showMetronomeSettings ? 'bg-gray-200 dark:bg-gray-700' : ''
+          className={`${iconButtonClass} ${
+            showMetronomeSettings
+              ? 'bg-primary/10 text-primary'
+              : 'bg-surface-container-highest text-on-surface-variant hover:text-on-surface'
           }`}
           title="Metronome Settings"
           aria-label="Metronome Settings"
@@ -144,15 +146,15 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
         {showMetronomeSettings && (
           <div className={panelClass} data-testid="metronome-settings-panel">
             <div className="flex flex-col gap-2">
-              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">
+              <span className="text-[10px] font-headline font-black text-on-surface-variant uppercase tracking-widest">
                 Click Volume
               </span>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-bold">
+                <span className="text-[10px] text-on-surface-variant/40 uppercase font-headline font-bold">
                   Level
                 </span>
                 <span
-                  className="text-[10px] font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded"
+                  className="text-[10px] text-primary font-headline font-black"
                   data-testid="metronome-volume-value"
                 >
                   {Math.round(metronomeVolume * 100)}%
@@ -171,47 +173,87 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
               <div className="flex justify-between mt-1">
                 <button
                   onClick={() => onMetronomeVolumeChange(0.3)}
-                  className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300"
+                  className="text-[9px] font-headline font-bold text-on-surface-variant hover:text-primary uppercase tracking-tighter"
                 >
                   Ghost
                 </button>
                 <button
                   onClick={() => onMetronomeVolumeChange(0.7)}
-                  className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300"
+                  className="text-[9px] font-headline font-bold text-on-surface-variant hover:text-primary uppercase tracking-tighter"
                 >
-                  Std
+                  Standard
                 </button>
                 <button
                   onClick={() => onMetronomeVolumeChange(1.0)}
-                  className="text-[10px] px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded text-gray-600 dark:text-gray-300"
+                  className="text-[9px] font-headline font-bold text-on-surface-variant hover:text-primary uppercase tracking-tighter"
                 >
-                  Accent
+                  Full
                 </button>
               </div>
+              <button
+                onClick={() => setShowMetronomeSettings(false)}
+                data-testid="close-metronome-settings"
+                className="mt-4 w-full bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-headline font-black uppercase tracking-widest py-2 rounded-lg transition-all"
+              >
+                Close
+              </button>
             </div>
-            <button
-              className="w-full mt-2 text-[10px] text-blue-600 dark:text-blue-400 hover:underline text-center"
-              onClick={() => setShowMetronomeSettings(false)}
-            >
-              Close
-            </button>
           </div>
         )}
       </div>
 
       <div className={lastGroupClass}>
-        <span className={mutedLabelClass}>Measures:</span>
+        <span className={mutedLabelClass}>Time:</span>
         <div className={controlBoxClass}>
+          <input
+            type="number"
+            value={state.timeSignature.beatsPerMeasure}
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10);
+              if (Number.isNaN(val)) return;
+              updateTimeSignature({
+                ...state.timeSignature,
+                beatsPerMeasure: Math.max(1, val),
+              });
+            }}
+            className="w-10 px-1 py-1 bg-transparent text-center font-bold font-headline focus:outline-none"
+            min="1"
+            title="Beats per measure"
+          />
+          <span className="text-on-surface-variant/40">/</span>
+          <select
+            value={state.timeSignature.beatValue}
+            onChange={(e) => {
+              updateTimeSignature({
+                ...state.timeSignature,
+                beatValue: parseInt(e.target.value, 10),
+              });
+            }}
+            className="bg-transparent px-1 py-1 font-bold font-headline focus:outline-none appearance-none cursor-pointer"
+            title="Beat value"
+          >
+            {[2, 4, 8, 16].map((v) => (
+              <option key={v} value={v} className="bg-surface-container-low text-on-surface">
+                {v}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className={lastGroupClass}>
+        <span className={mutedLabelClass}>Measures:</span>
+        <div className={controlBoxClass} data-testid="measures-control">
           {!readOnly && (
             <button
               onClick={() => updateMeasures(-1)}
-              className={`${controlBtnClass} border-r border-gray-300 dark:border-gray-700`}
+              className={`${controlBtnClass} border-r border-outline-variant/10`}
               title="Decrease measures"
             >
               <Minus size={14} />
             </button>
           )}
-          <span className="px-3 py-1 font-bold min-w-[2rem] text-center text-gray-900 dark:text-gray-100">
+          <span className="px-3 py-1 font-bold min-w-[2rem] text-center text-on-surface font-headline">
             {state.measures}
           </span>
           {!readOnly && (
@@ -227,7 +269,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
       </div>
 
       <div className={lastGroupClass}>
-        <span className={mutedLabelClass}>Resolution:</span>
+        <span className={mutedLabelClass}>Res:</span>
         <div className={controlBoxClass}>
           {[4, 8, 16].map((res) => (
             <button
@@ -249,51 +291,18 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
         </div>
       </div>
 
-      <div className={lastGroupClass}>
-        <span className={mutedLabelClass}>Time Sig:</span>
-        <div className="flex items-center gap-1">
-          <input
-            type="number"
-            value={state.timeSignature.beatsPerMeasure}
-            disabled={readOnly}
-            onChange={(e) => {
-              const val = parseInt(e.target.value, 10);
-              if (Number.isNaN(val)) return;
-              updateTimeSignature(Math.max(1, val), state.timeSignature.beatValue);
-            }}
-            className={`${borderedInputClass} w-12 disabled:bg-transparent disabled:border-none`}
-            min="1"
-          />
-          <span className="text-gray-400 dark:text-gray-500">/</span>
-          <select
-            value={state.timeSignature.beatValue}
-            disabled={readOnly}
-            onChange={(e) =>
-              updateTimeSignature(state.timeSignature.beatsPerMeasure, parseInt(e.target.value, 10))
-            }
-            className="px-2 py-1 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-bold disabled:bg-transparent disabled:border-none disabled:appearance-none"
-          >
-            {[2, 4, 8, 16].map((v) => (
-              <option key={v} value={v}>
-                {v}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
       <div className="flex-1" />
 
-      <div className={lastGroupClass}>
-        {!readOnly && (
+      <div className="flex items-center gap-2">
+        {!readOnly && onClearGrid && (
           <button
             onClick={() => {
-              if (window.confirm('Clear all notes in the grid?')) {
-                onClearGrid?.();
+              if (window.confirm('Clear entire grid?')) {
+                onClearGrid();
               }
             }}
-            className={`${iconButtonClass} bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400`}
-            title="Clear Grid"
+            className={`${iconButtonClass} bg-error/10 text-error hover:bg-error/20`}
+            title="Clear All"
             data-testid="clear-grid-button"
           >
             <Trash2 size={18} />

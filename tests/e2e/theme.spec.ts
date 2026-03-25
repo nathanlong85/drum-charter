@@ -51,7 +51,7 @@ test.describe('Dark Mode Support', () => {
     await page.waitForURL(/\/library/);
 
     // Switch to Snippets tab if not already active
-    const snippetsTab = page.getByRole('button', { name: /Snippets/i });
+    const snippetsTab = page.getByTestId('tab-snippet');
     await snippetsTab.click();
 
     // The selector needs to be more specific to the toolbar in the editor

@@ -1,92 +1,54 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
-import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { describe, expect, it } from 'vitest';
 import { NoteCell } from '@/components/groove/NoteCell';
-import type { GrooveGrid } from '@/lib/types/groove';
-
-// Mock child components or hooks if necessary
-vi.mock('@/components/groove/InstrumentRow', () => ({
-  InstrumentRow: () => <div data-testid="instrument-row" />,
-}));
+import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { createDefaultDrumInstruments } from '@/lib/types/groove';
 
 describe('Theme Class Verification', () => {
   describe('NoteCell', () => {
-    it('applies dark:invert class to the symbol image when isBeat is true', () => {
-      render(
-        <NoteCell
-          symbol="standard"
-          onClick={() => {}}
-          onContextMenu={(e) => e.preventDefault()}
-          isBeat={true}
-        />,
-      );
-
-      const img = screen.getByAltText('standard');
-      expect(img.className).toContain('dark:invert');
-    });
-
-    it('does not apply dark:invert class when isBeat is false', () => {
-      render(
-        <NoteCell
-          symbol="standard"
-          onClick={() => {}}
-          onContextMenu={(e) => e.preventDefault()}
-          isBeat={false}
-        />,
-      );
-
-      const img = screen.getByAltText('standard');
-      expect(img.className).not.toContain('dark:invert');
-    });
-
-    it('applies theme-aware border and background classes', () => {
+    it('applies new design system tokens', () => {
       const { container } = render(
         <NoteCell
-          symbol="none"
+          symbol="standard"
           onClick={() => {}}
-          onContextMenu={(e) => e.preventDefault()}
-          isBeat={true}
-        />,
+          onContextMenu={() => {}}
+        />
       );
 
       const cell = container.firstChild as HTMLElement;
-      expect(cell.className).toContain('dark:border-gray-700');
-      expect(cell.className).toContain('dark:hover:bg-blue-900');
-      expect(cell.className).toContain('dark:bg-gray-900');
+      expect(cell.className).toContain('border-outline-variant/20');
+      expect(cell.className).toContain('hover:bg-primary/10');
     });
   });
 
   describe('GrooveGridEditor', () => {
-    const mockGrid: GrooveGrid = {
-      timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-      resolution: 16,
+    const mockGrid = {
+      id: 'g1',
       measures: 1,
-      instruments: [
-        {
-          id: 'hihat',
-          category: 'hi-hat',
-          presetVariety: 'Hi-Hat',
-          customName: 'Hi-Hat',
-          notes: Array(16).fill('none'),
-          velocities: Array(16).fill(0),
-        },
-      ],
+      resolution: 4 as const,
+      timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+      instruments: createDefaultDrumInstruments({
+        measures: 1,
+        resolution: 4,
+        timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+      }),
     };
 
-    it('applies dark mode classes to the toolbar container', () => {
+    it('applies surface and primary tokens to the toolbar', () => {
       render(<GrooveGridEditor initialGrid={mockGrid} />);
 
       const toolbar = screen.getByTestId('groove-toolbar');
-      expect(toolbar.className).toContain('dark:bg-gray-900');
-      expect(toolbar.className).toContain('dark:border-gray-800');
+      expect(toolbar.className).toContain('bg-surface-container-low');
+      expect(toolbar.className).toContain('border-outline-variant/10');
     });
 
-    it('applies dark mode classes to numeric inputs', () => {
+    it('applies headline and surface tokens to numeric inputs', () => {
       render(<GrooveGridEditor initialGrid={mockGrid} />);
 
+      // BPM input is 120 by default
       const bpmInput = screen.getByDisplayValue('120');
-      expect(bpmInput.className).toContain('dark:bg-gray-800');
-      expect(bpmInput.className).toContain('dark:border-gray-700');
+      expect(bpmInput.className).toContain('bg-surface-container-highest');
+      expect(bpmInput.className).toContain('font-headline');
     });
   });
 });
