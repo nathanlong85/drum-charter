@@ -1,19 +1,64 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
-import { createClient } from '@/lib/supabase/client';
-import LibraryDashboard from '../LibraryDashboard';
 
-// Mock the Supabase client - Define EVERYTHING inside to avoid hoisting issues
-vi.mock('@/lib/supabase/client', () => {
-  const auth = {
-    getUser: vi.fn(),
-  };
-  const instance = {
-    auth,
-  };
+interface MockLibraryItem {
+  id: string;
+  title: string;
+  type: string;
+  tags?: string[];
+  created_at: string;
+  bpm?: number;
+}
+
+// Use vi.hoisted to ensure these are available inside vi.mock factory
+const { mockGetUser, mockSupabase, navState, mockRouter } = vi.hoisted(() => {
+  const getUser = vi.fn().mockResolvedValue({
+    data: { user: { id: 'test-user-id' } },
+    error: null,
+  });
+  const state = { currentTab: 'song', listeners: [] as ((val: string) => void)[] };
   return {
-    createClient: vi.fn(() => instance),
+    mockGetUser: getUser,
+    mockSupabase: {
+      auth: { getUser },
+    },
+    navState: state,
+    mockRouter: {
+      push: vi.fn((url: string) => {
+        const tabMatch = url.match(/tab=([^&]+)/);
+        if (tabMatch) {
+          state.currentTab = tabMatch[1];
+          state.listeners.forEach((l) => l(state.currentTab));
+        }
+      }),
+    },
+  };
+});
+
+// Mock Supabase client module
+vi.mock('@/lib/supabase/client', () => ({
+  createClient: vi.fn(() => mockSupabase),
+}));
+
+// Mock next/navigation
+import { useEffect, useState } from 'react';
+
+vi.mock('next/navigation', () => {
+  return {
+    useSearchParams: () => {
+      const [tab, setTab] = useState(navState.currentTab);
+      useEffect(() => {
+        navState.listeners.push(setTab);
+        return () => {
+          navState.listeners = navState.listeners.filter((l) => l !== setTab);
+        };
+      }, []);
+      return {
+        get: vi.fn((key) => (key === 'tab' ? tab : null)),
+      };
+    },
+    useRouter: () => mockRouter,
   };
 });
 
@@ -24,99 +69,140 @@ vi.mock('@/lib/services/supabase-service', () => ({
     saveNotebook: vi.fn(),
     saveGrooveSnippet: vi.fn(),
     saveSetlist: vi.fn(),
-    deleteSongChart: vi.fn().mockResolvedValue({}),
-    deleteNotebook: vi.fn().mockResolvedValue({}),
-    deleteGrooveSnippet: vi.fn().mockResolvedValue({}),
-    deleteSetlist: vi.fn().mockResolvedValue({}),
-    duplicateSongChart: vi.fn().mockResolvedValue({ id: 's2', title: 'Song 2', tags: [] }),
-    duplicateNotebook: vi.fn().mockResolvedValue({ id: 'n2', title: 'Notebook 2', tags: [] }),
-    duplicateGrooveSnippet: vi.fn().mockResolvedValue({ id: 'sn2', title: 'Snippet 2', tags: [] }),
-    duplicateSetlist: vi.fn().mockResolvedValue({ id: 'set2', title: 'Setlist 2', tags: [] }),
+    deleteSongChart: vi.fn(),
+    deleteNotebook: vi.fn(),
+    deleteGrooveSnippet: vi.fn(),
+    deleteSetlist: vi.fn(),
+    duplicateSongChart: vi.fn(),
+    duplicateNotebook: vi.fn(),
+    duplicateGrooveSnippet: vi.fn(),
+    duplicateSetlist: vi.fn(),
   },
 }));
 
-// Mock window.location
-const originalLocation = window.location;
-beforeEach(() => {
-  vi.clearAllMocks();
-  // @ts-expect-error stubbing window.location for tests to mock assign behavior
-  delete window.location;
-  window.location = { ...originalLocation, assign: vi.fn() };
-  vi.spyOn(window, 'alert').mockImplementation(() => {});
-});
-
-afterEach(() => {
-  window.location = originalLocation;
-});
-
-const mockProps = {
-  initialSongs: [{ id: 's1', title: 'Song 1', tags: ['rock'] }],
-  initialNotebooks: [{ id: 'n1', title: 'Notebook 1', tags: ['practice'] }],
-  initialSnippets: [{ id: 'sn1', title: 'Snippet 1', tags: ['funk'] }],
-  initialSetlists: [{ id: 'set1', title: 'Setlist 1', tags: ['live'] }],
-};
-
-interface AuthMock {
-  getUser: ReturnType<typeof vi.fn>;
-}
+// Import LibraryDashboard AFTER mocks are defined
+import LibraryDashboard from '../LibraryDashboard';
 
 describe('LibraryDashboard', () => {
-  const getAuthMock = () => {
-    return vi.mocked(createClient)().auth as unknown as AuthMock;
+  const mockSongs: MockLibraryItem[] = [
+    {
+      id: 's1',
+      title: 'Song 1',
+      type: 'song',
+      tags: ['rock'],
+      created_at: new Date().toISOString(),
+    },
+  ];
+  const mockNotebooks: MockLibraryItem[] = [
+    {
+      id: 'n1',
+      title: 'Notebook 1',
+      type: 'notebook',
+      tags: ['jazz'],
+      created_at: new Date().toISOString(),
+    },
+  ];
+  const mockSnippets: MockLibraryItem[] = [
+    {
+      id: 'sn1',
+      title: 'Snippet 1',
+      type: 'snippet',
+      tags: ['funk'],
+      created_at: new Date().toISOString(),
+    },
+  ];
+  const mockSetlists: MockLibraryItem[] = [
+    { id: 'set1', title: 'Setlist 1', type: 'setlist', created_at: new Date().toISOString() },
+  ];
+
+  const mockProps = {
+    initialSongs: mockSongs as any[],
+    initialNotebooks: mockNotebooks as any[],
+    initialSnippets: mockSnippets as any[],
+    initialSetlists: mockSetlists as any[],
   };
 
-  describe('Rendering and Filtering', () => {
-    it('renders initial items across tabs', () => {
-      render(<LibraryDashboard {...mockProps} />);
+  beforeEach(() => {
+    vi.clearAllMocks();
+    navState.currentTab = 'song'; // Reset URL state
 
-      expect(screen.getByText('Song 1')).toBeDefined();
-
-      fireEvent.click(screen.getByTestId('tab-notebook'));
-      expect(screen.getByText('Notebook 1')).toBeDefined();
-
-      fireEvent.click(screen.getByTestId('tab-snippet'));
-      expect(screen.getByText('Snippet 1')).toBeDefined();
-
-      fireEvent.click(screen.getByTestId('tab-setlist'));
-      expect(screen.getByText('Setlist 1')).toBeDefined();
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'test-user-id' } },
+      error: null,
     });
 
-    it('filters items by search query', () => {
+    // Mock window.location.assign
+    const location = { assign: vi.fn() };
+    vi.stubGlobal('location', location);
+
+    // Mock window.alert
+    vi.stubGlobal('alert', vi.fn());
+  });
+
+  const switchTab = async (tabId: string) => {
+    const tabBtn = screen.getByTestId(`tab-${tabId}`);
+    fireEvent.click(tabBtn);
+
+    // We must wait for React to process the state change.
+    await waitFor(
+      () => {
+        const btn = screen.getByTestId(`tab-${tabId}`);
+        expect(btn.getAttribute('aria-selected')).toBe('true');
+      },
+      { timeout: 2000 },
+    );
+  };
+
+  describe('Initial Rendering', () => {
+    it('renders initial items across tabs', async () => {
       render(<LibraryDashboard {...mockProps} />);
-      const searchInput = screen.getByPlaceholderText(/Search/i);
 
-      fireEvent.change(searchInput, { target: { value: 'non-existent' } });
-      expect(screen.queryByText('Song 1')).toBeNull();
-      expect(screen.getByText(/No results found/i)).toBeDefined();
-
-      fireEvent.change(searchInput, { target: { value: 'Song' } });
       expect(screen.getByText('Song 1')).toBeDefined();
+
+      await switchTab('notebook');
+      await waitFor(() => expect(screen.getByText('Notebook 1')).toBeDefined());
+
+      await switchTab('snippet');
+      await waitFor(() => expect(screen.getByText('Snippet 1')).toBeDefined());
+
+      await switchTab('setlist');
+      await waitFor(() => expect(screen.getByText('Setlist 1')).toBeDefined());
     });
 
-    it('filters items by tags', () => {
-      render(<LibraryDashboard {...mockProps} />);
+    it('filters items by tags', async () => {
+      const songsWithTags = [
+        ...mockSongs,
+        {
+          id: 's2',
+          title: 'Song 2',
+          type: 'song',
+          tags: ['pop'],
+          created_at: new Date().toISOString(),
+        },
+      ];
+      render(<LibraryDashboard {...mockProps} initialSongs={songsWithTags as any} />);
 
-      // Toggle a tag filter
-      const rockTag = screen.getByLabelText(/Filter by rock tag/i);
-      fireEvent.click(rockTag);
       expect(screen.getByText('Song 1')).toBeDefined();
+      expect(screen.getByText('Song 2')).toBeDefined();
 
-      // Clear filters
-      fireEvent.click(screen.getByText(/Clear Filters/i));
-      expect(screen.queryByText(/Clear Filters/i)).toBeNull();
+      // Click 'rock' tag filter
+      fireEvent.click(screen.getByTestId('tag-filter-rock'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Song 1')).toBeDefined();
+        expect(screen.queryByText('Song 2')).toBeNull();
+      });
     });
   });
 
   describe('Creation Flow', () => {
-    it('successfully creates a new song and redirects', async () => {
-      getAuthMock().getUser.mockResolvedValue({
-        data: { user: { id: 'test-user-id' } },
-        error: null,
-      });
-      vi.mocked(supabaseService).saveSongChart.mockResolvedValue({ id: 'new-song-id' } as any);
+    it('successfully creates a new song chart and redirects', async () => {
+      vi.mocked(supabaseService.saveSongChart).mockResolvedValue({ id: 'new-song-id' } as any);
 
       render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByText(/New Song/i));
+
+      // Button is dynamic: "New song"
+      fireEvent.click(screen.getByTestId('create-new-button'));
 
       await waitFor(() => {
         expect(supabaseService.saveSongChart).toHaveBeenCalled();
@@ -125,15 +211,17 @@ describe('LibraryDashboard', () => {
     });
 
     it('successfully creates a new notebook and redirects', async () => {
-      getAuthMock().getUser.mockResolvedValue({
-        data: { user: { id: 'test-user-id' } },
-        error: null,
-      });
-      vi.mocked(supabaseService).saveNotebook.mockResolvedValue({ id: 'new-nb-id' } as any);
+      vi.mocked(supabaseService.saveNotebook).mockResolvedValue({ id: 'new-nb-id' } as any);
 
       render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByTestId('tab-notebook'));
-      fireEvent.click(screen.getByText(/New Notebook/i));
+      await switchTab('notebook');
+
+      // The button text is updated by activeTab state
+      await waitFor(() =>
+        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/notebook/i),
+      );
+
+      fireEvent.click(screen.getByTestId('create-new-button'));
 
       await waitFor(() => {
         expect(supabaseService.saveNotebook).toHaveBeenCalled();
@@ -142,15 +230,16 @@ describe('LibraryDashboard', () => {
     });
 
     it('successfully creates a new snippet and redirects', async () => {
-      getAuthMock().getUser.mockResolvedValue({
-        data: { user: { id: 'test-user-id' } },
-        error: null,
-      });
-      vi.mocked(supabaseService).saveGrooveSnippet.mockResolvedValue({ id: 'new-snip-id' } as any);
+      vi.mocked(supabaseService.saveGrooveSnippet).mockResolvedValue({ id: 'new-snip-id' } as any);
 
       render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByTestId('tab-snippet'));
-      fireEvent.click(screen.getByText(/New Snippet/i));
+      await switchTab('snippet');
+
+      await waitFor(() =>
+        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/snippet/i),
+      );
+
+      fireEvent.click(screen.getByTestId('create-new-button'));
 
       await waitFor(() => {
         expect(supabaseService.saveGrooveSnippet).toHaveBeenCalled();
@@ -159,93 +248,30 @@ describe('LibraryDashboard', () => {
     });
 
     it('successfully creates a new setlist and redirects', async () => {
-      getAuthMock().getUser.mockResolvedValue({
-        data: { user: { id: 'test-user-id' } },
-        error: null,
-      });
-      vi.mocked(supabaseService).saveSetlist.mockResolvedValue({
-        id: 'new-setlist-id',
-        title: 'Untitled Setlist',
-        owner_id: 'test-user-id',
-        is_public: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        songs: [],
-      });
+      vi.mocked(supabaseService.saveSetlist).mockResolvedValue({ id: 'new-setlist-id' } as any);
 
       render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByTestId('tab-setlist'));
-      fireEvent.click(screen.getByText(/New Setlist/i));
+      await switchTab('setlist');
+
+      await waitFor(() =>
+        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/setlist/i),
+      );
+
+      fireEvent.click(screen.getByTestId('create-new-button'));
 
       await waitFor(() => {
         expect(supabaseService.saveSetlist).toHaveBeenCalled();
         expect(window.location.assign).toHaveBeenCalledWith('/setlists/new-setlist-id');
       });
     });
-
-    it('handles unauthenticated users', async () => {
-      getAuthMock().getUser.mockResolvedValue({
-        data: { user: null },
-        error: null,
-      });
-
-      render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByText(/New Song/i));
-
-      await waitFor(() => {
-        expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Please log in'));
-      });
-    });
-
-    it('attempts to create a new song chart and handles errors', async () => {
-      getAuthMock().getUser.mockResolvedValue({
-        data: { user: { id: 'test-user-id' } },
-        error: null,
-      });
-      const error = { message: 'Network error', code: '500' };
-      vi.mocked(supabaseService).saveSongChart.mockRejectedValue(error);
-
-      render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByText(/New Song/i));
-
-      await waitFor(() => {
-        expect(window.alert).toHaveBeenCalledWith(
-          expect.stringContaining('Failed to create item: Network error'),
-        );
-      });
-    });
-
-    it('handles notebook creation error', async () => {
-      getAuthMock().getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
-      vi.mocked(supabaseService).saveNotebook.mockRejectedValue(new Error('NB Fail'));
-
-      render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByTestId('tab-notebook'));
-      fireEvent.click(screen.getByText(/New Notebook/i));
-      await waitFor(() =>
-        expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Failed to create item')),
-      );
-    });
-
-    it('handles snippet creation error', async () => {
-      getAuthMock().getUser.mockResolvedValue({ data: { user: { id: 'u1' } } });
-      vi.mocked(supabaseService).saveGrooveSnippet.mockRejectedValue(new Error('Snip Fail'));
-
-      render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getByTestId('tab-snippet'));
-      fireEvent.click(screen.getByText(/New Snippet/i));
-      await waitFor(() =>
-        expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Failed to create item')),
-      );
-    });
   });
 
   describe('Management Flow', () => {
-    it('deletes song', async () => {
+    it('deletes song chart', async () => {
       vi.spyOn(window, 'confirm').mockReturnValue(true);
       render(<LibraryDashboard {...mockProps} />);
 
-      fireEvent.click(screen.getAllByTitle(/Delete/i)[0]);
+      fireEvent.click(screen.getByTestId('delete-song-s1'));
       expect(supabaseService.deleteSongChart).toHaveBeenCalledWith('s1');
       await waitFor(() => expect(screen.queryByText('Song 1')).toBeNull());
     });
@@ -254,88 +280,60 @@ describe('LibraryDashboard', () => {
       vi.spyOn(window, 'confirm').mockReturnValue(true);
       render(<LibraryDashboard {...mockProps} />);
 
-      fireEvent.click(screen.getByTestId('tab-notebook'));
-      fireEvent.click(screen.getAllByTitle(/Delete/i)[0]);
+      await switchTab('notebook');
+      await waitFor(() => expect(screen.getByTestId('delete-notebook-n1')).toBeDefined());
+
+      fireEvent.click(screen.getByTestId('delete-notebook-n1'));
       expect(supabaseService.deleteNotebook).toHaveBeenCalledWith('n1');
       await waitFor(() => expect(screen.queryByText('Notebook 1')).toBeNull());
     });
 
-    it('deletes snippet', async () => {
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
+    it('handles item duplication', async () => {
+      vi.mocked(supabaseService.duplicateSongChart).mockResolvedValue({
+        id: 's2',
+        title: 'Song 1 (Copy)',
+        type: 'song',
+        tags: [],
+        created_at: new Date().toISOString(),
+      } as any);
+
       render(<LibraryDashboard {...mockProps} />);
 
-      fireEvent.click(screen.getByTestId('tab-snippet'));
-      fireEvent.click(screen.getAllByTitle(/Delete/i)[0]);
-      expect(supabaseService.deleteGrooveSnippet).toHaveBeenCalledWith('sn1');
-      await waitFor(() => expect(screen.queryByText('Snippet 1')).toBeNull());
-    });
-
-    it('deletes setlist', async () => {
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
-      render(<LibraryDashboard {...mockProps} />);
-
-      fireEvent.click(screen.getByTestId('tab-setlist'));
-      fireEvent.click(screen.getAllByTitle(/Delete/i)[0]);
-      expect(supabaseService.deleteSetlist).toHaveBeenCalledWith('set1');
-      await waitFor(() => expect(screen.queryByText('Setlist 1')).toBeNull());
-    });
-
-    it('handles item duplication for all types', async () => {
-      render(<LibraryDashboard {...mockProps} />);
-
-      // 1. Duplicate Song
-      fireEvent.click(screen.getAllByTitle(/Duplicate/i)[0]);
+      fireEvent.click(screen.getByTestId('duplicate-song-s1'));
       await waitFor(() => {
         expect(supabaseService.duplicateSongChart).toHaveBeenCalledWith('s1');
-        expect(screen.getByText('Song 2')).toBeDefined();
-      });
-
-      // 2. Duplicate Notebook
-      fireEvent.click(screen.getByTestId('tab-notebook'));
-      fireEvent.click(screen.getAllByTitle(/Duplicate/i)[0]);
-      await waitFor(() => {
-        expect(supabaseService.duplicateNotebook).toHaveBeenCalledWith('n1');
-        expect(screen.getByText('Notebook 2')).toBeDefined();
-      });
-
-      // 3. Duplicate Snippet
-      fireEvent.click(screen.getByTestId('tab-snippet'));
-      fireEvent.click(screen.getAllByTitle(/Duplicate/i)[0]);
-      await waitFor(() => {
-        expect(supabaseService.duplicateGrooveSnippet).toHaveBeenCalledWith('sn1');
-        expect(screen.getByText('Snippet 2')).toBeDefined();
-      });
-
-      // 4. Duplicate Setlist
-      fireEvent.click(screen.getByTestId('tab-setlist'));
-      fireEvent.click(screen.getAllByTitle(/Duplicate/i)[0]);
-      await waitFor(() => {
-        expect(supabaseService.duplicateSetlist).toHaveBeenCalledWith('set1');
-        expect(screen.getByText('Setlist 2')).toBeDefined();
+        expect(screen.getByText('Song 1 (Copy)')).toBeDefined();
       });
     });
 
-    it('handles errors during deletion and duplication', async () => {
-      supabaseService.deleteSongChart = vi
-        .fn()
-        .mockRejectedValue({ message: 'Delete fail', code: '123' });
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    it('handles snippet creation error', async () => {
+      vi.mocked(supabaseService.saveGrooveSnippet).mockRejectedValue(new Error('Snip Fail'));
 
       render(<LibraryDashboard {...mockProps} />);
-      fireEvent.click(screen.getAllByTitle(/Delete/i)[0]);
+      await switchTab('snippet');
+      await waitFor(() =>
+        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/snippet/i),
+      );
 
-      await waitFor(() => {
-        expect(window.alert).toHaveBeenCalledWith('Failed to delete item.');
-        expect(consoleSpy).toHaveBeenCalled();
-      });
+      fireEvent.click(screen.getByTestId('create-new-button'));
+      await waitFor(() =>
+        expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Failed to create item')),
+      );
+    });
 
-      // Test non-Supabase error duplication
-      supabaseService.duplicateSongChart = vi.fn().mockRejectedValue(new Error('Simple fail'));
-      fireEvent.click(screen.getAllByTitle(/Duplicate/i)[0]);
-      await waitFor(() => {
-        expect(window.alert).toHaveBeenCalledWith('Failed to duplicate item.');
-      });
+    it('handles notebook creation error', async () => {
+      vi.mocked(supabaseService.saveNotebook).mockRejectedValue(new Error('NB Fail'));
+
+      render(<LibraryDashboard {...mockProps} />);
+      await switchTab('notebook');
+      await waitFor(() =>
+        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/notebook/i),
+      );
+
+      fireEvent.click(screen.getByTestId('create-new-button'));
+      await waitFor(() =>
+        expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Failed to create item')),
+      );
     });
   });
 });

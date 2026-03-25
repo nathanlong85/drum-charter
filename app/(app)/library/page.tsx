@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { AuthStatus } from '@/components/auth/AuthStatus';
+import { Suspense } from 'react';
 import LibraryDashboard from '@/components/library/LibraryDashboard';
 import { createClient } from '@/lib/supabase/server';
 
@@ -39,23 +39,27 @@ export default async function LibraryPage() {
   ]);
 
   return (
-    <main className="min-h-screen bg-zinc-50 py-12 px-6">
-      <div className="max-w-6xl mx-auto">
-        <header className="flex justify-between items-end mb-12">
-          <div>
-            <h1 className="text-4xl font-black text-zinc-900 tracking-tight mb-2">My Library</h1>
-            <p className="text-zinc-500">Manage your songs, sketches, and practice routines.</p>
-          </div>
-          <AuthStatus />
-        </header>
+    <div className="max-w-[1400px] mx-auto p-8 space-y-12">
+      {/* Hero Header Section */}
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4">
+        <div>
+          <h2 className="text-5xl lg:text-7xl font-headline font-black tracking-tighter text-on-surface uppercase mb-2">
+            My Library
+          </h2>
+          <p className="text-on-surface-variant font-headline text-xs tracking-[0.3em] uppercase max-w-md">
+            Orchestrating rhythm through modular architectural design systems.
+          </p>
+        </div>
+      </section>
 
+      <Suspense fallback={<div className="animate-pulse bg-surface-container h-96 rounded-3xl" />}>
         <LibraryDashboard
           initialSongs={songsRes.data || []}
           initialNotebooks={notebooksRes.data || []}
           initialSnippets={snippetsRes.data || []}
           initialSetlists={setlistsRes.data || []}
         />
-      </div>
-    </main>
+      </Suspense>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import type React from 'react';
 import type { DrumSymbol } from '@/lib/types/groove';
 
@@ -64,11 +63,8 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   const iconPath = symbolToIcon[symbol];
 
   // Visual feedback for velocity (opacity)
-  // If velocity is provided, we use it.
-  // If not, we infer a default opacity based on symbol type.
   const getOpacity = () => {
     if (velocity !== undefined && velocity > 0) {
-      // Scale velocity (0.1 - 1.0) to opacity
       return Math.max(0.2, velocity);
     }
     if (symbol.includes('accent')) return 1.0;
@@ -85,29 +81,32 @@ export const NoteCell: React.FC<NoteCellProps> = ({
       onMouseDown={readOnly ? undefined : onMouseDown}
       onMouseEnter={readOnly ? undefined : onMouseEnter}
       data-testid="note-cell"
+      data-selected={isSelected ? 'true' : 'false'}
       className={`
-        w-8 h-8 flex items-center justify-center border-r border-gray-300 dark:border-gray-700 
-        transition-colors relative
-        ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900'}
-        ${isBeat ? 'bg-gray-50 dark:bg-gray-900' : ''}
-        ${isMeasureBoundary ? 'border-r-2 border-r-gray-800 dark:border-r-gray-200' : ''}
-        ${isSelected && !readOnly ? 'bg-blue-200/50 dark:bg-blue-800/50 ring-2 ring-blue-500 ring-inset z-10' : ''}
+        note-cell w-8 h-8 flex items-center justify-center border-r border-outline-variant/20 
+        transition-all relative
+        ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-primary/10'}
+        ${isBeat ? 'bg-surface-container-high' : 'bg-surface-container-low'}
+        ${isMeasureBoundary ? 'border-r-2 border-r-outline' : ''}
+        ${isSelected && !readOnly ? 'bg-primary/30 ring-2 ring-primary ring-inset z-10' : ''}
       `}
     >
       {iconPath && (
-        <Image
-          src={iconPath}
-          alt={symbol}
-          width={24}
-          height={24}
-          style={{ opacity }}
-          className={`select-none pointer-events-none transition-opacity ${isBeat ? 'dark:invert' : ''}`}
-        />
+        <div className="w-full h-full flex items-center justify-center pointer-events-none select-none">
+          {/* biome-ignore lint/performance/noImgElement: intentional for E2E reliability (SVG transitions caused flakes) */}
+          <img
+            src={iconPath}
+            alt={symbol}
+            data-testid="note-cell-icon"
+            style={{ opacity, width: 24, height: 24 }}
+            className="select-none pointer-events-none"
+          />
+        </div>
       )}
       {/* Velocity indicator (mini bar if explicit velocity exists) */}
       {velocity !== undefined && velocity > 0 && (
         <div
-          className="absolute bottom-0 left-0 h-0.5 bg-blue-500 transition-all"
+          className="absolute bottom-0 left-0 h-0.5 bg-primary transition-all"
           style={{ width: `${velocity * 100}%` }}
         />
       )}

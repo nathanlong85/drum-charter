@@ -88,11 +88,17 @@ describe('GrooveGridToolbar', () => {
     const inputs = screen.getAllByRole('spinbutton');
     const beatsInput = inputs[1];
     fireEvent.change(beatsInput, { target: { value: '3' } });
-    expect(props.updateTimeSignature).toHaveBeenCalledWith(3, 4);
+    expect(props.updateTimeSignature).toHaveBeenCalledWith({
+      beatsPerMeasure: 3,
+      beatValue: 4,
+    });
 
     // Only one combobox (select) in the toolbar
     const beatValueSelect = screen.getByRole('combobox');
     fireEvent.change(beatValueSelect, { target: { value: '8' } });
-    expect(props.updateTimeSignature).toHaveBeenCalledWith(4, 8);
+    expect(props.updateTimeSignature).toHaveBeenCalledWith({
+      beatsPerMeasure: 4,
+      beatValue: 8,
+    });
   });
 });

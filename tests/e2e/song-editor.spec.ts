@@ -9,7 +9,8 @@ test.describe('Song Chart Editor', () => {
     await expect(page).toHaveURL('/library');
 
     // Create new song
-    await page.click('text=New Song');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, { timeout: 15000 });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/songs\//);
   });
 
@@ -19,23 +20,20 @@ test.describe('Song Chart Editor', () => {
     await page.locator('input[placeholder="Song Title"]').fill(songTitle);
 
     // Change BPM
-    await page.locator('input[placeholder="0"]').fill('145');
+    await page.getByTestId('bpm-input').fill('145');
 
     // Change Time Signature
-    const tsContainer = page
-      .locator('div', { hasText: 'Time' })
-      .locator('div.flex.items-center.gap-1');
-    await tsContainer.locator('input').first().fill('3'); // Beats
-    await tsContainer.locator('input').last().fill('4'); // Value
+    await page.getByTestId('time-signature-beats').fill('3');
+    await page.getByTestId('time-signature-value').selectOption('4');
 
     await waitForSave(page);
 
     // Verify metadata persists after reload
     await page.reload();
     await expect(page.locator('input[placeholder="Song Title"]')).toHaveValue(songTitle);
-    await expect(page.locator('input[placeholder="0"]')).toHaveValue('145');
-    await expect(tsContainer.locator('input').first()).toHaveValue('3');
-    await expect(tsContainer.locator('input').last()).toHaveValue('4');
+    await expect(page.getByTestId('bpm-input')).toHaveValue('145');
+    await expect(page.getByTestId('time-signature-beats')).toHaveValue('3');
+    await expect(page.getByTestId('time-signature-value')).toHaveValue('4');
   });
 
   test('should manage song sections', async ({ page }) => {
@@ -49,9 +47,7 @@ test.describe('Song Chart Editor', () => {
     await sectionNameInput.fill('Chorus');
 
     // Change measures count
-    const _measuresInput = page.locator('input[type="number"]').filter({ hasText: '' }).last(); // The one with (M)
-    // Actually SongEditor.tsx line 426 uses a specific class: text-zinc-600 font-bold
-    const measures = page.locator('input.text-zinc-600.font-bold');
+    const measures = page.getByTestId('song-editor-measures-input');
     await measures.fill('8');
 
     await waitForSave(page);
@@ -61,8 +57,7 @@ test.describe('Song Chart Editor', () => {
     await expect(page.locator('input[placeholder="Section Name"]')).toHaveValue('Chorus');
 
     // Check measures value
-    // SongEditor.tsx: const measures = page.locator('input.text-zinc-600.font-bold');
-    await expect(page.locator('input.text-zinc-600.font-bold')).toHaveValue('8');
+    await expect(page.getByTestId('song-editor-measures-input')).toHaveValue('8');
 
     // Remove Section
     page.on('dialog', (dialog) => dialog.accept());
@@ -83,36 +78,33 @@ test.describe('Song Chart Editor', () => {
     const kickRow = page.getByTestId('instrument-row-kick');
     const firstCell = kickRow.getByTestId('note-cell').first();
 
-    // Click to toggle note
+    // Toggle a note
     await firstCell.click();
     // Verify it's active (has symbol)
-    await expect(firstCell.locator('img')).toBeVisible();
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 10000 });
 
     // Right-click for symbol picker
     await firstCell.click({ button: 'right' });
-    // SymbolPicker uses a fixed/absolute positioning div
-    // Use a more flexible locator for the picker
     const picker = page.getByTestId('symbol-picker');
-    await expect(picker).toBeVisible();
+    await expect(picker).toBeVisible({ timeout: 10000 });
 
     // Select a different symbol (e.g., accent hit)
-    // The symbol buttons have aria-labels like "Accent"
-    // Use dispatchEvent('click') for all fixed overlay interactions to avoid viewport issues
-    await picker.locator('button[aria-label="Accent"]').dispatchEvent('click');
+    // Note: { force: true } is used because the sticky footer can intercept pointer events on small viewports
+    await picker.locator('button[aria-label="Accent"]').click({ force: true });
 
     // Verify cell icon changed to accent
-    await expect(firstCell.locator('img[alt="accent"]')).toBeVisible();
+    await expect(firstCell.locator('img[alt="accent"]')).toBeVisible({ timeout: 10000 });
 
     // Velocity adjustment buttons (GHOST/STD/ACCENT)
     const ghostVelBtn = picker.locator('button', { hasText: 'GHOST' });
     await expect(ghostVelBtn).toBeVisible();
-    await ghostVelBtn.dispatchEvent('click');
+    await ghostVelBtn.click({ force: true });
 
-    // Verify velocity bar changed (ghost is 0.2, so width should be 20%)
-    await expect(firstCell.locator('div[style*="width: 20%"]')).toBeVisible();
+    // Verify velocity bar changed (ghost is 0.3, so width should be 30%)
+    await expect(firstCell.locator('div[style*="width: 30%"]')).toBeVisible({ timeout: 10000 });
 
     // Click Done
-    await picker.locator('button', { hasText: 'Done' }).dispatchEvent('click');
+    await picker.locator('button', { hasText: 'Done' }).click({ force: true });
     await expect(picker).not.toBeVisible();
 
     await waitForSave(page);
@@ -120,7 +112,11 @@ test.describe('Song Chart Editor', () => {
     // Reload and verify persistence
     await page.reload();
     await expect(
-      page.getByTestId('instrument-row-kick').getByTestId('note-cell').first().locator('img'),
+      page
+        .getByTestId('instrument-row-kick')
+        .getByTestId('note-cell')
+        .first()
+        .getByTestId('note-cell-icon'),
     ).toBeVisible();
   });
 

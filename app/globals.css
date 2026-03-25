@@ -1,41 +1,189 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --muted: #f9fafb;
-  --muted-foreground: #6b7280;
-  --border: #e5e7eb;
-  --input: #d1d5db;
-  --ring: #3b82f6;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --on-primary: #d7f9ff;
+  --on-primary-fixed: #004148;
+  --error-dim: #9f0519;
+  --inverse-primary: #74ebfd;
+  --surface-container-low: #eef1f2;
+  --inverse-on-surface: #9a9d9e;
+  --primary-dim: #005862;
+  --surface-container-high: #dfe3e4;
+  --on-surface: #2c2f30;
+  --primary-fixed: #74ebfd;
+  --on-surface-variant: #595c5d;
+  --tertiary-container: #ff8fa9;
+  --on-primary-container: #00555f;
+  --tertiary-dim: #a00047;
+  --on-background: #2c2f30;
+  --on-secondary-fixed: #2d424c;
+  --primary-container: #74ebfd;
+  --on-tertiary-container: #66002b;
+  --on-primary-fixed-variant: #005f6a;
+  --surface-container: #e5e9ea;
+  --surface-dim: #d0d5d7;
+  --on-secondary-container: #40555f;
+  --on-tertiary: #ffeff0;
+  --on-secondary: #e4f5ff;
+  --outline: #747778;
+  --on-error-container: #570008;
+  --secondary-fixed-dim: #c1d8e4;
+  --secondary-fixed: #cfe6f2;
+  --surface-variant: #d9dddf;
+  --outline-variant: #abadae;
+  --secondary: #495f69;
+  --on-tertiary-fixed-variant: #770033;
+  --tertiary: #b60051;
+  --surface-tint: #006570;
+  --error-container: #fb5151;
+  --background: #f5f7f8;
+  --surface: #f5f7f8;
+  --surface-container-lowest: #ffffff;
+  --primary-fixed-dim: #64dcee;
+  --error: #b31b25;
+  --secondary-dim: #3e535c;
+  --on-error: #ffefee;
+  --on-secondary-fixed-variant: #495f69;
+  --secondary-container: #cfe6f2;
+  --tertiary-fixed-dim: #ff769b;
+  --primary: #006570;
+  --surface-bright: #f5f7f8;
+  --surface-container-highest: #d9dddf;
+  --on-tertiary-fixed: #380014;
+  --inverse-surface: #0b0f10;
+  --tertiary-fixed: #ff8fa9;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --muted: #1a1a1a;
-    --muted-foreground: #a1a1aa;
-    --border: #27272a;
-    --input: #3f3f46;
-    --ring: #3b82f6;
+    --on-primary-fixed-variant: #005762;
+    --on-surface: #ffffff;
+    --surface-container-high: #20201f;
+    --inverse-surface: #fcf9f8;
+    --surface-bright: #2c2c2c;
+    --on-tertiary: #48001c;
+    --tertiary-container: #fd3e80;
+    --primary: #81ecff;
+    --surface-variant: #262626;
+    --tertiary-fixed-dim: #ff769b;
+    --on-error: #490006;
+    --secondary-fixed: #d4e5ef;
+    --secondary-dim: #c6d7e1;
+    --error-container: #9f0519;
+    --on-primary-fixed: #003840;
+    --inverse-on-surface: #565555;
+    --on-surface-variant: #adaaaa;
+    --outline-variant: #484847;
+    --on-primary-container: #004d57;
+    --tertiary-dim: #ff6c95;
+    --secondary: #d4e5ef;
+    --on-secondary: #44545c;
+    --secondary-container: #394951;
+    --surface: #0e0e0e;
+    --on-secondary-fixed: #324249;
+    --surface-container: #1a1a1a;
+    --tertiary-fixed: #ff8fa9;
+    --primary-container: #00e3fd;
+    --on-tertiary-container: #100003;
+    --surface-tint: #81ecff;
+    --on-tertiary-fixed: #380014;
+    --on-tertiary-fixed-variant: #770033;
+    --background: #0e0e0e;
+    --on-background: #ffffff;
+    --primary-fixed: #00e3fd;
+    --on-secondary-fixed-variant: #4e5e66;
+    --surface-dim: #0e0e0e;
+    --on-error-container: #ffa8a3;
+    --surface-container-low: #131313;
+    --error: #ff716c;
+    --on-secondary-container: #c2d3dd;
+    --primary-dim: #00d4ec;
+    --secondary-fixed-dim: #c6d7e1;
+    --surface-container-lowest: #000000;
+    --on-primary: #005762;
+    --surface-container-highest: #262626;
+    --inverse-primary: #006976;
+    --primary-fixed-dim: #00d4ec;
+    --outline: #767575;
+    --error-dim: #d7383b;
+    --tertiary: #ff6c95;
   }
+}
+
+@theme inline {
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-fixed: var(--on-primary-fixed);
+  --color-error-dim: var(--error-dim);
+  --color-inverse-primary: var(--inverse-primary);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-primary-dim: var(--primary-dim);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-on-surface: var(--on-surface);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-tertiary-dim: var(--tertiary-dim);
+  --color-on-background: var(--on-background);
+  --color-on-secondary-fixed: var(--on-secondary-fixed);
+  --color-primary-container: var(--primary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  --color-on-primary-fixed-variant: var(--on-primary-fixed-variant);
+  --color-surface-container: var(--surface-container);
+  --color-surface-dim: var(--surface-dim);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-on-secondary: var(--on-secondary);
+  --color-outline: var(--outline);
+  --color-on-error-container: var(--on-error-container);
+  --color-secondary-fixed-dim: var(--secondary-fixed-dim);
+  --color-secondary-fixed: var(--secondary-fixed);
+  --color-surface-variant: var(--surface-variant);
+  --color-outline-variant: var(--outline-variant);
+  --color-secondary: var(--secondary);
+  --color-on-tertiary-fixed-variant: var(--on-tertiary-fixed-variant);
+  --color-tertiary: var(--tertiary);
+  --color-surface-tint: var(--surface-tint);
+  --color-error-container: var(--error-container);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-primary-fixed-dim: var(--primary-fixed-dim);
+  --color-error: var(--error);
+  --color-secondary-dim: var(--secondary-dim);
+  --color-on-error: var(--on-error);
+  --color-on-secondary-fixed-variant: var(--on-secondary-fixed-variant);
+  --color-secondary-container: var(--secondary-container);
+  --color-tertiary-fixed-dim: var(--tertiary-fixed-dim);
+  --color-primary: var(--primary);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-on-tertiary-fixed: var(--on-tertiary-fixed);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-tertiary-fixed: var(--tertiary-fixed);
+  
+  --font-headline: var(--font-space-grotesk), sans-serif;
+  --font-body: var(--font-inter), sans-serif;
+  --font-label: var(--font-space-grotesk), sans-serif;
+  
+  --animate-spin-slow: spin 3s linear infinite;
+  --animate-fade-in: fade-in 0.5s ease-out;
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Fallback aliases for any existing classes temporarily */
+  --color-muted: var(--surface-variant);
+  --color-muted-foreground: var(--on-surface-variant);
+  --color-border: var(--outline-variant);
+  --color-input: var(--outline);
 }
 
 body {
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--on-background);
+  font-family: var(--font-body);
 }

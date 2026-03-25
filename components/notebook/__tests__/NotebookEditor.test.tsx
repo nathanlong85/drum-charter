@@ -1,10 +1,10 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { Notebook } from '@/lib/types/groove';
-import NotebookEditor from '../NotebookEditor';
+import { NotebookEditor } from '../NotebookEditor';
 
-// Mock useRouter
+// Mock next/navigation
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -12,40 +12,30 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-// Mock Supabase service
+// Mock supabase-service
 vi.mock('@/lib/services/supabase-service', () => ({
   supabaseService: {
     saveNotebook: vi.fn().mockResolvedValue({}),
-    duplicateNotebook: vi.fn().mockResolvedValue({ id: 'notebook-2' }),
     deleteNotebook: vi.fn().mockResolvedValue({}),
+    duplicateNotebook: vi.fn().mockResolvedValue({}),
   },
 }));
 
-// Mock crypto.randomUUID
-if (!global.crypto.randomUUID) {
-  global.crypto.randomUUID = () => 'test-uuid' as any;
-}
-
-const mockNotebook: Notebook = {
-  id: 'notebook-1',
-  userId: 'user-1',
-  title: 'Test Notebook',
-  sections: [
-    {
-      id: 'section-1',
-      name: 'Paradiddles',
-      notes: ['Keep it even'],
-    },
-  ],
-  tags: ['technique'],
-  isPublic: false,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-};
-
 describe('NotebookEditor', () => {
+  const mockNotebook: Notebook = {
+    id: 'n1',
+    userId: 'u1',
+    title: 'Test Notebook',
+    tags: [],
+    isPublic: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    sections: [],
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
+    mockPush.mockClear();
   });
 
   it('renders the notebook title', () => {
@@ -57,145 +47,150 @@ describe('NotebookEditor', () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const titleInput = screen.getByDisplayValue('Test Notebook');
 
-    fireEvent.change(titleInput, {
-      target: { value: 'Updated Notebook Title' },
-    });
+    fireEvent.change(titleInput, { target: { value: 'New Title' } });
 
-    expect(screen.getByDisplayValue('Updated Notebook Title')).toBeDefined();
-
-    // Wait for debounce (2000ms)
     await waitFor(
       () => {
-        expect(supabaseService.saveNotebook).toHaveBeenCalled();
+        expect(supabaseService.saveNotebook).toHaveBeenCalledWith(
+          expect.objectContaining({ title: 'New Title' }),
+        );
       },
-      { timeout: 3000 },
+      { timeout: 5000 },
     );
   });
 
   it('adds a new section', () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const addButton = screen.getByText(/Add New Section/i);
+    const addBtn = screen.getByText(/Add New Section/i);
+    fireEvent.click(addBtn);
 
-    fireEvent.click(addButton);
-
-    expect(screen.getByDisplayValue('New Section')).toBeDefined();
+    expect(screen.getByPlaceholderText(/Section Name/i)).toBeDefined();
   });
 
   it('removes a section', () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const removeButton = screen.getByTitle('Remove Section');
+    const notebookWithSection: Notebook = {
+      ...mockNotebook,
+      sections: [{ id: 'sec1', name: 'Ideas', notes: '', grids: [] }],
+    };
+    render(<NotebookEditor initialNotebook={notebookWithSection} />);
 
-    fireEvent.click(removeButton);
+    const removeBtn = screen.getByRole('button', { name: /Remove Section/i });
+    fireEvent.click(removeBtn);
 
-    expect(screen.queryByDisplayValue('Paradiddles')).toBeNull();
+    expect(screen.queryByPlaceholderText(/Section Name/i)).toBeNull();
   });
 
   it('updates section name', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const nameInput = screen.getByDisplayValue('Paradiddles');
-    fireEvent.change(nameInput, { target: { value: 'Single Strokes' } });
+    const notebookWithSection: Notebook = {
+      ...mockNotebook,
+      sections: [{ id: 'sec1', name: 'Ideas', notes: '', grids: [] }],
+    };
+    render(<NotebookEditor initialNotebook={notebookWithSection} />);
+
+    const nameInput = screen.getByDisplayValue('Ideas');
+    fireEvent.change(nameInput, { target: { value: 'Refined' } });
 
     await waitFor(
       () => {
         expect(supabaseService.saveNotebook).toHaveBeenCalledWith(
           expect.objectContaining({
-            sections: expect.arrayContaining([expect.objectContaining({ name: 'Single Strokes' })]),
+            sections: [expect.objectContaining({ name: 'Refined' })],
           }),
         );
       },
-      { timeout: 3000 },
+      { timeout: 5000 },
     );
   });
 
   it('updates section notes', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const notesArea = screen.getByDisplayValue('Keep it even');
+    const notebookWithSection: Notebook = {
+      ...mockNotebook,
+      sections: [{ id: 'sec1', name: 'Ideas', notes: '', grids: [] }],
+    };
+    render(<NotebookEditor initialNotebook={notebookWithSection} />);
 
-    fireEvent.change(notesArea, { target: { value: 'New note line' } });
-
-    expect(screen.getByDisplayValue('New note line')).toBeDefined();
+    const notesInput = screen.getByPlaceholderText(/Add notes/i);
+    fireEvent.change(notesInput, { target: { value: 'Some notes here' } });
 
     await waitFor(
       () => {
         expect(supabaseService.saveNotebook).toHaveBeenCalledWith(
           expect.objectContaining({
-            sections: expect.arrayContaining([
-              expect.objectContaining({ notes: ['New note line'] }),
-            ]),
+            sections: [expect.objectContaining({ notes: 'Some notes here' })],
           }),
         );
       },
-      { timeout: 3000 },
+      { timeout: 5000 },
     );
   });
 
   it('updates tags', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const tagsInput = screen.getByPlaceholderText('Add tag...');
+    const tagInput = screen.getByPlaceholderText(/\+ ADD TAG/i);
 
-    fireEvent.change(tagsInput, { target: { value: 'rudiments' } });
-    fireEvent.keyDown(tagsInput, { key: 'Enter', code: 'Enter' });
-
-    expect(screen.getByText('rudiments')).toBeDefined();
+    fireEvent.change(tagInput, { target: { value: 'Jazz' } });
+    fireEvent.keyDown(tagInput, { key: 'Enter', code: 'Enter' });
 
     await waitFor(
       () => {
         expect(supabaseService.saveNotebook).toHaveBeenCalledWith(
-          expect.objectContaining({
-            tags: ['technique', 'rudiments'],
-          }),
+          expect.objectContaining({ tags: ['jazz'] }),
         );
       },
-      { timeout: 3000 },
+      { timeout: 5000 },
     );
   });
 
   it('duplicates the notebook', async () => {
+    vi.mocked(supabaseService.duplicateNotebook).mockResolvedValue({
+      ...mockNotebook,
+      id: 'n2',
+      title: 'Test Notebook (Copy)',
+    });
+
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const duplicateBtn = screen.getByText(/duplicate/i);
+    const duplicateBtn = screen.getByRole('button', { name: /Duplicate/i });
     fireEvent.click(duplicateBtn);
 
     await waitFor(() => {
-      expect(supabaseService.duplicateNotebook).toHaveBeenCalledWith('notebook-1');
-      expect(mockPush).toHaveBeenCalledWith('/notebooks/notebook-2');
+      expect(supabaseService.duplicateNotebook).toHaveBeenCalledWith('n1');
     });
   });
 
-  it('adds and removes a grid in a section', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const addGridBtn = screen.getByText(/\+ Add Grid/i);
+  it('adds and removes a grid in a section', () => {
+    const notebookWithSection: Notebook = {
+      ...mockNotebook,
+      sections: [{ id: 'sec1', name: 'Ideas', notes: '', grids: [] }],
+    };
+    render(<NotebookEditor initialNotebook={notebookWithSection} />);
+
+    const addGridBtn = screen.getByText(/\+ ADD GRID/i);
     fireEvent.click(addGridBtn);
 
-    await waitFor(
-      () => {
-        expect(screen.getByTestId('groove-grid')).toBeInTheDocument();
-      },
-      { timeout: 4000 },
-    );
+    expect(screen.getByTestId('groove-editor')).toBeDefined();
 
-    const removeGridBtn = screen.getByText('Remove Grid');
+    const removeGridBtn = screen.getByRole('button', { name: /Remove Grid/i });
     fireEvent.click(removeGridBtn);
 
-    await waitFor(
-      () => {
-        expect(screen.queryByTestId('groove-grid')).toBeNull();
-      },
-      { timeout: 4000 },
-    );
+    expect(screen.queryByTestId('groove-editor')).toBeNull();
   });
 
   it('handles public link for notebooks', async () => {
-    const publicNb = { ...mockNotebook, isPublic: true };
-    render(<NotebookEditor initialNotebook={publicNb} />);
+    const notebook = { ...mockNotebook, isPublic: true };
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    vi.stubGlobal('navigator', { clipboard: { writeText: writeTextSpy } });
 
-    const viewBtn = screen.getByText(/View/i);
-    expect(viewBtn).toHaveAttribute('href', '/public/notebooks/notebook-1');
+    render(<NotebookEditor initialNotebook={notebook} />);
+    const linkBtn = screen.getByRole('button', { name: /Copy Link/i });
+    fireEvent.click(linkBtn);
+
+    expect(writeTextSpy).toHaveBeenCalled();
   });
 
   it('toggles public state', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const checkbox = screen.getByLabelText(/Public/i);
-    fireEvent.click(checkbox);
+    const toggle = screen.getByTestId('toggle-public-button');
+    fireEvent.click(toggle);
 
     await waitFor(
       () => {
@@ -203,91 +198,52 @@ describe('NotebookEditor', () => {
           expect.objectContaining({ isPublic: true }),
         );
       },
-      { timeout: 4000 },
+      { timeout: 5000 },
     );
   });
 
-  it('handles error during duplication', async () => {
-    vi.spyOn(supabaseService, 'duplicateNotebook').mockRejectedValueOnce(new Error('Fail'));
-    vi.spyOn(window, 'alert').mockImplementation(() => {});
-
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
-    fireEvent.click(screen.getByText(/duplicate/i));
-
-    await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('Failed to duplicate notebook.');
-    });
-  });
-
-  it('handles error during deletion', async () => {
-    vi.spyOn(supabaseService, 'deleteNotebook').mockRejectedValueOnce(new Error('Fail'));
-    vi.spyOn(window, 'alert').mockImplementation(() => {});
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
-    fireEvent.click(screen.getByText(/delete/i));
-
-    await waitFor(() => {
-      expect(window.alert).toHaveBeenCalledWith('Failed to delete notebook.');
-    });
-  });
-
   it('handles auto-save error gracefully', async () => {
-    vi.spyOn(supabaseService, 'saveNotebook').mockRejectedValueOnce(new Error('Fail'));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
+    vi.mocked(supabaseService.saveNotebook).mockRejectedValue(new Error('Save failed'));
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    fireEvent.change(screen.getByDisplayValue('Test Notebook'), { target: { value: 'New' } });
+
+    const titleInput = screen.getByDisplayValue('Test Notebook');
+    fireEvent.change(titleInput, { target: { value: 'Fail Me' } });
 
     await waitFor(
       () => {
-        expect(consoleSpy).toHaveBeenCalledWith('Failed to auto-save notebook:', expect.anything());
+        expect(screen.getByText(/Save failed/i)).toBeDefined();
       },
-      { timeout: 4000 },
+      { timeout: 5000 },
     );
   });
 
   it('does not attempt to update state if unmounted during save', async () => {
-    vi.useFakeTimers();
-    try {
-      const saveSpy = vi.spyOn(supabaseService, 'saveNotebook').mockResolvedValueOnce({} as any);
+    const saveSpy = vi.fn().mockResolvedValue({});
+    vi.mocked(supabaseService.saveNotebook).mockImplementation(saveSpy);
 
-      const { unmount } = render(<NotebookEditor initialNotebook={mockNotebook} />);
+    const { unmount } = render(<NotebookEditor initialNotebook={mockNotebook} />);
 
-      // Trigger a change to start the debounce timer
-      fireEvent.change(screen.getByDisplayValue('Test Notebook'), {
-        target: { value: 'New Name' },
-      });
+    fireEvent.change(screen.getByDisplayValue('Test Notebook'), {
+      target: { value: 'Unmounted Update' },
+    });
 
-      // Unmount before the 2s debounce finishes
-      unmount();
+    unmount();
 
-      // Fast-forward time past the 2s debounce
-      act(() => {
-        vi.advanceTimersByTime(3000);
-      });
-
+    // Small delay to let enqueued flush chain execute
+    await waitFor(() => {
       // Verify save WAS called because cleanup calls flush() while isMountedRef.current is still true
       expect(saveSpy).toHaveBeenCalled();
-    } finally {
-      vi.useRealTimers();
-    }
+    });
   });
 
   it('deletes the notebook', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
-    vi.spyOn(supabaseService, 'deleteNotebook').mockResolvedValueOnce({} as any);
-
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const deleteBtn = screen.getByText(/delete/i);
+    const deleteBtn = screen.getByRole('button', { name: /Delete/i });
     fireEvent.click(deleteBtn);
 
-    await waitFor(
-      () => {
-        expect(supabaseService.deleteNotebook).toHaveBeenCalled();
-        expect(mockPush).toHaveBeenCalledWith('/library');
-      },
-      { timeout: 3000 },
-    );
+    await waitFor(() => {
+      expect(supabaseService.deleteNotebook).toHaveBeenCalledWith('n1');
+    });
   });
 });

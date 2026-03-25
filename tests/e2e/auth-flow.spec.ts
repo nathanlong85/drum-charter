@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForSave } from './test-utils';
 
 test.describe('Authentication and Core Flow', () => {
   test.beforeEach(async ({ page }) => {
@@ -14,11 +15,13 @@ test.describe('Authentication and Core Flow', () => {
 
   test('User can create and edit a new snippet with persistence', async ({ page }) => {
     // Switch to Snippets tab
-    await page.click('button:has-text("Snippets")');
+    await page.getByTestId('tab-snippet').click();
 
     // Create new snippet
-    await page.click('button:has-text("NEW")');
-    await page.click('button:has-text("Snippet")');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
 
     // Should redirect to snippet editor
     await expect(page).toHaveURL(/\/snippets\/.+/);
@@ -27,9 +30,8 @@ test.describe('Authentication and Core Flow', () => {
     const uniqueTitle = `Auth Snippet ${Date.now()}`;
     await titleInput.fill(uniqueTitle);
 
-    // Wait for save - need to wait for SAVING then SAVED
-    await expect(page.getByText(/SAVING/)).toBeVisible();
-    await expect(page.getByText(/SAVED/)).toBeVisible({ timeout: 20000 });
+    // Wait for save
+    await waitForSave(page);
 
     // Additional wait to ensure DB is truly updated
     await page.waitForTimeout(2000);
@@ -38,18 +40,19 @@ test.describe('Authentication and Core Flow', () => {
     await page.reload({ waitUntil: 'networkidle' });
 
     // Check if title persisted
-    await expect(page.locator(`input[value="${uniqueTitle}"]`)).toBeVisible({
-      timeout: 20000,
-    });
+    const reloadedTitleInput = page.getByPlaceholder(/Snippet Title/i);
+    await expect(reloadedTitleInput).toHaveValue(uniqueTitle, { timeout: 20000 });
   });
 
   test('User can create and edit a new notebook', async ({ page }) => {
     // Switch to Notebooks tab
-    await page.click('button:has-text("Notebooks")');
+    await page.getByTestId('tab-notebook').click();
 
     // Create new notebook
-    await page.click('button:has-text("NEW")');
-    await page.click('button:has-text("Notebook")');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
 
     // Should redirect to notebook editor
     await expect(page).toHaveURL(/\/notebooks\/.+/);
@@ -61,7 +64,6 @@ test.describe('Authentication and Core Flow', () => {
     await titleInput.fill(uniqueTitle);
 
     // Wait for auto-save
-    await expect(page.getByText(/SAVING/)).toBeVisible();
-    await expect(page.getByText(/SAVED/)).toBeVisible({ timeout: 20000 });
+    await waitForSave(page);
   });
 });

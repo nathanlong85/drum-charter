@@ -10,7 +10,10 @@ test.describe('Notebook Editor', () => {
 
     // Navigate to Notebooks tab and create new notebook
     await page.getByTestId('tab-notebook').click();
-    await page.click('text=New Notebook');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/notebooks\//);
   });
 
@@ -61,7 +64,7 @@ test.describe('Notebook Editor', () => {
         .getByTestId('instrument-row-kick')
         .getByTestId('note-cell')
         .first()
-        .locator('img'),
+        .getByTestId('note-cell-icon'),
     ).toBeVisible();
   });
 
@@ -88,7 +91,7 @@ test.describe('Notebook Editor', () => {
     const secondToolbar = secondSection.getByTestId('groove-toolbar');
 
     // Set first grid to 8th notes
-    await firstToolbar.locator('button', { hasText: '8' }).click();
+    await firstToolbar.getByTestId('resolution-button-8').click();
 
     // Set second grid to 16th notes (default) but change measures to 2
     await secondToolbar.locator('button[title="Increase measures"]').click();
@@ -108,14 +111,12 @@ test.describe('Notebook Editor', () => {
       .getByTestId('groove-toolbar');
 
     // First should still be 8th resolution
-    await expect(reloadedFirstToolbar.locator('button', { hasText: '8' })).toHaveClass(
-      /bg-blue-600/,
-    );
+    await expect(reloadedFirstToolbar.getByTestId('resolution-button-8')).toHaveClass(/bg-primary/);
 
     // Second should still have 2 measures
     await expect(
       reloadedSecondToolbar
-        .locator('div', { has: page.locator('span', { hasText: 'Measures:' }) })
+        .locator('div', { has: page.locator('span', { hasText: 'MEASURES' }) })
         .locator('span')
         .filter({ hasText: /^\d+$/ }),
     ).toHaveText('2');

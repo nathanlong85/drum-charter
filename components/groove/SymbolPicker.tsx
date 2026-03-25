@@ -1,8 +1,10 @@
 'use client';
 
-import Image from 'next/image';
+import { X } from 'lucide-react';
 import type React from 'react';
+import { useEffect, useRef } from 'react';
 import { type DrumCategory, type DrumSymbol, getSymbolsForCategory } from '@/lib/types/groove';
+import { NoteCell } from './NoteCell';
 
 interface SymbolPickerProps {
   onSelect: (symbol: DrumSymbol) => void;
@@ -87,27 +89,42 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
   position,
   category,
 }) => {
+  const pickerRef = useRef<HTMLDivElement>(null);
   const filteredSymbols = category ? getSymbolsForCategory(category) : allSymbols;
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
 
   return (
     <>
-      <div className="fixed inset-0 z-40" onClick={onClose} data-testid="symbolpicker-backdrop" />
       <div
-        className="fixed z-50 bg-white dark:bg-gray-900 border-2 border-zinc-800 dark:border-zinc-700 shadow-2xl rounded-lg p-4 flex flex-col gap-4 min-w-[280px] animate-in zoom-in-95 duration-100"
+        className="fixed inset-0 z-40 bg-black/5 backdrop-blur-[1px]"
+        data-testid="symbolpicker-backdrop"
+      />
+      <div
+        ref={pickerRef}
+        className="fixed z-50 bg-surface-container-low border border-outline-variant/20 shadow-2xl rounded-2xl p-4 flex flex-col gap-4 min-w-[280px] animate-in zoom-in-95 duration-100"
         style={{ top: position.top, left: position.left }}
         data-testid="symbol-picker"
       >
-        <div className="flex justify-between items-center border-b border-gray-100 dark:border-zinc-800 pb-2">
-          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+        <div className="flex justify-between items-center border-b border-outline-variant/10 pb-2">
+          <span className="text-[10px] font-headline font-black uppercase tracking-widest text-on-surface-variant">
             {category || 'Select Symbol'}
           </span>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+            className="text-on-surface-variant/40 hover:text-error transition-colors"
           >
-            ✕
+            <X size={14} />
           </button>
         </div>
 
@@ -119,36 +136,35 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
               onClick={() => {
                 onSelect(sym);
               }}
-              className="group flex flex-col items-center gap-1 p-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-all border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
+              className="group flex flex-col items-center gap-1 p-2 hover:bg-primary/10 rounded-xl transition-all border border-transparent hover:border-primary/20"
               title={symbolLabels[sym] || sym.replace(/_/g, ' ')}
               aria-label={symbolLabels[sym] || sym.replace(/_/g, ' ')}
             >
-              <div className="w-8 h-8 flex items-center justify-center">
+              <div className="w-8 h-8 flex items-center justify-center bg-surface-container-highest rounded-lg border border-outline-variant/10 group-hover:border-primary/30 transition-all pointer-events-none">
                 {sym === 'none' ? (
-                  <span className="text-xl text-zinc-300 group-hover:text-blue-400">∅</span>
+                  <span className="text-xl text-on-surface-variant/20 group-hover:text-primary">
+                    ∅
+                  </span>
                 ) : (
-                  <Image
-                    src={symbolToIcon[sym]!}
-                    alt={sym}
-                    width={24}
-                    height={24}
-                    className="dark:invert opacity-70 group-hover:opacity-100 transition-opacity"
+                  <NoteCell
+                    symbol={sym}
+                    onClick={() => {}}
+                    onContextMenu={(e) => e.preventDefault()}
+                    readOnly
                   />
                 )}
               </div>
-              <span className="text-[8px] font-bold uppercase tracking-tighter text-zinc-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate w-full text-center">
+              <span className="text-[8px] font-headline font-bold uppercase tracking-tighter text-on-surface-variant/60 group-hover:text-primary truncate w-full text-center">
                 {symbolLabels[sym] || sym}
               </span>
             </button>
           ))}
         </div>
 
-        <div className="border-t border-gray-100 dark:border-zinc-800 pt-4 flex flex-col gap-2">
-          <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-zinc-400">
+        <div className="border-t border-outline-variant/10 pt-4 flex flex-col gap-3">
+          <div className="flex justify-between items-center text-[10px] font-headline font-black uppercase tracking-widest text-on-surface-variant">
             <span>Velocity</span>
-            <span className="font-mono text-blue-600 dark:text-blue-400">
-              {Math.round(currentVelocity * 100)}%
-            </span>
+            <span className="text-primary">{Math.round(currentVelocity * 100)}%</span>
           </div>
           <input
             type="range"
@@ -157,21 +173,21 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
             step="0.05"
             value={currentVelocity}
             onChange={(e) => onVelocityChange(parseFloat(e.target.value))}
-            className="w-full h-1.5 bg-gray-100 dark:bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            className="w-full h-1.5 bg-surface-container-highest rounded-lg appearance-none cursor-pointer accent-primary"
           />
-          <div className="flex justify-between mt-1 gap-1">
+          <div className="flex justify-between mt-1 gap-1 p-1 bg-surface-container-highest rounded-xl">
             {[
-              { label: 'GHOST', val: 0.2 },
+              { label: 'GHOST', val: 0.3 },
               { label: 'STD', val: 0.7 },
-              { label: 'ACCENT', val: 1.2 },
+              { label: 'ACCENT', val: 1.0 },
             ].map((btn) => (
               <button
                 key={btn.label}
                 onClick={() => onVelocityChange(btn.val)}
-                className={`flex-1 text-[9px] font-black py-1 rounded transition-colors ${
-                  Math.abs(currentVelocity - btn.val) < 0.01
-                    ? 'bg-zinc-800 text-white'
-                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                className={`flex-1 text-[9px] font-headline font-black py-1.5 rounded-lg transition-all ${
+                  Math.abs(currentVelocity - btn.val) < 0.05
+                    ? 'bg-primary text-on-primary shadow-lg shadow-primary/20'
+                    : 'text-on-surface-variant/60 hover:text-primary hover:bg-surface-bright'
                 }`}
               >
                 {btn.label}
@@ -182,7 +198,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
 
         <button
           onClick={onClose}
-          className="w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-[10px] font-black uppercase tracking-widest rounded-md transition-colors shadow-lg shadow-zinc-200 dark:shadow-none"
+          className="w-full py-2.5 bg-primary/10 hover:bg-primary/20 text-primary text-[10px] font-headline font-black uppercase tracking-widest rounded-xl transition-all"
         >
           Done
         </button>

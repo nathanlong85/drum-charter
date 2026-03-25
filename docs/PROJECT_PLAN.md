@@ -96,6 +96,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🔵 In Progress
 
+- [x] [Epic] Apply UI Redesign from Stitch Exports (#70)
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
@@ -178,3 +179,7 @@ To ensure high-quality collaboration and maintain the stability of the DrumChart
 
 - **Read Before Work**: This file MUST be read before any work is done.
 - **Update After Work**: This file MUST be updated after every task is completed.
+
+## Known Issues
+- [ ] Issue #73: Flaky E2E tests related to grid dragging ergonomics.
+- [ ] Issue #74: Flaky E2E tests related to Live Mode transitions.

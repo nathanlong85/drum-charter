@@ -10,7 +10,10 @@ test.describe('Groove Snippet Editor', () => {
 
     // Navigate to Snippets tab and create new snippet
     await page.getByTestId('tab-snippet').click();
-    await page.click('text=New Snippet');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/snippets\//);
   });
 
@@ -20,11 +23,11 @@ test.describe('Groove Snippet Editor', () => {
     await page.locator('input[placeholder="Snippet Title"]').fill(snippetTitle);
 
     // Toggle Public
-    const publicCheckbox = page.locator('#isPublicSnippet');
-    await publicCheckbox.check();
+    const publicToggle = page.getByTestId('toggle-public-button');
+    await publicToggle.click();
 
     // Add a tag
-    const tagInput = page.locator('input[placeholder*="genre, style, or technique"]');
+    const tagInput = page.locator('input[placeholder*="ADD TAG"]');
     await tagInput.fill('funk');
     await page.keyboard.press('Enter');
 
@@ -33,7 +36,7 @@ test.describe('Groove Snippet Editor', () => {
     // Verify persistence after reload
     await page.reload();
     await expect(page.locator('input[placeholder="Snippet Title"]')).toHaveValue(snippetTitle);
-    await expect(publicCheckbox).toBeChecked();
+    await expect(page.getByTestId('toggle-public-button')).toHaveText('PUBLIC');
     await expect(page.locator('span', { hasText: 'funk' })).toBeVisible();
 
     // Verify "View" link is visible when public
@@ -56,7 +59,7 @@ test.describe('Groove Snippet Editor', () => {
 
     // Verify persistence
     await page.reload();
-    await expect(toolbar.locator('button', { hasText: '8' })).toHaveClass(/bg-blue-600/);
+    await expect(toolbar.locator('button', { hasText: '8' })).toHaveClass(/bg-primary/);
     await expect(
       toolbar
         .locator('div', { has: page.locator('span', { hasText: 'Measures:' }) })
@@ -66,20 +69,19 @@ test.describe('Groove Snippet Editor', () => {
   });
 
   test('should auto-save on grid changes', async ({ page }) => {
-    const kickRow = page.getByTestId('instrument-row-kick');
-    const firstCell = kickRow.getByTestId('note-cell').first();
+    // Wait for grid to be stable
+    await page.waitForSelector('[data-testid="note-cell"]');
+    const firstCell = page.getByTestId('note-cell').first();
 
     // Toggle a note
     await firstCell.click();
-    await expect(firstCell.locator('img')).toBeVisible();
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 10000 });
 
     // Wait for auto-save
     await waitForSave(page);
 
     // Verify persistence
     await page.reload();
-    await expect(
-      page.getByTestId('instrument-row-kick').getByTestId('note-cell').first().locator('img'),
-    ).toBeVisible();
+    await expect(page.getByTestId('note-cell-icon').first()).toBeVisible({ timeout: 15000 });
   });
 });

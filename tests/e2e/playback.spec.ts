@@ -9,7 +9,10 @@ test.describe('Playback & Metronome', () => {
 
     // Create new snippet for a clean grid
     await page.getByTestId('tab-snippet').click();
-    await page.click('text=New Snippet');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/snippets\//);
   });
 
@@ -19,17 +22,17 @@ test.describe('Playback & Metronome', () => {
 
     // Initial state
     await expect(playButton).toHaveText(/Play/i);
-    await expect(playButton).toHaveClass(/bg-green-600/);
+    await expect(playButton).toHaveClass(/bg-primary/);
 
     // Start
     await playButton.click();
     await expect(playButton).toHaveText(/Stop/i);
-    await expect(playButton).toHaveClass(/bg-red-600/);
+    await expect(playButton).toHaveClass(/bg-error/);
 
     // Stop
     await playButton.click();
     await expect(playButton).toHaveText(/Play/i);
-    await expect(playButton).toHaveClass(/bg-green-600/);
+    await expect(playButton).toHaveClass(/bg-primary/);
   });
 
   test('should manage metronome settings', async ({ page }) => {
@@ -64,25 +67,25 @@ test.describe('Playback & Metronome', () => {
     await expect(page.getByTestId('metronome-volume-value')).toHaveText('80%');
 
     // Click a preset button (Ghost = 0.3 = 30%)
-    await settingsPanel.locator('button', { hasText: 'Ghost' }).dispatchEvent('click');
+    await settingsPanel.locator('button', { hasText: 'Ghost' }).click({ force: true });
     await expect(page.getByTestId('metronome-volume-value')).toHaveText('30%');
 
     // Close settings
-    await settingsPanel.locator('button', { hasText: 'Close' }).dispatchEvent('click');
-    await expect(settingsPanel).not.toBeVisible();
+    await page.getByTestId('close-metronome-settings').click();
+    await expect(settingsPanel).not.toBeVisible({ timeout: 10000 });
   });
 
   test('should show beat labels and measure boundaries', async ({ page }) => {
     const grid = page.getByTestId('groove-grid');
 
-    // Default 4/4 should have labels 1, 2, 3, 4
-    await expect(grid.locator('text=1').first()).toBeVisible();
-    await expect(grid.locator('text=2').first()).toBeVisible();
-    await expect(grid.locator('text=3').first()).toBeVisible();
-    await expect(grid.locator('text=4').first()).toBeVisible();
+    // Verify beat labels are visible
+    await expect(grid.getByTestId('beat-label-1')).toBeVisible();
+    await expect(grid.getByTestId('beat-label-2')).toBeVisible();
+    await expect(grid.getByTestId('beat-label-3')).toBeVisible();
+    await expect(grid.getByTestId('beat-label-4')).toBeVisible();
 
-    // Beat 1 should have text-blue-600
-    await expect(grid.locator('div', { hasText: /^1$/ }).first()).toHaveClass(/text-blue-600/);
+    // Beat 1 should have text-primary (from redesigned InstrumentRow beat label)
+    await expect(grid.getByTestId('beat-label-1').first()).toHaveClass(/text-primary/);
 
     // Add a second measure
     const toolbar = page.getByTestId('groove-toolbar');

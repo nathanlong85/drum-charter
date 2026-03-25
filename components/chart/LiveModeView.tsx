@@ -90,12 +90,14 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
 
   if (!activeSection) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-yellow-400 gap-8">
-        <p className="text-2xl font-bold text-center">No sections found in this chart.</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-surface-container-lowest text-primary gap-8 font-headline">
+        <p className="text-3xl font-black uppercase tracking-widest text-center">
+          No sections found in this chart.
+        </p>
         <button
           onClick={handleExit}
           data-testid="exit-live-mode-empty-btn"
-          className="px-8 py-4 bg-red-900 text-red-100 rounded-xl font-black uppercase tracking-tighter hover:bg-red-800 transition-all shadow-2xl"
+          className="px-8 py-4 bg-primary text-on-primary rounded-xl font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-2xl shadow-primary/20"
         >
           Exit Live Mode
         </button>
@@ -105,19 +107,26 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
 
   return (
     <div
-      className="fixed inset-0 z-[10000] bg-black text-white flex flex-col font-sans"
+      className="fixed inset-0 z-[10000] bg-surface-container-lowest text-on-surface flex flex-col font-body"
       data-testid="live-mode-view"
       id="live-mode-view-root"
     >
       {/* Header - Hidden in Fullscreen */}
       {!isFullscreen && (
-        <header className="p-6 bg-zinc-900 border-b border-zinc-800 flex justify-between items-center">
+        <header
+          className="p-6 bg-surface-container-low border-b border-outline-variant/10 flex justify-between items-center transition-all duration-300"
+          data-testid="live-mode-header"
+        >
           <div>
-            <h1 className="text-3xl font-black uppercase tracking-tighter text-yellow-400">
+            <h1
+              className="text-3xl font-headline font-black uppercase tracking-tighter text-primary"
+              data-testid="live-mode-title"
+            >
               {chart.header.title}
             </h1>
-            <div className="flex gap-4 mt-1 text-zinc-400 font-mono text-sm uppercase">
+            <div className="flex gap-4 mt-1 text-on-surface-variant font-headline text-xs font-bold uppercase tracking-widest">
               <span>BPM: {chart.header.bpm || 'N/A'}</span>
+              <div className="w-[1px] h-3 bg-outline-variant/30 self-center"></div>
               <span>
                 {chart.header.timeSignature.beatsPerMeasure}/{chart.header.timeSignature.beatValue}
               </span>
@@ -129,7 +138,7 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
               href="/manual"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-bold text-zinc-500 hover:text-white uppercase tracking-widest transition-colors mr-2"
+              className="text-xs font-headline font-bold text-on-surface-variant hover:text-primary uppercase tracking-widest transition-colors mr-2"
             >
               Manual
             </a>
@@ -137,7 +146,7 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
             <button
               onClick={toggleFullscreen}
               data-testid="live-mode-fullscreen-btn"
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded text-sm font-bold uppercase transition-colors border border-zinc-700"
+              className="px-4 py-2 bg-surface-container-highest hover:bg-surface-bright text-on-surface-variant rounded-lg text-[10px] font-headline font-bold uppercase tracking-widest transition-all border border-outline-variant/10"
             >
               {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
               {fullscreenShortcut}
@@ -145,7 +154,7 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
             <button
               onClick={handleExit}
               data-testid="exit-live-mode-btn"
-              className="px-4 py-2 bg-red-900/50 hover:bg-red-900 text-red-200 rounded text-sm font-bold uppercase transition-colors border border-red-800"
+              className="px-4 py-2 bg-error/10 hover:bg-error/20 text-error rounded-lg text-[10px] font-headline font-bold uppercase tracking-widest transition-all border border-error/20"
             >
               Exit Live Mode
             </button>
@@ -154,16 +163,22 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       )}
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col p-8 lg:p-12 overflow-y-auto">
+      <main className="flex-1 flex flex-col p-8 lg:p-12 overflow-y-auto bg-[radial-gradient(circle_at_top_right,var(--color-primary-dim)_0%,transparent_40%)]">
         <div className="max-w-6xl mx-auto w-full">
-          <div className="flex justify-between items-end mb-8 border-b-4 border-yellow-400 pb-4">
+          <div className="flex justify-between items-end mb-12 border-b-4 border-primary pb-6">
             <div className="flex flex-col">
-              <h2 className="text-6xl font-black uppercase text-white leading-none">
+              <div className="text-primary font-headline font-bold text-xs uppercase tracking-[0.4em] mb-2">
+                Current Section
+              </div>
+              <h2
+                className="text-7xl lg:text-8xl font-headline font-black uppercase text-on-surface leading-none tracking-tighter"
+                data-testid="active-section-name"
+              >
                 {activeSection.name}
               </h2>
               {activeSection.measuresCount > 0 && (
                 <div
-                  className="text-2xl font-bold text-yellow-400 mt-3 tracking-widest uppercase"
+                  className="text-2xl font-headline font-bold text-on-surface-variant mt-4 tracking-[0.2em] uppercase opacity-70"
                   data-testid="section-measures-count"
                 >
                   {activeSection.measuresCount} Measures
@@ -171,38 +186,49 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
               )}
             </div>
             <div className="flex flex-col items-end">
-              <div className="text-4xl font-mono text-zinc-500 font-bold mb-2">
-                {activeSectionIdx + 1} / {chart.sections.length}
+              <div className="text-5xl font-headline text-on-surface-variant font-black mb-4 opacity-30">
+                {activeSectionIdx + 1} <span className="text-2xl opacity-50">/</span>{' '}
+                {chart.sections.length}
               </div>
               {activeSectionIdx < chart.sections.length - 1 && (
-                <div
-                  className="text-xl font-bold text-zinc-400 uppercase tracking-wider"
-                  data-testid="next-section-preview"
-                >
-                  Next:{' '}
-                  <span className="text-white">{chart.sections[activeSectionIdx + 1].name}</span>
+                <div className="text-right" data-testid="next-section-preview">
+                  <div className="text-primary font-headline font-bold text-[10px] uppercase tracking-[0.3em] mb-1">
+                    Up Next
+                  </div>
+                  <div className="text-3xl font-headline font-bold text-on-surface uppercase tracking-tight">
+                    {chart.sections[activeSectionIdx + 1].name}
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-12">
+          <div className="grid grid-cols-1 gap-16">
             {activeSection.grid && (
-              <div className="bg-zinc-900 p-8 rounded-2xl border border-zinc-800 shadow-2xl">
+              <div className="bg-surface-container-low p-10 rounded-[32px] border border-outline-variant/10 shadow-2xl shadow-black/40">
                 <GrooveGridEditor initialGrid={activeSection.grid} readOnly />
               </div>
             )}
 
             {activeSection.notes && activeSection.notes.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-2xl font-bold text-yellow-400 uppercase tracking-widest">
-                  Performance Notes
-                </h3>
-                <ul className="space-y-3">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="h-px flex-1 bg-outline-variant/20"></div>
+                  <h3 className="text-xl font-headline font-bold text-primary uppercase tracking-[0.3em]">
+                    Performance Cues
+                  </h3>
+                  <div className="h-px flex-1 bg-outline-variant/20"></div>
+                </div>
+                <ul className="space-y-4">
                   {activeSection.notes.map((note, idx) => (
-                    <li key={idx} className="text-3xl font-medium text-zinc-200 flex gap-4">
-                      <span className="text-yellow-400">›</span>
-                      {note}
+                    <li
+                      key={idx}
+                      className="text-4xl lg:text-5xl font-headline font-black text-on-surface flex gap-6 items-start leading-tight"
+                    >
+                      <span className="text-primary mt-1">»</span>
+                      <span className="bg-gradient-to-r from-on-surface to-on-surface-variant bg-clip-text text-transparent">
+                        {note}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -210,17 +236,17 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
             )}
 
             {activeSection.subSections && activeSection.subSections.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-8">
                 {activeSection.subSections.map((sub) => (
                   <div
                     key={sub.id}
-                    className="bg-zinc-900/50 p-6 rounded-xl border border-zinc-800"
+                    className="bg-surface-container-low/50 p-8 rounded-3xl border border-outline-variant/10 backdrop-blur-sm shadow-xl"
                   >
-                    <h4 className="text-2xl font-bold text-white mb-4 uppercase flex justify-between items-center">
+                    <h4 className="text-2xl font-headline font-bold text-on-surface mb-6 uppercase flex justify-between items-center border-b border-outline-variant/10 pb-4">
                       <span>{sub.name}</span>
                       {sub.measuresCount > 0 && (
                         <span
-                          className="text-xl text-yellow-400 font-black tracking-widest bg-yellow-400/10 px-3 py-1 rounded-md border border-yellow-400/20"
+                          className="text-lg text-primary font-black tracking-widest bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20"
                           data-testid={`subsection-measures-${sub.id}`}
                         >
                           {sub.measuresCount}M
@@ -229,10 +255,13 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
                     </h4>
                     {sub.grid && <GrooveGridEditor initialGrid={sub.grid} readOnly />}
                     {sub.notes && sub.notes.length > 0 && (
-                      <ul className="mt-4 space-y-2">
+                      <ul className="mt-6 space-y-3">
                         {sub.notes.map((n, i) => (
-                          <li key={i} className="text-xl text-zinc-400 flex gap-2">
-                            <span className="text-yellow-600">▪</span> {n}
+                          <li
+                            key={i}
+                            className="text-xl font-headline font-bold text-on-surface-variant flex gap-3"
+                          >
+                            <span className="text-primary">•</span> {n}
                           </li>
                         ))}
                       </ul>
@@ -247,14 +276,15 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
 
       {/* Navigation Footer - Hidden in Fullscreen */}
       {!isFullscreen && (
-        <footer className="p-6 bg-zinc-950 border-t border-zinc-900 flex justify-between items-center">
+        <footer className="p-8 bg-surface-container-low border-t border-outline-variant/10 flex justify-between items-center shadow-[0_-10px_40px_rgba(0,0,0,0.3)]">
           <button
             disabled={activeSectionIdx === 0}
             onClick={prevSection}
-            className="flex items-center gap-4 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors group"
+            data-testid="live-mode-prev-btn"
+            className="flex items-center gap-6 text-on-surface-variant hover:text-primary disabled:opacity-10 transition-all group"
           >
-            <div className="w-12 h-12 rounded-full border-2 border-current flex items-center justify-center group-hover:bg-zinc-800">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 rounded-2xl border-2 border-outline-variant/30 flex items-center justify-center group-hover:border-primary group-hover:bg-primary/5 transition-all">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -263,17 +293,21 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
                 />
               </svg>
             </div>
-            <div className="text-left">
-              <div className="text-[10px] font-black uppercase tracking-widest opacity-50">
-                Previous
+            <div className="text-left hidden sm:block">
+              <div className="text-xs font-headline font-black uppercase tracking-[0.3em] opacity-40 mb-1">
+                PREVIOUS
               </div>
-              <div className="text-lg font-bold uppercase">
-                {activeSectionIdx > 0 ? chart.sections[activeSectionIdx - 1].name : 'Start'}
+              <div className="text-xl font-headline font-black uppercase tracking-tight">
+                {activeSectionIdx > 0 ? chart.sections[activeSectionIdx - 1].name : 'TOP'}
               </div>
             </div>
           </button>
 
-          <div className="flex gap-2" role="list" aria-label="Song sections progress">
+          <div
+            className="flex gap-3 px-6 py-3 bg-surface-container-highest/50 rounded-full border border-outline-variant/10"
+            role="list"
+            aria-label="Song sections progress"
+          >
             {chart.sections.map((section, idx) => (
               <div
                 key={section.id}
@@ -282,29 +316,33 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
                   idx === activeSectionIdx ? ', current section' : ''
                 }`}
                 aria-current={idx === activeSectionIdx ? 'step' : undefined}
-                className={`h-2 rounded-full transition-all ${
-                  idx === activeSectionIdx ? 'w-8 bg-yellow-400' : 'w-2 bg-zinc-800'
+                className={`h-3 rounded-full transition-all duration-500 ${
+                  idx === activeSectionIdx
+                    ? 'w-12 bg-primary shadow-[0_0_15px_var(--color-primary)]'
+                    : 'w-3 bg-on-surface-variant/20'
                 }`}
               />
             ))}
           </div>
+
           <button
             disabled={activeSectionIdx === chart.sections.length - 1}
             onClick={nextSection}
-            className="flex items-center gap-4 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors group text-right"
+            data-testid="live-mode-next-btn"
+            className="flex items-center gap-6 text-on-surface-variant hover:text-primary disabled:opacity-10 transition-all group text-right"
           >
-            <div className="text-right">
-              <div className="text-[10px] font-black uppercase tracking-widest opacity-50">
-                Next
+            <div className="text-right hidden sm:block">
+              <div className="text-xs font-headline font-black uppercase tracking-[0.3em] opacity-40 mb-1">
+                NEXT
               </div>
-              <div className="text-lg font-bold uppercase text-yellow-400">
+              <div className="text-xl font-headline font-black uppercase tracking-tight text-primary">
                 {activeSectionIdx < chart.sections.length - 1
                   ? chart.sections[activeSectionIdx + 1].name
-                  : 'End'}
+                  : 'FINISH'}
               </div>
             </div>
-            <div className="w-12 h-12 rounded-full border-2 border-current flex items-center justify-center group-hover:bg-zinc-800 border-yellow-400 text-yellow-400">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 rounded-2xl border-2 border-primary flex items-center justify-center group-hover:bg-primary group-hover:text-on-primary transition-all shadow-[0_0_20px_rgba(129,236,255,0.2)]">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

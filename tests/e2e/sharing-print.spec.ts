@@ -9,21 +9,23 @@ test.describe('Sharing & Public View', () => {
     await expect(page).toHaveURL('/library');
 
     await page.getByTestId('tab-snippet').click();
-    await page.click('text=New Snippet');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/snippets\//);
 
     const snippetTitle = `Public Snippet ${Date.now()}`;
     await page.locator('input[placeholder="Snippet Title"]').fill(snippetTitle);
 
     // Toggle Public
-    const publicCheckbox = page.locator('#isPublicSnippet');
-    await publicCheckbox.check();
+    await page.getByTestId('toggle-public-button').click();
 
     // Wait for save
     await waitForSave(page);
 
     // Get the public URL
-    const viewLink = page.locator('text=View');
+    const viewLink = page.getByText(/View Public/i);
     await expect(viewLink).toBeVisible();
     const publicUrl = await viewLink.getAttribute('href');
     expect(publicUrl).toContain('/public/snippets/');
@@ -47,14 +49,15 @@ test.describe('Sharing & Public View', () => {
     const firstCell = page.getByTestId('note-cell').first();
     await firstCell.click({ force: true }); // force: true to bypass pointer-events-none
     // It should NOT have an image after clicking if it was empty
-    await expect(firstCell.locator('img')).not.toBeVisible();
+    await expect(firstCell.getByTestId('note-cell-icon')).not.toBeVisible();
   });
 
   test('should adapt UI for printing', async ({ page }) => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
 
-    await page.click('text=New Song');
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, { timeout: 15000 });
+    await page.getByTestId('create-new-button').click();
     await expect(page).toHaveURL(/\/songs\//);
 
     // Add some content
