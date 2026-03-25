@@ -40,6 +40,7 @@ export default function LoginPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || guestLoading) return;
     setLoading(true);
     setMessage('');
     setMessageType('error');
@@ -62,6 +63,7 @@ export default function LoginPage() {
   };
 
   const handleGuestSignIn = async () => {
+    if (loading || guestLoading) return;
     setGuestLoading(true);
     setMessage('');
     setMessageType('error');

@@ -92,10 +92,16 @@ export function AuthStatus() {
           >
             {user.email || user.phone || 'No email provided'}
           </span>
-          {/* TODO: Drive this from user account metadata when available */}
-          <span className="text-[8px] font-headline font-bold text-on-surface-variant uppercase tracking-widest opacity-50">
-            PRO ACCOUNT
-          </span>
+          {/* TODO: Drive this from user account metadata (app_metadata.tier) when available */}
+          {user.app_metadata?.tier === 'pro' ? (
+            <span className="text-[8px] font-headline font-bold text-primary uppercase tracking-widest">
+              PRO ACCOUNT
+            </span>
+          ) : (
+            <span className="text-[8px] font-headline font-bold text-on-surface-variant uppercase tracking-widest opacity-50">
+              BASIC ACCOUNT
+            </span>
+          )}
         </div>
       </div>
       <button
