@@ -67,7 +67,7 @@ export default function LibraryDashboard({
   const router = useRouter();
 
   const queryTab = searchParams.get('tab');
-  const activeTab: ItemType = isValidItemType(queryTab) ? (queryTab as ItemType) : 'song';
+  const activeTab: ItemType = isValidItemType(queryTab) ? queryTab : 'song';
 
   const handleTabChange = (tab: ItemType) => {
     router.push(`/library?tab=${tab}`);
@@ -355,7 +355,7 @@ export default function LibraryDashboard({
             className="bg-gradient-to-br from-primary to-primary-dim text-on-primary font-headline text-[11px] font-bold tracking-widest uppercase px-6 py-3 rounded-full shadow-[0_4px_20px_rgba(129,236,255,0.3)] hover:opacity-90 transition-all flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            New {activeTab}
+            New {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
           </button>
         </div>
       </div>
@@ -432,10 +432,12 @@ export default function LibraryDashboard({
         </div>
       </section>
 
-      {currentItems.length === 0 && searchQuery && (
+      {currentItems.length === 0 && (searchQuery || selectedTags.length > 0) && (
         <div className="text-center py-20 bg-surface-container rounded-xl">
           <p className="text-on-surface-variant font-headline tracking-widest text-sm uppercase">
-            No results found for &quot;{searchQuery}&quot;
+            {searchQuery
+              ? `No results found for "${searchQuery}"`
+              : 'No results found for selected tags'}
           </p>
         </div>
       )}

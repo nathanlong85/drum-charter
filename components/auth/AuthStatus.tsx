@@ -12,11 +12,17 @@ export function AuthStatus() {
 
   useEffect(() => {
     const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (err) {
+        console.error('Error fetching user:', err);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
     getUser();
@@ -97,11 +103,11 @@ export function AuthStatus() {
             <span className="text-[8px] font-headline font-bold text-primary uppercase tracking-widest">
               PRO ACCOUNT
             </span>
-          ) : (
+          ) : user.app_metadata?.tier === 'basic' ? (
             <span className="text-[8px] font-headline font-bold text-on-surface-variant uppercase tracking-widest opacity-50">
               BASIC ACCOUNT
             </span>
-          )}
+          ) : null}
         </div>
       </div>
       <button
