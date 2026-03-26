@@ -13,9 +13,12 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import type { ReactNode } from 'react';
+import { type ReactNode, useCallback } from 'react';
 import { AuthStatus } from '@/components/auth/AuthStatus';
-import { version } from '@/package.json';
+import { useSupabaseStatus } from '@/lib/hooks/useSupabaseStatus';
+import packageJson from '@/package.json';
+
+const { version } = packageJson;
 
 interface AppShellProps {
   children: ReactNode;
@@ -25,6 +28,17 @@ export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get('tab');
+  const supabaseStatus = useSupabaseStatus();
+
+  const handleRefresh = useCallback(() => {
+    // Refresh implementation - revalidate current page
+    window.location.reload();
+  }, []);
+
+  const handleOpenSettings = useCallback(() => {
+    // Open settings implementation - show a toast or alert for now
+    alert('System settings are not yet available.');
+  }, []);
 
   const navItems = [
     { name: 'Songs', href: '/library?tab=song', icon: Music, tab: 'song' },
@@ -74,6 +88,7 @@ export function AppShell({ children }: AppShellProps) {
                   <span className="hidden lg:block font-bold uppercase tracking-wider text-[11px]">
                     {item.name}
                   </span>
+                  <span className="sr-only">{item.name}</span>
                 </Link>
               );
             })}
@@ -87,6 +102,7 @@ export function AppShell({ children }: AppShellProps) {
                 <span className="hidden lg:block font-bold uppercase tracking-wider text-[11px]">
                   User Manual
                 </span>
+                <span className="sr-only">User Manual</span>
               </Link>
             </div>
           </nav>
@@ -113,8 +129,14 @@ export function AppShell({ children }: AppShellProps) {
           </span>
           <div className="hidden md:block h-4 w-[1px] bg-outline-variant/20"></div>
           <div className="flex items-center gap-2 text-primary/60 font-label text-[10px] tracking-[0.25em] font-bold">
-            <Cloud className="w-4 h-4 animate-pulse" />
-            <span className="hidden sm:inline-block uppercase">Live Sync Ready</span>
+            <Cloud className={`w-4 h-4 ${supabaseStatus === 'connected' ? 'animate-pulse' : ''}`} />
+            <span className="hidden sm:inline-block uppercase">
+              {supabaseStatus === 'connected'
+                ? 'Live Sync Ready'
+                : supabaseStatus === 'connecting'
+                  ? 'Connecting…'
+                  : 'Offline'}
+            </span>
           </div>
         </div>
 
@@ -130,6 +152,7 @@ export function AppShell({ children }: AppShellProps) {
           </div>
           <div className="flex items-center gap-4 text-on-surface-variant/60">
             <button
+              onClick={handleRefresh}
               className="hover:text-primary transition-colors p-2 hover:bg-surface-container-highest/50 rounded-full"
               type="button"
               aria-label="Refresh data"
@@ -137,6 +160,7 @@ export function AppShell({ children }: AppShellProps) {
               <RefreshCw className="w-4 h-4" />
             </button>
             <button
+              onClick={handleOpenSettings}
               className="hover:text-primary transition-colors p-2 hover:bg-surface-container-highest/50 rounded-full"
               type="button"
               aria-label="System settings"

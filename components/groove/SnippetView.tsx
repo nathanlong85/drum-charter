@@ -30,7 +30,7 @@ export function SnippetView({ snippet }: SnippetViewProps) {
             </div>
             <div className="h-8 w-[1px] bg-outline-variant/20" />
             <div className="text-right">
-              <p className="text-[10px] font-black text-on-surface-variant/40 uppercase tracking-[0.3em] mb-1">
+              <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] mb-1">
                 Status
               </p>
               <p className="text-[10px] font-black text-primary uppercase leading-none tracking-widest bg-primary/10 px-2 py-1 rounded">
@@ -46,14 +46,14 @@ export function SnippetView({ snippet }: SnippetViewProps) {
               key={idx}
               className="bg-surface-container-highest/50 text-primary px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] border border-outline-variant/10"
             >
-              #{tag.toUpperCase()}
+              {tag}
             </span>
           ))}
         </div>
       </header>
 
       <div className="space-y-16">
-        <section className="bg-surface-container-low/30 border border-outline-variant/10 rounded-2xl p-8 shadow-inner overflow-hidden relative">
+        <section className="bg-surface-container-low/30 border border-outline-variant/10 rounded-2xl p-8 shadow-inner overflow-hidden relative pointer-events-none">
           <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
             <Library className="w-24 h-24" aria-hidden="true" focusable={false} />
           </div>
@@ -70,10 +70,10 @@ export function SnippetView({ snippet }: SnippetViewProps) {
       </div>
 
       <footer className="mt-24 pt-8 border-t border-outline-variant/10 text-center">
-        <p className="text-on-surface-variant/30 text-[9px] font-label font-black uppercase tracking-[0.3em] mb-2">
+        <p className="text-on-surface-variant text-[9px] font-label font-black uppercase tracking-[0.3em] mb-2">
           DrumCharter Module v1.0
         </p>
-        <p className="text-on-surface-variant/40 text-[10px] font-label font-bold uppercase tracking-widest">
+        <p className="text-on-surface-variant text-[10px] font-label font-bold uppercase tracking-widest">
           Last updated {formatDateTime(snippet.updatedAt)}
         </p>
       </footer>

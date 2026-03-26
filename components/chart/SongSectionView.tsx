@@ -14,7 +14,7 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({ section }) => 
       <div className="flex items-center gap-4 mb-6">
         <h2 className="text-xl font-black uppercase tracking-tighter text-on-surface bg-surface-container-highest px-4 py-2 rounded-lg border-l-4 border-primary shadow-sm font-headline print:bg-transparent print:p-0 print:border-none print:shadow-none">
           {section.name}
-          <span className="ml-3 text-on-surface-variant/40 font-label tracking-widest text-xs font-bold">
+          <span className="ml-3 text-on-surface-variant font-label tracking-widest text-xs font-bold">
             [{section.measuresCount}M]
           </span>
         </h2>
@@ -46,7 +46,7 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({ section }) => 
                 <h3 className="text-base font-black uppercase tracking-widest text-on-surface mb-4 font-headline flex items-center gap-3">
                   <span className="w-2 h-2 rounded-full bg-primary" />
                   {sub.name}
-                  <span className="text-on-surface-variant/40 font-label text-[10px] tracking-widest">
+                  <span className="text-on-surface-variant font-label text-[10px] tracking-widest">
                     ({sub.measuresCount}M)
                   </span>
                 </h3>

@@ -49,14 +49,16 @@ test.describe('Guest Access & Library Flow', () => {
     await expect(page.getByRole('heading', { name: 'My Library' })).toBeVisible();
 
     // Switch to Notebooks tab
-    await page.getByTestId('tab-notebook').first().click();
+    const notebookTab = page.getByTestId('tab-notebook').first();
+    await notebookTab.click();
+    await expect(notebookTab).toHaveAttribute('aria-selected', 'true');
 
     // Click "New notebook" and wait for creation response
     const createPromise = page.waitForResponse(
       (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
-    const newNotebookBtn = page.getByRole('button', { name: /New notebook/i });
+    const newNotebookBtn = page.getByTestId('create-new-button');
     await expect(newNotebookBtn).toBeVisible();
     await newNotebookBtn.click();
     await createPromise;
@@ -97,7 +99,7 @@ test.describe('Guest Access & Library Flow', () => {
         resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
       { timeout: 30000 },
     );
-    await page.getByRole('button', { name: /New snippet/i }).click();
+    await page.getByTestId('create-new-button').click();
     await createPromise;
 
     // Wait for redirect
