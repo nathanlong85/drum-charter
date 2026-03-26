@@ -25,12 +25,12 @@ Use these queries with the `gh api graphql` command to interact with GitHub
 ProjectV2 boards. Replace variables (`$owner`, `$repo`, `$login`, `$number`, `$id`)
 as needed.
 
-### List ProjectV2 boards for a repository
+### List ProjectV2 boards for a user
 
 ```bash
 gh api graphql -f query='
-query($owner:String!, $repo:String!) {
-  repository(owner:$owner, name:$repo) {
+query($login:String!) {
+  user(login:$login) {
     projectsV2(first: 10) {
       nodes {
         id
@@ -40,7 +40,25 @@ query($owner:String!, $repo:String!) {
       }
     }
   }
-}' -F owner='nathanlong85' -F repo='drum-charter'
+}' -F login='nathanlong85'
+```
+
+### List ProjectV2 boards for an organization
+
+```bash
+gh api graphql -f query='
+query($login:String!) {
+  organization(login:$login) {
+    projectsV2(first: 10) {
+      nodes {
+        id
+        title
+        number
+        url
+      }
+    }
+  }
+}' -F login='your-org-name'
 ```
 
 ### Get a specific ProjectV2 by number (User Level)
@@ -84,8 +102,9 @@ query($id:ID!) {
             nodes {
               ... on ProjectV2ItemFieldSingleSelectValue {
                 name
+                optionId
                 field {
-                  ... on ProjectV2SingleSelectField {
+                  ... on ProjectV2FieldCommon {
                     name
                   }
                 }

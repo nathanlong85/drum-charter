@@ -18,9 +18,10 @@ test.describe('Playback & Metronome', () => {
 
   test('should toggle playback transport controls', async ({ page }) => {
     const toolbar = page.getByTestId('groove-toolbar');
-    const playButton = toolbar.locator('button', { hasText: /Play|Stop/i }).first();
+    const playButton = toolbar.locator('button', { hasText: /Play|Stop|Loading/i }).first();
 
-    // Initial state
+    // Initial state (wait for samples to load)
+    await expect(playButton).toBeEnabled({ timeout: 15000 });
     await expect(playButton).toHaveText(/Play/i);
     await expect(playButton).toHaveClass(/bg-primary/);
 

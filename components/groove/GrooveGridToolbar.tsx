@@ -56,6 +56,7 @@ export interface GrooveGridToolbarProps {
   onToggleOptionalHits?: (enabled: boolean) => void;
   onClearGrid?: () => void;
   readOnly?: boolean;
+  isSamplesLoaded?: boolean;
 }
 
 export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
@@ -76,6 +77,7 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
   onToggleOptionalHits,
   onClearGrid,
   readOnly = false,
+  isSamplesLoaded = true,
 }) => {
   const [showMetronomeSettings, setShowMetronomeSettings] = useState(false);
 
@@ -84,16 +86,24 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
       <div className={controlGroupClass}>
         <button
           onClick={togglePlayback}
+          disabled={!isSamplesLoaded && !isPlaying}
           className={`flex items-center gap-2 px-4 py-1.5 rounded-lg font-black font-headline uppercase tracking-tighter transition-all ${
             isPlaying
               ? 'bg-error text-on-error hover:opacity-90'
-              : 'bg-primary text-on-primary hover:opacity-90 shadow-[0_0_15px_var(--color-primary-dim)]'
+              : !isSamplesLoaded
+                ? 'bg-surface-container-highest text-on-surface-variant cursor-wait opacity-50'
+                : 'bg-primary text-on-primary hover:opacity-90 shadow-[0_0_15px_var(--color-primary-dim)]'
           }`}
         >
           {isPlaying ? (
             <>
               <Square size={14} fill="currentColor" />
               Stop
+            </>
+          ) : !isSamplesLoaded ? (
+            <>
+              <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              Loading...
             </>
           ) : (
             <>

@@ -216,7 +216,7 @@ describe('SongEditor', () => {
   });
 
   it('handles auto-save error gracefully', async () => {
-    vi.mocked(supabaseService.saveSongChart).mockRejectedValue(new Error('Save failed'));
+    vi.mocked(supabaseService.saveSongChart).mockRejectedValueOnce(new Error('Save failed'));
     render(<SongEditor initialSong={mockSong} />);
 
     const titleInput = screen.getByDisplayValue('Test Song');

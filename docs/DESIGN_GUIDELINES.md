@@ -27,7 +27,7 @@ The "Groove Grid" is an interactive sequencer, not just a static table.
 * **Empty States:** Design helpful "First-Use" states for empty libraries (e.g., "Ready to chart your first groove?").
 * **Design Tokens:** Define a clear set of CSS variables for:
   * **Colors:** Primary (Brand), Surface (Backgrounds), Border, Overlay, and Success/Error.
-  * **Spacing:** A consistent 4px or 8px based scale.
+  * Spacing: A consistent 4px or 8px-based scale.
   * **Elevation:** Define levels for cards, modals, and tooltips.
 
 ## 5. User Personas

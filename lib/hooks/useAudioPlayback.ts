@@ -19,6 +19,7 @@ export function useAudioPlayback({
   initialMetronomeVolume = 0.5,
 }: UseAudioPlaybackProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isSamplesLoaded, setIsSamplesLoaded] = useState(false);
   const [metronomeEnabled, setMetronomeEnabled] = useState(initialMetronomeEnabled);
   const [metronomeVolume, setMetronomeVolume] = useState(initialMetronomeVolume);
 
@@ -94,6 +95,7 @@ export function useAudioPlayback({
           console.error(`Failed to load sample for ${symbol} from ${url}:`, error);
         }
       }
+      setIsSamplesLoaded(true);
     };
 
     loadSamples();
@@ -113,9 +115,6 @@ export function useAudioPlayback({
 
     source.buffer = samplesRef.current.get(sampleKey as DrumSymbol)!;
 
-    // Set volume based on velocity (0-1+ range)
-    // Using a steeper exponential curve (2.0) for more natural volume transitions
-    // Accents can go slightly above 1.0 (e.g. 1.1)
     // Clamping to 1.5 to prevent extreme clipping as per CodeRabbit recommendation
     const gainValue = Math.min(velocity ** 2.0, 1.5);
     gainNode.gain.setValueAtTime(gainValue, time);
@@ -156,19 +155,18 @@ export function useAudioPlayback({
           const category = inst.category.toLowerCase();
           const variety = inst.presetVariety.toLowerCase().replace(/\s+/g, '_');
 
-          // Determine velocity: explicit value from inst.velocities, or derived from symbol
+          // Determine velocity
           let velocity = getVelocityForSymbol(symbol);
           if (inst.velocities && inst.velocities[step] !== undefined) {
             velocity = inst.velocities[step];
           }
 
-          // Search strategy for samples:
           const candidates = [
-            symbol, // 1. Direct symbol (e.g. 'hi_hat_open')
-            `${variety}_${symbol}`, // 2. variety + symbol (e.g. 'snare_rim_shot')
-            `${category}_${symbol}`, // 3. category + symbol (e.g. 'snare_rim_shot')
-            variety, // 4. raw variety (e.g. 'snare')
-            category, // 5. raw category (e.g. 'snare')
+            symbol,
+            `${variety}_${symbol}`,
+            `${category}_${symbol}`,
+            variety,
+            category,
           ];
 
           for (const cand of candidates) {
@@ -178,7 +176,6 @@ export function useAudioPlayback({
             }
           }
 
-          // Special hardcoded fallbacks for 'kick' and other common names if not caught by simple rules
           if (category === 'kick' || category === 'bass') {
             playSample('kick', time, velocity);
           } else if (category === 'snare') {
@@ -194,7 +191,6 @@ export function useAudioPlayback({
       });
 
       if (onStepChange) {
-        // Sync UI with audio (rough estimation for now)
         onStepChange(step);
       }
     },
@@ -230,7 +226,7 @@ export function useAudioPlayback({
       }
       setIsPlaying(false);
     } else {
-      if (!audioContextRef.current) return;
+      if (!audioContextRef.current || !isSamplesLoaded) return;
 
       if (audioContextRef.current.state === 'suspended') {
         audioContextRef.current.resume();
@@ -245,6 +241,7 @@ export function useAudioPlayback({
 
   return {
     isPlaying,
+    isSamplesLoaded,
     togglePlayback,
     metronomeEnabled,
     setMetronomeEnabled,

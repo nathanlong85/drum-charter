@@ -203,7 +203,7 @@ describe('NotebookEditor', () => {
   });
 
   it('handles auto-save error gracefully', async () => {
-    vi.mocked(supabaseService.saveNotebook).mockRejectedValue(new Error('Save failed'));
+    vi.mocked(supabaseService.saveNotebook).mockRejectedValueOnce(new Error('Save failed'));
     render(<NotebookEditor initialNotebook={mockNotebook} />);
 
     const titleInput = screen.getByDisplayValue('Test Notebook');

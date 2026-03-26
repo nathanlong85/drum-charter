@@ -235,6 +235,13 @@ export function calculateTotalNotes(
   grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'>,
 ): number {
   const { timeSignature, resolution, measures } = grid;
+
+  if (!timeSignature.beatValue || timeSignature.beatValue <= 0) {
+    throw new Error(
+      `Invalid beatValue (${timeSignature.beatValue}) in timeSignature: ${JSON.stringify(timeSignature)}`,
+    );
+  }
+
   // Formula: (beatsPerMeasure * (resolution / beatValue)) * measures
   return timeSignature.beatsPerMeasure * (resolution / timeSignature.beatValue) * measures;
 }

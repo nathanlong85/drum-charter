@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { NoteCell } from '@/components/groove/NoteCell';
@@ -31,8 +31,12 @@ describe('Theme Class Verification', () => {
       }),
     };
 
-    it('applies surface and primary tokens to the toolbar', () => {
+    it('applies surface and primary tokens to the toolbar', async () => {
       render(<GrooveGridEditor initialGrid={mockGrid} />);
+
+      await waitFor(() => {
+        expect(screen.queryByText(/Loading/i)).toBeNull();
+      });
 
       const toolbar = screen.getByTestId('groove-toolbar');
       expect(toolbar.className).toContain('bg-surface-container-low');
