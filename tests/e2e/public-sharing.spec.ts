@@ -10,6 +10,38 @@ test.describe('Public Sharing Workflows', () => {
     await expect(page.getByText('404')).toBeVisible();
   });
 
+  test('Should allow viewing a public song', async ({ page }) => {
+    // 1. Sign in as guest
+    await page.goto('http://localhost:3001/login');
+    await page.getByRole('button', { name: /Continue as Guest/i }).click();
+    await page.waitForURL(/\/library/);
+
+    // 2. Create a new song
+    await page.getByTestId('tab-song').first().click();
+    const createPromise = page.waitForResponse((resp) =>
+      resp.url().includes('/rest/v1/song_charts'),
+    );
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
+    const response = await createPromise;
+    expect(response.ok()).toBe(true);
+    await page.waitForURL(/\/songs\/.+/);
+    const songId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
+    await page.getByTestId('toggle-public-button').click();
+    await expect(page.locator('text=Saved')).toBeVisible();
+    // Increase buffer for local Supabase propagation to public views
+    await page.waitForTimeout(3000);
+
+    // 4. View public page
+    await page.goto(`http://localhost:3001/public/songs/${songId}`);
+    // Wait for content that confirms public view is loaded
+    await expect(page.getByText(/Untitled Song/i)).toBeVisible({
+      timeout: 20000,
+    });
+  });
+
   test('Should allow viewing a public notebook', async ({ page }) => {
     // 1. Sign in as guest
     await page.goto('http://localhost:3001/login');

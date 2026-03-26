@@ -103,11 +103,7 @@ export function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
     }
 
     return {
-      id:
-        inst.id ||
-        inst.instrumentId ||
-        crypto.randomUUID?.() ||
-        Math.random().toString(36).substring(2),
+      id: inst.id || inst.instrumentId || crypto.randomUUID(),
       category,
       presetVariety,
       customName: label || presetVariety,

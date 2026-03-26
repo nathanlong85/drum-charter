@@ -122,7 +122,7 @@ describe('SnippetEditor', () => {
   });
 
   it('handles auto-save error gracefully', async () => {
-    vi.mocked(supabaseService.saveGrooveSnippet).mockRejectedValue(new Error('Save failed'));
+    vi.mocked(supabaseService.saveGrooveSnippet).mockRejectedValueOnce(new Error('Save failed'));
     render(<SnippetEditor initialSnippet={mockSnippet} />);
 
     const titleInput = screen.getByDisplayValue('Test Snippet');

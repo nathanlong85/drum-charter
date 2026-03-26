@@ -28,6 +28,7 @@ test.describe('Sharing & Public View', () => {
     const viewLink = page.getByText(/View Public/i);
     await expect(viewLink).toBeVisible();
     const publicUrl = await viewLink.getAttribute('href');
+    expect(publicUrl).not.toBeNull();
     expect(publicUrl).toContain('/public/snippets/');
 
     // 2. Open the public URL in a new context (incognito/fresh session)

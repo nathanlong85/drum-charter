@@ -42,6 +42,9 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   readOnly = false,
 }) => {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
+  const latestStateRef = React.useRef(state);
+  latestStateRef.current = state;
+
   const [pickerPos, setPickerPos] = useState<{
     top: number;
     left: number;
@@ -64,6 +67,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
 
   const {
     isPlaying,
+    isSamplesLoaded,
     togglePlayback,
     metronomeEnabled,
     setMetronomeEnabled,
@@ -130,12 +134,12 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
   const wrappedDispatch = useCallback(
     (action: GrooveAction) => {
       if (readOnly) return;
+      const nextState = grooveReducer(latestStateRef.current, action);
       dispatch(action);
-      // Note: This is a bit tricky because useReducer's state isn't updated yet.
-      // We should ideally use the reducer function directly to get the next state for the callback.
-      onChange?.(grooveReducer(state, action));
+      onChange?.(nextState);
+      latestStateRef.current = nextState;
     },
-    [onChange, state, readOnly],
+    [onChange, readOnly],
   );
 
   const handleNoteClick = (id: string, noteIndex: number, e: React.MouseEvent) => {
@@ -441,6 +445,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       <GrooveGridToolbar
         state={state}
         isPlaying={isPlaying}
+        isSamplesLoaded={isSamplesLoaded}
         togglePlayback={togglePlayback}
         bpm={bpm}
         onBpmChange={(newBpm) => {

@@ -125,7 +125,8 @@ test.describe('Song Chart Editor', () => {
     await page.click('text=Add New Section');
     await page.click('text=+ ADD GRID');
 
-    const playButton = page.locator('button', { hasText: /Play|Stop/i }).first();
+    const playButton = page.locator('button', { hasText: /Play|Stop|Loading/i }).first();
+    await expect(playButton).toBeEnabled({ timeout: 15000 });
     await expect(playButton).toHaveText(/Play/i);
 
     // Start playback

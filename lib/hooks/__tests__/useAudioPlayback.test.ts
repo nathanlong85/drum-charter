@@ -91,8 +91,14 @@ describe('useAudioPlayback', () => {
     expect(result.current.isPlaying).toBe(false);
   });
 
-  it('toggles isPlaying state', () => {
+  it('toggles isPlaying state', async () => {
     const { result } = renderHook(() => useAudioPlayback({ grid: mockGrid, bpm: 120 }));
+
+    // Wait for samples to load
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    expect(result.current.isSamplesLoaded).toBe(true);
 
     act(() => {
       result.current.togglePlayback();
@@ -105,7 +111,7 @@ describe('useAudioPlayback', () => {
     expect(result.current.isPlaying).toBe(false);
   });
 
-  it('calls onStepChange when playing', () => {
+  it('calls onStepChange when playing', async () => {
     const onStepChange = vi.fn();
     const { result } = renderHook(() =>
       useAudioPlayback({
@@ -114,6 +120,11 @@ describe('useAudioPlayback', () => {
         onStepChange,
       }),
     );
+
+    // Wait for samples to load
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
 
     act(() => {
       result.current.togglePlayback();

@@ -65,6 +65,7 @@ describe('GrooveGridToolbar', () => {
     // Target only buttons to avoid <option> elements
     const buttons = screen.getAllByRole('button');
     const res8Btn = buttons.find((b) => b.textContent === '8');
+    expect(res8Btn).toBeDefined();
     if (res8Btn) fireEvent.click(res8Btn);
     expect(props.updateResolution).toHaveBeenCalledWith(8);
   });

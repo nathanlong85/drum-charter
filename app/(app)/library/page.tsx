@@ -38,6 +38,11 @@ export default async function LibraryPage() {
       .order('updated_at', { ascending: false }),
   ]);
 
+  if (songsRes.error) console.error('Error fetching songs:', songsRes.error);
+  if (notebooksRes.error) console.error('Error fetching notebooks:', notebooksRes.error);
+  if (snippetsRes.error) console.error('Error fetching snippets:', snippetsRes.error);
+  if (setlistsRes.error) console.error('Error fetching setlists:', setlistsRes.error);
+
   return (
     <div className="max-w-[1400px] mx-auto p-8 space-y-12">
       {/* Hero Header Section */}
