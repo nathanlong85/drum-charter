@@ -6,4 +6,3 @@
 | (x) | Optional | Optional/ghost hit |
 | O | Accent | Accented hit |
 | @ | Rimshot | Rimshot on snare |
-| ... | ... | ... |

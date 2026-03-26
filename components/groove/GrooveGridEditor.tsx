@@ -43,7 +43,10 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
 }) => {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
   const latestStateRef = React.useRef(state);
-  latestStateRef.current = state;
+
+  React.useEffect(() => {
+    latestStateRef.current = state;
+  }, [state]);
 
   const [pickerPos, setPickerPos] = useState<{
     top: number;

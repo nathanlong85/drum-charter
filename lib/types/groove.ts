@@ -237,8 +237,9 @@ export function calculateTotalNotes(
   const { timeSignature, resolution, measures } = grid;
 
   if (!timeSignature.beatValue || timeSignature.beatValue <= 0) {
-    console.warn('Invalid beatValue in calculateTotalNotes, defaulting to 4');
-    return timeSignature.beatsPerMeasure * (resolution / 4) * measures;
+    throw new Error(
+      `Invalid beatValue (${timeSignature.beatValue}) in timeSignature: ${JSON.stringify(timeSignature)}`,
+    );
   }
 
   // Formula: (beatsPerMeasure * (resolution / beatValue)) * measures

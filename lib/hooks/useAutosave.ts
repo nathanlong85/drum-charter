@@ -31,24 +31,16 @@ export function useAutosave<T, R = unknown>(saveFn: (data: T) => Promise<R>, del
       setIsSaving(true);
       setError(null);
 
-      // Enqueue the save operation
-      const currentSavePromise = writeQueueRef.current
-        .then(async () => {
-          return saveFnRef.current(data);
-        })
-        .catch((_err) => {
-          // Swallow error for the queue itself to keep it moving,
-          // but we still await it below to handle UI state.
-          return {} as R;
-        });
+      // Create the save promise for this specific data
+      const currentSavePromise = writeQueueRef.current.then(() => saveFnRef.current(data));
 
-      writeQueueRef.current = currentSavePromise;
+      // Update the queue to always resolve so the next save can run
+      writeQueueRef.current = currentSavePromise.catch(() => ({}) as R);
       latestSavePromiseRef.current = currentSavePromise;
 
       try {
-        // We want to await the actual save operation result here for UI error reporting,
-        // but writeQueueRef.current should always resolve.
-        await saveFnRef.current(data);
+        // Await the current save for UI feedback (this will throw if save fails)
+        await currentSavePromise;
       } catch (err) {
         console.error('Autosave failed:', err);
         // Only update error if this is still the latest save attempt

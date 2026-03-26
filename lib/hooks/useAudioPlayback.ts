@@ -8,7 +8,7 @@ interface UseAudioPlaybackProps {
   bpm: number;
   onStepChange?: (step: number) => void;
   initialMetronomeEnabled?: boolean;
-  initialMetronomeVolume?: boolean | number;
+  initialMetronomeVolume?: number;
 }
 
 export function useAudioPlayback({
@@ -21,9 +21,7 @@ export function useAudioPlayback({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSamplesLoaded, setIsSamplesLoaded] = useState(false);
   const [metronomeEnabled, setMetronomeEnabled] = useState(initialMetronomeEnabled);
-  const [metronomeVolume, setMetronomeVolume] = useState(
-    typeof initialMetronomeVolume === 'number' ? initialMetronomeVolume : 0.5,
-  );
+  const [metronomeVolume, setMetronomeVolume] = useState(initialMetronomeVolume);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const samplesRef = useRef<Map<DrumSymbol | string, AudioBuffer>>(new Map());

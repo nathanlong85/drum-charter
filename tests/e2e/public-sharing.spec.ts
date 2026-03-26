@@ -18,8 +18,8 @@ test.describe('Public Sharing Workflows', () => {
 
     // 2. Create a new song
     await page.getByTestId('tab-song').first().click();
-    const createPromise = page.waitForResponse((resp) =>
-      resp.url().includes('/rest/v1/song_charts'),
+    const createPromise = page.waitForResponse(
+      (resp) => resp.url().includes('/rest/v1/song_charts') && resp.request().method() === 'POST',
     );
     await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, {
       timeout: 15000,
@@ -29,13 +29,15 @@ test.describe('Public Sharing Workflows', () => {
     expect(response.ok()).toBe(true);
     await page.waitForURL(/\/songs\/.+/);
     const songId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
+    expect(songId, 'Expected song id in URL after creating song').toBeTruthy();
+
     await page.getByTestId('toggle-public-button').click();
     await expect(page.locator('text=Saved')).toBeVisible();
     // Increase buffer for local Supabase propagation to public views
     await page.waitForTimeout(3000);
 
     // 4. View public page
-    await page.goto(`http://localhost:3001/public/songs/${songId}`);
+    await page.goto(`http://localhost:3001/public/songs/${songId!}`);
     // Wait for content that confirms public view is loaded
     await expect(page.getByText(/Untitled Song/i)).toBeVisible({
       timeout: 20000,
@@ -50,7 +52,9 @@ test.describe('Public Sharing Workflows', () => {
 
     // 2. Create a new notebook
     await page.getByTestId('tab-notebook').first().click();
-    const createPromise = page.waitForResponse((resp) => resp.url().includes('/rest/v1/notebooks'));
+    const createPromise = page.waitForResponse(
+      (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
+    );
     await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {
       timeout: 15000,
     });
@@ -59,13 +63,15 @@ test.describe('Public Sharing Workflows', () => {
     expect(response.ok()).toBe(true);
     await page.waitForURL(/\/notebooks\/.+/);
     const notebookId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
+    expect(notebookId, 'Expected notebook id in URL after creating notebook').toBeTruthy();
+
     await page.getByTestId('toggle-public-button').click();
     await expect(page.locator('text=Saved')).toBeVisible();
     // Increase buffer for local Supabase propagation to public views
     await page.waitForTimeout(3000);
 
     // 4. View public page
-    await page.goto(`http://localhost:3001/public/notebooks/${notebookId}`);
+    await page.goto(`http://localhost:3001/public/notebooks/${notebookId!}`);
     // Wait for the specific heading that confirms the public view is loaded
     await expect(page.getByText(/Public Notebook View/i).first()).toBeVisible({
       timeout: 20000,
@@ -86,8 +92,9 @@ test.describe('Public Sharing Workflows', () => {
 
     // 2. Create a new snippet
     await page.getByTestId('tab-snippet').first().click();
-    const createPromise = page.waitForResponse((resp) =>
-      resp.url().includes('/rest/v1/groove_snippets'),
+    const createPromise = page.waitForResponse(
+      (resp) =>
+        resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
     );
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
       timeout: 15000,
@@ -97,13 +104,15 @@ test.describe('Public Sharing Workflows', () => {
     expect(response.ok()).toBe(true);
     await page.waitForURL(/\/snippets\/.+/);
     const snippetId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
+    expect(snippetId, 'Expected snippet id in URL after creating snippet').toBeTruthy();
+
     await page.getByTestId('toggle-public-button').click();
     await expect(page.locator('text=Saved')).toBeVisible();
     // Increase buffer for local Supabase propagation to public views
     await page.waitForTimeout(3000);
 
     // 4. View public page
-    await page.goto(`http://localhost:3001/public/snippets/${snippetId}`);
+    await page.goto(`http://localhost:3001/public/snippets/${snippetId!}`);
     // Wait for the specific heading that confirms the public view is loaded
     await expect(page.getByText(/Atomic Snippet View/i).first()).toBeVisible({
       timeout: 20000,
