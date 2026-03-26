@@ -44,9 +44,9 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({ section }) => 
               <div key={sub.id} className="relative">
                 <div className="absolute -left-6 top-0 bottom-0 w-[2px] bg-primary/20" />
                 <h3 className="text-base font-black uppercase tracking-widest text-on-surface mb-4 font-headline flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-primary" />
-                  {sub.name}
-                  <span className="text-on-surface-variant font-label text-[10px] tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                  <span className="flex-1 min-w-0 truncate">{sub.name}</span>
+                  <span className="text-on-surface-variant font-label text-[10px] tracking-widest shrink-0">
                     ({sub.measuresCount}M)
                   </span>
                 </h3>

@@ -53,7 +53,7 @@ export function SnippetView({ snippet }: SnippetViewProps) {
       </header>
 
       <div className="space-y-16">
-        <section className="bg-surface-container-low/30 border border-outline-variant/10 rounded-2xl p-8 shadow-inner overflow-hidden relative pointer-events-none">
+        <section className="bg-surface-container-low/30 border border-outline-variant/10 rounded-2xl p-8 shadow-inner overflow-hidden relative">
           <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
             <Library className="w-24 h-24" aria-hidden="true" focusable={false} />
           </div>

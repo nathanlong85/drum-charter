@@ -8,9 +8,6 @@ export function useSupabaseStatus(): SupabaseStatus {
   const [status, setStatus] = useState<SupabaseStatus>('connecting');
 
   useEffect(() => {
-    // SSR safe
-    if (typeof window === 'undefined') return;
-
     const updateStatus = () => {
       // Base status on network connectivity for now as a proxy for realtime health
       // In a real app, we would listen to supabase.auth.onAuthStateChange
