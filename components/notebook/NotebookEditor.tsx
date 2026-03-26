@@ -182,19 +182,23 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
 
         {/* Notebook Header Section */}
         <section className="p-8 pb-4 pt-16 md:pt-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-2 w-full max-w-2xl">
-              <div className="flex items-center gap-4 text-tertiary font-headline uppercase tracking-[0.2em] text-xs font-bold">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4 w-full max-w-2xl">
+              <div className="flex items-center gap-4 text-tertiary font-label uppercase tracking-[0.3em] text-[10px] font-black">
                 <span>Notebook</span>
-                <span className="w-1 h-1 rounded-full bg-tertiary/40"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-tertiary/40"></span>
                 <span className="text-on-surface-variant flex gap-2 items-center">
                   {isSaving ? <span className="animate-pulse">Saving...</span> : <span>Saved</span>}
                 </span>
-                <span className="w-1 h-1 rounded-full bg-tertiary/40"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-tertiary/40"></span>
                 <button
                   onClick={() => dispatch({ type: 'UPDATE_PUBLIC', isPublic: !state.isPublic })}
                   data-testid="toggle-public-button"
-                  className={state.isPublic ? 'text-green-400' : 'text-on-surface-variant'}
+                  className={
+                    state.isPublic
+                      ? 'text-primary'
+                      : 'text-on-surface-variant/50 hover:text-on-surface-variant transition-colors'
+                  }
                 >
                   {state.isPublic ? 'PUBLIC' : 'PRIVATE'}
                 </button>
@@ -203,11 +207,11 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                 type="text"
                 value={state.title}
                 onChange={(e) => dispatch({ type: 'UPDATE_TITLE', title: e.target.value })}
-                className="text-5xl lg:text-6xl font-headline font-bold tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0"
+                className="text-5xl lg:text-6xl font-headline font-black tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0 leading-tight"
                 placeholder="Notebook Title"
               />
 
-              <div className="mt-4">
+              <div className="mt-6">
                 <TagInput
                   tags={state.tags}
                   onChange={(tags) => dispatch({ type: 'UPDATE_TAGS', tags })}
@@ -244,7 +248,7 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                   </svg>
                 </button>
 
-                <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center gap-4 mb-8">
                   <input
                     type="text"
                     value={section.name}
@@ -255,14 +259,14 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                         updates: { name: e.target.value },
                       })
                     }
-                    className="text-3xl font-headline font-bold uppercase text-on-surface bg-transparent border-b border-transparent focus:border-primary px-0 py-1 focus:ring-0 transition-colors w-full"
+                    className="text-3xl font-headline font-black uppercase tracking-tighter text-on-surface bg-transparent border-b border-transparent focus:border-primary px-0 py-1 focus:ring-0 transition-colors w-full leading-none"
                     placeholder="Section Name"
                   />
                 </div>
 
                 <div className="space-y-8">
-                  <div className="space-y-2">
-                    <h4 className="text-[10px] font-headline font-bold text-on-surface-variant uppercase tracking-[0.2em]">
+                  <div className="space-y-3">
+                    <h4 className="text-[10px] font-label font-black text-on-surface-variant/50 uppercase tracking-[0.2em]">
                       Practice Notes
                     </h4>
                     <textarea
@@ -279,7 +283,7 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                         })
                       }
                       placeholder="Add notes, patterns, or exercises..."
-                      className="w-full h-32 text-sm text-on-surface bg-surface-container-highest border border-transparent rounded-xl p-6 focus:outline-none focus:border-primary/50 resize-none transition-all placeholder:text-on-surface-variant/50 font-body"
+                      className="w-full h-32 text-sm text-on-surface bg-surface-container-lowest border border-outline-variant/10 shadow-inner rounded-xl p-6 focus:outline-none focus:border-primary/50 resize-none transition-all placeholder:text-on-surface-variant/30 font-body leading-relaxed"
                     />
                   </div>
 

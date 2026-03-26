@@ -67,7 +67,7 @@ test.describe('Playback & Metronome', () => {
     await expect(page.getByTestId('metronome-volume-value')).toHaveText('80%');
 
     // Click a preset button (Ghost = 0.3 = 30%)
-    await settingsPanel.locator('button', { hasText: 'Ghost' }).click({ force: true });
+    await page.getByTestId('metronome-preset-ghost').click();
     await expect(page.getByTestId('metronome-volume-value')).toHaveText('30%');
 
     // Close settings

@@ -1,58 +1,69 @@
 'use client';
 
 import type React from 'react';
-import type { GrooveGrid, SongSection } from '@/lib/types/groove';
+import type { SongSection } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../groove/GrooveGridEditor';
 
 interface SongSectionViewProps {
   section: SongSection;
-  onGridChange?: (grid: GrooveGrid) => void;
 }
 
-export const SongSectionView: React.FC<SongSectionViewProps> = ({ section, onGridChange }) => {
+export const SongSectionView: React.FC<SongSectionViewProps> = ({ section }) => {
   return (
-    <div className="mb-8 last:mb-0 print:mb-6">
-      <div className="flex items-center gap-4 mb-2">
-        <h2 className="text-xl font-bold uppercase text-gray-800 bg-gray-100 px-3 py-1 rounded print:bg-transparent print:p-0">
+    <div className="mb-12 last:mb-0 print:mb-8">
+      <div className="flex items-center gap-4 mb-6">
+        <h2 className="text-xl font-black uppercase tracking-tighter text-on-surface bg-surface-container-highest px-4 py-2 rounded-lg border-l-4 border-primary shadow-sm font-headline print:bg-transparent print:p-0 print:border-none print:shadow-none">
           {section.name}
-          <span className="ml-2 text-gray-500 font-medium">({section.measuresCount}M)</span>
+          <span className="ml-3 text-on-surface-variant font-label tracking-widest text-xs font-bold">
+            [{section.measuresCount}M]
+          </span>
         </h2>
       </div>
 
-      <div className="ml-4">
+      <div className="ml-6 border-l border-outline-variant/10 pl-6 space-y-8">
         {section.grid && (
-          <div className="mb-4">
-            <GrooveGridEditor initialGrid={section.grid} onChange={onGridChange} />
+          <div className="mb-6">
+            <GrooveGridEditor initialGrid={section.grid} readOnly={true} />
           </div>
         )}
 
         {section.notes && section.notes.length > 0 && (
-          <ul className="list-disc list-inside text-gray-700 mb-4 space-y-1">
+          <ul className="list-none space-y-2 text-on-surface-variant font-body text-sm leading-relaxed">
             {section.notes.map((note, idx) => (
-              <li key={idx}>{note}</li>
+              <li key={idx} className="flex gap-3">
+                <span className="text-primary mt-1.5 shrink-0 block w-1.5 h-1.5 rounded-full bg-primary/40" />
+                <span>{note}</span>
+              </li>
             ))}
           </ul>
         )}
 
         {section.subSections && section.subSections.length > 0 && (
-          <div className="mt-4 space-y-6">
+          <div className="mt-8 space-y-10">
             {section.subSections.map((sub) => (
-              <div key={sub.id} className="border-l-4 border-gray-200 pl-4">
-                <h3 className="text-lg font-semibold text-gray-700 mb-2 print:text-base">
-                  {sub.name}{' '}
-                  <span className="text-gray-400 font-normal">({sub.measuresCount}M)</span>
+              <div key={sub.id} className="relative">
+                <div className="absolute -left-6 top-0 bottom-0 w-[2px] bg-primary/20" />
+                <h3 className="text-base font-black uppercase tracking-widest text-on-surface mb-4 font-headline flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
+                  <span className="flex-1 min-w-0 truncate">{sub.name}</span>
+                  <span className="text-on-surface-variant font-label text-[10px] tracking-widest shrink-0">
+                    ({sub.measuresCount}M)
+                  </span>
                 </h3>
 
                 {sub.grid && (
-                  <div className="mb-3">
-                    <GrooveGridEditor initialGrid={sub.grid} />
+                  <div className="mb-4">
+                    <GrooveGridEditor initialGrid={sub.grid} readOnly={true} />
                   </div>
                 )}
 
                 {sub.notes && sub.notes.length > 0 && (
-                  <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
+                  <ul className="list-none space-y-1.5 text-on-surface-variant/80 font-body text-xs ml-5">
                     {sub.notes.map((note, idx) => (
-                      <li key={idx}>{note}</li>
+                      <li key={idx} className="flex gap-2">
+                        <span className="text-primary mt-1 shrink-0 block w-1 h-1 rounded-full bg-primary/20" />
+                        <span>{note}</span>
+                      </li>
                     ))}
                   </ul>
                 )}

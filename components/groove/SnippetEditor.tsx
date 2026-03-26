@@ -180,11 +180,11 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
 
         {/* Snippet Header Section */}
         <section className="p-8 pb-4 pt-16 md:pt-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-2 w-full max-w-2xl">
-              <div className="flex items-center gap-4 text-primary font-headline uppercase tracking-[0.2em] text-xs font-bold">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4 w-full max-w-2xl">
+              <div className="flex items-center gap-4 text-primary font-label uppercase tracking-[0.3em] text-[10px] font-black">
                 <span>Snippet</span>
-                <span className="w-1 h-1 rounded-full bg-primary/40"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/40"></span>
                 <span className="text-on-surface-variant flex gap-2 items-center">
                   {error ? (
                     <span className="text-error">{error}</span>
@@ -194,11 +194,15 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                     <span>Saved</span>
                   )}
                 </span>
-                <span className="w-1 h-1 rounded-full bg-primary/40"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/40"></span>
                 <button
                   onClick={() => dispatch({ type: 'UPDATE_PUBLIC', isPublic: !state.isPublic })}
                   data-testid="toggle-public-button"
-                  className={state.isPublic ? 'text-green-400' : 'text-on-surface-variant'}
+                  className={
+                    state.isPublic
+                      ? 'text-primary'
+                      : 'text-on-surface-variant/50 hover:text-on-surface-variant transition-colors'
+                  }
                 >
                   {state.isPublic ? 'PUBLIC' : 'PRIVATE'}
                 </button>
@@ -207,11 +211,11 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                 type="text"
                 value={state.title}
                 onChange={(e) => dispatch({ type: 'UPDATE_TITLE', title: e.target.value })}
-                className="text-5xl lg:text-6xl font-headline font-bold tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0"
+                className="text-5xl lg:text-6xl font-headline font-black tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0 leading-tight"
                 placeholder="Snippet Title"
               />
 
-              <div className="mt-4">
+              <div className="mt-6">
                 <TagInput
                   tags={state.tags}
                   onChange={(tags) => dispatch({ type: 'UPDATE_TAGS', tags })}
@@ -226,7 +230,7 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
         {/* Main Workspace */}
         <section className="flex-1 p-8 pt-4">
           <div className="max-w-5xl mx-auto">
-            <div className="bg-surface-container rounded-3xl p-10 border border-outline-variant/10 shadow-sm relative overflow-hidden">
+            <div className="bg-surface-container-low/30 rounded-3xl p-10 border border-outline-variant/10 shadow-inner relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
               <GrooveGridEditor
                 initialGrid={{

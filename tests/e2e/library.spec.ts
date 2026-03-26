@@ -84,7 +84,7 @@ test.describe('Library Management & Guest Flow', () => {
 
     // Click tag filter
     await tagFilter.click();
-    await expect(tagFilter).toHaveClass(/bg-primary\/20/);
+    await expect(tagFilter).toHaveClass(/bg-primary/);
   });
 
   test('should duplicate and delete a song', async ({ page }) => {

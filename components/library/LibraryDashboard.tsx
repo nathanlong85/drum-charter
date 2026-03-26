@@ -1,6 +1,6 @@
 'use client';
 
-import { Filter, LayoutGrid, Plus, Search } from 'lucide-react';
+import { Filter, Plus, Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -314,10 +314,13 @@ export default function LibraryDashboard({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 antialiased font-body">
       {/* Controls Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex gap-2 p-1 bg-surface-container-low rounded-xl" role="tablist">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div
+          className="flex gap-1.5 p-1.5 bg-surface-container-low rounded-2xl shadow-inner border border-outline-variant/5"
+          role="tablist"
+        >
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -325,44 +328,52 @@ export default function LibraryDashboard({
               data-testid={`tab-${tab.id}`}
               role="tab"
               aria-selected={activeTab === tab.id}
-              className={`px-4 py-2 text-sm font-headline font-bold uppercase tracking-widest rounded-lg transition-all ${
+              className={`px-5 py-2.5 text-[11px] font-label font-black uppercase tracking-[0.2em] rounded-xl transition-all duration-300 ${
                 activeTab === tab.id
-                  ? 'bg-surface-container-highest text-primary shadow-[0_4px_12px_rgba(0,0,0,0.2)]'
-                  : 'text-on-surface-variant hover:text-on-surface'
+                  ? 'bg-surface-container-highest text-primary shadow-lg ring-1 ring-primary/20'
+                  : 'text-on-surface-variant/60 hover:text-on-surface hover:bg-surface-container-high/50'
               }`}
             >
               {tab.label}
-              <span className="ml-2 opacity-50 text-[10px]">{tab.count}</span>
+              <span
+                className={`ml-3 text-[9px] font-black px-1.5 py-0.5 rounded-md ${
+                  activeTab === tab.id
+                    ? 'bg-primary text-on-primary'
+                    : 'bg-surface-container-highest text-on-surface-variant/40'
+                }`}
+              >
+                {tab.count}
+              </span>
             </button>
           ))}
         </div>
 
-        <div className="flex gap-4">
-          <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant w-4 h-4" />
+        <div className="flex gap-4 w-full md:w-auto">
+          <div className="relative group flex-1 md:flex-none">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40 w-4 h-4 transition-colors group-focus-within:text-primary" />
             <input
               type="text"
-              placeholder="FILTER LIST..."
+              placeholder="SEARCH LIBRARY..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               data-testid="search-library-input"
-              className="bg-surface-container border-none text-[10px] font-headline tracking-widest w-full md:w-64 pl-10 pr-4 py-3 rounded-full focus:ring-1 focus:ring-primary/50 text-on-surface placeholder:text-on-surface-variant/50 outline-none"
+              className="bg-surface-container-low border border-outline-variant/10 text-[10px] font-label font-bold tracking-[0.2em] w-full md:w-64 pl-12 pr-6 py-3.5 rounded-full focus:ring-1 focus:ring-primary/40 text-on-surface placeholder:text-on-surface-variant/30 outline-none transition-all shadow-sm"
             />
           </div>
           <button
             onClick={handleCreateNew}
             data-testid="create-new-button"
-            className="bg-gradient-to-br from-primary to-primary-dim text-on-primary font-headline text-[11px] font-bold tracking-widest uppercase px-6 py-3 rounded-full shadow-[0_4px_20px_rgba(129,236,255,0.3)] hover:opacity-90 transition-all flex items-center gap-2"
+            className="bg-primary text-on-primary font-headline text-[11px] font-black tracking-[0.2em] uppercase px-8 py-3.5 rounded-full shadow-[0_8px_25px_var(--color-primary-dim)] hover:translate-y-[-2px] hover:shadow-[0_12px_30px_var(--color-primary-dim)] transition-all flex items-center gap-3 active:translate-y-[1px]"
           >
-            <Plus className="w-4 h-4" />
-            New {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+            <Plus className="w-5 h-5 stroke-[3px]" />
+            NEW {activeTab.toUpperCase()}
           </button>
         </div>
       </div>
 
       {allAvailableTags.length > 0 && (
-        <div className="flex flex-wrap gap-2 items-center">
-          <Filter className="w-4 h-4 text-on-surface-variant mr-1" />
+        <div className="flex flex-wrap gap-2.5 items-center p-4 bg-surface-container-lowest/50 rounded-2xl border border-outline-variant/5">
+          <Filter className="w-3.5 h-3.5 text-primary/60 mr-2" />
           {allAvailableTags.map((tag) => {
             const isActive = selectedTags.includes(tag);
             return (
@@ -371,10 +382,10 @@ export default function LibraryDashboard({
                 onClick={() => toggleTag(tag)}
                 aria-label={`Filter by ${tag} tag`}
                 data-testid={`tag-filter-${tag}`}
-                className={`px-3 py-1 rounded-full text-[10px] font-headline font-bold uppercase tracking-widest transition-all ${
+                className={`px-4 py-1.5 rounded-lg text-[9px] font-label font-black uppercase tracking-[0.25em] transition-all duration-300 ${
                   isActive
-                    ? 'bg-primary/20 text-primary border border-primary/50'
-                    : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                    ? 'bg-primary text-on-primary shadow-md scale-105'
+                    : 'bg-surface-container-highest/50 text-on-surface-variant/60 hover:bg-surface-container-highest hover:text-on-surface border border-outline-variant/10'
                 }`}
               >
                 {tag}
@@ -384,33 +395,34 @@ export default function LibraryDashboard({
           {selectedTags.length > 0 && (
             <button
               onClick={() => setSelectedTags([])}
-              className="text-[10px] font-headline font-bold text-error hover:text-error-dim uppercase tracking-widest ml-2"
+              className="text-[9px] font-label font-black text-error hover:text-error-dim uppercase tracking-[0.25em] ml-4 hover:underline underline-offset-4"
             >
-              Clear Filters
+              RESET FILTERS
             </button>
           )}
         </div>
       )}
 
       {/* Grid */}
-      <section className="space-y-6">
-        <div className="flex items-center gap-3">
-          <LayoutGrid className="w-5 h-5 text-primary" />
-          <h3 className="font-headline font-bold text-lg tracking-tight">
-            Active {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}s
+      <section className="space-y-8">
+        <div className="flex items-center gap-4">
+          <div className="w-8 h-[2px] bg-primary/20" />
+          <h3 className="font-headline font-black text-sm tracking-[0.3em] uppercase text-on-surface-variant/40">
+            {activeTab}s Index
           </h3>
+          <div className="flex-1 h-[1px] bg-outline-variant/10" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <button
             onClick={handleCreateNew}
-            className="aspect-[4/3] bg-surface-container flex flex-col items-center justify-center p-8 rounded-xl border border-dashed border-outline-variant/30 hover:border-primary/50 hover:bg-surface-container-high transition-all group"
+            className="aspect-[4/3] bg-surface-container-lowest flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-outline-variant/20 hover:border-primary/40 hover:bg-surface-container-low transition-all group shadow-sm active:scale-[0.98]"
           >
-            <div className="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:text-primary transition-colors text-on-surface-variant">
-              <Plus className="w-6 h-6" />
+            <div className="w-16 h-16 bg-surface-container-highest/50 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-500 text-on-surface-variant/30">
+              <Plus className="w-8 h-8 stroke-[1.5px] group-hover:rotate-90 transition-transform duration-500" />
             </div>
-            <span className="text-xs font-headline font-bold tracking-widest uppercase text-on-surface-variant group-hover:text-primary transition-colors">
-              Create New
+            <span className="text-[10px] font-label font-black tracking-[0.3em] uppercase text-on-surface-variant/40 group-hover:text-primary transition-colors">
+              ADD NEW {activeTab.toUpperCase()}
             </span>
           </button>
 

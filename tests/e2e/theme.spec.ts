@@ -53,9 +53,10 @@ test.describe('Dark Mode Support', () => {
     // Switch to Snippets tab if not already active
     const snippetsTab = page.getByTestId('tab-snippet');
     await snippetsTab.click();
+    await expect(snippetsTab).toHaveAttribute('aria-selected', 'true');
 
     // The selector needs to be more specific to the toolbar in the editor
-    await page.getByRole('button', { name: /New snippet/i }).click();
+    await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/snippets\/.+/);
 
     // Check GrooveGridEditor toolbar background

@@ -165,11 +165,11 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
 
         {/* Setlist Header Section */}
         <section className="p-8 pb-4 pt-16 md:pt-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-2 w-full max-w-2xl">
-              <div className="flex items-center gap-4 text-secondary font-headline uppercase tracking-[0.2em] text-xs font-bold">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4 w-full max-w-2xl">
+              <div className="flex items-center gap-4 text-secondary font-label uppercase tracking-[0.3em] text-[10px] font-black">
                 <span>Setlist</span>
-                <span className="w-1 h-1 rounded-full bg-secondary/40"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary/40"></span>
                 <span className="text-on-surface-variant flex gap-2 items-center">
                   {saveError ? (
                     <span className="text-error">{saveError}</span>
@@ -179,11 +179,15 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                     <span>Saved</span>
                   )}
                 </span>
-                <span className="w-1 h-1 rounded-full bg-secondary/40"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary/40"></span>
                 <button
                   onClick={handleVisibilityToggle}
                   data-testid="toggle-public-button"
-                  className={setlist.isPublic ? 'text-green-400' : 'text-on-surface-variant'}
+                  className={
+                    setlist.isPublic
+                      ? 'text-primary'
+                      : 'text-on-surface-variant/50 hover:text-on-surface-variant transition-colors'
+                  }
                 >
                   {setlist.isPublic ? 'PUBLIC' : 'PRIVATE'}
                 </button>
@@ -192,7 +196,7 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                 type="text"
                 value={setlist.title}
                 onChange={handleTitleChange}
-                className="text-5xl lg:text-6xl font-headline font-bold tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0"
+                className="text-5xl lg:text-6xl font-headline font-black tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0 leading-tight"
                 placeholder="Setlist Title"
               />
             </div>
@@ -202,13 +206,13 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
         {/* Setlist Content */}
         <section className="flex-1 p-8 pt-4">
           <div className="max-w-5xl mx-auto space-y-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-headline font-bold text-on-surface uppercase tracking-tight">
+            <div className="flex items-center justify-between border-b border-outline-variant/10 pb-4">
+              <h2 className="text-[10px] font-label font-black text-on-surface-variant/50 uppercase tracking-[0.2em]">
                 Set Sequence
               </h2>
               <button
                 onClick={() => setIsSelectingSong(!isSelectingSong)}
-                className="flex items-center gap-2 text-[10px] font-headline font-bold text-primary hover:text-primary-dim uppercase tracking-widest bg-primary/10 px-4 py-2 rounded-full transition-all"
+                className="flex items-center gap-2 text-[10px] font-label font-black text-primary hover:text-primary-dim uppercase tracking-widest bg-primary/10 px-4 py-2 rounded-full transition-all"
               >
                 <Plus size={14} />
                 Add Composition
@@ -241,11 +245,11 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
               </div>
             )}
 
-            <div className="bg-surface-container rounded-[32px] border border-outline-variant/10 overflow-hidden shadow-sm">
+            <div className="bg-surface-container-low/30 rounded-3xl border border-outline-variant/10 overflow-hidden shadow-inner">
               {setlist.songs.length === 0 ? (
-                <div className="p-20 text-center text-on-surface-variant font-headline uppercase tracking-widest text-xs opacity-40">
-                  Initial set is empty. <br />
-                  Add compositions to begin.
+                <div className="p-24 text-center text-on-surface-variant font-label font-black uppercase tracking-[0.3em] text-[10px] opacity-40">
+                  Initial Set Empty <br />
+                  Add Compositions to Begin
                 </div>
               ) : (
                 <div className="divide-y divide-outline-variant/5">

@@ -178,18 +178,21 @@ export const GrooveGridToolbar: React.FC<GrooveGridToolbarProps> = ({
               <div className="flex justify-between mt-1">
                 <button
                   onClick={() => onMetronomeVolumeChange(0.3)}
+                  data-testid="metronome-preset-ghost"
                   className="text-[9px] font-headline font-bold text-on-surface-variant hover:text-primary uppercase tracking-tighter"
                 >
                   Ghost
                 </button>
                 <button
                   onClick={() => onMetronomeVolumeChange(0.7)}
+                  data-testid="metronome-preset-standard"
                   className="text-[9px] font-headline font-bold text-on-surface-variant hover:text-primary uppercase tracking-tighter"
                 >
                   Standard
                 </button>
                 <button
                   onClick={() => onMetronomeVolumeChange(1.0)}
+                  data-testid="metronome-preset-full"
                   className="text-[9px] font-headline font-bold text-on-surface-variant hover:text-primary uppercase tracking-tighter"
                 >
                   Full

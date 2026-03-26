@@ -39,15 +39,10 @@ test.describe('Sharing & Public View', () => {
     await expect(page.locator('h1')).toHaveText(snippetTitle);
     await expect(page.locator('text=READ ONLY')).toBeVisible();
 
-    // Verify edit controls are disabled/hidden
-    // The container has pointer-events-none
-    const gridContainer = page.locator('section.pointer-events-none');
-    await expect(gridContainer).toBeVisible();
-
     // Try to click a cell and verify it doesn't change (using a non-intrusive check)
-    // Since pointer-events-none is on the container, it shouldn't even receive clicks.
+    // GrooveGridEditor is readOnly={true}
     const firstCell = page.getByTestId('note-cell').first();
-    await firstCell.click({ force: true }); // force: true to bypass pointer-events-none
+    await firstCell.click();
     // It should NOT have an image after clicking if it was empty
     await expect(firstCell.getByTestId('note-cell-icon')).not.toBeVisible();
   });

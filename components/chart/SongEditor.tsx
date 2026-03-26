@@ -337,8 +337,8 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
               </div>
 
               <div className="flex gap-4">
-                <div className="bg-surface-container-low p-4 rounded-xl flex flex-col items-center min-w-[100px] border border-outline-variant/10 shadow-sm">
-                  <span className="font-label text-[10px] uppercase text-on-surface-variant tracking-widest">
+                <div className="bg-surface-container-low/50 p-4 rounded-2xl flex flex-col items-center min-w-[110px] border border-outline-variant/10 shadow-sm">
+                  <span className="font-label text-[10px] font-black uppercase text-on-surface-variant/50 tracking-[0.2em] mb-1">
                     BPM
                   </span>
                   <input
@@ -352,12 +352,12 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                         bpm: Number.isNaN(val) ? 120 : Math.max(1, Math.min(val, 999)),
                       });
                     }}
-                    className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-full"
+                    className="font-headline text-3xl font-black text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-full leading-none"
                   />
                 </div>
-                <div className="bg-surface-container-low p-4 rounded-xl flex flex-col items-center min-w-[100px] border border-outline-variant/10 shadow-sm">
-                  <span className="font-label text-[10px] uppercase text-on-surface-variant tracking-widest">
-                    Time
+                <div className="bg-surface-container-low/50 p-4 rounded-2xl flex flex-col items-center min-w-[110px] border border-outline-variant/10 shadow-sm">
+                  <span className="font-label text-[10px] font-black uppercase text-on-surface-variant/50 tracking-[0.2em] mb-1">
+                    TIME
                   </span>
                   <div className="flex items-center justify-center">
                     <input
@@ -376,11 +376,13 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                           beatValue: state.header.timeSignature.beatValue,
                         });
                       }}
-                      className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-8"
+                      className="font-headline text-3xl font-black text-primary bg-transparent border-none p-0 focus:ring-0 text-center w-10 leading-none"
                       min={MIN_BEATS_PER_MEASURE}
                       max={MAX_BEATS_PER_MEASURE}
                     />
-                    <span className="text-primary text-2xl font-bold">/</span>
+                    <span className="text-primary text-3xl font-black opacity-50 px-1 leading-none">
+                      /
+                    </span>
                     <select
                       value={state.header.timeSignature.beatValue}
                       data-testid="time-signature-value"
@@ -391,7 +393,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                           beatValue: parseInt(e.target.value, 10),
                         });
                       }}
-                      className="font-headline text-2xl font-bold text-primary bg-transparent border-none p-0 focus:ring-0 text-center cursor-pointer appearance-none outline-none"
+                      className="font-headline text-3xl font-black text-primary bg-transparent border-none p-0 focus:ring-0 text-center cursor-pointer appearance-none outline-none leading-none"
                     >
                       {VALID_BEAT_VALUES.map((v) => (
                         <option
@@ -413,14 +415,15 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
           <section className="flex-1 p-8 pt-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Sidebar: Section List */}
             <div className="lg:col-span-3 space-y-6 hidden lg:block">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-headline uppercase text-xs font-bold tracking-widest text-on-surface-variant">
+              <div className="flex items-center justify-between mb-4 border-b border-outline-variant/10 pb-2">
+                <h3 className="font-label font-black uppercase text-[10px] tracking-[0.2em] text-on-surface-variant/60">
                   Song Sections
                 </h3>
                 <button
                   onClick={() => dispatch({ type: 'ADD_SECTION' })}
-                  className="text-primary hover:text-primary-container transition-colors"
+                  className="text-primary hover:text-primary-dim transition-colors"
                   title="Add Section"
+                  aria-label="Add section"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
@@ -436,14 +439,14 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                 {state.sections.map((section) => (
                   <div
                     key={section.id}
-                    className="bg-surface-container p-4 rounded-xl flex items-center justify-between group hover:bg-surface-container-high transition-colors cursor-pointer border-l-4 border-transparent"
+                    className="bg-surface-container-low/50 p-4 rounded-xl flex items-center justify-between border border-outline-variant/5 shadow-sm"
                   >
                     <div>
-                      <p className="font-headline font-bold text-on-surface truncate w-32">
+                      <p className="font-headline font-black text-on-surface truncate w-32 tracking-tight">
                         {section.name || 'Untitled'}
                       </p>
-                      <p className="text-[10px] font-label text-on-surface-variant">
-                        {section.measuresCount} Measures
+                      <p className="text-[9px] font-label font-bold text-on-surface-variant/50 uppercase tracking-[0.2em] mt-1">
+                        {section.measuresCount} MEASURES
                       </p>
                     </div>
                   </div>
@@ -484,10 +487,10 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                           updates: { name: e.target.value },
                         })
                       }
-                      className="text-2xl font-headline font-bold uppercase text-on-surface bg-transparent border-b border-transparent focus:border-primary px-0 py-1 focus:ring-0 transition-colors w-1/2"
+                      className="text-3xl font-headline font-black uppercase tracking-tighter text-on-surface bg-transparent border-b border-transparent focus:border-primary px-0 py-1 focus:ring-0 transition-colors w-1/2 leading-none"
                       placeholder="Section Name"
                     />
-                    <div className="flex items-center text-on-surface-variant font-headline text-sm tracking-widest bg-surface-container-highest px-3 py-1 rounded-full">
+                    <div className="flex items-center text-on-surface-variant font-label text-[11px] font-black tracking-[0.2em] bg-surface-container-highest/50 border border-outline-variant/10 px-3 py-1.5 rounded-lg shadow-inner">
                       <input
                         type="number"
                         value={section.measuresCount}
@@ -501,9 +504,9 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                             },
                           })
                         }
-                        className="w-8 text-center bg-transparent border-none p-0 focus:ring-0 font-bold text-on-surface"
+                        className="w-8 text-center bg-transparent border-none p-0 focus:ring-0 font-black text-on-surface leading-none"
                       />
-                      <span className="ml-1 text-[10px]">MEASURES</span>
+                      <span className="ml-1 opacity-50 text-[9px]">MEASURES</span>
                     </div>
                   </div>
 
