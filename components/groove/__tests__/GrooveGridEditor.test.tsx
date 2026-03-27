@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
@@ -430,7 +430,6 @@ describe('GrooveGridEditor', () => {
   });
 
   it('handles step changes during playback', async () => {
-    const { act } = require('@testing-library/react');
     render(<GrooveGridEditor initialGrid={initialGrid} />);
 
     await act(async () => {
@@ -438,10 +437,12 @@ describe('GrooveGridEditor', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('active-step')).toHaveAttribute('data-testid', 'active-step');
+      const activeStep = screen.getByTestId('active-step');
+      expect(activeStep).toBeInTheDocument();
+      // Step 1 corresponds to beat 2 in a 4/4 grid with res 4
+      expect(activeStep).toHaveTextContent('2');
     });
   });
-
   it('handles BPM and metronome volume changes', async () => {
     const onBpmChange = vi.fn();
     const onMetronomeVolumeChange = vi.fn();
@@ -745,6 +746,7 @@ describe('GrooveGridEditor', () => {
 
     it('handles copy error gracefully', async () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const originalWriteText = navigator.clipboard.writeText;
       navigator.clipboard.writeText = vi.fn().mockRejectedValue(new Error('Copy failed'));
 
       render(<TestEditor grid={initialGrid} />);
@@ -753,10 +755,17 @@ describe('GrooveGridEditor', () => {
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseUp(window);
 
-      fireEvent.keyDown(window, { key: 'c', ctrlKey: true });
-      await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalledWith('Failed to copy to clipboard:', expect.any(Error));
-      });
+      try {
+        fireEvent.keyDown(window, { key: 'c', ctrlKey: true });
+        await waitFor(() => {
+          expect(consoleSpy).toHaveBeenCalledWith(
+            'Failed to copy to clipboard:',
+            expect.any(Error),
+          );
+        });
+      } finally {
+        navigator.clipboard.writeText = originalWriteText;
+      }
     });
 
     it('handles paste with invalid JSON or wrong format', async () => {
