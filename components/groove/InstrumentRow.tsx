@@ -34,7 +34,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   onNoteMouseEnter,
   selectionRange,
   instIdx,
-  isEditing,
+  isEditing = false,
   onSettingsClick,
   onMoveUp,
   onMoveDown,
@@ -45,53 +45,73 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   const notesPerBeat = resolution / timeSignature.beatValue;
   const totalNotesPerMeasure = timeSignature.beatsPerMeasure * notesPerBeat;
 
+  const isSelected = (noteIdx: number) => {
+    if (!selectionRange) return false;
+    const minInst = Math.min(selectionRange.start.instIdx, selectionRange.end.instIdx);
+    const maxInst = Math.max(selectionRange.start.instIdx, selectionRange.end.instIdx);
+    const minNote = Math.min(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
+    const maxNote = Math.max(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
+
+    return instIdx >= minInst && instIdx <= maxInst && noteIdx >= minNote && noteIdx <= maxNote;
+  };
+
   return (
     <div
-      className="flex border-b border-outline-variant/10 group/row"
+      className="flex group/row border-b border-outline-variant/10 hover:bg-surface-container-high/30 transition-colors"
       data-testid={`instrument-row-${instrument.customName.toLowerCase().replace(/\s+/g, '-')}`}
     >
-      <div className="w-32 h-8 flex items-center px-2 bg-surface-container-low font-headline font-bold text-[10px] uppercase tracking-widest text-on-surface-variant border-r border-outline-variant/20 select-none relative group">
-        {isEditing && !readOnly ? (
-          <div className="flex items-center gap-1 w-full">
-            <div className="flex flex-col">
-              {onMoveUp && (
-                <button
-                  type="button"
-                  onClick={onMoveUp}
-                  className="p-0.5 hover:bg-surface-container-highest rounded transition-colors text-on-surface-variant/40 hover:text-primary"
-                  title="Move Up"
-                  aria-label="Move instrument up"
-                >
-                  <ChevronUp size={10} strokeWidth={4} />
-                </button>
-              )}
-              {onMoveDown && (
-                <button
-                  type="button"
-                  onClick={onMoveDown}
-                  className="p-0.5 hover:bg-surface-container-highest rounded transition-colors text-on-surface-variant/40 hover:text-primary"
-                  title="Move Down"
-                  aria-label="Move instrument down"
-                >
-                  <ChevronDown size={10} strokeWidth={4} />
-                </button>
-              )}
-            </div>
-            <span className="truncate flex-1" title={instrument.customName}>
-              {instrument.customName}
-            </span>
+      {/* Instrument Info Panel */}
+      <div className="w-32 h-10 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0">
+        {!readOnly && isEditing && (
+          <div className="flex flex-col mr-1">
+            {onMoveUp && (
+              <button
+                type="button"
+                onClick={onMoveUp}
+                className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
+                title="Move Up"
+                aria-label="Move instrument up"
+              >
+                <ChevronUp size={10} strokeWidth={4} />
+              </button>
+            )}
+            {onMoveDown && (
+              <button
+                type="button"
+                onClick={onMoveDown}
+                className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
+                title="Move Down"
+                aria-label="Move instrument down"
+              >
+                <ChevronDown size={10} strokeWidth={4} />
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-headline font-black text-on-surface truncate uppercase tracking-tight leading-none">
+            {instrument.customName}
+          </p>
+          <p className="text-[8px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-widest mt-0.5 truncate">
+            {instrument.category}
+          </p>
+        </div>
+
+        {!readOnly && (
+          <div className="flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100 transition-opacity ml-1">
             {onSettingsClick && (
               <button
                 type="button"
                 onClick={onSettingsClick}
-                className="p-1 hover:bg-surface-container-highest rounded transition-colors text-on-surface-variant/40 hover:text-primary"
+                className="p-1 hover:bg-primary/10 text-on-surface-variant hover:text-primary rounded transition-colors"
                 title="Edit Settings"
                 aria-label="Edit instrument settings"
               >
                 <Settings2 size={12} />
               </button>
             )}
-            {onClear && (
+            {isEditing && onClear && (
               <button
                 type="button"
                 onClick={() => {
@@ -99,7 +119,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
                     onClear();
                   }
                 }}
-                className="p-1 hover:bg-error/10 rounded transition-colors text-on-surface-variant/40 hover:text-error"
+                className="p-1 hover:bg-error/10 text-on-surface-variant hover:text-error rounded transition-colors"
                 title="Clear Row"
                 aria-label={`Clear all notes for ${instrument.customName}`}
                 data-testid={`clear-row-${instrument.id}`}
@@ -108,57 +128,31 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
               </button>
             )}
           </div>
-        ) : (
-          <span className="truncate w-full" title={instrument.customName}>
-            {instrument.customName}
-          </span>
         )}
       </div>
+
+      {/* Notes Grid */}
       <div className="flex">
-        {instrument.notes.map((symbol, i) => {
-          const isBeat = i % notesPerBeat === 0;
-          const isMeasureBoundary = (i + 1) % totalNotesPerMeasure === 0;
+        {instrument.notes.map((symbol, noteIdx) => {
           const velocity =
-            instrument.velocities && instrument.velocities[i] !== undefined
-              ? instrument.velocities[i]
+            instrument.velocities && instrument.velocities[noteIdx] !== undefined
+              ? instrument.velocities[noteIdx]
               : getVelocityForSymbol(symbol);
 
-          let isSelected = false;
-          if (selectionRange) {
-            const minInst = Math.min(selectionRange.start.instIdx, selectionRange.end.instIdx);
-            const maxInst = Math.max(selectionRange.start.instIdx, selectionRange.end.instIdx);
-            const minNote = Math.min(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
-            const maxNote = Math.max(selectionRange.start.noteIdx, selectionRange.end.noteIdx);
-            isSelected = instIdx >= minInst && instIdx <= maxInst && i >= minNote && i <= maxNote;
-          }
-
           return (
-            <div key={i} className="relative">
-              {isBeat && instIdx === 0 && (
-                <div
-                  data-testid={`beat-label-${i / notesPerBeat + 1}`}
-                  className={`
-                    absolute -top-8 left-0 w-8 h-8 flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/20 select-none bg-surface-container-highest pointer-events-none
-                    ${isMeasureBoundary ? 'border-r-2 border-r-outline' : ''}
-                    ${i === 0 ? 'text-primary' : 'text-on-surface-variant'}
-                  `}
-                >
-                  {i / notesPerBeat + 1}
-                </div>
-              )}
-              <NoteCell
-                symbol={symbol}
-                velocity={velocity}
-                onClick={(e) => onNoteClick(i, e)}
-                onContextMenu={(e) => onNoteContextMenu(i, e)}
-                onMouseDown={(e) => onNoteMouseDown?.(i, e)}
-                onMouseEnter={() => onNoteMouseEnter?.(i)}
-                isBeat={isBeat}
-                isMeasureBoundary={isMeasureBoundary}
-                isSelected={isSelected}
-                readOnly={readOnly}
-              />
-            </div>
+            <NoteCell
+              key={noteIdx}
+              symbol={symbol}
+              velocity={velocity}
+              isBeat={noteIdx % notesPerBeat === 0}
+              isMeasureBoundary={(noteIdx + 1) % totalNotesPerMeasure === 0}
+              isSelected={isSelected(noteIdx)}
+              onClick={(e) => onNoteClick(noteIdx, e)}
+              onContextMenu={(e) => onNoteContextMenu(noteIdx, e)}
+              onMouseDown={(e) => onNoteMouseDown?.(noteIdx, e)}
+              onMouseEnter={() => onNoteMouseEnter?.(noteIdx)}
+              readOnly={readOnly}
+            />
           );
         })}
       </div>

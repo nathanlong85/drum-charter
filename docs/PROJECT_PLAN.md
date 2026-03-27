@@ -96,13 +96,15 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🔵 In Progress
 
-- [ ] [Issue #76] Address CodeRabbit Full Review Findings
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
 
 ### 🟢 Done
 
+- [x] [Bug] Groove Grid Editor: Fixed elements extending out of the side with responsive layout and wrapping toolbar (#59) `✓`
+- [x] [Fix] Grid Interaction Stability: Resolved flakiness in E2E dragging/selection tests (#73) `✓`
+- [x] [Feature] Issue #76: Address CodeRabbit Full Review Findings (completed) `✓`
 - [x] [Epic] Apply UI Redesign from Stitch Exports (#70) `✓`
 - [x] [Epic] Upgrade to Next.js 16.2 & AI Agent Optimization (#52) `✓`
   - [x] [Task] Upgrade next and eslint-config-next to 16.2.1 (#53) `✓`
@@ -182,5 +184,4 @@ To ensure high-quality collaboration and maintain the stability of the DrumChart
 - **Update After Work**: This file MUST be updated after every task is completed.
 
 ## Known Issues
-- [ ] Issue #73: Flaky E2E tests related to grid dragging ergonomics.
 - [ ] Issue #74: Flaky E2E tests related to Live Mode transitions.

@@ -48,6 +48,7 @@ Whenever the user asks for a PR description, always provide the output in a fenc
 
 - Test all code paths.
 - Code coverage must be 100% for all new files.
+- **FORBIDDEN**: Never run tests in "watch", "wait", or interactive mode (e.g., `vitest` without `run`). Always use `run` flags (e.g., `pnpm test:run` or `pnpm vitest run`) to ensure commands terminate immediately after execution. This is a critical efficiency mandate.
 
 ### Linting
 

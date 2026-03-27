@@ -43,8 +43,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command:
-      'pnpm cross-env NO_COLOR=1 NEXT_PUBLIC_FORCE_SW=true pnpm build && pnpm start --port 3001',
+    command: 'pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build && pnpm start --port 3001',
     url: 'http://localhost:3001',
     reuseExistingServer: !process.env.CI && process.env.RUN_OFFLINE_E2E !== 'true',
     timeout: 180000,

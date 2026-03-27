@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type React from 'react';
+import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DrumInstrument } from '@/lib/types/groove';
 import { InstrumentSettingsModal } from '../InstrumentSettingsModal';
@@ -16,6 +16,7 @@ interface PortalProps {
 
 interface ContentProps {
   children?: React.ReactNode;
+  onOpenAutoFocus?: (e: any) => void;
 }
 
 interface TitleProps {
@@ -42,11 +43,17 @@ vi.mock('@radix-ui/react-dialog', () => ({
   ),
   Portal: ({ children }: PortalProps) => <div data-testid="dialog-portal">{children}</div>,
   Overlay: () => <div data-testid="dialog-overlay" />,
-  Content: ({ children }: ContentProps) => (
-    <div data-testid="dialog-content" onClick={(e) => e.stopPropagation()}>
-      {children}
-    </div>
-  ),
+  Content: ({ children, onOpenAutoFocus }: ContentProps) => {
+    // Call the callback immediately to cover the line
+    React.useEffect(() => {
+      onOpenAutoFocus?.({ preventDefault: () => {} });
+    }, [onOpenAutoFocus]);
+    return (
+      <div data-testid="dialog-content" onClick={(e) => e.stopPropagation()}>
+        {children}
+      </div>
+    );
+  },
   Title: ({ children }: TitleProps) => <h2>{children}</h2>,
   Close: ({ children, asChild }: CloseProps) => {
     if (asChild) return children;

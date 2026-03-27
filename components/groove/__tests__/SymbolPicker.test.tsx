@@ -121,4 +121,20 @@ describe('SymbolPicker', () => {
     fireEvent.mouseDown(backdrop);
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('renders drag and drag_opt symbols', () => {
+    render(
+      <SymbolPicker
+        onSelect={onSelect}
+        onVelocityChange={onVelocityChange}
+        currentVelocity={0.7}
+        onClose={onClose}
+        position={position}
+        category="snare"
+      />,
+    );
+
+    expect(screen.getByLabelText('Drag')).toBeInTheDocument();
+    expect(screen.getByLabelText('Opt Drag')).toBeInTheDocument();
+  });
 });

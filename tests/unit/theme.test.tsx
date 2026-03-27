@@ -12,8 +12,8 @@ describe('Theme Class Verification', () => {
       );
 
       const cell = container.firstChild as HTMLElement;
-      expect(cell.className).toContain('border-outline-variant/20');
-      expect(cell.className).toContain('hover:bg-primary/10');
+      expect(cell.className).toContain('border-outline-variant/10');
+      expect(cell.className).toContain('hover:bg-primary/5');
     });
   });
 
@@ -31,25 +31,25 @@ describe('Theme Class Verification', () => {
       }),
     };
 
-    it('applies surface and primary tokens to the toolbar', async () => {
+    it('applies surface tokens to the toolbar pods', async () => {
       render(<GrooveGridEditor initialGrid={mockGrid} />);
 
       await waitFor(() => {
         expect(screen.queryByText(/Loading/i)).toBeNull();
       });
 
-      const toolbar = screen.getByTestId('groove-toolbar');
-      expect(toolbar.className).toContain('bg-surface-container-low');
-      expect(toolbar.className).toContain('border-outline-variant/10');
+      const transportPod = screen.getByText(/Transport/i).closest('div');
+      expect(transportPod?.parentElement?.className).toContain('bg-surface-container-high');
+      expect(transportPod?.parentElement?.className).toContain('border-outline-variant/10');
     });
 
-    it('applies headline and surface tokens to numeric inputs', () => {
+    it('applies headline tokens to numeric inputs', () => {
       render(<GrooveGridEditor initialGrid={mockGrid} />);
 
       // BPM input is 120 by default
       const bpmInput = screen.getByDisplayValue('120');
-      expect(bpmInput.className).toContain('bg-surface-container-highest');
       expect(bpmInput.className).toContain('font-headline');
+      expect(bpmInput.className).toContain('font-black');
     });
   });
 });
