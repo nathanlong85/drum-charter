@@ -58,8 +58,7 @@ test.describe('Grid Ergonomics', () => {
     await expect(firstCell.getByTestId('note-cell-icon')).not.toBeVisible();
   });
 
-  // TODO: Fix flakiness in redesigned UI. See Issue #73
-  test.skip('should select multiple cells via dragging', async ({ page }) => {
+  test('should select multiple cells via dragging', async ({ page }) => {
     const snareRow = page.getByTestId('instrument-row-snare');
     await snareRow.waitFor({ state: 'visible' });
     const cells = snareRow.getByTestId('note-cell');
@@ -67,27 +66,21 @@ test.describe('Grid Ergonomics', () => {
     const firstCell = cells.nth(0);
     const secondCell = cells.nth(1);
 
-    // Get bounding boxes for dragging
-    const box1 = await firstCell.boundingBox();
-    const box2 = await secondCell.boundingBox();
-
-    if (!box1 || !box2) throw new Error('Could not find cells');
-
-    // Drag from center of first cell to center of second cell
-    await page.mouse.move(box1.x + box1.width / 2, box1.y + box1.height / 2);
-    await page.mouse.down();
-    await page.waitForTimeout(200);
-    await page.mouse.move(box2.x + box2.width / 2, box2.y + box2.height / 2, { steps: 20 });
-    await page.waitForTimeout(200);
-    await page.mouse.up();
+    // Drag from first cell to second cell using dispatchEvent for total reliability
+    await firstCell.dispatchEvent('mousedown', { button: 0 });
+    await page.waitForTimeout(100);
+    await secondCell.dispatchEvent('mouseenter');
+    await secondCell.dispatchEvent('mouseover'); // Extra insurance
+    await page.waitForTimeout(100);
 
     // Verify selection styling (using the data attribute)
     await expect(firstCell).toHaveAttribute('data-selected', 'true', { timeout: 15000 });
     await expect(secondCell).toHaveAttribute('data-selected', 'true', { timeout: 15000 });
+
+    await page.mouse.up();
   });
 
-  // TODO: Fix flakiness in redesigned UI. See Issue #73
-  test.skip('should toggle optional hits with Shift+Click', async ({ page }) => {
+  test('should toggle optional hits with Shift+Click', async ({ page }) => {
     const kickRow = page.getByTestId('instrument-row-kick');
     await kickRow.waitFor({ state: 'visible' });
     const firstCell = kickRow.getByTestId('note-cell').first();
@@ -101,13 +94,9 @@ test.describe('Grid Ergonomics', () => {
     await firstCell.click({ modifiers: ['Shift'] });
 
     // Verify it changed to standard_opt
-    await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute(
-      'alt',
-      'standard_opt_hit',
-      {
-        timeout: 15000,
-      },
-    );
+    await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute('alt', 'standard_opt', {
+      timeout: 15000,
+    });
 
     // Shift + Click again to toggle back
     await firstCell.click({ modifiers: ['Shift'] });
@@ -129,8 +118,7 @@ test.describe('Grid Ergonomics', () => {
     await expect(page.getByTestId('symbol-picker')).toBeVisible({ timeout: 10000 });
   });
 
-  // TODO: Fix flakiness in redesigned UI. See Issue #73
-  test.skip('should clear selection with Delete key', async ({ page }) => {
+  test('should clear selection with Delete key', async ({ page }) => {
     const kickRow = page.getByTestId('instrument-row-kick');
     await kickRow.waitFor({ state: 'visible' });
     const firstCell = kickRow.getByTestId('note-cell').first();

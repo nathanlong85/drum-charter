@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus } from 'lucide-react';
-import React, { useCallback, useEffect, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 
 import { useAudioPlayback } from '@/lib/hooks/useAudioPlayback';
 import { type GrooveAction, grooveReducer } from '@/lib/state/groove-reducer';
@@ -18,7 +18,7 @@ import { InstrumentRow } from './InstrumentRow';
 import { InstrumentSettingsModal } from './InstrumentSettingsModal';
 import { SymbolPicker } from './SymbolPicker';
 
-interface GrooveGridEditorProps {
+export interface GrooveGridEditorProps {
   initialGrid: GrooveGrid;
   onChange?: (grid: GrooveGrid) => void;
   bpm?: number;
@@ -54,7 +54,6 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     id: string;
     noteIndex: number;
   } | null>(null);
-  const [_showSettings, _setShowSettings] = useState(false);
   const [activeStep, setActiveStep] = useState<number | null>(null);
   const [localBpm, setLocalBpm] = useState(120);
   const [isEditingInstruments, setIsEditingInstruments] = useState(false);
@@ -64,7 +63,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     start: { instIdx: number; noteIdx: number };
     end: { instIdx: number; noteIdx: number };
   } | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const isDraggingRef = useRef(false);
 
   const bpm = parentBpm !== undefined ? parentBpm : localBpm;
 
@@ -166,10 +165,11 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       return;
     }
 
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     if (e.altKey) {
       setPickerPos({
-        top: e.clientY,
-        left: e.clientX,
+        top: rect.bottom,
+        left: rect.left,
         id,
         noteIndex,
       });
@@ -186,17 +186,18 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       start: { instIdx, noteIdx },
       end: { instIdx, noteIdx },
     });
-    setIsDragging(true);
+    isDraggingRef.current = true;
   };
 
   const handleNoteMouseEnter = (instIdx: number, noteIdx: number) => {
-    if (readOnly) return;
-    if (isDragging && selectionRange) {
-      setSelectionRange({
-        ...selectionRange,
+    if (readOnly || !isDraggingRef.current) return;
+    setSelectionRange((prev) => {
+      if (!prev) return null;
+      return {
+        ...prev,
         end: { instIdx, noteIdx },
-      });
-    }
+      };
+    });
   };
 
   const handleNoteContextMenu = (id: string, noteIndex: number, e: React.MouseEvent) => {
@@ -216,9 +217,10 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       }
     }
 
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     setPickerPos({
-      top: e.clientY,
-      left: e.clientX,
+      top: rect.bottom,
+      left: rect.left,
       id,
       noteIndex,
     });
@@ -277,7 +279,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       });
 
     const handleMouseUp = () => {
-      setIsDragging(false);
+      isDraggingRef.current = false;
     };
 
     const handleKeyDown = async (e: KeyboardEvent) => {
@@ -395,56 +397,64 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
     });
   };
 
-  // Generate headers (1 e + a)
   const renderHeader = () => {
     if (!state) return null;
-    const { timeSignature, resolution, measures } = state;
+    const { timeSignature, resolution } = state;
     const notesPerBeat = resolution / timeSignature.beatValue;
-    const totalNotes = timeSignature.beatsPerMeasure * notesPerBeat * measures;
-
+    const totalNotes = state.measures * timeSignature.beatsPerMeasure * notesPerBeat;
     const headers = [];
-    for (let i = 0; i < totalNotes; i++) {
-      let label = '';
-      const beatIndex = Math.floor(i / notesPerBeat) % timeSignature.beatsPerMeasure;
-      const subIndex = i % notesPerBeat;
 
+    for (let i = 0; i < totalNotes; i++) {
+      const beatIndex = Math.floor(i / notesPerBeat);
+      const beatIndexInMeasure = beatIndex % timeSignature.beatsPerMeasure;
+      const subIndex = i % notesPerBeat;
+      const isMeasureBoundary = (i + 1) % (timeSignature.beatsPerMeasure * notesPerBeat) === 0;
+
+      let label = '';
       if (subIndex === 0) {
-        label = (beatIndex + 1).toString();
-      } else if (resolution === 16) {
+        label = (beatIndexInMeasure + 1).toString();
+      } else if (notesPerBeat === 4) {
         if (subIndex === 1) label = 'e';
         else if (subIndex === 2) label = '+';
         else if (subIndex === 3) label = 'a';
-      } else if (resolution === 8 && subIndex === 1) {
-        label = '+';
+      } else if (notesPerBeat === 2) {
+        if (subIndex === 1) label = '+';
       }
-
-      const isMeasureBoundary = (i + 1) % (timeSignature.beatsPerMeasure * notesPerBeat) === 0;
 
       headers.push(
         <div
           key={i}
           data-testid={activeStep === i ? 'active-step' : `step-${i}`}
-          className={`w-8 h-8 flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/20 bg-surface-container-highest select-none
-            ${subIndex === 0 ? 'text-primary' : 'text-on-surface-variant/40'}
-            ${isMeasureBoundary ? 'border-r-2 border-r-outline' : ''}
+          className={`w-10 h-10 flex items-center justify-center text-[9px] font-headline font-black border-r border-outline-variant/10 bg-surface-container-highest select-none
+            ${isMeasureBoundary ? 'border-r-2 border-r-outline-variant/30' : ''}
             ${activeStep === i ? 'bg-primary/20' : ''}
           `}
         >
-          {label}
+          {subIndex === 0 ? (
+            <span className="text-primary" data-testid={`beat-label-${beatIndex + 1}`}>
+              {label}
+            </span>
+          ) : (
+            <span className="text-on-surface-variant/30">{label}</span>
+          )}
         </div>,
       );
     }
 
     return (
-      <div className="flex border-b border-outline-variant/20">
-        <div className="w-32 h-8 bg-surface-container-low border-r border-outline-variant/20" />
-        <div className="flex">{headers}</div>
+      <div className="flex border-b border-outline-variant/10 sticky top-0 z-20">
+        <div className="w-32 h-10 bg-surface-container-low border-r border-outline-variant/10 flex-shrink-0" />
+        <div className="flex bg-surface-container">{headers}</div>
       </div>
     );
   };
 
+  const notesPerMeasure =
+    state.timeSignature.beatsPerMeasure * (state.resolution / state.timeSignature.beatValue);
+  const twoMeasuresWidth = 128 + notesPerMeasure * 2 * 40;
+
   return (
-    <div className="flex flex-col gap-4 print:gap-1 no-print-break" data-testid="groove-editor">
+    <div className="flex flex-col gap-6 print:gap-1 no-print-break" data-testid="groove-editor">
       <GrooveGridToolbar
         state={state}
         isPlaying={isPlaying}
@@ -484,89 +494,96 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
       />
 
       <div
-        className="inline-block border border-outline-variant/10 shadow-xl rounded-2xl bg-surface-container overflow-hidden max-w-full print:border-none print:shadow-none print:overflow-visible dark:print:bg-white dark:print:border-none"
+        className="relative border border-outline-variant/10 shadow-xl rounded-2xl bg-surface-container-low overflow-hidden print:border-none print:shadow-none print:overflow-visible"
+        style={{
+          maxWidth: `${twoMeasuresWidth}px`,
+          width: 'fit-content',
+        }}
         data-testid="groove-grid"
       >
-        <div className="overflow-x-auto">
-          {renderHeader()}
-          <div className="flex flex-col">
-            {state?.instruments.map((inst, instIdx) => (
-              <InstrumentRow
-                key={inst.id}
-                instrument={inst}
-                grid={state}
-                onNoteClick={(idx, e) => handleNoteClick(inst.id, idx, e)}
-                onNoteContextMenu={(idx, e) => handleNoteContextMenu(inst.id, idx, e)}
-                onNoteMouseDown={(idx, e) => handleNoteMouseDown(instIdx, idx, e)}
-                onNoteMouseEnter={(idx) => handleNoteMouseEnter(instIdx, idx)}
-                selectionRange={selectionRange}
-                instIdx={instIdx}
-                isEditing={isEditingInstruments}
-                onSettingsClick={() => setEditingInstrumentId(inst.id)}
-                onMoveUp={() =>
-                  wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'up' })
-                }
-                onMoveDown={() =>
-                  wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'down' })
-                }
-                onClear={() => wrappedDispatch({ type: 'CLEAR_ROW', id: inst.id })}
-                readOnly={readOnly}
-              />
-            ))}
+        <div className="overflow-x-auto overflow-y-hidden custom-scrollbar">
+          <div className="flex flex-col min-w-max">
+            {renderHeader()}
+            <div className="flex flex-col">
+              {state?.instruments.map((inst, instIdx) => (
+                <InstrumentRow
+                  key={inst.id}
+                  instrument={inst}
+                  grid={state}
+                  onNoteClick={(idx, e) => handleNoteClick(inst.id, idx, e)}
+                  onNoteContextMenu={(idx, e) => handleNoteContextMenu(inst.id, idx, e)}
+                  onNoteMouseDown={(idx, e) => handleNoteMouseDown(instIdx, idx, e)}
+                  onNoteMouseEnter={(idx) => handleNoteMouseEnter(instIdx, idx)}
+                  selectionRange={selectionRange}
+                  instIdx={instIdx}
+                  isEditing={isEditingInstruments}
+                  onSettingsClick={() => setEditingInstrumentId(inst.id)}
+                  onMoveUp={() =>
+                    wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'up' })
+                  }
+                  onMoveDown={() =>
+                    wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'down' })
+                  }
+                  onClear={() => wrappedDispatch({ type: 'CLEAR_ROW', id: inst.id })}
+                  readOnly={readOnly}
+                />
+              ))}
 
-            {isEditingInstruments && (
-              <button
-                onClick={handleAddInstrument}
-                className="flex items-center justify-center h-10 w-full bg-surface-container-low border-t border-outline-variant/10 hover:bg-primary/5 text-primary text-[10px] font-headline font-black transition-all uppercase tracking-[0.2em]"
-                data-testid="add-instrument-button"
-              >
-                <Plus size={14} className="mr-2" />
-                Add Instrument
-              </button>
-            )}
+              {isEditingInstruments && (
+                <button
+                  key="add-instrument"
+                  onClick={handleAddInstrument}
+                  className="flex items-center justify-center h-10 w-full bg-surface-container-highest/30 border-t border-outline-variant/10 hover:bg-primary/5 text-primary text-[10px] font-headline font-black transition-all uppercase tracking-[0.2em]"
+                  data-testid="add-instrument-button"
+                >
+                  <Plus size={14} className="mr-2" />
+                  Add Instrument
+                </button>
+              )}
+            </div>
           </div>
         </div>
-
-        {pickerPos && (
-          <SymbolPicker
-            position={{ top: pickerPos.top, left: pickerPos.left }}
-            onSelect={handleSymbolSelect}
-            category={state.instruments.find((i) => i.id === pickerPos.id)?.category}
-            onVelocityChange={(vel) => handleVelocityChange(pickerPos.id, pickerPos.noteIndex, vel)}
-            currentVelocity={
-              state.instruments.find((i) => i.id === pickerPos.id)?.velocities?.[
-                pickerPos.noteIndex
-              ] ??
-              getVelocityForSymbol(
-                state.instruments.find((i) => i.id === pickerPos.id)?.notes[pickerPos.noteIndex] ??
-                  'none',
-              )
-            }
-            onClose={() => setPickerPos(null)}
-          />
-        )}
-
-        {(() => {
-          const editingInstrument = editingInstrumentId
-            ? state.instruments.find((i) => i.id === editingInstrumentId)
-            : undefined;
-
-          if (!editingInstrument) return null;
-
-          return (
-            <InstrumentSettingsModal
-              instrument={editingInstrument}
-              onClose={() => setEditingInstrumentId(null)}
-              onSave={(updates) => {
-                wrappedDispatch({ type: 'UPDATE_INSTRUMENT', id: editingInstrument.id, updates });
-              }}
-              onDelete={() => {
-                wrappedDispatch({ type: 'REMOVE_INSTRUMENT', id: editingInstrument.id });
-              }}
-            />
-          );
-        })()}
       </div>
+
+      {pickerPos && (
+        <SymbolPicker
+          position={{ top: pickerPos.top, left: pickerPos.left }}
+          onSelect={handleSymbolSelect}
+          category={state.instruments.find((i) => i.id === pickerPos.id)?.category}
+          onVelocityChange={(vel) => handleVelocityChange(pickerPos.id, pickerPos.noteIndex, vel)}
+          currentVelocity={
+            state.instruments.find((i) => i.id === pickerPos.id)?.velocities?.[
+              pickerPos.noteIndex
+            ] ??
+            getVelocityForSymbol(
+              state.instruments.find((i) => i.id === pickerPos.id)?.notes[pickerPos.noteIndex] ??
+                'none',
+            )
+          }
+          onClose={() => setPickerPos(null)}
+        />
+      )}
+
+      {(() => {
+        const editingInstrument = editingInstrumentId
+          ? state.instruments.find((i) => i.id === editingInstrumentId)
+          : undefined;
+
+        if (!editingInstrument) return null;
+
+        return (
+          <InstrumentSettingsModal
+            instrument={editingInstrument}
+            onClose={() => setEditingInstrumentId(null)}
+            onSave={(updates) => {
+              wrappedDispatch({ type: 'UPDATE_INSTRUMENT', id: editingInstrument.id, updates });
+            }}
+            onDelete={() => {
+              wrappedDispatch({ type: 'REMOVE_INSTRUMENT', id: editingInstrument.id });
+            }}
+          />
+        );
+      })()}
     </div>
   );
 };

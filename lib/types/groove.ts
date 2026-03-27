@@ -25,6 +25,8 @@ export type DrumSymbol =
   | 'cymbal_choke_opt'
   | 'double'
   | 'double_opt'
+  | 'drag'
+  | 'drag_opt'
   | 'flam'
   | 'flam_opt'
   | 'hi_hat_closed'
@@ -275,7 +277,15 @@ export function getNextSymbol(current: string): DrumSymbol {
  * Used for SymbolPicker filtering (#29).
  */
 export function getSymbolsForCategory(category: DrumCategory): DrumSymbol[] {
-  const baseSymbols: DrumSymbol[] = ['none', 'standard', 'standard_opt', 'accent', 'accent_opt'];
+  const baseSymbols: DrumSymbol[] = [
+    'none',
+    'standard',
+    'standard_opt',
+    'accent',
+    'accent_opt',
+    'drag',
+    'drag_opt',
+  ];
 
   switch (category) {
     case 'kick':

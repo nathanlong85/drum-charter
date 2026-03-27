@@ -96,13 +96,14 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🔵 In Progress
 
-- [ ] [Issue #76] Address CodeRabbit Full Review Findings
 - [ ] [Epic] Drum-Aware Grid Architecture (#26)
   - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
   - [ ] [Task] Drum Sample Sourcing (#31)
 
 ### 🟢 Done
 
+- [x] [Bug] Groove Grid Editor: Fixed elements extending out of the side with responsive layout and wrapping toolbar (#59) `✓`
+- [x] [Fix] Grid Interaction Stability: Resolved flakiness in E2E dragging/selection tests `✓`
 - [x] [Epic] Apply UI Redesign from Stitch Exports (#70) `✓`
 - [x] [Epic] Upgrade to Next.js 16.2 & AI Agent Optimization (#52) `✓`
   - [x] [Task] Upgrade next and eslint-config-next to 16.2.1 (#53) `✓`

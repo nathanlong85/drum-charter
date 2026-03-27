@@ -104,7 +104,7 @@ describe('groove utils', () => {
       const misc = getSymbolsForCategory('invalid');
       expect(misc).toContain('standard');
 
-      expect(misc).toHaveLength(5); // none, standard, standard_opt, accent, accent_opt
+      expect(misc).toHaveLength(7); // none, standard, standard_opt, accent, accent_opt, drag, drag_opt
     });
   });
 

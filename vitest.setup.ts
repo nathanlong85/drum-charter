@@ -40,3 +40,9 @@ global.fetch = vi.fn().mockResolvedValue({
   status: 200,
   arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
 });
+
+// Mock window methods not implemented in JSDOM
+if (typeof window !== 'undefined') {
+  window.alert = vi.fn();
+  window.confirm = vi.fn(() => true);
+}

@@ -33,6 +33,8 @@ const symbolToIcon: Record<DrumSymbol, string | null> = {
   cymbal_choke_opt: '/icons/drum-symbols/cymbal_choke_hit_opt.svg',
   double: '/icons/drum-symbols/double_hit.svg',
   double_opt: '/icons/drum-symbols/double_hit_opt.svg',
+  drag: '/icons/drum-symbols/drag_hit.svg',
+  drag_opt: '/icons/drum-symbols/drag_hit_opt.svg',
   flam: '/icons/drum-symbols/flam_hit.svg',
   flam_opt: '/icons/drum-symbols/flam_hit_opt.svg',
   hi_hat_closed: '/icons/drum-symbols/hi_hat_closed_hit.svg',
@@ -83,31 +85,37 @@ export const NoteCell: React.FC<NoteCellProps> = ({
       data-testid="note-cell"
       data-selected={isSelected ? 'true' : 'false'}
       className={`
-        note-cell w-8 h-8 flex items-center justify-center border-r border-outline-variant/20 
-        transition-all relative
-        ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-primary/10'}
-        ${isBeat ? 'bg-surface-container-high' : 'bg-surface-container-low'}
-        ${isMeasureBoundary ? 'border-r-2 border-r-outline' : ''}
-        ${isSelected && !readOnly ? 'bg-primary/30 ring-2 ring-primary ring-inset z-10' : ''}
+        note-cell w-10 h-10 flex items-center justify-center border-r border-outline-variant/10 
+        transition-all relative select-none
+        ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-primary/5'}
+        ${isBeat ? 'bg-surface-container-high/40' : 'bg-surface-container-low/20'}
+        ${isMeasureBoundary ? 'border-r-2 border-r-outline-variant/30' : ''}
+        ${isSelected && !readOnly ? 'bg-primary/20 ring-1 ring-primary ring-inset z-10' : ''}
       `}
     >
       {iconPath && (
-        <div className="w-full h-full flex items-center justify-center pointer-events-none select-none">
+        <div className="w-full h-full flex items-center justify-center pointer-events-none select-none animate-in zoom-in-50 duration-200">
           {/* biome-ignore lint/performance/noImgElement: intentional for E2E reliability (SVG transitions caused flakes) */}
           <img
             src={iconPath}
             alt={symbol}
             data-testid="note-cell-icon"
-            style={{ opacity, width: 24, height: 24 }}
-            className="select-none pointer-events-none"
+            style={{ opacity }}
+            className="w-7 h-7 select-none pointer-events-none filter drop-shadow-sm"
           />
         </div>
       )}
+
+      {/* Beat highlight dot */}
+      {isBeat && symbol === 'none' && (
+        <div className="w-1 h-1 rounded-full bg-on-surface-variant/10" />
+      )}
+
       {/* Velocity indicator (mini bar if explicit velocity exists) */}
       {velocity !== undefined && velocity > 0 && (
         <div
-          className="absolute bottom-0 left-0 h-0.5 bg-primary transition-all"
-          style={{ width: `${velocity * 100}%` }}
+          className="absolute bottom-0 left-0 h-0.5 bg-primary/40 transition-all"
+          style={{ width: `${Math.min(1, velocity) * 100}%` }}
         />
       )}
     </div>
