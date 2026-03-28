@@ -33,9 +33,7 @@ test.describe('Public Sharing Workflows', () => {
     expect(songId, 'Expected song id in URL after creating song').toBeTruthy();
 
     await page.getByTestId('toggle-public-button').click();
-    await expect(page.locator('text=Saved')).toBeVisible();
-    // Increase buffer for local Supabase propagation to public views
-    await page.waitForTimeout(3000);
+    await waitForSave(page);
 
     // 4. View public page
     await page.goto(`http://localhost:3001/public/songs/${songId!}`);
@@ -67,9 +65,7 @@ test.describe('Public Sharing Workflows', () => {
     expect(notebookId, 'Expected notebook id in URL after creating notebook').toBeTruthy();
 
     await page.getByTestId('toggle-public-button').click();
-    await expect(page.locator('text=Saved')).toBeVisible();
-    // Increase buffer for local Supabase propagation to public views
-    await page.waitForTimeout(3000);
+    await waitForSave(page);
 
     // 4. View public page
     await page.goto(`http://localhost:3001/public/notebooks/${notebookId!}`);
@@ -108,9 +104,7 @@ test.describe('Public Sharing Workflows', () => {
     expect(snippetId, 'Expected snippet id in URL after creating snippet').toBeTruthy();
 
     await page.getByTestId('toggle-public-button').click();
-    await expect(page.locator('text=Saved')).toBeVisible();
-    // Increase buffer for local Supabase propagation to public views
-    await page.waitForTimeout(3000);
+    await waitForSave(page);
 
     // 4. View public page
     await page.goto(`http://localhost:3001/public/snippets/${snippetId!}`);

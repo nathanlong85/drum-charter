@@ -43,7 +43,7 @@ test.describe('Setlist Editor', () => {
     await publicButton.click();
     await expect(publicButton).toHaveText(/Public/i);
 
-    // Check if public link is shown (it's a button "Copy Link")
-    await expect(page.getByRole('button', { name: /Copy Link/i })).toBeVisible();
+    // Check if public link is shown (it's a button "Copy Public Link")
+    await expect(page.getByRole('button', { name: /Copy Public Link/i })).toBeVisible();
   });
 });
