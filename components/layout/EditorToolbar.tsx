@@ -1,6 +1,6 @@
 'use client';
 
-import { Copy, Copy as DuplicateIcon, ExternalLink, Play, Printer, Trash2 } from 'lucide-react';
+import { Copy, Files as DuplicateIcon, ExternalLink, Play, Printer, Trash2 } from 'lucide-react';
 import type React from 'react';
 
 interface EditorToolbarProps {
@@ -45,7 +45,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
     }`;
 
   return (
-    <div className="sticky top-0 right-0 p-3 md:p-4 no-print flex flex-wrap justify-between items-center gap-3 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10 shadow-sm">
+    <div className="sticky top-16 right-0 p-3 md:p-4 no-print flex flex-wrap justify-between items-center gap-3 z-30 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10 shadow-sm">
       {/* Secondary Actions Group */}
       <div className="flex flex-wrap items-center gap-2">
         <button
@@ -53,6 +53,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           className={toggleBtnClass(isPublic)}
           data-testid="toggle-public-button"
           title={isPublic ? 'Make Private' : 'Make Public'}
+          aria-pressed={isPublic}
         >
           <div
             className={`w-1.5 h-1.5 rounded-full ${isPublic ? 'bg-primary animate-pulse' : 'bg-on-surface-variant/30'}`}
@@ -64,7 +65,12 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
 
         {isPublic && (
           <>
-            <button onClick={copyLink} className={btnClass} title="Copy Public Link">
+            <button
+              onClick={copyLink}
+              className={btnClass}
+              title="Copy Public Link"
+              aria-label="Copy Public Link"
+            >
               <Copy size={14} className="md:w-4 md:h-4" />
               <span className="hidden sm:inline">Copy Link</span>
             </button>
@@ -74,6 +80,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
               className={btnClass}
               rel="noopener noreferrer"
               title="View Public Page"
+              aria-label="View Public Page"
             >
               <ExternalLink size={14} className="md:w-4 md:h-4" />
               <span className="hidden sm:inline">View Public</span>
@@ -81,12 +88,22 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           </>
         )}
         {onDuplicate && (
-          <button onClick={onDuplicate} className={btnClass} title="Duplicate This Item">
+          <button
+            onClick={onDuplicate}
+            className={btnClass}
+            title="Duplicate This Item"
+            aria-label="Duplicate This Item"
+          >
             <DuplicateIcon size={14} className="md:w-4 md:h-4" />
             <span className="hidden sm:inline">Duplicate</span>
           </button>
         )}
-        <button onClick={onDelete} className={deleteBtnClass} title="Delete This Item">
+        <button
+          onClick={onDelete}
+          className={deleteBtnClass}
+          title="Delete This Item"
+          aria-label="Delete This Item"
+        >
           <Trash2 size={14} className="md:w-4 md:h-4" />
           <span className="hidden sm:inline">Delete</span>
         </button>
@@ -100,6 +117,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
             data-testid="go-live-button"
             className={primaryBtnClass}
             title="Start Live Mode"
+            aria-label="Start Live Mode"
           >
             <Play size={16} className="fill-current" />
             <span>GO LIVE</span>
@@ -109,6 +127,7 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           onClick={() => window.print()}
           className={`${btnClass} text-on-surface !bg-surface-container-highest hover:!bg-surface-bright`}
           title="Print Version"
+          aria-label="Print Version"
         >
           <Printer size={14} className="md:w-4 md:h-4" />
           <span className="hidden sm:inline">PRINT</span>

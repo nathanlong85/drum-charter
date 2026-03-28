@@ -51,7 +51,7 @@ test.describe('Sharing & Public View', () => {
   test('should adapt UI for printing', async ({ page }) => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
-    await page.waitForURL('/library');
+    await page.waitForURL(/\/library(?:\/|\?|$)/);
 
     const createPromise = page.waitForResponse(
       (resp) => resp.url().includes('/rest/v1/song_charts') && resp.request().method() === 'POST',

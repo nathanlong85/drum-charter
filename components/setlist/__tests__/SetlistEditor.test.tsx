@@ -62,7 +62,9 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
     expect(screen.getByDisplayValue('My Setlist')).toBeInTheDocument();
-    expect(screen.getByTestId('toggle-public-button')).toBeInTheDocument();
+    const visibilityToggle = screen.getByTestId('toggle-public-button');
+    expect(visibilityToggle).toBeInTheDocument();
+    expect(visibilityToggle).toHaveTextContent(/Private/i);
 
     // Wait for songs to load and display titles
     await waitFor(() => {
