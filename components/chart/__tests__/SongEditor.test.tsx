@@ -150,7 +150,7 @@ describe('SongEditor', () => {
     });
 
     render(<SongEditor initialSong={mockSong} />);
-    const duplicateBtn = screen.getByRole('button', { name: /Duplicate/i });
+    const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
     fireEvent.click(duplicateBtn);
 
     await waitFor(() => {
@@ -164,7 +164,7 @@ describe('SongEditor', () => {
     vi.stubGlobal('navigator', { clipboard: { writeText: writeTextSpy } });
 
     render(<SongEditor initialSong={song} />);
-    const linkBtn = screen.getByRole('button', { name: /Copy Link/i });
+    const linkBtn = screen.getByRole('button', { name: /Copy Public Link/i });
     fireEvent.click(linkBtn);
 
     expect(writeTextSpy).toHaveBeenCalled();

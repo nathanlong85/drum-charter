@@ -86,7 +86,7 @@ describe('SnippetEditor', () => {
     });
 
     render(<SnippetEditor initialSnippet={mockSnippet} />);
-    const duplicateBtn = screen.getByRole('button', { name: /Duplicate/i });
+    const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
     fireEvent.click(duplicateBtn);
 
     await waitFor(() => {
@@ -115,7 +115,7 @@ describe('SnippetEditor', () => {
     vi.stubGlobal('navigator', { clipboard: { writeText: writeTextSpy } });
 
     render(<SnippetEditor initialSnippet={snippet} />);
-    const linkBtn = screen.getByRole('button', { name: /Copy Link/i });
+    const linkBtn = screen.getByRole('button', { name: /Copy Public Link/i });
     fireEvent.click(linkBtn);
 
     expect(writeTextSpy).toHaveBeenCalled();
@@ -158,7 +158,7 @@ describe('SnippetEditor', () => {
   it('deletes the snippet', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     render(<SnippetEditor initialSnippet={mockSnippet} />);
-    const deleteBtn = screen.getByRole('button', { name: /Delete/i });
+    const deleteBtn = screen.getByRole('button', { name: /Delete This Item/i });
     fireEvent.click(deleteBtn);
 
     await waitFor(() => {

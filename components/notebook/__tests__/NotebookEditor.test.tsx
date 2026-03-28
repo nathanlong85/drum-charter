@@ -149,7 +149,7 @@ describe('NotebookEditor', () => {
     });
 
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const duplicateBtn = screen.getByRole('button', { name: /Duplicate/i });
+    const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
     fireEvent.click(duplicateBtn);
 
     await waitFor(() => {
@@ -181,7 +181,7 @@ describe('NotebookEditor', () => {
     vi.stubGlobal('navigator', { clipboard: { writeText: writeTextSpy } });
 
     render(<NotebookEditor initialNotebook={notebook} />);
-    const linkBtn = screen.getByRole('button', { name: /Copy Link/i });
+    const linkBtn = screen.getByRole('button', { name: /Copy Public Link/i });
     fireEvent.click(linkBtn);
 
     expect(writeTextSpy).toHaveBeenCalled();
@@ -239,7 +239,7 @@ describe('NotebookEditor', () => {
   it('deletes the notebook', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     render(<NotebookEditor initialNotebook={mockNotebook} />);
-    const deleteBtn = screen.getByRole('button', { name: /Delete/i });
+    const deleteBtn = screen.getByRole('button', { name: /Delete This Item/i });
     fireEvent.click(deleteBtn);
 
     await waitFor(() => {
