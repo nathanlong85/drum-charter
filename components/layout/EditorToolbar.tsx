@@ -53,7 +53,8 @@ export const EditorToolbar: React.FC<EditorToolbarProps> = ({
           className={toggleBtnClass(isPublic)}
           data-testid="toggle-public-button"
           title={isPublic ? 'Make Private' : 'Make Public'}
-          aria-pressed={isPublic}
+          role="switch"
+          aria-checked={isPublic}
         >
           <div
             className={`w-1.5 h-1.5 rounded-full ${isPublic ? 'bg-primary animate-pulse' : 'bg-on-surface-variant/30'}`}
