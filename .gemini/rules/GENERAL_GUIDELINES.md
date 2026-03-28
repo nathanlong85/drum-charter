@@ -20,6 +20,7 @@ Work is "Done" when it is verified, in an up-to-date PR, and the Copilot loop is
 * **Linting**: Project fully linted (`pnpm lint` + `pnpm lint:md`) with ZERO errors/warnings.
 * **Testing**: 100% test coverage for new code. All tests pass (`verify_done.sh`).
 * **Review**: Iterative Copilot feedback loop fully completed on the PR.
+* **Green CI**: All remote GitHub Action checks must be PASSING. Polling must continue until success is confirmed.
 
 ### Documentation/Rules/Skills Only
 

@@ -65,6 +65,7 @@ Once all checks pass, you MUST report completion using this exact checklist form
 - [ ] **Copilot Loop**: Remote iterative loop completed and addressed.
 - [ ] **Unit Tests**: 100% pass rate.
 - [ ] **E2E Tests**: 100% pass rate.
+- [ ] **Green CI**: All remote GitHub Action checks passing.
 - [ ] **Manual Checks**: Plan updated, no logs, types verified.
 ```
 

@@ -21,9 +21,14 @@ Follow these steps for every code change:
     * **Disagreement**: If a suggestion is unnecessary or conflicts with project plans/standards, notify the user and leave a detailed comment on the original Copilot review comment explaining the rationale.
 8. **Repeat**: Repeat steps 1–7 until:
     * Copilot reviews come back clean (no new relevant findings).
-    * All CI checks are passing.
+    * **ALL CI checks are green/passing.** Even if no new Copilot comments exist, you MUST poll until the remote CI confirms success.
 
-### 2. Disagreement & Flagging Protocol
+### 2. The "Green CI" Mandate
+
+Verification is not complete until the remote CI environment (GitHub Actions) returns a success state.
+* Do not signal task completion or sign off based solely on local tests.
+* If CI fails, you MUST investigate the logs (using `gh run view` or similar), fix the issue locally, and push again.
+* Continue the loop until both Copilot and CI are satisfied.
 
 Proactively flag a Copilot suggestion for final human decision if it:
 * Conflicts with the project's specific architectural goals or established standards.
