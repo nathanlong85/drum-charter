@@ -38,25 +38,25 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50">
-      <nav className="bg-white border-b border-zinc-200 py-4 px-8 mb-8">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
+    <div className="max-w-4xl mx-auto px-6 py-8">
+      <nav className="bg-surface-container-low border border-outline-variant/10 rounded-2xl py-4 px-8 mb-8 shadow-sm">
+        <div className="flex justify-between items-center">
           <div className="flex items-center gap-6">
             <Link
               href="/library"
-              className="text-sm font-bold text-zinc-500 hover:text-zinc-900 flex items-center gap-2 transition-colors"
+              className="text-xs font-headline font-black text-on-surface-variant/60 hover:text-primary flex items-center gap-2 transition-all uppercase tracking-widest"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth="3"
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
-              BACK TO LIBRARY
+              Back to Library
             </Link>
-            <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest hidden sm:block">
+            <div className="text-[10px] font-headline font-bold text-on-surface-variant/30 uppercase tracking-[0.2em] hidden sm:block">
               DrumCharter / Setlist / {id.slice(0, 8)}
             </div>
           </div>
@@ -64,9 +64,7 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto px-6">
-        <SetlistEditor initialSetlist={formattedSetlist} />
-      </div>
-    </main>
+      <SetlistEditor initialSetlist={formattedSetlist} />
+    </div>
   );
 }

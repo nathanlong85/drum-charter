@@ -55,7 +55,7 @@ describe('TagInput', () => {
     const input = screen.getByPlaceholderText(/Add tag.../i);
 
     fireEvent.focus(input);
-    expect(screen.getByText('Suggestions')).toBeInTheDocument();
+    expect(screen.getByText('Suggested Identities')).toBeInTheDocument();
     expect(screen.getByText('rock')).toBeInTheDocument();
     expect(screen.getByText('jazz')).toBeInTheDocument();
   });
@@ -84,7 +84,7 @@ describe('TagInput', () => {
     render(<TagInput tags={[]} onChange={onChange} suggestions={['rock']} />);
     const input = screen.getByPlaceholderText(/Add tag.../i);
     fireEvent.focus(input);
-    expect(screen.getByText('Suggestions')).toBeInTheDocument();
+    expect(screen.getByText('Suggested Identities')).toBeInTheDocument();
 
     fireEvent.mouseDown(document.body);
     expect(screen.queryByText('Suggestions')).not.toBeInTheDocument();
@@ -108,7 +108,7 @@ describe('TagInput', () => {
       const input = screen.getByPlaceholderText(/Add tag.../i);
 
       fireEvent.focus(input);
-      expect(screen.getByText('Suggestions')).toBeInTheDocument();
+      expect(screen.getByText('Suggested Identities')).toBeInTheDocument();
 
       fireEvent.blur(input);
 

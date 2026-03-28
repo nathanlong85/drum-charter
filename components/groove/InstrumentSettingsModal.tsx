@@ -57,24 +57,27 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" />
         <Dialog.Content
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white dark:bg-gray-900 rounded-lg shadow-xl w-full max-w-md border border-gray-200 dark:border-gray-800 animate-in zoom-in-95 duration-200"
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-surface-container-low rounded-3xl shadow-3xl w-full max-w-md border border-outline-variant/10 animate-in zoom-in-95 duration-200 overflow-hidden"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
-            <Dialog.Title className="text-lg font-bold text-gray-900 dark:text-gray-100">
+          <div className="flex items-center justify-between p-6 border-b border-outline-variant/10 bg-surface-container">
+            <Dialog.Title className="text-xl font-headline font-black text-on-surface uppercase tracking-tight">
               Instrument Settings
             </Dialog.Title>
             <Dialog.Close
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors text-gray-500"
+              className="p-2 hover:bg-surface-container-highest text-on-surface-variant/60 hover:text-on-surface rounded-full transition-all"
               aria-label="Close"
             >
               <X size={20} />
             </Dialog.Close>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-4 space-y-4">
-            <div className="space-y-1">
-              <label htmlFor="inst-name" className="text-xs font-bold text-gray-500 uppercase">
+          <form onSubmit={handleSubmit} className="p-8 space-y-8">
+            <div className="space-y-3">
+              <label
+                htmlFor="inst-name"
+                className="text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant/40 ml-1"
+              >
                 Custom Name
               </label>
               <input
@@ -83,31 +86,49 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface placeholder:text-on-surface-variant/20 outline-none transition-all font-headline font-bold"
                 placeholder="e.g. Main Snare"
               />
             </div>
 
-            <div className="space-y-1">
-              <label htmlFor="inst-category" className="text-xs font-bold text-gray-500 uppercase">
+            <div className="space-y-3">
+              <label
+                htmlFor="inst-category"
+                className="text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant/40 ml-1"
+              >
                 Category
               </label>
-              <select
-                id="inst-category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as DrumCategory)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
+              <div className="relative group">
+                <select
+                  id="inst-category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value as DrumCategory)}
+                  className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface outline-none transition-all font-headline font-bold appearance-none cursor-pointer"
+                >
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat.value} value={cat.value} className="bg-surface-container-high">
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/40">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="3"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-1">
-              <label htmlFor="inst-variety" className="text-xs font-bold text-gray-500 uppercase">
+            <div className="space-y-3">
+              <label
+                htmlFor="inst-variety"
+                className="text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant/40 ml-1"
+              >
                 Variety (Sample Preset)
               </label>
               <input
@@ -115,15 +136,15 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
                 type="text"
                 value={variety}
                 onChange={(e) => setVariety(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface placeholder:text-on-surface-variant/20 outline-none transition-all font-headline font-bold"
                 placeholder="e.g. Snare"
               />
-              <p className="text-[10px] text-gray-400 italic">
+              <p className="text-[10px] text-on-surface-variant/40 italic font-body ml-1 uppercase tracking-wider">
                 This affects which samples are played back.
               </p>
             </div>
 
-            <div className="pt-4 flex items-center justify-between border-t border-gray-100 dark:border-gray-800 mt-4">
+            <div className="pt-8 flex items-center justify-between border-t border-outline-variant/5 mt-4">
               <button
                 type="button"
                 onClick={() => {
@@ -132,24 +153,24 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
                     onClose();
                   }
                 }}
-                className="flex items-center gap-1.5 text-red-600 hover:text-red-700 font-medium text-sm transition-colors"
+                className="flex items-center gap-2 px-6 py-3 text-[10px] font-headline font-black uppercase tracking-widest text-error hover:bg-error/10 rounded-xl transition-all"
               >
                 <Trash2 size={16} />
-                Delete Row
+                Remove
               </button>
 
-              <div className="flex gap-2">
+              <div className="flex gap-4">
                 <Dialog.Close asChild>
                   <button
                     type="button"
-                    className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
+                    className="px-6 py-3 text-[10px] font-headline font-black uppercase tracking-widest text-on-surface-variant hover:bg-surface-container-highest rounded-xl transition-all"
                   >
                     Cancel
                   </button>
                 </Dialog.Close>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 rounded shadow-sm transition-colors"
+                  className="px-8 py-3 bg-primary text-on-primary font-headline font-black text-[10px] uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
                 >
                   Save Changes
                 </button>

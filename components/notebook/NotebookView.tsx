@@ -10,15 +10,31 @@ interface NotebookViewProps {
 
 export function NotebookView({ notebook }: NotebookViewProps) {
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white min-h-screen">
-      <header className="mb-12 border-b-2 border-zinc-800 pb-6">
-        <div className="flex justify-between items-start mb-4">
-          <h1 className="text-4xl font-black uppercase tracking-tighter text-zinc-900 w-full">
-            {notebook.title}
-          </h1>
-          <div className="flex flex-col items-end gap-2">
-            <div className="text-xs font-medium text-zinc-400 uppercase tracking-widest">
-              READ ONLY
+    <div className="max-w-4xl mx-auto p-10 bg-surface-container-lowest min-h-screen border-x border-outline-variant/10 shadow-2xl font-body antialiased">
+      <header className="mb-16 border-b-4 border-primary pb-8">
+        <div className="flex justify-between items-end mb-6">
+          <div className="flex-1">
+            <h1 className="text-5xl font-black uppercase tracking-tighter text-on-surface font-headline leading-tight">
+              {notebook.title}
+            </h1>
+          </div>
+          <div className="flex items-center gap-6 font-label">
+            <div className="text-right">
+              <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-1">
+                Module Type
+              </p>
+              <p className="text-xl font-black text-on-surface uppercase leading-none tracking-tighter">
+                NOTEBOOK
+              </p>
+            </div>
+            <div className="h-8 w-[1px] bg-outline-variant/20" />
+            <div className="text-right">
+              <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-[0.3em] mb-1">
+                Status
+              </p>
+              <p className="text-[10px] font-black text-primary uppercase leading-none tracking-widest bg-primary/10 px-2 py-1 rounded">
+                Read Only
+              </p>
             </div>
           </div>
         </div>
@@ -26,7 +42,7 @@ export function NotebookView({ notebook }: NotebookViewProps) {
           {notebook.tags.map((tag, idx) => (
             <span
               key={idx}
-              className="bg-zinc-100 text-zinc-600 px-2 py-1 rounded text-xs font-medium"
+              className="bg-surface-container-highest/50 text-primary px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-[0.2em] border border-outline-variant/10"
             >
               #{tag}
             </span>
@@ -37,15 +53,17 @@ export function NotebookView({ notebook }: NotebookViewProps) {
       <div className="space-y-16">
         {notebook.sections.map((section) => (
           <div key={section.id} className="relative group">
-            <div className="flex items-center gap-4 mb-4">
-              <h2 className="text-xl font-bold uppercase text-zinc-800 bg-zinc-100 px-3 py-1 rounded border-none w-full max-w-md">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-12 h-1 bg-primary" />
+              <h2 className="text-xl font-headline font-black uppercase tracking-[0.2em] text-on-surface">
                 {section.name}
               </h2>
+              <div className="flex-1 h-[1px] bg-outline-variant/10" />
             </div>
 
-            <div className="ml-4 space-y-6">
+            <div className="ml-4 space-y-12 pl-6 border-l-2 border-outline-variant/5">
               {section.grid && (
-                <div className="mb-4 pointer-events-none opacity-90">
+                <div className="mb-8 pointer-events-none opacity-90 p-6 bg-surface-container-low/30 rounded-2xl border border-outline-variant/5 shadow-inner">
                   <GrooveGridEditor
                     initialGrid={section.grid}
                     onChange={() => {}} // No-op for read-only
@@ -54,7 +72,7 @@ export function NotebookView({ notebook }: NotebookViewProps) {
               )}
 
               {section.notes && section.notes.length > 0 && (
-                <div className="w-full text-zinc-700 bg-zinc-50 p-4 rounded-lg min-h-[50px] text-sm whitespace-pre-wrap">
+                <div className="text-on-surface-variant bg-surface-container-low/30 p-8 rounded-2xl border border-outline-variant/5 shadow-inner leading-relaxed font-body text-lg italic whitespace-pre-wrap">
                   {section.notes}
                 </div>
               )}
@@ -63,8 +81,13 @@ export function NotebookView({ notebook }: NotebookViewProps) {
         ))}
       </div>
 
-      <footer className="mt-24 pt-8 border-t border-zinc-100 text-center">
-        <p className="text-zinc-400 text-sm">Last updated {formatDateTime(notebook.updatedAt)}</p>
+      <footer className="mt-24 pt-8 border-t border-outline-variant/10 text-center">
+        <p className="text-on-surface-variant text-[9px] font-label font-black uppercase tracking-[0.3em] mb-2">
+          DrumCharter Module v1.0
+        </p>
+        <p className="text-on-surface-variant text-[10px] font-label font-bold uppercase tracking-widest">
+          Last updated {formatDateTime(notebook.updatedAt)}
+        </p>
       </footer>
     </div>
   );

@@ -39,29 +39,31 @@ test.describe('Live Mode', () => {
       .fill('Section 2');
 
     // Ensure GO LIVE is ready
-    await expect(page.getByRole('button', { name: /GO LIVE/i })).toBeVisible({ timeout: 20000 });
+    await expect(page.getByTestId('go-live-button')).toBeVisible({ timeout: 20000 });
   });
 
   // TODO: Fix live mode tests in redesigned UI. See Issue #74
-  test.skip('should enter and exit live mode from editor', async ({ page }) => {
+  test('should enter and exit live mode from editor', async ({ page }) => {
     await waitForGoLiveAndClick(page);
 
     // Verify live mode is active
+    await expect(page.getByTestId('song-editor-container')).toBeHidden({ timeout: 15000 });
     await expect(page.getByTestId('live-mode-view')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('live-mode-header')).toBeVisible();
 
     // Exit live mode - wait for UI stability
     await page.waitForTimeout(500);
-    await page.getByTestId('exit-live-mode-btn').click({ force: true });
-    await expect(page.getByRole('button', { name: /GO LIVE/i })).toBeVisible({ timeout: 15000 });
+    await page.getByTestId('exit-live-mode-btn').evaluate((el) => (el as HTMLElement).click());
+    await expect(page.getByTestId('go-live-button')).toBeVisible({ timeout: 15000 });
   });
 
   // TODO: Fix live mode tests in redesigned UI. See Issue #74
-  test.skip('should navigate between sections via keyboard', async ({ page }) => {
+  test('should navigate between sections via keyboard', async ({ page }) => {
     await waitForGoLiveAndClick(page);
 
     // Verify live mode is active
-    await expect(page.getByTestId('exit-live-mode-btn')).toBeVisible({ timeout: 15000 });
+    await expect(page.getByTestId('song-editor-container')).toBeHidden({ timeout: 15000 });
+    await expect(page.getByTestId('live-mode-view')).toBeVisible({ timeout: 15000 });
 
     // Section 1 should be active
     await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 1');
@@ -76,11 +78,12 @@ test.describe('Live Mode', () => {
   });
 
   // TODO: Fix live mode tests in redesigned UI. See Issue #74
-  test.skip('should toggle fullscreen with F key', async ({ page }) => {
+  test('should toggle fullscreen with F key', async ({ page }) => {
     await waitForGoLiveAndClick(page);
 
-    // Header should be visible initially
-    await expect(page.getByTestId('live-mode-header')).toBeVisible();
+    // Verify live mode is active
+    await expect(page.getByTestId('song-editor-container')).toBeHidden({ timeout: 15000 });
+    await expect(page.getByTestId('live-mode-view')).toBeVisible({ timeout: 15000 });
 
     // Toggle fullscreen with F
     await page.keyboard.press('f');
@@ -94,9 +97,12 @@ test.describe('Live Mode', () => {
   });
 
   // TODO: Fix live mode tests in redesigned UI. See Issue #74
-  test.skip('should display section markers and next section preview', async ({ page }) => {
-    // Navigate to live mode
+  test('should display section markers and next section preview', async ({ page }) => {
     await waitForGoLiveAndClick(page);
+
+    // Verify live mode is active
+    await expect(page.getByTestId('song-editor-container')).toBeHidden({ timeout: 15000 });
+    await expect(page.getByTestId('live-mode-view')).toBeVisible({ timeout: 15000 });
 
     // Section 1 markers
     await expect(page.getByTestId('section-measures-count')).toBeVisible();

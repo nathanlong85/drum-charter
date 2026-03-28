@@ -16,14 +16,14 @@ describe('GrooveDemo', () => {
   it('renders without crashing', () => {
     render(<GrooveDemo />);
 
-    expect(screen.getByText('Try it yourself:')).toBeInTheDocument();
-    expect(screen.getByText('Live Editor Demo')).toBeInTheDocument();
+    expect(screen.getByText('Sonic Architect Engine')).toBeInTheDocument();
+    expect(screen.getByText('v1.0-alpha Live Preview')).toBeInTheDocument();
     expect(screen.getByTestId('mock-grid-editor')).toBeInTheDocument();
     expect(screen.getByText(/Mocked Editor with 3 instruments/)).toBeInTheDocument();
   });
 
   it('contains the instructions text', () => {
     render(<GrooveDemo />);
-    expect(screen.getByText(/Click on the cells above/)).toBeInTheDocument();
+    expect(screen.getByText(/Interact with grid to explore articulation/i)).toBeInTheDocument();
   });
 });

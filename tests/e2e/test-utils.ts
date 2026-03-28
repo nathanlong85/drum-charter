@@ -21,8 +21,9 @@ export const waitForSave = async (page: Page) => {
  * Waits for the GO LIVE button to be visible and enabled, then clicks it.
  */
 export const waitForGoLiveAndClick = async (page: Page) => {
-  const goLiveBtn = page.getByRole('button', { name: /GO LIVE/i });
+  const goLiveBtn = page.getByTestId('go-live-button');
   await expect(goLiveBtn).toBeVisible({ timeout: 20000 });
   await expect(goLiveBtn).not.toBeDisabled();
-  await goLiveBtn.click({ force: true });
+  // Use evaluate to ensure the click is triggered even if something is overlaying it in the test environment
+  await goLiveBtn.evaluate((el) => (el as HTMLElement).click());
 };

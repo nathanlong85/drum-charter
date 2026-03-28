@@ -21,7 +21,7 @@ fi
 
 # 2. Unit Tests
 echo "🧪 Running Vitest unit tests..."
-pnpm test run
+pnpm test:run
 if [ $? -ne 0 ]; then
   echo "❌ Unit tests failed."
   exit 1
