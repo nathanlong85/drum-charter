@@ -66,22 +66,41 @@ export function GrooveDemo() {
   const [grid, dispatch] = useReducer(grooveReducer, INITIAL_DEMO_GRID);
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-xl border border-zinc-200 w-full max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-zinc-900">Try it yourself:</h3>
-        <span className="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded-full uppercase tracking-wider">
-          Live Editor Demo
-        </span>
+    <div className="bg-surface-container-low p-8 rounded-[40px] shadow-3xl border border-outline-variant/10 w-full max-w-4xl mx-auto overflow-hidden relative">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
+
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col">
+          <h3 className="text-xl font-headline font-black text-on-surface uppercase tracking-tighter">
+            Sonic Architect Engine
+          </h3>
+          <p className="text-[10px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.3em] mt-1">
+            v1.0-alpha Live Preview
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="px-4 py-2 bg-primary/10 rounded-xl text-[9px] font-headline font-black text-primary uppercase tracking-widest border border-primary/20">
+            Interactive Console
+          </div>
+        </div>
       </div>
-      <div className="overflow-x-auto">
-        <GrooveGridEditor
-          initialGrid={grid}
-          onChange={(updatedGrid) => dispatch({ type: 'SET_FULL_GRID', grid: updatedGrid })}
-        />
+
+      <div className="bg-surface-container-lowest/50 rounded-[32px] p-6 border border-outline-variant/5 shadow-inner mb-6">
+        <div className="overflow-x-auto">
+          <GrooveGridEditor
+            initialGrid={grid}
+            onChange={(updatedGrid) => dispatch({ type: 'SET_FULL_GRID', grid: updatedGrid })}
+          />
+        </div>
       </div>
-      <p className="mt-4 text-sm text-zinc-500 italic text-center">
-        Click on the cells above to toggle hits or change drum symbols.
-      </p>
+
+      <div className="flex items-center justify-center gap-4">
+        <div className="h-px w-8 bg-outline-variant/20" />
+        <p className="text-[10px] text-on-surface-variant font-headline font-black uppercase tracking-[0.25em]">
+          Interact with grid to explore articulation
+        </p>
+        <div className="h-px w-8 bg-outline-variant/20" />
+      </div>
     </div>
   );
 }

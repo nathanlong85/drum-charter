@@ -140,7 +140,7 @@ describe('InstrumentSettingsModal', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /Delete Row/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Remove/i }));
     expect(onDelete).toHaveBeenCalled();
   });
 
@@ -156,7 +156,7 @@ describe('InstrumentSettingsModal', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /Delete Row/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Remove/i }));
 
     expect(onDelete).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();

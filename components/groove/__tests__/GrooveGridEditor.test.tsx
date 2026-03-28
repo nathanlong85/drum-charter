@@ -190,7 +190,7 @@ describe('GrooveGridEditor', () => {
     fireEvent.click(screen.getByTitle('Edit Settings'));
 
     vi.spyOn(window, 'confirm').mockReturnValue(true);
-    const deleteBtn = screen.getByRole('button', { name: /Delete Row/i });
+    const deleteBtn = screen.getByRole('button', { name: /Remove/i });
     fireEvent.click(deleteBtn);
 
     await waitFor(() => {

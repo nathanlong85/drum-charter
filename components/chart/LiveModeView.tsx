@@ -90,7 +90,10 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
 
   if (!activeSection) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-surface-container-lowest text-primary gap-8 font-headline">
+      <div
+        className="flex flex-col items-center justify-center min-h-screen bg-surface-container-lowest text-primary gap-8 font-headline"
+        data-testid="live-mode-view"
+      >
         <p className="text-3xl font-black uppercase tracking-widest text-center">
           No sections found in this chart.
         </p>

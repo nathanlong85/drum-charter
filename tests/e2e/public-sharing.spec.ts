@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForSave } from './test-utils';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -122,6 +123,42 @@ test.describe('Public Sharing Workflows', () => {
 
   test('Should handle private or missing snippets with 404', async ({ page }) => {
     await page.goto('http://localhost:3001/public/snippets/test-snippet-id');
+    await expect(page.getByText('404')).toBeVisible();
+  });
+
+  test('Should allow viewing a public setlist', async ({ page }) => {
+    // 1. Sign in as guest
+    await page.goto('http://localhost:3001/login');
+    await page.getByRole('button', { name: /Continue as Guest/i }).click();
+    await page.waitForURL(/\/library/);
+
+    // 2. Create a new setlist
+    await page.getByTestId('tab-setlist').first().click();
+    const createPromise = page.waitForResponse(
+      (resp) => resp.url().includes('/rest/v1/setlists') && resp.request().method() === 'POST',
+    );
+    await expect(page.getByTestId('create-new-button')).toHaveText(/New setlist/i, {
+      timeout: 15000,
+    });
+    await page.getByTestId('create-new-button').click();
+    const response = await createPromise;
+    expect(response.ok()).toBe(true);
+    await page.waitForURL(/\/setlists\/.+/);
+    const setlistId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
+    expect(setlistId, 'Expected setlist id in URL after creating setlist').toBeTruthy();
+
+    await page.getByTestId('toggle-public-button').click();
+    await waitForSave(page);
+
+    // 4. View public page
+    await page.goto(`http://localhost:3001/public/setlists/${setlistId!}`);
+    await expect(page.getByText(/Untitled Setlist/i)).toBeVisible({
+      timeout: 20000,
+    });
+  });
+
+  test('Should handle private or missing setlists with 404', async ({ page }) => {
+    await page.goto('http://localhost:3001/public/setlists/test-setlist-id');
     await expect(page.getByText('404')).toBeVisible();
   });
 });

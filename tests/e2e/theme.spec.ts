@@ -21,70 +21,83 @@ test.describe('Dark Mode Support', () => {
     await expect(body).toHaveCSS('color', 'rgb(255, 255, 255)');
   });
 
-  test('should toggle body background in dark mode', async ({ page }) => {
-    // Start in guest mode to see the editor
+  test('should apply dark mode to all major pages', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+
+    const pages = [
+      { path: '/', name: 'Home' },
+      { path: '/login', name: 'Login' },
+    ];
+
+    for (const p of pages) {
+      await page.goto(p.path);
+      const body = page.locator('body');
+      const bgColor = await body.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+      expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)'], `Page ${p.name} should be dark`).toContain(
+        bgColor,
+      );
+    }
+
+    // Authenticated pages
     await page.goto('/login');
     await page.getByRole('button', { name: /Continue as Guest/i }).click();
     await page.waitForURL(/\/library/);
 
-    // Initial check (Light Mode)
-    const body = page.locator('body');
-    let bgColor = await body.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-    // Light mode background is (rgb(245, 247, 248))
-    expect(bgColor).toBe('rgb(245, 247, 248)');
+    const authPages = [
+      { path: '/library', name: 'Library' },
+      { path: '/manual', name: 'Manual' },
+    ];
 
-    // Switch to Dark Mode
-    await page.emulateMedia({ colorScheme: 'dark' });
-
-    // Check for a dark background
-    await expect(async () => {
-      bgColor = await body.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-      // Dark mode background
-      expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
-    }).toPass();
+    for (const p of authPages) {
+      await page.goto(p.path);
+      const body = page.locator('body');
+      const bgColor = await body.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+      expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)'], `Auth Page ${p.name} should be dark`).toContain(
+        bgColor,
+      );
+    }
   });
 
-  test('should apply dark mode classes to UI components', async ({ page }) => {
+  test('should apply dark mode to editor pages', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/login');
     await page.getByRole('button', { name: /Continue as Guest/i }).click();
     await page.waitForURL(/\/library/);
 
-    // Switch to Snippets tab if not already active
-    const snippetsTab = page.getByTestId('tab-snippet');
-    await snippetsTab.click();
-    await expect(snippetsTab).toHaveAttribute('aria-selected', 'true');
+    // Check Song Editor
+    await page.getByTestId('tab-song').click();
+    await page.getByTestId('create-new-button').click();
+    await page.waitForURL(/\/songs\/.+/);
+    let bgColor = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
 
-    // The selector needs to be more specific to the toolbar in the editor
+    // Check Snippet Editor
+    await page.goto('/library?tab=snippet');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/snippets\/.+/);
+    bgColor = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
 
-    // Check GrooveGridEditor toolbar background
-    const toolbar = page.locator('[data-testid="groove-toolbar"]').first();
-    await expect(toolbar).toBeVisible();
+    // Check Notebook Editor
+    await page.goto('/library?tab=notebook');
+    await page.getByTestId('create-new-button').click();
+    await page.waitForURL(/\/notebooks\/.+/);
+    bgColor = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
 
-    // Check for dark-mode background color
-    const bgColor = await toolbar.evaluate((el) => window.getComputedStyle(el).backgroundColor);
-    // In some browsers/environments, this might resolve to a lab() color or rgb()
-    // We'll check that it's a dark color (very low lightness)
-    if (bgColor.startsWith('rgb')) {
-      const match = bgColor.match(/\d+/g);
-      if (match) {
-        const [r, g, b] = match.map(Number);
-        expect(r).toBeLessThan(30);
-        expect(g).toBeLessThan(35);
-        expect(b).toBeLessThan(50);
-      }
-    } else if (bgColor.startsWith('lab')) {
-      // lab(8.11897 0.811279 -12.254) -> Lightness is ~8%
-      const match = bgColor.match(/[\d.]+/);
-      if (match) {
-        const lightness = Number(match[0]);
-        expect(lightness).toBeLessThan(15);
-      }
-    } else {
-      // Fallback for other formats
-      expect(bgColor).not.toBe('rgb(255, 255, 255)');
-    }
+    // Check Setlist Editor
+    await page.goto('/library?tab=setlist');
+    await page.getByTestId('create-new-button').click();
+    await page.waitForURL(/\/setlists\/.+/);
+    bgColor = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
   });
 });

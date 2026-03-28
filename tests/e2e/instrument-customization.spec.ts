@@ -62,7 +62,7 @@ test.describe('Instrument Customization', () => {
 
     // Setup dialog handler for confirm
     page.once('dialog', (dialog) => dialog.accept());
-    await page.getByRole('button', { name: /Delete Row/i }).click();
+    await page.getByRole('button', { name: /Remove/i }).click();
 
     // Verify removal
     await expect(page.getByTestId('instrument-row-snare')).not.toBeVisible();

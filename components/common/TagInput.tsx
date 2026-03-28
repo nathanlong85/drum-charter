@@ -55,25 +55,25 @@ export function TagInput({
   return (
     <div ref={containerRef} className="relative w-full">
       <div
-        className={`flex flex-wrap gap-2 p-2 border-2 rounded-lg transition-all ${
-          isFocused ? 'border-zinc-800 bg-white' : 'border-zinc-100 bg-zinc-50'
+        className={`flex flex-wrap items-center gap-2 p-3 bg-surface-container-highest rounded-2xl border transition-all duration-300 ${
+          isFocused ? 'border-primary/40 ring-4 ring-primary/5' : 'border-outline-variant/10'
         }`}
       >
-        <TagIcon className="w-4 h-4 text-zinc-400 mt-1 ml-1" />
+        <TagIcon className="w-4 h-4 text-primary/40 ml-1" />
 
         {tags.map((tag) => (
           <span
             key={tag}
-            className="flex items-center gap-1 bg-zinc-800 text-white px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider"
+            className="flex items-center gap-2 bg-primary text-on-primary px-3 py-1.5 rounded-lg text-[10px] font-headline font-black uppercase tracking-widest shadow-sm"
           >
             {tag}
             <button
               type="button"
               onClick={() => removeTag(tag)}
-              className="hover:text-red-400 transition-colors"
+              className="hover:text-on-primary/60 transition-colors"
               aria-label={`Remove ${tag} tag`}
             >
-              <X className="w-3 h-3" />
+              <X size={12} strokeWidth={3} />
             </button>
           </span>
         ))}
@@ -108,18 +108,18 @@ export function TagInput({
             }
           }}
           placeholder={placeholder}
-          className="flex-1 bg-transparent border-none focus:ring-0 text-sm p-0 min-w-[120px] placeholder-zinc-400 font-medium"
+          className="flex-1 bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-on-surface-variant/30 text-sm font-headline font-bold min-w-[120px] outline-none"
         />
       </div>
 
       {showSuggestions && filteredSuggestions.length > 0 && (
-        <div className="absolute z-10 w-full mt-1 bg-white border-2 border-zinc-800 rounded-lg shadow-xl overflow-hidden">
-          <div className="p-2 border-b border-zinc-100 bg-zinc-50 flex items-center justify-between">
-            <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">
-              Suggestions
+        <div className="absolute z-10 w-full mt-2 bg-surface-container-low border border-outline-variant/20 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2">
+          <div className="p-3 border-b border-outline-variant/5 bg-surface-container flex items-center justify-between">
+            <span className="text-[9px] font-headline font-black text-on-surface-variant/40 uppercase tracking-[0.2em]">
+              Suggested Identities
             </span>
           </div>
-          <div className="max-h-48 overflow-y-auto">
+          <div className="max-h-48 overflow-y-auto p-1">
             {filteredSuggestions.map((suggestion) => (
               <button
                 key={suggestion}
@@ -134,10 +134,10 @@ export function TagInput({
                     addTag(suggestion);
                   }
                 }}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-zinc-800 hover:text-white transition-colors font-bold uppercase tracking-tight flex items-center justify-between group focus:bg-zinc-800 focus:text-white focus:outline-none"
+                className="w-full text-left px-4 py-3 text-[11px] font-headline font-bold uppercase tracking-widest text-on-surface hover:bg-primary/10 hover:text-primary transition-all rounded-xl flex items-center justify-between group"
               >
                 {suggestion}
-                <Plus className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <Plus className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />
               </button>
             ))}
           </div>
