@@ -38,12 +38,12 @@ test.describe('Setlist Editor', () => {
     await page.waitForURL(/\/setlists\/.+/);
 
     const publicButton = page.getByTestId('toggle-public-button');
-    await expect(publicButton).toHaveText('PRIVATE');
+    await expect(publicButton).toHaveText(/Private/i);
 
     await publicButton.click();
-    await expect(publicButton).toHaveText('PUBLIC');
+    await expect(publicButton).toHaveText(/Public/i);
 
-    // Check if public link is shown (it's a button "Copy Link")
-    await expect(page.getByRole('button', { name: /Copy Link/i })).toBeVisible();
+    // Check if public link is shown (it's a button "Copy Public Link")
+    await expect(page.getByRole('button', { name: /Copy Public Link/i })).toBeVisible();
   });
 });

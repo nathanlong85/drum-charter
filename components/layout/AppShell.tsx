@@ -50,7 +50,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div className="min-h-screen bg-surface flex flex-col font-body antialiased">
       {/* Sidebar Navigation Shell */}
-      <aside className="fixed left-0 top-0 h-full flex flex-col w-[72px] lg:w-[240px] bg-surface-container-low border-r border-outline-variant/10 z-50 transition-all duration-300">
+      <aside className="fixed left-0 top-0 h-full flex flex-col w-[72px] lg:w-[240px] bg-surface-container-low border-r border-outline-variant/10 z-50 transition-all duration-300 no-print">
         <div className="p-6 flex-1 flex flex-col">
           <div className="flex items-center gap-3 mb-10">
             <div className="w-10 h-10 shrink-0 bg-primary flex items-center justify-center rounded-lg shadow-[0_0_15px_var(--color-primary-dim)]">
@@ -122,7 +122,7 @@ export function AppShell({ children }: AppShellProps) {
       </aside>
 
       {/* Top App Bar Shell */}
-      <header className="fixed top-0 right-0 left-[72px] lg:left-[240px] z-40 flex justify-between items-center px-6 h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 transition-all duration-300">
+      <header className="fixed top-0 right-0 left-[72px] lg:left-[240px] z-40 flex justify-between items-center px-6 h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 transition-all duration-300 no-print">
         <div className="flex items-center gap-6">
           <span className="text-primary font-black text-lg font-headline tracking-widest uppercase hidden md:inline-block">
             DrumCharter
@@ -177,7 +177,7 @@ export function AppShell({ children }: AppShellProps) {
       </main>
 
       {/* System Status Bar */}
-      <footer className="fixed bottom-0 right-0 left-[72px] lg:left-[240px] px-6 py-2 bg-background/90 backdrop-blur-md border-t border-outline-variant/10 flex justify-between items-center z-40 transition-all duration-300">
+      <footer className="fixed bottom-0 right-0 left-[72px] lg:left-[240px] px-6 py-2 bg-background/90 backdrop-blur-md border-t border-outline-variant/10 flex justify-between items-center z-40 transition-all duration-300 no-print">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>

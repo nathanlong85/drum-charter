@@ -36,12 +36,13 @@ test.describe('Groove Snippet Editor', () => {
     // Verify persistence after reload
     await page.reload();
     await expect(page.locator('input[placeholder="Snippet Title"]')).toHaveValue(snippetTitle);
-    await expect(page.getByTestId('toggle-public-button')).toHaveText('PUBLIC');
+    await expect(page.getByTestId('toggle-public-button')).toHaveText(/Public/i);
     await expect(page.locator('span', { hasText: 'funk' })).toBeVisible();
 
     // Verify "View" link is visible when public
-    await expect(page.locator('text=View')).toBeVisible();
-    await expect(page.locator('text=View')).toHaveAttribute('href', /\/public\/snippets\//);
+    const viewLink = page.getByRole('link', { name: /View Public/i });
+    await expect(viewLink).toBeVisible();
+    await expect(viewLink).toHaveAttribute('href', /\/public\/snippets\//);
   });
 
   test('should manage snippet grid configuration', async ({ page }) => {

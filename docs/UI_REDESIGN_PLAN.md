@@ -23,5 +23,5 @@ We will surgically implement the redesign page-by-page, matching the Stitch mock
 
 ## 5. Verification
 - Perform full-suite testing (Vitest, Playwright).
-- Conduct a local CodeRabbit review.
+- Request a Copilot review on the PR.
 - Visually verify Dark Mode and Light Mode transitions across all refactored pages.

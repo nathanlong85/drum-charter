@@ -1,6 +1,6 @@
-## PAIR PROGRAMMING PROTOCOL
+# PAIR PROGRAMMING PROTOCOL
 
-### 1. Work Initialization (Mandatory)
+## 1. Work Initialization (Mandatory)
 
 Before starting ANY new work on an issue or task:
 
@@ -9,21 +9,23 @@ Before starting ANY new work on an issue or task:
 3. **Branch**: Switch to a new, appropriately-named branch for the task (e.g., `git checkout -b feature/issue-number-description`).
 4. **Project Status**: Mark the corresponding issue/task as "In Progress" on the project status board (e.g., using `gh project item-edit`).
 
-### 2. Pre-Push Lockdown (Mandatory)
+## 2. Pre-Push & PR Protocol (Mandatory)
 
-I am strictly FORBIDDEN from calling `git push` or creating/updating a Pull Request unless the following conditions are met in the current or immediately preceding turn:
+I am strictly FORBIDDEN from considering a task "Done" unless the following conditions are met:
 
-1. **Clean Lint**: `pnpm lint` and `pnpm lint:md` must return ZERO errors AND ZERO warnings. Any output from the linter is a block.
-2. **Local CodeRabbit Loop**: The `code-review` skill must have been activated, and `cr review --prompt-only --base main` must have been run and addressed.
-3. **Full Suite Pass**: `verify_done.sh` must have been run and returned a total pass.
-4. **Checklist Reporting**: I must provide a "Definition of Done Checklist" in my response before the push.
+1. **Clean Lint**: `pnpm lint` and `pnpm lint:md` must return ZERO errors AND ZERO warnings.
+2. **Full Suite Pass**: `verify_done.sh` must have been run and returned a total pass.
+3. **Iterative Copilot Loop**:
+    * A Pull Request must be opened.
+    * A Copilot review must be requested and completed.
+    * **ALL** relevant Copilot comments must be addressed or flagged for discussion.
+    * All remote CI checks must pass.
+4. **Checklist Reporting**: I must provide a "Definition of Done Checklist" in my response before final sign-off.
 
-Failure to follow this lockdown costs time and resources. There are no exceptions.
-
-### 3. Commit Identity
+## 3. Commit Identity
 
 All commits must be made exclusively on behalf of the configured git user. No co-author trailers.
 
-### 4. PR Merging
+## 4. PR Merging
 
 Merging a PR into `main` is a human-only task. I will never merge a PR myself.
