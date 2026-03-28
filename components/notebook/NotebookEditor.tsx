@@ -11,6 +11,7 @@ import {
   type Notebook,
   type NotebookSection,
 } from '@/lib/types/groove';
+import { EditorToolbar } from '../layout/EditorToolbar';
 
 type NotebookAction =
   | { type: 'SET_NOTEBOOK'; notebook: Notebook }
@@ -100,85 +101,34 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
   return (
     <div data-testid="notebook-editor-root" className="min-h-screen bg-surface">
       <div data-testid="notebook-editor-container" className="flex flex-col h-full relative">
-        {/* Top Actions */}
-        <div className="sticky top-0 right-0 p-4 no-print flex justify-end gap-2 z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/10">
-          {state.isPublic && (
-            <>
-              <button
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(
-                      `${window.location.origin}/public/notebooks/${state.id}`,
-                    );
-                    alert('Public link copied to clipboard!');
-                  } catch (_err) {
-                    alert(
-                      `Failed to copy link. Here it is: ${window.location.origin}/public/notebooks/${state.id}`,
-                    );
-                  }
-                }}
-                className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
-              >
-                Copy Link
-              </button>
-              <a
-                href={`/public/notebooks/${state.id}`}
-                target="_blank"
-                className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
-                rel="noopener noreferrer"
-              >
-                View Public
-              </a>
-            </>
-          )}
-          <button
-            onClick={async () => {
+        <EditorToolbar
+          type="notebook"
+          id={state.id}
+          isPublic={state.isPublic}
+          onTogglePublic={() => dispatch({ type: 'UPDATE_PUBLIC', isPublic: !state.isPublic })}
+          onDuplicate={async () => {
+            try {
+              await settleAutosave();
+              const duplicated = await supabaseService.duplicateNotebook(state.id);
+              router.push(`/notebooks/${duplicated.id}`);
+            } catch (error) {
+              console.error('Failed to duplicate notebook:', error);
+              alert('Failed to duplicate notebook.');
+            }
+          }}
+          onDelete={async () => {
+            if (confirm('Are you sure you want to delete this notebook?')) {
               try {
                 await settleAutosave();
-                const duplicated = await supabaseService.duplicateNotebook(state.id);
-                router.push(`/notebooks/${duplicated.id}`);
+                await supabaseService.deleteNotebook(state.id);
+                router.push('/library');
               } catch (error) {
-                console.error('Failed to duplicate notebook:', error);
-                alert('Failed to duplicate notebook.');
+                console.error('Failed to delete notebook:', error);
+                alert('Failed to delete notebook.');
               }
-            }}
-            className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
-          >
-            Duplicate
-          </button>
-          <button
-            onClick={async () => {
-              if (confirm('Are you sure you want to delete this notebook?')) {
-                try {
-                  await settleAutosave();
-                  await supabaseService.deleteNotebook(state.id);
-                  router.push('/library');
-                } catch (error) {
-                  console.error('Failed to delete notebook:', error);
-                  alert('Failed to delete notebook.');
-                }
-              }
-            }}
-            className="flex items-center gap-2 bg-surface-container-highest text-error px-4 py-2 rounded-lg font-bold hover:bg-error/10 transition-all text-[10px] uppercase tracking-widest"
-          >
-            Delete
-          </button>
-          <div className="w-[1px] h-8 bg-outline-variant/20 mx-2" />
-          <button
-            onClick={() => window.print()}
-            className="flex items-center gap-2 bg-surface-container-highest text-on-surface px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-sm shadow-lg"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-              />
-            </svg>
-            PRINT
-          </button>
-        </div>
+            }
+          }}
+        />
 
         {/* Notebook Header Section */}
         <section className="p-8 pb-4 pt-16 md:pt-8">
@@ -190,18 +140,6 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                 <span className="text-on-surface-variant flex gap-2 items-center">
                   {isSaving ? <span className="animate-pulse">Saving...</span> : <span>Saved</span>}
                 </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-tertiary/40"></span>
-                <button
-                  onClick={() => dispatch({ type: 'UPDATE_PUBLIC', isPublic: !state.isPublic })}
-                  data-testid="toggle-public-button"
-                  className={
-                    state.isPublic
-                      ? 'text-primary'
-                      : 'text-on-surface-variant/50 hover:text-on-surface-variant transition-colors'
-                  }
-                >
-                  {state.isPublic ? 'PUBLIC' : 'PRIVATE'}
-                </button>
               </div>
               <input
                 type="text"

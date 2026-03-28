@@ -62,7 +62,7 @@ describe('SetlistEditor', () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
     expect(screen.getByDisplayValue('My Setlist')).toBeInTheDocument();
-    expect(screen.getByText('PRIVATE')).toBeInTheDocument();
+    expect(screen.getByTestId('toggle-public-button')).toBeInTheDocument();
 
     // Wait for songs to load and display titles
     await waitFor(() => {
@@ -92,13 +92,13 @@ describe('SetlistEditor', () => {
   it('toggles visibility and saves', async () => {
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
-    const visibilityButton = screen.getByText('PRIVATE');
+    const visibilityButton = screen.getByTestId('toggle-public-button');
 
     await act(async () => {
       fireEvent.click(visibilityButton);
     });
 
-    expect(screen.getByText('PUBLIC')).toBeInTheDocument();
+    expect(screen.getByTestId('toggle-public-button')).toHaveTextContent(/Public/i);
 
     await waitFor(() => {
       expect(supabaseService.saveSetlist).toHaveBeenCalledWith(

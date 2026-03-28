@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { Setlist, SetlistItem } from '@/lib/types/groove';
+import { EditorToolbar } from '../layout/EditorToolbar';
 
 interface SetlistEditorProps {
   initialSetlist: Setlist;
@@ -109,59 +110,26 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
 
   return (
     <div data-testid="setlist-editor-root" className="min-h-screen bg-surface">
-      <div data-testid="setlist-editor-container" className="flex flex-col h-full">
-        {/* Top Actions */}
-        <div className="absolute top-4 right-8 no-print flex gap-2 z-50">
-          {setlist.isPublic && (
-            <>
-              <button
-                onClick={async () => {
-                  try {
-                    await navigator.clipboard.writeText(
-                      `${window.location.origin}/public/setlists/${setlist.id}`,
-                    );
-                    alert('Public link copied to clipboard!');
-                  } catch (_err) {
-                    alert(
-                      `Failed to copy link. Here it is: ${window.location.origin}/public/setlists/${setlist.id}`,
-                    );
-                  }
-                }}
-                className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
-              >
-                Copy Link
-              </button>
-              <a
-                href={`/public/setlists/${setlist.id}`}
-                target="_blank"
-                className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
-                rel="noopener noreferrer"
-              >
-                View Public
-              </a>
-            </>
-          )}
-          <button
-            onClick={async () => {
-              if (confirm('Are you sure you want to delete this setlist?')) {
-                try {
-                  // Prevent any further autosaves
-                  cancelAutosave();
-                  await settleAutosave();
-
-                  await supabaseService.deleteSetlist(setlist.id);
-                  router.push('/library');
-                } catch (error) {
-                  console.error('Failed to delete setlist:', error);
-                  alert('Failed to delete setlist.');
-                }
+      <div data-testid="setlist-editor-container" className="flex flex-col h-full relative">
+        <EditorToolbar
+          type="setlist"
+          id={setlist.id}
+          isPublic={setlist.isPublic}
+          onTogglePublic={handleVisibilityToggle}
+          onDelete={async () => {
+            if (confirm('Are you sure you want to delete this setlist?')) {
+              try {
+                cancelAutosave();
+                await settleAutosave();
+                await supabaseService.deleteSetlist(setlist.id);
+                router.push('/library');
+              } catch (error) {
+                console.error('Failed to delete setlist:', error);
+                alert('Failed to delete setlist.');
               }
-            }}
-            className="flex items-center gap-2 bg-surface-container-highest text-error px-4 py-2 rounded-lg font-bold hover:bg-error/10 transition-all text-[10px] uppercase tracking-widest"
-          >
-            Delete
-          </button>
-        </div>
+            }
+          }}
+        />
 
         {/* Setlist Header Section */}
         <section className="p-8 pb-4 pt-16 md:pt-8">
@@ -179,18 +147,6 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                     <span>Saved</span>
                   )}
                 </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-secondary/40"></span>
-                <button
-                  onClick={handleVisibilityToggle}
-                  data-testid="toggle-public-button"
-                  className={
-                    setlist.isPublic
-                      ? 'text-primary'
-                      : 'text-on-surface-variant/50 hover:text-on-surface-variant transition-colors'
-                  }
-                >
-                  {setlist.isPublic ? 'PUBLIC' : 'PRIVATE'}
-                </button>
               </div>
               <input
                 type="text"

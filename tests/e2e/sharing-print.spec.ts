@@ -25,7 +25,7 @@ test.describe('Sharing & Public View', () => {
     await waitForSave(page);
 
     // Get the public URL
-    const viewLink = page.getByText(/View Public/i);
+    const viewLink = page.getByRole('link', { name: /View Public/i });
     await expect(viewLink).toBeVisible();
     const publicUrl = await viewLink.getAttribute('href');
     expect(publicUrl).not.toBeNull();
@@ -51,30 +51,37 @@ test.describe('Sharing & Public View', () => {
   test('should adapt UI for printing', async ({ page }) => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
+    await page.waitForURL('/library');
 
+    const createPromise = page.waitForResponse(
+      (resp) => resp.url().includes('/rest/v1/song_charts') && resp.request().method() === 'POST',
+    );
     await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, { timeout: 15000 });
     await page.getByTestId('create-new-button').click();
-    await expect(page).toHaveURL(/\/songs\//);
+    await createPromise;
+    await page.waitForURL(/\/songs\//);
 
     // Add some content
     await page.locator('input[placeholder="Song Title"]').fill('Print Test Song');
-    await page.click('text=Add New Section');
+    await page.getByRole('button', { name: /Add New Section/i }).click();
+    await page.getByRole('button', { name: /Add Grid/i }).click();
 
     // Check if PrintButton exists
-    const printBtn = page.locator('button[title="Print Chart"]');
-    if ((await printBtn.count()) > 0) {
-      // We can't actually "print" in E2E, but we can check the 'no-print' class
-      // which is used to hide elements during printing.
-      const toolbar = page.getByTestId('groove-toolbar');
-      await expect(toolbar).toHaveClass(/no-print/);
+    const printBtn = page.locator('button[title="Print Version"]');
+    await expect(printBtn).toBeVisible({ timeout: 15000 });
 
-      const sidebar = page.locator('aside');
-      if ((await sidebar.count()) > 0) {
-        await expect(sidebar).toHaveClass(/no-print/);
-      }
+    // The toolbar container has the 'no-print' class
+    const toolbar = page.getByTestId('groove-toolbar');
+    await expect(toolbar).toBeVisible({ timeout: 15000 });
+    await expect(toolbar).toHaveClass(/no-print/);
 
-      // Check the PrintButton itself is no-print
-      await expect(printBtn).toHaveClass(/no-print/);
+    // The editor toolbar also has no-print
+    const editorToolbar = page.locator('div.no-print').filter({ has: printBtn });
+    await expect(editorToolbar).toBeVisible();
+
+    const sidebar = page.locator('aside');
+    if ((await sidebar.count()) > 0) {
+      await expect(sidebar).toHaveClass(/no-print/);
     }
   });
 });

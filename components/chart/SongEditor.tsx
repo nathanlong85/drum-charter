@@ -17,6 +17,7 @@ import {
   MIN_BEATS_PER_MEASURE,
   VALID_BEAT_VALUES,
 } from '@/lib/utils/constants';
+import { EditorToolbar } from '../layout/EditorToolbar';
 import { LiveModeView } from './LiveModeView';
 
 type SongAction =
@@ -191,109 +192,38 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
         <LiveModeView chart={state} onExit={() => setIsLiveMode(false)} />
       ) : (
         <div data-testid="song-editor-container" className="flex flex-col h-full relative">
-          {/* Top Actions */}
-          <div className="sticky top-0 right-0 p-4 no-print flex justify-end gap-2 z-[45] bg-surface border-b border-outline-variant/10 shadow-sm">
-            {state.isPublic && (
-              <>
-                <button
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(
-                        `${window.location.origin}/public/songs/${state.id}`,
-                      );
-                      alert('Public link copied to clipboard!');
-                    } catch (_err) {
-                      alert(
-                        `Failed to copy link. Here it is: ${window.location.origin}/public/songs/${state.id}`,
-                      );
-                    }
-                  }}
-                  className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
-                >
-                  Copy Link
-                </button>
-                <a
-                  href={`/public/songs/${state.id}`}
-                  target="_blank"
-                  className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
-                  rel="noopener noreferrer"
-                >
-                  View Public
-                </a>
-              </>
-            )}
-            <button
-              onClick={async () => {
+          <EditorToolbar
+            type="song"
+            id={state.id}
+            isPublic={state.isPublic}
+            onTogglePublic={() => dispatch({ type: 'TOGGLE_PUBLIC' })}
+            onDuplicate={async () => {
+              try {
+                await settleAutosave();
+                const duplicated = await supabaseService.duplicateSongChart(state.id);
+                router.push(`/songs/${duplicated.id}`);
+              } catch (error) {
+                console.error('Failed to duplicate song chart:', error);
+                alert('Failed to duplicate song chart.');
+              }
+            }}
+            onDelete={async () => {
+              if (confirm('Are you sure you want to delete this song?')) {
                 try {
                   await settleAutosave();
-                  const duplicated = await supabaseService.duplicateSongChart(state.id);
-                  router.push(`/songs/${duplicated.id}`);
+                  await supabaseService.deleteSongChart(state.id);
+                  router.push('/library');
                 } catch (error) {
-                  console.error('Failed to duplicate song chart:', error);
-                  alert('Failed to duplicate song chart.');
+                  console.error('Failed to delete song chart:', error);
+                  alert('Failed to delete song chart.');
                 }
-              }}
-              className="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-[10px] uppercase tracking-widest"
-            >
-              Duplicate
-            </button>
-            <button
-              onClick={async () => {
-                if (confirm('Are you sure you want to delete this song?')) {
-                  try {
-                    await settleAutosave();
-                    await supabaseService.deleteSongChart(state.id);
-                    router.push('/library');
-                  } catch (error) {
-                    console.error('Failed to delete song chart:', error);
-                    alert('Failed to delete song chart.');
-                  }
-                }
-              }}
-              className="flex items-center gap-2 bg-surface-container-highest text-error px-4 py-2 rounded-lg font-bold hover:bg-error/10 transition-all text-[10px] uppercase tracking-widest"
-            >
-              Delete
-            </button>
-            <div className="w-[1px] h-8 bg-outline-variant/20 mx-2" />
-            <button
-              onClick={() => {
-                window.scrollTo(0, 0);
-                setIsLiveMode(true);
-              }}
-              data-testid="go-live-button"
-              className="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg font-black hover:bg-primary-dim transition-all text-sm shadow-lg shadow-primary/20 uppercase tracking-tighter"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2.5"
-                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2.5"
-                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              GO LIVE
-            </button>
-            <button
-              onClick={() => window.print()}
-              className="flex items-center gap-2 bg-surface-container-highest text-on-surface px-4 py-2 rounded-lg font-bold hover:bg-surface-bright transition-all text-sm shadow-lg"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
-                />
-              </svg>
-              PRINT
-            </button>
-          </div>
+              }
+            }}
+            onGoLive={() => {
+              window.scrollTo(0, 0);
+              setIsLiveMode(true);
+            }}
+          />
 
           {/* Song Header Section */}
           <section className="p-8 pb-4 pt-16 md:pt-8">
@@ -309,14 +239,6 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                       <span>Saved</span>
                     )}
                   </span>
-                  <span className="w-1 h-1 rounded-full bg-primary/40"></span>
-                  <button
-                    onClick={() => dispatch({ type: 'TOGGLE_PUBLIC' })}
-                    data-testid="toggle-public-button"
-                    className={state.isPublic ? 'text-green-400' : 'text-on-surface-variant'}
-                  >
-                    {state.isPublic ? 'PUBLIC' : 'PRIVATE'}
-                  </button>
                 </div>
                 <input
                   type="text"
