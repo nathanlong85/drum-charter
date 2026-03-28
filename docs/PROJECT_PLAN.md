@@ -102,6 +102,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done
 
+- [x] [Fix] Song Editor Layout: Resolved clumped action buttons with a new responsive EditorToolbar component (#62) `✓`
 - [x] [Fix] Dark Mode Support: Unified dark mode across all pages and expanded test coverage (#60) `✓`
 - [x] [Fix] Live Mode E2E Stability: Resolved flakiness in Live Mode transition tests (#74) `✓`
 - [x] [Bug] Groove Grid Editor: Fixed elements extending out of the side with responsive layout and wrapping toolbar (#59) `✓`

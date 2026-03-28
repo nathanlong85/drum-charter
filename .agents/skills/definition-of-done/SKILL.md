@@ -13,18 +13,18 @@ When you think you've finished a task (feature, bug fix, or documentation update
 
 ### 1. Determine Verification Path
 
-- **Documentation, Rules, or Skills ONLY**: If changes are limited to `.md` files, `.gemini/rules/`, or `.agents/skills/`, proceed to **Step 3 (Linting)**. You may skip CodeRabbit and Tests.
-- **Code Changes**: Proceed to **Step 2 (CodeRabbit)**.
+- **Documentation, Rules, or Skills ONLY**: If changes are limited to `.md` files, `.gemini/rules/`, or `.agents/skills/`, proceed to **Step 3 (Linting)**. You may skip Copilot Loop and Tests.
+- **Code Changes**: Proceed to **Step 2 (Iterative Copilot Loop)**.
 
-### 2. CodeRabbit Feedback Loop (Code Changes Only)
+### 2. Iterative Copilot Feedback Loop (Code Changes Only)
 
-Before final verification, you MUST complete the local CodeRabbit feedback loop as defined in `CODE_REVIEW_PROTOCOL.md`.
+Before final verification, you MUST complete the iterative feedback loop as defined in `CODE_REVIEW_PROTOCOL.md`.
 
-- Activate the `code-review` skill.
-- Run `cr review --prompt-only --base main`.
-- **MANDATORY**: For each run, report the Loop and Run number, target severities, and a summary of findings (Total, Critical, Major, etc.) before addressing them.
-- Address feedback following the "Structured Feedback Review" (3-run state machine).
-- The loop is finished only when no `Critical` or `Major` issues remain or the 3-run limit is reached.
+1.  **Verification**: Ensure changes are fully linted and tested (aim for 100% coverage).
+2.  **Push & PR**: Push changes and open/update a Pull Request.
+3.  **Request Review**: Request a review from **Copilot** on the PR (use `mcp_github_request_copilot_review`).
+4.  **Poll & Address**: Wait for Copilot and CI. Address ALL relevant comments or flag for discussion.
+5.  **Repeat**: Repeat until the review is clean and CI passes.
 
 ### 3. Run Linting
 
@@ -35,12 +35,11 @@ pnpm lint
 pnpm lint:md
 ```
 
-- **CRITICAL**: If `pnpm lint` modifies any code files (automatic fixes), you MUST treat this as a code change and run the **Full Automated Verification** (Step 4) and **CodeRabbit Loop** (Step 2) even if you only intended to change documentation.
+- **CRITICAL**: If `pnpm lint` modifies any code files (automatic fixes), you MUST treat this as a code change and run the **Full Automated Verification** (Step 4) and **Copilot Loop** (Step 2).
 
 ### 4. Full Automated Verification (Code Changes Only)
 
 Execute the bundled verification script to ensure no regressions or formatting issues were introduced.
-This script runs Biome linting, Markdown linting, Vitest unit tests, and Playwright E2E tests.
 
 ```bash
 ./.agents/skills/definition-of-done/scripts/verify_done.sh
@@ -57,22 +56,16 @@ In addition to the automated checks, manually verify the following:
 
 ### 4. Reporting (MANDATORY)
 
-Once all checks pass, you MUST report completion using this exact checklist format before proposing a push:
+Once all checks pass, you MUST report completion using this exact checklist format:
 
 ```markdown
 ### ✅ Definition of Done Checklist
 
 - [ ] **Clean Lint**: ZERO errors and ZERO warnings.
-- [ ] **CodeRabbit Loop**: Local review completed and addressed.
+- [ ] **Copilot Loop**: Remote iterative loop completed and addressed.
 - [ ] **Unit Tests**: 100% pass rate.
 - [ ] **E2E Tests**: 100% pass rate.
 - [ ] **Manual Checks**: Plan updated, no logs, types verified.
 ```
 
-If any box cannot be checked, the task is NOT done. Proposing a push with a partial checklist is a protocol violation.
-
-## Resources
-
-### scripts/
-
-- `verify_done.sh`: Automates linting and testing (Biome, Markdownlint, Vitest, Playwright).
+If any box cannot be checked, the task is NOT done.

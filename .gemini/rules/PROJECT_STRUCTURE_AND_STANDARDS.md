@@ -1,27 +1,27 @@
-## 🏗️ PROJECT STRUCTURE & STANDARDS
+# Project Structure & Standards
 
-### Project State
+## 📖 Sources of Truth
 
-- **Primary Source of Truth**: `docs/PROJECT_PLAN.md` must be read at the start of every session and updated as needed to keep the plan current and fresh.
-- **Development Workflow**: Refer to `docs/DEV_WORKFLOW.md` for branching, testing, and feedback loop.
-- **Secret Management**: Refer to `docs/SECRETS_MANAGEMENT.md` (Gemini is forbidden from reading `.env.private`).
+* **Project Plan**: `docs/PROJECT_PLAN.md` (Read at session start, update after every task).
+* **Workflow**: `docs/DEV_WORKFLOW.md`.
+* **Secrets**: `docs/SECRETS_MANAGEMENT.md` (Never read `.env.private`).
 
-### Engineering Excellence
+## 🏗️ Technical Stack
 
-- **DRY & Modular**: Write clean, reusable code; avoid duplication.
-- **Type Safety**: Prioritize TypeScript; ensure end-to-end type safety from DB to UI.
-- **Performance**: Mindful of bundle sizes, re-renders, and DB query efficiency.
-- **Documentation**: Maintain high-quality TSDoc, READMEs, CHANGELOGs as part of the process.
+* **Framework**: Next.js 16 (App Router, Server Components/Actions).
+* **Backend**: Supabase (`@supabase/ssr`, strict RLS).
+* **Styling**: Tailwind CSS 4 (Utility-first, CSS variables).
+* **Testing**: Vitest (Unit/Integration), Playwright (E2E).
 
-### Local Development Environment
+## 💻 Local Development
 
-- **Local-First Dev**: Always use the local Supabase Docker instance (`http://localhost:54321`) for development and testing.
-- **Frontend Server**: Next.js runs on port `3001` (to avoid conflicts with other local services).
-- **Database Schema**: Synchronized via managed migrations in `supabase/migrations/`.
+* **Next.js**: Runs on port `3001`.
+* **Supabase**: Local Docker instance on `http://localhost:54321`.
+* **Database**: Migrations in `supabase/migrations/`.
 
-### Technical Stack & Patterns
+## 🛠️ Engineering Excellence
 
-- **Next.js 16 (App Router)**: Follow patterns for Server Components and Server Actions.
-- **Supabase**: Use `@supabase/ssr` and maintain strict RLS policies.
-- **Tailwind CSS 4**: Use utility-first styling with CSS variables.
-- **Testing**: Vitest for unit/integration, Playwright for E2E.
+* **Modular**: DRY, reusable code. Consolidate logic into clean abstractions.
+* **Type Safety**: End-to-end TypeScript from DB to UI.
+* **Performance**: Bundle size awareness, minimal re-renders, efficient DB queries.
+* **Documentation**: High-quality TSDoc, READMEs, and CHANGELOGs.
