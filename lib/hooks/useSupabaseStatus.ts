@@ -24,7 +24,7 @@ export function useSupabaseStatus(): SupabaseStatus {
           cache: 'no-store',
           signal: AbortSignal.timeout(3000),
         });
-        
+
         if (response.ok && isMounted) {
           setStatus('connected');
           return;

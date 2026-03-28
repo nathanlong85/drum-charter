@@ -26,7 +26,7 @@ export default function OfflineStatus() {
           // Small timeout to avoid hanging
           signal: AbortSignal.timeout(3000),
         });
-        
+
         if (response.ok && isMounted) {
           setIsOffline(false);
           return;

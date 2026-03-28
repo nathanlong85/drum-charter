@@ -45,7 +45,10 @@ test.describe('Offline Support (PWA)', () => {
     await page.waitForTimeout(500);
 
     // Check for indicator using a more specific locator to avoid strict mode violations
-    const offlineIndicator = page.getByRole('alert').filter({ hasText: /reports you are offline/i }).first();
+    const offlineIndicator = page
+      .getByRole('alert')
+      .filter({ hasText: /reports you are offline/i })
+      .first();
     await expect(offlineIndicator).toBeVisible();
 
     // Test PWA: Reload while offline
