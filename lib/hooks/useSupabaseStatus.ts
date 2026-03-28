@@ -8,23 +8,53 @@ export function useSupabaseStatus(): SupabaseStatus {
   const [status, setStatus] = useState<SupabaseStatus>('connecting');
 
   useEffect(() => {
-    const updateStatus = () => {
-      // Base status on network connectivity for now as a proxy for realtime health
-      // In a real app, we would listen to supabase.auth.onAuthStateChange
-      // or check the actual realtime channel status.
-      setStatus(navigator.onLine ? 'connected' : 'offline');
+    let isMounted = true;
+
+    const checkConnectivity = async () => {
+      // First check navigator.onLine
+      if (typeof navigator !== 'undefined' && navigator.onLine) {
+        if (isMounted) setStatus('connected');
+        return;
+      }
+
+      // Verify by trying to reach the local server
+      try {
+        const response = await fetch('/manifest.json', {
+          method: 'HEAD',
+          cache: 'no-store',
+          signal: AbortSignal.timeout(3000),
+        });
+        
+        if (response.ok && isMounted) {
+          setStatus('connected');
+          return;
+        }
+      } catch (_err) {
+        // Truly offline
+      }
+
+      if (isMounted) setStatus('offline');
     };
 
-    updateStatus();
+    checkConnectivity();
 
-    window.addEventListener('online', updateStatus);
-    window.addEventListener('offline', updateStatus);
+    const handleOnline = () => setStatus('connected');
+    const handleOffline = () => checkConnectivity();
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    const interval = setInterval(() => {
+      if (status === 'offline') checkConnectivity();
+    }, 30000);
 
     return () => {
-      window.removeEventListener('online', updateStatus);
-      window.removeEventListener('offline', updateStatus);
+      isMounted = false;
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+      clearInterval(interval);
     };
-  }, []);
+  }, [status]);
 
   return status;
 }

@@ -45,7 +45,7 @@ test.describe('Offline Support (PWA)', () => {
     await page.waitForTimeout(500);
 
     // Check for indicator using a more specific locator to avoid strict mode violations
-    const offlineIndicator = page.getByRole('alert').filter({ hasText: 'You are offline' }).first();
+    const offlineIndicator = page.getByRole('alert').filter({ hasText: /reports you are offline/i }).first();
     await expect(offlineIndicator).toBeVisible();
 
     // Test PWA: Reload while offline
@@ -69,7 +69,7 @@ test.describe('Offline Support (PWA)', () => {
     // Go back online
     await page.context().setOffline(false);
     // Wait for the indicator to disappear (should be automatic via 'online' event)
-    await expect(page.getByText('You are offline').first()).not.toBeVisible();
+    await expect(page.getByText(/reports you are offline/i).first()).not.toBeVisible();
   });
 
   test('manifest should be linked in the head', async ({ page }) => {
