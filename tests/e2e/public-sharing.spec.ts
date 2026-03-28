@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { waitForSave } from './test-utils';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -147,8 +148,7 @@ test.describe('Public Sharing Workflows', () => {
     expect(setlistId, 'Expected setlist id in URL after creating setlist').toBeTruthy();
 
     await page.getByTestId('toggle-public-button').click();
-    await expect(page.locator('text=Saved')).toBeVisible();
-    await page.waitForTimeout(3000);
+    await waitForSave(page);
 
     // 4. View public page
     await page.goto(`http://localhost:3001/public/setlists/${setlistId!}`);

@@ -102,6 +102,8 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done
 
+- [x] [Fix] Dark Mode Support: Unified dark mode across all pages and expanded test coverage (#60) `✓`
+- [x] [Fix] Live Mode E2E Stability: Resolved flakiness in Live Mode transition tests (#74) `✓`
 - [x] [Bug] Groove Grid Editor: Fixed elements extending out of the side with responsive layout and wrapping toolbar (#59) `✓`
 - [x] [Fix] Grid Interaction Stability: Resolved flakiness in E2E dragging/selection tests (#73) `✓`
 - [x] [Feature] Issue #76: Address CodeRabbit Full Review Findings (completed) `✓`
@@ -184,4 +186,4 @@ To ensure high-quality collaboration and maintain the stability of the DrumChart
 - **Update After Work**: This file MUST be updated after every task is completed.
 
 ## Known Issues
-- [ ] Issue #74: Flaky E2E tests related to Live Mode transitions.
+- None.

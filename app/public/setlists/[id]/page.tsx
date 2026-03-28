@@ -35,6 +35,16 @@ export default async function PublicSetlistPage({ params }: PublicSetlistPagePro
     notFound();
   }
 
+  // Pre-fetch song titles server-side to avoid client-side RLS issues on public pages
+  const songIds = Array.from(new Set(setlist.songs.map((s) => s.songId)));
+  const songTitlesRes = await supabaseService.getSongTitles(songIds, supabase);
+  const songTitles: Record<string, string> = {};
+  if (songTitlesRes) {
+    songTitlesRes.forEach((s) => {
+      songTitles[s.id] = s.title;
+    });
+  }
+
   return (
     <main className="min-h-screen bg-surface py-12 px-6 print:bg-white print:p-0 selection:bg-primary/30 selection:text-primary">
       <div className="max-w-5xl mx-auto bg-surface-container rounded-[32px] overflow-hidden border border-outline-variant/10 shadow-2xl shadow-black/20 print:shadow-none print:rounded-none">
@@ -50,7 +60,7 @@ export default async function PublicSetlistPage({ params }: PublicSetlistPagePro
           <PrintButton />
         </div>
         <div className="p-8 md:p-12">
-          <SetlistView setlist={setlist} />
+          <SetlistView setlist={setlist} initialSongTitles={songTitles} />
         </div>
       </div>
       <footer className="max-w-4xl mx-auto mt-12 text-center no-print space-y-4">

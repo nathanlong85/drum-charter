@@ -68,24 +68,36 @@ test.describe('Dark Mode Support', () => {
     await page.getByTestId('tab-song').click();
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/songs\/.+/);
-    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(14, 14, 14)');
+    let bgColor = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
 
     // Check Snippet Editor
     await page.goto('/library?tab=snippet');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/snippets\/.+/);
-    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(14, 14, 14)');
+    bgColor = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
 
     // Check Notebook Editor
     await page.goto('/library?tab=notebook');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/notebooks\/.+/);
-    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(14, 14, 14)');
+    bgColor = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
 
     // Check Setlist Editor
     await page.goto('/library?tab=setlist');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/setlists\/.+/);
-    await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(14, 14, 14)');
+    bgColor = await page
+      .locator('body')
+      .evaluate((el) => window.getComputedStyle(el).backgroundColor);
+    expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
   });
 });

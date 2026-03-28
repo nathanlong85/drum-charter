@@ -269,6 +269,16 @@ export const supabaseService = {
     return data;
   },
 
+  async getSongTitles(ids: string[], supabaseParam?: SupabaseClient<Database>) {
+    const supabase = supabaseParam || createBrowserClient();
+    if (!ids || ids.length === 0) return [];
+
+    const { data, error } = await supabase.from('song_charts').select('id, title').in('id', ids);
+
+    if (error) throw error;
+    return data;
+  },
+
   // --- Notebooks ---
   async saveNotebook(
     notebook: Notebook,

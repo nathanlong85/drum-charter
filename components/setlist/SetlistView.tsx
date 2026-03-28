@@ -7,19 +7,32 @@ import type { Setlist } from '@/lib/types/groove';
 
 interface SetlistViewProps {
   setlist: Setlist;
+  /**
+   * Optional map of songId -> title, usually provided when titles are fetched server-side
+   * to avoid client-side RLS issues on public pages.
+   */
+  initialSongTitles?: Record<string, string>;
 }
 
-export function SetlistView({ setlist }: SetlistViewProps) {
-  const [songTitles, setSongTitles] = useState<Record<string, string>>({});
+export function SetlistView({ setlist, initialSongTitles }: SetlistViewProps) {
+  const [songTitles, setSongTitles] = useState<Record<string, string>>(initialSongTitles ?? {});
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialSongTitles);
 
   useEffect(() => {
+    // If titles were provided via props, we don't need to fetch them
+    if (initialSongTitles) {
+      setSongTitles(initialSongTitles);
+      setIsLoading(false);
+      return;
+    }
+
+    let isMounted = true;
     const loadTitles = async () => {
       setIsLoading(true);
       try {
         const songs = await supabaseService.listSongCharts();
-        if (songs) {
+        if (songs && isMounted) {
           const titleMap: Record<string, string> = {};
           songs.forEach((s) => {
             titleMap[s.id] = s.title;
@@ -27,14 +40,22 @@ export function SetlistView({ setlist }: SetlistViewProps) {
           setSongTitles(titleMap);
         }
       } catch (err) {
-        console.error('Failed to load song titles:', err);
-        setError('Failed to load composition titles. Please try refreshing the page.');
+        if (isMounted) {
+          console.error('Failed to load song titles:', err);
+          setError('Failed to load composition titles. Please try refreshing the page.');
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
     loadTitles();
-  }, []);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [initialSongTitles]);
 
   return (
     <div className="space-y-12">
