@@ -60,7 +60,10 @@ test.describe('Offline Support (PWA)', () => {
 
     // Offline indicator should still be there
     await expect(
-      page.getByRole('alert').filter({ hasText: 'You are offline' }).first(),
+      page
+        .getByRole('alert')
+        .filter({ hasText: /reports you are offline/i })
+        .first(),
     ).toBeVisible();
 
     const isCached = await page.evaluate(async () => {

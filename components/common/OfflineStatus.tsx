@@ -3,7 +3,7 @@
 import { WifiOff, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-export default function OfflineStatus() {
+export function OfflineStatus() {
   const [isOffline, setIsOffline] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
@@ -17,14 +17,21 @@ export default function OfflineStatus() {
         return;
       }
 
+      // Use AbortController + setTimeout for wider browser support than AbortSignal.timeout
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+      if (controller) {
+        timeoutId = setTimeout(() => controller.abort(), 3000);
+      }
+
       // If navigator says offline, verify by trying to reach the local server
       // This helps in environments where navigator.onLine is unreliable
       try {
         const response = await fetch('/manifest.json', {
           method: 'HEAD',
           cache: 'no-store',
-          // Small timeout to avoid hanging
-          signal: AbortSignal.timeout(3000),
+          signal: controller ? controller.signal : undefined,
         });
 
         if (response.ok && isMounted) {
@@ -33,6 +40,8 @@ export default function OfflineStatus() {
         }
       } catch (_err) {
         // Truly offline or server unreachable
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
       }
 
       if (isMounted) setIsOffline(true);
@@ -53,9 +62,9 @@ export default function OfflineStatus() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Periodic check every 30 seconds if we are marked as offline
+    // Periodic check every 30 seconds
     const interval = setInterval(() => {
-      if (isOffline) checkConnectivity();
+      checkConnectivity();
     }, 30000);
 
     return () => {
@@ -64,7 +73,7 @@ export default function OfflineStatus() {
       window.removeEventListener('offline', handleOffline);
       clearInterval(interval);
     };
-  }, [isOffline]);
+  }, []); // isOffline removed from dependencies to stabilize listeners
 
   if (!isOffline || isDismissed) return null;
 

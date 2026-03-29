@@ -17,12 +17,20 @@ export function useSupabaseStatus(): SupabaseStatus {
         return;
       }
 
+      // Use AbortController + setTimeout for wider browser support than AbortSignal.timeout
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+      if (controller) {
+        timeoutId = setTimeout(() => controller.abort(), 3000);
+      }
+
       // Verify by trying to reach the local server
       try {
         const response = await fetch('/manifest.json', {
           method: 'HEAD',
           cache: 'no-store',
-          signal: AbortSignal.timeout(3000),
+          signal: controller ? controller.signal : undefined,
         });
 
         if (response.ok && isMounted) {
@@ -31,6 +39,8 @@ export function useSupabaseStatus(): SupabaseStatus {
         }
       } catch (_err) {
         // Truly offline
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
       }
 
       if (isMounted) setStatus('offline');
@@ -45,7 +55,8 @@ export function useSupabaseStatus(): SupabaseStatus {
     window.addEventListener('offline', handleOffline);
 
     const interval = setInterval(() => {
-      if (status === 'offline') checkConnectivity();
+      // We check connectivity regardless of current state to ensure we recover
+      checkConnectivity();
     }, 30000);
 
     return () => {
@@ -54,7 +65,7 @@ export function useSupabaseStatus(): SupabaseStatus {
       window.removeEventListener('offline', handleOffline);
       clearInterval(interval);
     };
-  }, [status]);
+  }, []); // Status removed from dependencies to stabilize listeners
 
   return status;
 }
