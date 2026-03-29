@@ -10,11 +10,11 @@ Follow these steps for every code change:
 
 1. **Completion**: Finish the implementation of the work (feature, bug, chore, or PR fix).
 2. **Verification**: Ensure the changes are fully linted and tested. Aim for 100% coverage and ensure all user journeys are verified.
-3.  **PR Management**: Push the changes and open a Pull Request (if one does not already exist).
-4.  **Request Review (MANDATORY)**: You MUST initiate the review loop by requesting a review from **Copilot** on the PR.
-    *   **Autonomy**: Use the `mcp_github_request_copilot_review` tool immediately after opening the PR.
-    *   **Notification**: If the tool is unavailable, fails, or if you are unable to trigger the review for any reason, you MUST notify the user immediately so they can request it manually. **Do not start polling until the review has been successfully requested.**
-5.  **Monitoring**: Poll for the completion of all CI check results and the Copilot review.
+3. **PR Management**: Push the changes and open a Pull Request (if one does not already exist).
+4. **Request Review (MANDATORY)**: You MUST initiate the review loop by requesting a review from **Copilot** on the PR.
+    * **Autonomy**: Use the `mcp_github_request_copilot_review` tool immediately after opening the PR.
+    * **Notification**: If the tool is unavailable, fails, or if you are unable to trigger the review for any reason, you MUST notify the user immediately so they can request it manually. **Do not start polling until the review has been successfully requested.**
+5. **Monitoring**: Poll for the completion of all CI check results and the Copilot review.
 6. **CI Remediation**: Address any CI failures immediately.
 7. **Address Findings**: Address **ALL** relevant Copilot review comments.
     * **Agreement**: Apply fixes for all valid suggestions.
@@ -30,12 +30,14 @@ Verification is not complete until the remote CI environment (GitHub Actions) re
 * If CI fails, you MUST investigate the logs (using `gh run view` or similar), fix the issue locally, and push again.
 * Continue the loop until both Copilot and CI are satisfied.
 
+### 3. Disagreement & Flagging Protocol
+
 Proactively flag a Copilot suggestion for final human decision if it:
 * Conflicts with the project's specific architectural goals or established standards.
 * Contradicts previously established user preferences or known requirements.
 * Introduces unnecessary complexity ("over-engineering") or code smells.
 
-### 3. Reporting Requirements
+### 4. Reporting Requirements
 
 At the start of every iteration in the loop, you MUST explicitly state:
 * **Iteration Number**: e.g., "Starting Copilot Review Iteration 2".
