@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { GrooveSnippet } from '@/lib/types/groove';
@@ -17,8 +17,11 @@ vi.mock('@/lib/services/supabase-service', () => ({
     saveGrooveSnippet: vi.fn().mockResolvedValue({}),
     deleteGrooveSnippet: vi.fn().mockResolvedValue({}),
     duplicateGrooveSnippet: vi.fn().mockResolvedValue({}),
+    listGrooveSnippetsMapped: vi.fn().mockResolvedValue([]),
   },
 }));
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe('SnippetEditor', () => {
   const mockSnippet: GrooveSnippet = {
@@ -49,15 +52,13 @@ describe('SnippetEditor', () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const titleInput = screen.getByDisplayValue('Test Snippet');
 
-    fireEvent.change(titleInput, { target: { value: 'New Title' } });
+    await act(async () => {
+      fireEvent.change(titleInput, { target: { value: 'New Title' } });
+      await wait(2100);
+    });
 
-    await waitFor(
-      () => {
-        expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
-          expect.objectContaining({ title: 'New Title' }),
-        );
-      },
-      { timeout: 5000 },
+    expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'New Title' }),
     );
   });
 
@@ -65,16 +66,14 @@ describe('SnippetEditor', () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const tagInput = screen.getByPlaceholderText(/\+ ADD TAG/i);
 
-    fireEvent.change(tagInput, { target: { value: 'Funk' } });
-    fireEvent.keyDown(tagInput, { key: 'Enter', code: 'Enter' });
+    await act(async () => {
+      fireEvent.change(tagInput, { target: { value: 'Funk' } });
+      fireEvent.keyDown(tagInput, { key: 'Enter', code: 'Enter' });
+      await wait(2100);
+    });
 
-    await waitFor(
-      () => {
-        expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
-          expect.objectContaining({ tags: ['funk'] }),
-        );
-      },
-      { timeout: 5000 },
+    expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
+      expect.objectContaining({ tags: ['funk'] }),
     );
   });
 
@@ -87,25 +86,26 @@ describe('SnippetEditor', () => {
 
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
-    fireEvent.click(duplicateBtn);
 
-    await waitFor(() => {
-      expect(supabaseService.duplicateGrooveSnippet).toHaveBeenCalledWith('sn1');
+    await act(async () => {
+      fireEvent.click(duplicateBtn);
+      await wait(2100);
     });
+
+    expect(supabaseService.duplicateGrooveSnippet).toHaveBeenCalledWith('sn1');
   });
 
   it('handles public state toggle', async () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const toggle = screen.getByTestId('toggle-public-button');
-    fireEvent.click(toggle);
 
-    await waitFor(
-      () => {
-        expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
-          expect.objectContaining({ isPublic: true }),
-        );
-      },
-      { timeout: 5000 },
+    await act(async () => {
+      fireEvent.click(toggle);
+      await wait(2100);
+    });
+
+    expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
+      expect.objectContaining({ isPublic: true }),
     );
   });
 
@@ -126,14 +126,15 @@ describe('SnippetEditor', () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
 
     const titleInput = screen.getByDisplayValue('Test Snippet');
-    fireEvent.change(titleInput, { target: { value: 'Fail Me' } });
 
-    await waitFor(
-      () => {
-        expect(screen.getAllByText(/Save failed/i).length).toBeGreaterThan(0);
-      },
-      { timeout: 5000 },
-    );
+    await act(async () => {
+      fireEvent.change(titleInput, { target: { value: 'Fail Me' } });
+      await wait(2100);
+    });
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/Save failed/i).length).toBeGreaterThan(0);
+    });
   });
 
   it('does not attempt to update state if unmounted during save', async () => {
@@ -148,9 +149,12 @@ describe('SnippetEditor', () => {
 
     unmount();
 
-    // Small delay to let enqueued flush chain execute
+    await act(async () => {
+      await wait(2100);
+    });
+
+    // cleanup flushes
     await waitFor(() => {
-      // Verify save WAS called because cleanup calls flush() while isMountedRef.current is still true
       expect(saveSpy).toHaveBeenCalled();
     });
   });
@@ -159,10 +163,12 @@ describe('SnippetEditor', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const deleteBtn = screen.getByRole('button', { name: /Delete This Item/i });
-    fireEvent.click(deleteBtn);
 
-    await waitFor(() => {
-      expect(supabaseService.deleteGrooveSnippet).toHaveBeenCalledWith('sn1');
+    await act(async () => {
+      fireEvent.click(deleteBtn);
+      await wait(2100);
     });
+
+    expect(supabaseService.deleteGrooveSnippet).toHaveBeenCalledWith('sn1');
   });
 });
