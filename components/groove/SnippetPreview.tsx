@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { type DrumSymbol, type GrooveGrid } from '@/lib/types/groove';
+import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
 import { NoteCell } from './NoteCell';
 
 interface SnippetPreviewProps {
@@ -34,8 +34,8 @@ export const SnippetPreview: React.FC<SnippetPreviewProps> = ({ grid }) => {
                     isMeasureStart
                       ? 'border-primary/30'
                       : isBeatStart
-                      ? 'border-outline-variant/20'
-                      : 'border-outline-variant/5'
+                        ? 'border-outline-variant/20'
+                        : 'border-outline-variant/5'
                   }`}
                 >
                   <NoteCell

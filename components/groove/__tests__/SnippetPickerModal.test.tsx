@@ -38,9 +38,9 @@ describe('SnippetPickerModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(supabaseService, 'listGrooveSnippetsMapped').mockResolvedValue(mockSnippets);
-    });
+  });
 
-    it('renders loading state then snippets', async () => {
+  it('renders loading state then snippets', async () => {
     render(<SnippetPickerModal onClose={onClose} onSelect={onSelect} />);
 
     expect(screen.getByText(/Accessing Library.../i)).toBeDefined();
@@ -49,9 +49,9 @@ describe('SnippetPickerModal', () => {
       expect(screen.getByText('Funky Groove')).toBeDefined();
       expect(screen.getByText('Jazz Swing')).toBeDefined();
     });
-    });
+  });
 
-    it('filters snippets by search query', async () => {
+  it('filters snippets by search query', async () => {
     render(<SnippetPickerModal onClose={onClose} onSelect={onSelect} />);
 
     await waitFor(() => screen.getByText('Funky Groove'));
@@ -63,9 +63,9 @@ describe('SnippetPickerModal', () => {
 
     expect(screen.queryByText('Funky Groove')).toBeNull();
     expect(screen.getByText('Jazz Swing')).toBeDefined();
-    });
+  });
 
-    it('calls onSelect when a snippet is clicked', async () => {
+  it('calls onSelect when a snippet is clicked', async () => {
     render(<SnippetPickerModal onClose={onClose} onSelect={onSelect} />);
 
     await waitFor(() => screen.getByText('Funky Groove'));
@@ -75,9 +75,9 @@ describe('SnippetPickerModal', () => {
     });
 
     expect(onSelect).toHaveBeenCalledWith(mockSnippets[0]);
-    });
+  });
 
-    it('calls onClose when cancel is clicked', async () => {
+  it('calls onClose when cancel is clicked', async () => {
     render(<SnippetPickerModal onClose={onClose} onSelect={onSelect} />);
 
     await waitFor(() => screen.getByText('Funky Groove'));
@@ -88,11 +88,13 @@ describe('SnippetPickerModal', () => {
     });
 
     expect(onClose).toHaveBeenCalled();
-    });
+  });
 
-    it('shows error state on failure', async () => {
-    vi.spyOn(supabaseService, 'listGrooveSnippetsMapped').mockRejectedValue(new Error('Fetch failed'));
-    
+  it('shows error state on failure', async () => {
+    vi.spyOn(supabaseService, 'listGrooveSnippetsMapped').mockRejectedValue(
+      new Error('Fetch failed'),
+    );
+
     render(<SnippetPickerModal onClose={onClose} onSelect={onSelect} />);
 
     await waitFor(() => {

@@ -56,7 +56,7 @@ describe('SongEditor', () => {
   it('updates song title and triggers save', async () => {
     render(<SongEditor initialSong={mockSong} />);
     const titleInput = screen.getByPlaceholderText('Song Title');
-    
+
     fireEvent.change(titleInput, { target: { value: 'Updated Song' } });
     await act(async () => {
       await wait(2100);
@@ -76,7 +76,7 @@ describe('SongEditor', () => {
   it('adds a new section', async () => {
     render(<SongEditor initialSong={mockSong} />);
     const addSectionBtn = screen.getByRole('button', { name: /Add section/i });
-    
+
     fireEvent.click(addSectionBtn);
     await act(async () => {
       await wait(2100);
@@ -93,7 +93,7 @@ describe('SongEditor', () => {
   it('removes a section', async () => {
     render(<SongEditor initialSong={mockSong} />);
     const removeBtn = screen.getByTitle('Remove Section');
-    
+
     fireEvent.click(removeBtn);
     await act(async () => {
       await wait(2100);
@@ -150,7 +150,7 @@ describe('SongEditor', () => {
 
     // Wait for snippet to load and select it
     await waitFor(() => expect(screen.getByText('Test Snippet')).toBeInTheDocument());
-    
+
     fireEvent.click(screen.getByText('Test Snippet'));
     await act(async () => {
       await wait(2100);

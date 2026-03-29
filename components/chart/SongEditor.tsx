@@ -802,10 +802,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
       )}
 
       {pickerConfig && (
-        <SnippetPickerModal
-          onClose={() => setPickerConfig(null)}
-          onSelect={handleSnippetSelect}
-        />
+        <SnippetPickerModal onClose={() => setPickerConfig(null)} onSelect={handleSnippetSelect} />
       )}
 
       {/* Floating Save Status */}

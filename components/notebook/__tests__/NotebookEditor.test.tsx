@@ -47,7 +47,7 @@ describe('NotebookEditor', () => {
   it('updates the title and triggers auto-save ', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const titleInput = screen.getByPlaceholderText('Notebook Title');
-    
+
     fireEvent.change(titleInput, { target: { value: 'New Name' } });
     await act(async () => {
       await wait(2100);
@@ -65,7 +65,7 @@ describe('NotebookEditor', () => {
   it('adds a new section', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const addBtn = screen.getByText(/Add New Section/i);
-    
+
     fireEvent.click(addBtn);
     await act(async () => {
       await wait(2100);
@@ -82,7 +82,7 @@ describe('NotebookEditor', () => {
   it('removes a section', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const removeBtn = screen.getByLabelText(/Remove Section/i);
-    
+
     fireEvent.click(removeBtn);
     await act(async () => {
       await wait(2100);
@@ -99,7 +99,7 @@ describe('NotebookEditor', () => {
   it('updates section name ', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const nameInput = screen.getByPlaceholderText('Section Name');
-    
+
     fireEvent.change(nameInput, { target: { value: 'Updated Section' } });
     await act(async () => {
       await wait(2100);
@@ -116,7 +116,7 @@ describe('NotebookEditor', () => {
   it('updates section notes ', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const notesInput = screen.getByPlaceholderText(/Add notes/i);
-    
+
     fireEvent.change(notesInput, { target: { value: 'New practice notes' } });
     await act(async () => {
       await wait(2100);
@@ -133,7 +133,7 @@ describe('NotebookEditor', () => {
   it('updates tags ', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const tagInput = screen.getByPlaceholderText(/\+ ADD TAG/i);
-    
+
     fireEvent.change(tagInput, { target: { value: 'technique' } });
     fireEvent.keyDown(tagInput, { key: 'Enter' });
     await act(async () => {
@@ -197,7 +197,7 @@ describe('NotebookEditor', () => {
   it('toggles public state ', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const toggle = screen.getByTestId('toggle-public-button');
-    
+
     fireEvent.click(toggle);
     await act(async () => {
       await wait(2100);
@@ -217,7 +217,7 @@ describe('NotebookEditor', () => {
 
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const titleInput = screen.getByPlaceholderText('Notebook Title');
-    
+
     fireEvent.change(titleInput, { target: { value: 'Error Test' } });
     await act(async () => {
       await wait(2100);
@@ -233,15 +233,15 @@ describe('NotebookEditor', () => {
   it('does not attempt to update state if unmounted during save', async () => {
     const { unmount } = render(<NotebookEditor initialNotebook={mockNotebook} />);
     const titleInput = screen.getByPlaceholderText('Notebook Title');
-    
+
     fireEvent.change(titleInput, { target: { value: 'Unmount Test' } });
-    
+
     unmount();
-    
+
     await act(async () => {
       await wait(2100);
     });
-    
+
     // No error should be thrown
   });
 
@@ -278,7 +278,7 @@ describe('NotebookEditor', () => {
 
     // Wait for snippet to load and select it
     await waitFor(() => expect(screen.getByText('Test Snippet')).toBeInTheDocument());
-    
+
     fireEvent.click(screen.getByText('Test Snippet'));
     await act(async () => {
       await wait(2100);

@@ -78,9 +78,7 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
 
       return {
         ...state,
-        sections: state.sections.map((s) =>
-          s.id === action.sectionId ? { ...s, grid } : s,
-        ),
+        sections: state.sections.map((s) => (s.id === action.sectionId ? { ...s, grid } : s)),
         updatedAt: timestamp,
       };
     }

@@ -11,18 +11,19 @@ test.describe('Snippet Integration', () => {
     // 2. Create a snippet to use for integration
     // Use direct navigation to be sure
     await page.goto('/library?tab=snippet');
-    
+
     const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
+      (resp) =>
+        resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
     );
     await page.getByTestId('create-new-button').click();
     await createPromise;
-    
+
     await page.waitForURL(/\/snippets\/.+/);
-    
+
     await page.getByPlaceholder(/Snippet Title/i).fill('Integration Test Snippet');
     await waitForSave(page);
-    
+
     // Go back to library
     await page.goto('/library');
   });
@@ -46,13 +47,15 @@ test.describe('Snippet Integration', () => {
     await insertBtn.click();
 
     // 4. Select the snippet
-    const snippetItem = page.getByRole('button', { name: /Select snippet: Integration Test Snippet/i });
+    const snippetItem = page.getByRole('button', {
+      name: /Select snippet: Integration Test Snippet/i,
+    });
     await expect(snippetItem).toBeVisible({ timeout: 15000 });
     await snippetItem.click();
 
     // 5. Verify grid is visible in the song section
     await expect(page.getByTestId('groove-editor')).toBeVisible();
-    
+
     // 6. Verify persistence
     await waitForSave(page);
     await page.reload();
@@ -78,13 +81,15 @@ test.describe('Snippet Integration', () => {
     await insertBtn.click();
 
     // 4. Select the snippet
-    const snippetItem = page.getByRole('button', { name: /Select snippet: Integration Test Snippet/i });
+    const snippetItem = page.getByRole('button', {
+      name: /Select snippet: Integration Test Snippet/i,
+    });
     await expect(snippetItem).toBeVisible({ timeout: 15000 });
     await snippetItem.click();
 
     // 5. Verify grid is visible in the notebook section
     await expect(page.getByTestId('groove-editor')).toBeVisible();
-    
+
     // 6. Verify persistence
     await waitForSave(page);
     await page.reload();

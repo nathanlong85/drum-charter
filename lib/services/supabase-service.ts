@@ -512,7 +512,9 @@ export const supabaseService = {
     return data;
   },
 
-  async listGrooveSnippetsMapped(supabaseParam?: SupabaseClient<Database>): Promise<GrooveSnippet[]> {
+  async listGrooveSnippetsMapped(
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<GrooveSnippet[]> {
     const supabase = supabaseParam || createBrowserClient();
     const { data, error } = await supabase
       .from('groove_snippets')
