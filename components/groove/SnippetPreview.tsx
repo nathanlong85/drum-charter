@@ -9,13 +9,13 @@ interface SnippetPreviewProps {
 }
 
 export const SnippetPreview: React.FC<SnippetPreviewProps> = ({ grid }) => {
-  const { timeSignature, resolution, measures, instruments } = grid;
+  const { timeSignature, resolution, instruments } = grid;
   const notesPerBeat = resolution / timeSignature.beatValue;
   const totalNotesPerMeasure = timeSignature.beatsPerMeasure * notesPerBeat;
 
   return (
     <div className="space-y-1 w-full overflow-hidden">
-      {instruments.map((instrument, instIdx) => (
+      {instruments.map((instrument, _instIdx) => (
         <div key={instrument.id} className="flex gap-px h-6">
           <div className="w-20 shrink-0 flex items-center pr-2">
             <span className="text-[8px] font-headline font-black uppercase truncate text-on-surface-variant/60">

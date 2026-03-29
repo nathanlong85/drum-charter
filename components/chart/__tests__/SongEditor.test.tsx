@@ -36,15 +36,21 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+// Mock supabase-service
+vi.mock('@/lib/services/supabase-service', () => ({
+  supabaseService: {
+    saveSongChart: vi.fn().mockResolvedValue({}),
+    deleteSongChart: vi.fn().mockResolvedValue({}),
+    duplicateSongChart: vi.fn().mockResolvedValue({ id: 's2' }),
+    listGrooveSnippetsMapped: vi.fn().mockResolvedValue([]),
+  },
+}));
+
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe('SongEditor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(supabaseService, 'saveSongChart').mockResolvedValue({} as any);
-    vi.spyOn(supabaseService, 'duplicateSongChart').mockResolvedValue({ id: 's2' } as any);
-    vi.spyOn(supabaseService, 'deleteSongChart').mockResolvedValue(true);
-    vi.spyOn(supabaseService, 'listGrooveSnippetsMapped').mockResolvedValue([]);
   });
 
   it('renders initial song data', () => {
@@ -110,7 +116,12 @@ describe('SongEditor', () => {
   it('duplicates the song', async () => {
     render(<SongEditor initialSong={mockSong} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
-    fireEvent.click(duplicateBtn);
+
+    await act(async () => {
+      fireEvent.click(duplicateBtn);
+      // Wait for settleAutosave and the async operation
+      await wait(2100);
+    });
 
     await waitFor(() => {
       expect(supabaseService.duplicateSongChart).toHaveBeenCalledWith('s1');
@@ -121,7 +132,12 @@ describe('SongEditor', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     render(<SongEditor initialSong={mockSong} />);
     const deleteBtn = screen.getByRole('button', { name: /Delete This Item/i });
-    fireEvent.click(deleteBtn);
+
+    await act(async () => {
+      fireEvent.click(deleteBtn);
+      // Wait for settleAutosave and the async operation
+      await wait(2100);
+    });
 
     await waitFor(() => {
       expect(supabaseService.deleteSongChart).toHaveBeenCalledWith('s1');
@@ -141,24 +157,19 @@ describe('SongEditor', () => {
       createdAt: null,
       updatedAt: null,
     };
-    vi.spyOn(supabaseService, 'listGrooveSnippetsMapped').mockResolvedValue([mockSnippet]);
+    vi.mocked(supabaseService.listGrooveSnippetsMapped).mockResolvedValue([mockSnippet]);
 
     render(<SongEditor initialSong={mockSong} />);
 
     // Open picker
     fireEvent.click(screen.getByText(/\+ Insert Snippet/i));
 
-    // Wait for snippet to load and select it
+    // Wait for snippet to load
     await waitFor(() => expect(screen.getByText('Test Snippet')).toBeInTheDocument());
 
     fireEvent.click(screen.getByText('Test Snippet'));
     await act(async () => {
       await wait(2100);
-    });
-
-    // Verify grid is added to the section in the state/save call
-    await waitFor(() => {
-      expect(supabaseService.saveSongChart).toHaveBeenCalled();
     });
 
     const lastCall = vi.mocked(supabaseService.saveSongChart).mock.calls.at(-1)![0] as SongChart;

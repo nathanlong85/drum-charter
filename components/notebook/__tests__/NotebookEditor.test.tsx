@@ -28,15 +28,21 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+// Mock supabase-service
+vi.mock('@/lib/services/supabase-service', () => ({
+  supabaseService: {
+    saveNotebook: vi.fn().mockResolvedValue({}),
+    deleteNotebook: vi.fn().mockResolvedValue({}),
+    duplicateNotebook: vi.fn().mockResolvedValue({ id: 'n2' }),
+    listGrooveSnippetsMapped: vi.fn().mockResolvedValue([]),
+  },
+}));
+
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe('NotebookEditor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(supabaseService, 'saveNotebook').mockResolvedValue({} as any);
-    vi.spyOn(supabaseService, 'duplicateNotebook').mockResolvedValue({ id: 'n2' } as any);
-    vi.spyOn(supabaseService, 'deleteNotebook').mockResolvedValue(true);
-    vi.spyOn(supabaseService, 'listGrooveSnippetsMapped').mockResolvedValue([]);
   });
 
   it('renders the notebook title', () => {
@@ -151,7 +157,11 @@ describe('NotebookEditor', () => {
   it('duplicates the notebook', async () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
-    fireEvent.click(duplicateBtn);
+
+    await act(async () => {
+      fireEvent.click(duplicateBtn);
+      await wait(2100);
+    });
 
     await waitFor(() => {
       expect(supabaseService.duplicateNotebook).toHaveBeenCalledWith('n1');
@@ -162,6 +172,7 @@ describe('NotebookEditor', () => {
     render(<NotebookEditor initialNotebook={mockNotebook} />);
 
     const addGridBtn = screen.getByText(/\+ ADD GRID/i);
+
     fireEvent.click(addGridBtn);
     await act(async () => {
       await wait(2100);
@@ -172,6 +183,7 @@ describe('NotebookEditor', () => {
     });
 
     const removeGridBtn = screen.getByRole('button', { name: /Remove Grid/i });
+
     fireEvent.click(removeGridBtn);
     await act(async () => {
       await wait(2100);
@@ -242,14 +254,21 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    // No error should be thrown
+    // Save should still have been called because cleanup flushes
+    await waitFor(() => {
+      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+    });
   });
 
   it('deletes the notebook', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const deleteBtn = screen.getByRole('button', { name: /Delete This Item/i });
-    fireEvent.click(deleteBtn);
+
+    await act(async () => {
+      fireEvent.click(deleteBtn);
+      await wait(2100);
+    });
 
     await waitFor(() => {
       expect(supabaseService.deleteNotebook).toHaveBeenCalledWith('n1');
@@ -269,14 +288,14 @@ describe('NotebookEditor', () => {
       createdAt: null,
       updatedAt: null,
     };
-    vi.spyOn(supabaseService, 'listGrooveSnippetsMapped').mockResolvedValue([mockSnippet]);
+    vi.mocked(supabaseService.listGrooveSnippetsMapped).mockResolvedValue([mockSnippet]);
 
     render(<NotebookEditor initialNotebook={mockNotebook} />);
 
     // Open picker
     fireEvent.click(screen.getByText(/\+ Insert Snippet/i));
 
-    // Wait for snippet to load and select it
+    // Wait for snippet to load
     await waitFor(() => expect(screen.getByText('Test Snippet')).toBeInTheDocument());
 
     fireEvent.click(screen.getByText('Test Snippet'));
@@ -284,7 +303,6 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    // Verify grid is added to the section in the state/save call
     await waitFor(() => {
       expect(supabaseService.saveNotebook).toHaveBeenCalled();
     });

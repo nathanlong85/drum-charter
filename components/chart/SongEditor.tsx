@@ -166,8 +166,15 @@ function songReducer(state: SongChart, action: SongAction): SongChart {
         updatedAt: timestamp,
       };
     case 'INSERT_SNIPPET': {
-      const { timeSignature, resolution, measures, instruments } = action.snippet;
-      const grid = { timeSignature, resolution, measures, instruments };
+      const { timeSignature, resolution, measures, instruments, playbackOptionalHits } =
+        action.snippet;
+      const grid = {
+        timeSignature,
+        resolution,
+        measures,
+        instruments,
+        playbackOptionalHits,
+      };
 
       return {
         ...state,

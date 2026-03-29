@@ -109,17 +109,10 @@ export const SnippetPickerModal: React.FC<SnippetPickerModalProps> = ({ onClose,
             ) : (
               <div className="grid grid-cols-1 gap-6">
                 {filteredSnippets.map((snippet) => (
-                  <div
+                  <button
                     key={snippet.id}
+                    type="button"
                     onClick={() => onSelect(snippet)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onSelect(snippet);
-                      }
-                    }}
-                    tabIndex={0}
-                    role="button"
                     aria-label={`Select snippet: ${snippet.title}`}
                     className="text-left group bg-surface-container-lowest border border-outline-variant/10 rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-xl hover:-translate-y-1 transition-all focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer"
                   >
@@ -150,10 +143,11 @@ export const SnippetPickerModal: React.FC<SnippetPickerModalProps> = ({ onClose,
                           resolution: snippet.resolution,
                           measures: snippet.measures,
                           instruments: snippet.instruments,
+                          playbackOptionalHits: snippet.playbackOptionalHits,
                         }}
                       />
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             )}
