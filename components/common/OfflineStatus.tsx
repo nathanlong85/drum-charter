@@ -1,39 +1,105 @@
 'use client';
 
-import { WifiOff } from 'lucide-react';
+import { WifiOff, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-export default function OfflineStatus() {
-  const [isOffline, setIsOffline] = useState(() => {
-    // SSR-safe check for navigator availability
-    if (typeof navigator !== 'undefined') {
-      return !navigator.onLine;
-    }
-    return false;
-  });
+export function OfflineStatus() {
+  const [isOffline, setIsOffline] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
+    let isMounted = true;
+
+    const checkConnectivity = async () => {
+      // First check navigator.onLine as it's the fastest
+      if (typeof navigator !== 'undefined' && navigator.onLine) {
+        if (isMounted) setIsOffline(false);
+        return;
+      }
+
+      // Use AbortController + setTimeout for wider browser support than AbortSignal.timeout
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+      if (controller) {
+        timeoutId = setTimeout(() => controller.abort(), 5000);
+      }
+
+      // If navigator says offline, verify by trying to reach the local server
+      // This helps in environments where navigator.onLine is unreliable
+      try {
+        const response = await fetch('/manifest.json', {
+          method: 'HEAD',
+          cache: 'no-store',
+          signal: controller ? controller.signal : undefined,
+        });
+
+        if (response.ok && isMounted) {
+          setIsOffline(false);
+          return;
+        }
+      } catch (_err) {
+        // Truly offline or server unreachable
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
+      }
+
+      if (isMounted) setIsOffline(true);
+    };
+
+    // Initial check
+    checkConnectivity();
+
+    const handleOnline = () => {
+      setIsOffline(false);
+      setIsDismissed(false);
+    };
+    const handleOffline = () => {
+      // When browser reports offline, double check
+      checkConnectivity();
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    // Periodic check every 30 seconds
+    const interval = setInterval(() => {
+      checkConnectivity();
+    }, 30000);
+
     return () => {
+      isMounted = false;
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      clearInterval(interval);
     };
-  }, []);
+  }, []); // isOffline removed from dependencies to stabilize listeners
 
-  if (!isOffline) return null;
+  if (!isOffline || isDismissed) return null;
 
   return (
     <div
-      className="fixed bottom-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-50 animate-bounce motion-reduce:animate-none"
+      className="fixed bottom-20 right-4 bg-amber-500 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 z-[100] animate-in slide-in-from-right-8 duration-300 border border-white/20"
       role="alert"
     >
-      <WifiOff size={18} />
-      <span className="text-sm font-medium">You are offline. Some features may be limited.</span>
+      <div className="bg-white/20 p-2 rounded-lg">
+        <WifiOff size={20} />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-xs font-black uppercase tracking-widest leading-none mb-1 text-white">
+          Network Issue
+        </span>
+        <span className="text-[10px] font-medium opacity-90 leading-tight max-w-[180px] text-amber-50">
+          Browser reports you are offline. Some features may be limited.
+        </span>
+      </div>
+      <button
+        onClick={() => setIsDismissed(true)}
+        className="ml-2 p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white"
+        aria-label="Dismiss"
+      >
+        <X size={16} />
+      </button>
     </div>
   );
 }

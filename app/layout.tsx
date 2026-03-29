@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
-import OfflineStatus from '@/components/common/OfflineStatus';
+import { OfflineStatus } from '@/components/common/OfflineStatus';
 import ServiceWorkerRegistration from '@/components/common/ServiceWorkerRegistration';
 import './globals.css';
 import './print.css';
