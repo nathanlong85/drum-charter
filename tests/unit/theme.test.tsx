@@ -1,13 +1,20 @@
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { render, screen, waitFor } from '@testing-library/react';
+import type React from 'react';
 import { describe, expect, it } from 'vitest';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { NoteCell } from '@/components/groove/NoteCell';
 import { createDefaultDrumInstruments } from '@/lib/types/groove';
 
+const renderWithProvider = (ui: React.ReactElement) =>
+  render(ui, {
+    wrapper: ({ children }) => <Tooltip.Provider>{children}</Tooltip.Provider>,
+  });
+
 describe('Theme Class Verification', () => {
   describe('NoteCell', () => {
     it('applies new design system tokens', () => {
-      const { container } = render(
+      const { container } = renderWithProvider(
         <NoteCell symbol="standard" onClick={() => {}} onContextMenu={() => {}} />,
       );
 
@@ -32,7 +39,7 @@ describe('Theme Class Verification', () => {
     };
 
     it('applies surface tokens to the toolbar pods', async () => {
-      render(<GrooveGridEditor initialGrid={mockGrid} />);
+      renderWithProvider(<GrooveGridEditor initialGrid={mockGrid} />);
 
       await waitFor(() => {
         expect(screen.queryByText(/Loading/i)).toBeNull();
@@ -44,7 +51,7 @@ describe('Theme Class Verification', () => {
     });
 
     it('applies headline tokens to numeric inputs', () => {
-      render(<GrooveGridEditor initialGrid={mockGrid} />);
+      renderWithProvider(<GrooveGridEditor initialGrid={mockGrid} />);
 
       // BPM input is 120 by default
       const bpmInput = screen.getByDisplayValue('120');

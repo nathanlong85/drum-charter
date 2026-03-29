@@ -1,7 +1,8 @@
 'use client';
 
 import type React from 'react';
-import type { DrumSymbol } from '@/lib/types/groove';
+import { type DrumSymbol, symbolLabels } from '@/lib/types/groove';
+import { Tooltip } from '../common/Tooltip';
 
 interface NoteCellProps {
   symbol: DrumSymbol;
@@ -76,7 +77,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
 
   const opacity = getOpacity();
 
-  return (
+  const content = (
     <div
       onClick={readOnly ? undefined : onClick}
       onContextMenu={readOnly ? (e) => e.preventDefault() : onContextMenu}
@@ -119,5 +120,15 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         />
       )}
     </div>
+  );
+
+  if (readOnly || symbol === 'none') {
+    return content;
+  }
+
+  return (
+    <Tooltip content={symbolLabels[symbol]} side="top">
+      {content}
+    </Tooltip>
   );
 };
