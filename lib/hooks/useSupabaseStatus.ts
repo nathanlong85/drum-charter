@@ -22,7 +22,7 @@ export function useSupabaseStatus(): SupabaseStatus {
       let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
       if (controller) {
-        timeoutId = setTimeout(() => controller.abort(), 3000);
+        timeoutId = setTimeout(() => controller.abort(), 5000);
       }
 
       // Verify by trying to reach the local server
