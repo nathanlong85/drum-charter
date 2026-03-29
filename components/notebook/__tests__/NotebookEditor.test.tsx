@@ -163,9 +163,7 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    await waitFor(() => {
-      expect(supabaseService.duplicateNotebook).toHaveBeenCalledWith('n1');
-    });
+    expect(supabaseService.duplicateNotebook).toHaveBeenCalledWith('n1');
   });
 
   it('adds and removes a grid in a section', async () => {
@@ -178,9 +176,7 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    await waitFor(() => {
-      expect(screen.getByTestId('groove-editor')).toBeDefined();
-    });
+    expect(screen.getByTestId('groove-editor')).toBeDefined();
 
     const removeGridBtn = screen.getByRole('button', { name: /Remove Grid/i });
 
@@ -189,9 +185,7 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    await waitFor(() => {
-      expect(screen.queryByTestId('groove-editor')).toBeNull();
-    });
+    expect(screen.queryByTestId('groove-editor')).toBeNull();
   });
 
   it('handles public link for notebooks', async () => {
@@ -254,7 +248,7 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    // Save should still have been called because cleanup flushes
+    // Save was called because unmount cleanup flushes
     await waitFor(() => {
       expect(supabaseService.saveNotebook).toHaveBeenCalled();
     });
@@ -270,9 +264,7 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    await waitFor(() => {
-      expect(supabaseService.deleteNotebook).toHaveBeenCalledWith('n1');
-    });
+    expect(supabaseService.deleteNotebook).toHaveBeenCalledWith('n1');
   });
 
   it('inserts a snippet into a section', async () => {
@@ -296,7 +288,7 @@ describe('NotebookEditor', () => {
     fireEvent.click(screen.getByText(/\+ Insert Snippet/i));
 
     // Wait for snippet to load
-    await waitFor(() => expect(screen.getByText('Test Snippet')).toBeInTheDocument());
+    await screen.findByText('Test Snippet');
 
     fireEvent.click(screen.getByText('Test Snippet'));
     await act(async () => {

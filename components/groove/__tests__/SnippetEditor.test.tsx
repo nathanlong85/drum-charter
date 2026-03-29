@@ -52,8 +52,8 @@ describe('SnippetEditor', () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const titleInput = screen.getByDisplayValue('Test Snippet');
 
-    fireEvent.change(titleInput, { target: { value: 'New Title' } });
     await act(async () => {
+      fireEvent.change(titleInput, { target: { value: 'New Title' } });
       await wait(2100);
     });
 
@@ -66,9 +66,9 @@ describe('SnippetEditor', () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const tagInput = screen.getByPlaceholderText(/\+ ADD TAG/i);
 
-    fireEvent.change(tagInput, { target: { value: 'Funk' } });
-    fireEvent.keyDown(tagInput, { key: 'Enter', code: 'Enter' });
     await act(async () => {
+      fireEvent.change(tagInput, { target: { value: 'Funk' } });
+      fireEvent.keyDown(tagInput, { key: 'Enter', code: 'Enter' });
       await wait(2100);
     });
 
@@ -99,8 +99,8 @@ describe('SnippetEditor', () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const toggle = screen.getByTestId('toggle-public-button');
 
-    fireEvent.click(toggle);
     await act(async () => {
+      fireEvent.click(toggle);
       await wait(2100);
     });
 
@@ -126,17 +126,15 @@ describe('SnippetEditor', () => {
     render(<SnippetEditor initialSnippet={mockSnippet} />);
 
     const titleInput = screen.getByDisplayValue('Test Snippet');
-    fireEvent.change(titleInput, { target: { value: 'Fail Me' } });
+
     await act(async () => {
+      fireEvent.change(titleInput, { target: { value: 'Fail Me' } });
       await wait(2100);
     });
 
-    await waitFor(
-      () => {
-        expect(screen.getAllByText(/Save failed/i).length).toBeGreaterThan(0);
-      },
-      { timeout: 5000 },
-    );
+    await waitFor(() => {
+      expect(screen.getAllByText(/Save failed/i).length).toBeGreaterThan(0);
+    });
   });
 
   it('does not attempt to update state if unmounted during save', async () => {
@@ -155,7 +153,7 @@ describe('SnippetEditor', () => {
       await wait(2100);
     });
 
-    // Cleanup flushes
+    // cleanup flushes
     await waitFor(() => {
       expect(saveSpy).toHaveBeenCalled();
     });

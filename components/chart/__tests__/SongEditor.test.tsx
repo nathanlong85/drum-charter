@@ -63,8 +63,8 @@ describe('SongEditor', () => {
     render(<SongEditor initialSong={mockSong} />);
     const titleInput = screen.getByPlaceholderText('Song Title');
 
-    fireEvent.change(titleInput, { target: { value: 'Updated Song' } });
     await act(async () => {
+      fireEvent.change(titleInput, { target: { value: 'Updated Song' } });
       await wait(2100);
     });
 
@@ -83,8 +83,8 @@ describe('SongEditor', () => {
     render(<SongEditor initialSong={mockSong} />);
     const addSectionBtn = screen.getByRole('button', { name: /Add section/i });
 
-    fireEvent.click(addSectionBtn);
     await act(async () => {
+      fireEvent.click(addSectionBtn);
       await wait(2100);
     });
 
@@ -100,8 +100,8 @@ describe('SongEditor', () => {
     render(<SongEditor initialSong={mockSong} />);
     const removeBtn = screen.getByTitle('Remove Section');
 
-    fireEvent.click(removeBtn);
     await act(async () => {
+      fireEvent.click(removeBtn);
       await wait(2100);
     });
 
@@ -119,13 +119,10 @@ describe('SongEditor', () => {
 
     await act(async () => {
       fireEvent.click(duplicateBtn);
-      // Wait for settleAutosave and the async operation
       await wait(2100);
     });
 
-    await waitFor(() => {
-      expect(supabaseService.duplicateSongChart).toHaveBeenCalledWith('s1');
-    });
+    expect(supabaseService.duplicateSongChart).toHaveBeenCalledWith('s1');
   });
 
   it('deletes the song', async () => {
@@ -135,13 +132,10 @@ describe('SongEditor', () => {
 
     await act(async () => {
       fireEvent.click(deleteBtn);
-      // Wait for settleAutosave and the async operation
       await wait(2100);
     });
 
-    await waitFor(() => {
-      expect(supabaseService.deleteSongChart).toHaveBeenCalledWith('s1');
-    });
+    expect(supabaseService.deleteSongChart).toHaveBeenCalledWith('s1');
   });
 
   it('inserts a snippet into a section', async () => {
@@ -165,10 +159,10 @@ describe('SongEditor', () => {
     fireEvent.click(screen.getByText(/\+ Insert Snippet/i));
 
     // Wait for snippet to load
-    await waitFor(() => expect(screen.getByText('Test Snippet')).toBeInTheDocument());
+    await screen.findByText('Test Snippet');
 
-    fireEvent.click(screen.getByText('Test Snippet'));
     await act(async () => {
+      fireEvent.click(screen.getByText('Test Snippet'));
       await wait(2100);
     });
 
