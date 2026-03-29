@@ -512,6 +512,30 @@ export const supabaseService = {
     return data;
   },
 
+  async listGrooveSnippetsMapped(supabaseParam?: SupabaseClient<Database>): Promise<GrooveSnippet[]> {
+    const supabase = supabaseParam || createBrowserClient();
+    const { data, error } = await supabase
+      .from('groove_snippets')
+      .select('*')
+      .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+
+    return (data || []).map((row) => {
+      const gridData = migrateGrooveGrid(fromJson<GrooveGrid>(row.grid_data));
+      return {
+        id: row.id,
+        title: row.title,
+        tags: row.tags || [],
+        userId: row.user_id,
+        isPublic: !!row.is_public,
+        createdAt: row.created_at || null,
+        updatedAt: row.updated_at || null,
+        ...gridData!,
+      };
+    });
+  },
+
   async getGrooveSnippet(
     id: string,
     supabaseParam?: SupabaseClient<Database>,

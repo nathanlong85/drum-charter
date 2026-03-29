@@ -4,10 +4,12 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { SnippetPickerModal } from '@/components/groove/SnippetPickerModal';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import { supabaseService } from '@/lib/services/supabase-service';
 import {
   createDefaultDrumInstruments,
+  type GrooveSnippet,
   type SongChart,
   type SongSection,
   type SongSubSection,
@@ -41,6 +43,12 @@ type SongAction =
       sectionId: string;
       subSectionId: string;
       updates: Partial<SongSubSection>;
+    }
+  | {
+      type: 'INSERT_SNIPPET';
+      sectionId: string;
+      subSectionId?: string;
+      snippet: GrooveSnippet;
     }
   | { type: 'TOGGLE_PUBLIC' };
 
@@ -157,6 +165,29 @@ function songReducer(state: SongChart, action: SongAction): SongChart {
         }),
         updatedAt: timestamp,
       };
+    case 'INSERT_SNIPPET': {
+      const { timeSignature, resolution, measures, instruments } = action.snippet;
+      const grid = { timeSignature, resolution, measures, instruments };
+
+      return {
+        ...state,
+        sections: state.sections.map((s) => {
+          if (s.id !== action.sectionId) return s;
+
+          if (action.subSectionId) {
+            return {
+              ...s,
+              subSections: (s.subSections || []).map((sub) =>
+                sub.id === action.subSectionId ? { ...sub, grid } : sub,
+              ),
+            };
+          }
+
+          return { ...s, grid };
+        }),
+        updatedAt: timestamp,
+      };
+    }
     case 'TOGGLE_PUBLIC':
       return { ...state, isPublic: !state.isPublic, updatedAt: timestamp };
     default:
@@ -171,6 +202,10 @@ interface SongEditorProps {
 export default function SongEditor({ initialSong }: SongEditorProps) {
   const [state, dispatch] = useReducer(songReducer, initialSong);
   const [isLiveMode, setIsLiveMode] = useState(false);
+  const [pickerConfig, setPickerConfig] = useState<{
+    sectionId: string;
+    subSectionId?: string;
+  } | null>(null);
   const router = useRouter();
   const isInitialRender = useRef(true);
 
@@ -185,6 +220,18 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
     }
     triggerSave(state);
   }, [state, triggerSave]);
+
+  const handleSnippetSelect = (snippet: GrooveSnippet) => {
+    if (pickerConfig) {
+      dispatch({
+        type: 'INSERT_SNIPPET',
+        sectionId: pickerConfig.sectionId,
+        subSectionId: pickerConfig.subSectionId,
+        snippet,
+      });
+      setPickerConfig(null);
+    }
+  };
 
   return (
     <div data-testid="song-editor-root" className="min-h-screen bg-surface">
@@ -381,6 +428,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
               {state.sections.map((section) => (
                 <section
                   key={section.id}
+                  data-testid="song-section"
                   className="relative group bg-surface-container rounded-2xl p-6 border border-outline-variant/10 shadow-sm"
                 >
                   <button
@@ -433,58 +481,101 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                   </div>
 
                   <div className="space-y-6">
-                    <div className="glass-panel border border-white/5 rounded-xl p-6 bg-surface-container-low/50">
+                    <div
+                      data-testid="grid-container"
+                      className="glass-panel border border-white/5 rounded-xl p-6 bg-surface-container-low/50"
+                    >
                       <div className="flex justify-between items-center mb-4">
                         <h4 className="text-[10px] font-headline font-bold text-on-surface-variant uppercase tracking-[0.2em]">
                           Main Groove
                         </h4>
                         {!section.grid && (
-                          <button
-                            onClick={() =>
-                              dispatch({
-                                type: 'UPDATE_SECTION',
-                                sectionId: section.id,
-                                updates: {
-                                  grid: {
-                                    timeSignature: state.header.timeSignature,
-                                    resolution: 16,
-                                    measures: 1,
-                                    instruments: createDefaultDrumInstruments({
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() =>
+                                setPickerConfig({
+                                  sectionId: section.id,
+                                })
+                              }
+                              data-testid="insert-snippet-button"
+                              className="bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase hover:bg-secondary/20 transition-colors"
+                            >
+                              + Insert Snippet
+                            </button>
+                            <button
+                              onClick={() =>
+                                dispatch({
+                                  type: 'UPDATE_SECTION',
+                                  sectionId: section.id,
+                                  updates: {
+                                    grid: {
                                       timeSignature: state.header.timeSignature,
                                       resolution: 16,
                                       measures: 1,
-                                    }),
+                                      instruments: createDefaultDrumInstruments({
+                                        timeSignature: state.header.timeSignature,
+                                        resolution: 16,
+                                        measures: 1,
+                                      }),
+                                    },
                                   },
-                                },
-                              })
-                            }
-                            className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase hover:bg-primary/20 transition-colors"
-                          >
-                            + Add Grid
-                          </button>
+                                })
+                              }
+                              className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase hover:bg-primary/20 transition-colors"
+                            >
+                              + Add Grid
+                            </button>
+                          </div>
                         )}
                       </div>
                       {section.grid && (
-                        <GrooveGridEditor
-                          initialGrid={section.grid}
-                          onChange={(grid) =>
-                            dispatch({
-                              type: 'UPDATE_SECTION',
-                              sectionId: section.id,
-                              updates: { grid },
-                            })
-                          }
-                          bpm={state.header.bpm}
-                          onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
-                          metronomeEnabled={state.header.metronomeEnabled}
-                          onMetronomeToggle={(enabled) =>
-                            dispatch({ type: 'UPDATE_METRONOME', enabled })
-                          }
-                          metronomeVolume={state.header.metronomeVolume}
-                          onMetronomeVolumeChange={(volume) =>
-                            dispatch({ type: 'UPDATE_METRONOME', volume })
-                          }
-                        />
+                        <div className="space-y-4">
+                          <GrooveGridEditor
+                            initialGrid={section.grid}
+                            onChange={(grid) =>
+                              dispatch({
+                                type: 'UPDATE_SECTION',
+                                sectionId: section.id,
+                                updates: { grid },
+                              })
+                            }
+                            bpm={state.header.bpm}
+                            onBpmChange={(bpm) => dispatch({ type: 'UPDATE_BPM', bpm })}
+                            metronomeEnabled={state.header.metronomeEnabled}
+                            onMetronomeToggle={(enabled) =>
+                              dispatch({ type: 'UPDATE_METRONOME', enabled })
+                            }
+                            metronomeVolume={state.header.metronomeVolume}
+                            onMetronomeVolumeChange={(volume) =>
+                              dispatch({ type: 'UPDATE_METRONOME', volume })
+                            }
+                          />
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              onClick={() =>
+                                setPickerConfig({
+                                  sectionId: section.id,
+                                })
+                              }
+                              data-testid="replace-snippet-button"
+                              className="text-[10px] font-headline font-bold text-secondary hover:text-secondary/80 uppercase tracking-widest transition-colors no-print"
+                            >
+                              Replace with Snippet
+                            </button>
+                            <button
+                              onClick={() =>
+                                dispatch({
+                                  type: 'UPDATE_SECTION',
+                                  sectionId: section.id,
+                                  updates: { grid: undefined },
+                                })
+                              }
+                              className="text-[10px] font-headline font-bold text-on-surface-variant hover:text-error uppercase tracking-widest transition-colors no-print"
+                            >
+                              Remove Grid
+                            </button>
+                          </div>
+                        </div>
                       )}
                     </div>
 
@@ -579,8 +670,48 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                                 <span className="ml-1">M</span>
                               </div>
                             </div>
+                            {!sub.grid && (
+                              <div className="flex gap-2 mb-4">
+                                <button
+                                  onClick={() =>
+                                    setPickerConfig({
+                                      sectionId: section.id,
+                                      subSectionId: sub.id,
+                                    })
+                                  }
+                                  data-testid="insert-snippet-button"
+                                  className="bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase hover:bg-secondary/20 transition-colors"
+                                >
+                                  + Insert Snippet
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    dispatch({
+                                      type: 'UPDATE_SUBSECTION',
+                                      sectionId: section.id,
+                                      subSectionId: sub.id,
+                                      updates: {
+                                        grid: {
+                                          timeSignature: state.header.timeSignature,
+                                          resolution: 16,
+                                          measures: 1,
+                                          instruments: createDefaultDrumInstruments({
+                                            timeSignature: state.header.timeSignature,
+                                            resolution: 16,
+                                            measures: 1,
+                                          }),
+                                        },
+                                      },
+                                    })
+                                  }
+                                  className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase hover:bg-primary/20 transition-colors"
+                                >
+                                  + Add Grid
+                                </button>
+                              </div>
+                            )}
                             {sub.grid && (
-                              <div className="bg-surface-container-low/50 rounded-lg p-4 border border-white/5">
+                              <div className="bg-surface-container-low/50 rounded-lg p-4 border border-white/5 space-y-4">
                                 <GrooveGridEditor
                                   initialGrid={sub.grid}
                                   onChange={(grid) =>
@@ -602,6 +733,33 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
                                     dispatch({ type: 'UPDATE_METRONOME', volume })
                                   }
                                 />
+                                <div className="flex gap-2 justify-end">
+                                  <button
+                                    onClick={() =>
+                                      setPickerConfig({
+                                        sectionId: section.id,
+                                        subSectionId: sub.id,
+                                      })
+                                    }
+                                    data-testid="replace-snippet-button"
+                                    className="text-[10px] font-headline font-bold text-secondary hover:text-secondary/80 uppercase tracking-widest transition-colors no-print"
+                                  >
+                                    Replace with Snippet
+                                  </button>
+                                  <button
+                                    onClick={() =>
+                                      dispatch({
+                                        type: 'UPDATE_SUBSECTION',
+                                        sectionId: section.id,
+                                        subSectionId: sub.id,
+                                        updates: { grid: undefined },
+                                      })
+                                    }
+                                    className="text-[10px] font-headline font-bold text-on-surface-variant hover:text-error uppercase tracking-widest transition-colors no-print"
+                                  >
+                                    Remove Grid
+                                  </button>
+                                </div>
                               </div>
                             )}
                           </div>
@@ -641,6 +799,13 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             </div>
           </section>
         </div>
+      )}
+
+      {pickerConfig && (
+        <SnippetPickerModal
+          onClose={() => setPickerConfig(null)}
+          onSelect={handleSnippetSelect}
+        />
       )}
 
       {/* Floating Save Status */}

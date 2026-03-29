@@ -1,13 +1,15 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import { SnippetPickerModal } from '@/components/groove/SnippetPickerModal';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import { supabaseService } from '@/lib/services/supabase-service';
 import {
   createDefaultDrumInstruments,
+  type GrooveSnippet,
   type Notebook,
   type NotebookSection,
 } from '@/lib/types/groove';
@@ -21,7 +23,8 @@ type NotebookAction =
   | { type: 'ADD_SECTION' }
   | { type: 'REMOVE_SECTION'; sectionId: string }
   | { type: 'UPDATE_SECTION'; sectionId: string; updates: Partial<NotebookSection> }
-  | { type: 'UPDATE_SECTION_BPM'; sectionId: string; bpm: number };
+  | { type: 'UPDATE_SECTION_BPM'; sectionId: string; bpm: number }
+  | { type: 'INSERT_SNIPPET'; sectionId: string; snippet: GrooveSnippet };
 
 function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
   const timestamp = new Date().toISOString();
@@ -69,6 +72,18 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
         ),
         updatedAt: timestamp,
       };
+    case 'INSERT_SNIPPET': {
+      const { timeSignature, resolution, measures, instruments } = action.snippet;
+      const grid = { timeSignature, resolution, measures, instruments };
+
+      return {
+        ...state,
+        sections: state.sections.map((s) =>
+          s.id === action.sectionId ? { ...s, grid } : s,
+        ),
+        updatedAt: timestamp,
+      };
+    }
     default:
       return state;
   }
@@ -80,6 +95,7 @@ interface NotebookEditorProps {
 
 export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
   const [state, dispatch] = useReducer(notebookReducer, initialNotebook);
+  const [activeSectionForPicker, setActiveSectionForPicker] = useState<string | null>(null);
   const router = useRouter();
   const isInitialRender = useRef(true);
 
@@ -97,6 +113,17 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
     }
     triggerSave(state);
   }, [state, triggerSave]);
+
+  const handleSnippetSelect = (snippet: GrooveSnippet) => {
+    if (activeSectionForPicker) {
+      dispatch({
+        type: 'INSERT_SNIPPET',
+        sectionId: activeSectionForPicker,
+        snippet,
+      });
+      setActiveSectionForPicker(null);
+    }
+  };
 
   return (
     <div data-testid="notebook-editor-root" className="min-h-screen bg-surface">
@@ -225,35 +252,47 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                     />
                   </div>
 
-                  <div className="glass-panel border border-white/5 rounded-2xl p-8 bg-surface-container-low/50">
+                  <div
+                    data-testid="grid-container"
+                    className="glass-panel border border-white/5 rounded-2xl p-8 bg-surface-container-low/50"
+                  >
                     <div className="flex justify-between items-center mb-6">
                       <h4 className="text-[10px] font-headline font-bold text-on-surface-variant uppercase tracking-[0.2em]">
                         Interactive Grid
                       </h4>
                       {!section.grid && (
-                        <button
-                          onClick={() =>
-                            dispatch({
-                              type: 'UPDATE_SECTION',
-                              sectionId: section.id,
-                              updates: {
-                                grid: {
-                                  timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-                                  resolution: 16,
-                                  measures: 1,
-                                  instruments: createDefaultDrumInstruments({
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setActiveSectionForPicker(section.id)}
+                            data-testid="insert-snippet-button"
+                            className="bg-secondary/10 text-secondary px-4 py-1.5 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase hover:bg-secondary/20 transition-colors"
+                          >
+                            + Insert Snippet
+                          </button>
+                          <button
+                            onClick={() =>
+                              dispatch({
+                                type: 'UPDATE_SECTION',
+                                sectionId: section.id,
+                                updates: {
+                                  grid: {
                                     timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
                                     resolution: 16,
                                     measures: 1,
-                                  }),
+                                    instruments: createDefaultDrumInstruments({
+                                      timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+                                      resolution: 16,
+                                      measures: 1,
+                                    }),
+                                  },
                                 },
-                              },
-                            })
-                          }
-                          className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase hover:bg-primary/20 transition-colors"
-                        >
-                          + Add Grid
-                        </button>
+                              })
+                            }
+                            className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-headline font-bold tracking-widest uppercase hover:bg-primary/20 transition-colors"
+                          >
+                            + Add Grid
+                          </button>
+                        </div>
                       )}
                     </div>
 
@@ -277,18 +316,27 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
                             })
                           }
                         />
-                        <button
-                          onClick={() =>
-                            dispatch({
-                              type: 'UPDATE_SECTION',
-                              sectionId: section.id,
-                              updates: { grid: undefined },
-                            })
-                          }
-                          className="text-[10px] font-headline font-bold text-on-surface-variant hover:text-error uppercase tracking-widest transition-colors no-print"
-                        >
-                          Remove Grid
-                        </button>
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => setActiveSectionForPicker(section.id)}
+                            data-testid="replace-snippet-button"
+                            className="text-[10px] font-headline font-bold text-secondary hover:text-secondary/80 uppercase tracking-widest transition-colors no-print"
+                          >
+                            Replace with Snippet
+                          </button>
+                          <button
+                            onClick={() =>
+                              dispatch({
+                                type: 'UPDATE_SECTION',
+                                sectionId: section.id,
+                                updates: { grid: undefined },
+                              })
+                            }
+                            className="text-[10px] font-headline font-bold text-on-surface-variant hover:text-error uppercase tracking-widest transition-colors no-print"
+                          >
+                            Remove Grid
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -324,6 +372,13 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
           </p>
         </footer>
       </div>
+
+      {activeSectionForPicker && (
+        <SnippetPickerModal
+          onClose={() => setActiveSectionForPicker(null)}
+          onSelect={handleSnippetSelect}
+        />
+      )}
 
       {/* Floating Save Status */}
       <div
