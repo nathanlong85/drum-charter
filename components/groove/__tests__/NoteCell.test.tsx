@@ -18,7 +18,13 @@ describe('NoteCell', () => {
 
   it('renders standard hit correctly', () => {
     renderWithProvider(
-      <NoteCell symbol="standard" velocity={0.7} onClick={onClick} onContextMenu={onContextMenu} />,
+      <NoteCell
+        symbol="standard"
+        index={0}
+        velocity={0.7}
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+      />,
     );
     const cell = screen.getByTestId('note-cell');
     expect(cell).toBeInTheDocument();
@@ -27,7 +33,13 @@ describe('NoteCell', () => {
 
   it('renders empty cell correctly', () => {
     renderWithProvider(
-      <NoteCell symbol="none" velocity={0} onClick={onClick} onContextMenu={onContextMenu} />,
+      <NoteCell
+        symbol="none"
+        index={0}
+        velocity={0}
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+      />,
     );
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
   });
@@ -37,6 +49,7 @@ describe('NoteCell', () => {
       <Tooltip.Provider>
         <NoteCell
           symbol="none"
+          index={0}
           velocity={0}
           onClick={onClick}
           onContextMenu={onContextMenu}
@@ -50,6 +63,7 @@ describe('NoteCell', () => {
       <Tooltip.Provider>
         <NoteCell
           symbol="none"
+          index={0}
           velocity={0}
           onClick={onClick}
           onContextMenu={onContextMenu}
@@ -62,7 +76,13 @@ describe('NoteCell', () => {
 
   it('triggers context menu callback', () => {
     renderWithProvider(
-      <NoteCell symbol="standard" velocity={0.7} onClick={onClick} onContextMenu={onContextMenu} />,
+      <NoteCell
+        symbol="standard"
+        index={0}
+        velocity={0.7}
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+      />,
     );
     fireEvent.contextMenu(screen.getByTestId('note-cell'));
     expect(onContextMenu).toHaveBeenCalled();
@@ -73,6 +93,7 @@ describe('NoteCell', () => {
     renderWithProvider(
       <NoteCell
         symbol="standard"
+        index={0}
         velocity={0.7}
         onClick={onClick}
         onContextMenu={onContextMenu}

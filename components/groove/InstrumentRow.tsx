@@ -1,8 +1,10 @@
 'use client';
 
-import { ChevronDown, ChevronUp, Settings2, Trash2 } from 'lucide-react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { ChevronDown, ChevronUp, Settings2, Trash2, Volume2, VolumeX, Wand2 } from 'lucide-react';
 import type React from 'react';
 import { type DrumInstrument, type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
+import { getFilteredPresets, type RowPreset } from '@/lib/utils/rowPresets';
 import { NoteCell } from './NoteCell';
 
 interface InstrumentRowProps {
@@ -22,6 +24,7 @@ interface InstrumentRowProps {
   onMoveUp?: () => void;
   onMoveDown?: () => void;
   onClear?: () => void;
+  onPresetSelect?: (preset: RowPreset) => void;
   readOnly?: boolean;
 }
 
@@ -39,11 +42,14 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   onMoveUp,
   onMoveDown,
   onClear,
+  onPresetSelect,
   readOnly = false,
 }) => {
   const { timeSignature, resolution } = grid;
   const notesPerBeat = resolution / timeSignature.beatValue;
   const totalNotesPerMeasure = timeSignature.beatsPerMeasure * notesPerBeat;
+
+  const presets = getFilteredPresets(instrument.category, timeSignature);
 
   const isSelected = (noteIdx: number) => {
     if (!selectionRange) return false;
@@ -57,7 +63,9 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
 
   return (
     <div
-      className="flex group/row border-b border-outline-variant/10 hover:bg-surface-container-high/30 transition-colors"
+      className={`flex group/row border-b border-outline-variant/10 hover:bg-surface-container-high/30 transition-colors ${
+        instrument.muted ? 'opacity-40' : ''
+      }`}
       data-testid={`instrument-row-${instrument.customName.toLowerCase().replace(/\s+/g, '-')}`}
     >
       {/* Instrument Info Panel */}
@@ -89,14 +97,67 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
           </div>
         )}
 
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-headline font-black text-on-surface truncate uppercase tracking-tight leading-none">
-            {instrument.customName}
-          </p>
-          <p className="text-[8px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-widest mt-0.5 truncate">
-            {instrument.category}
-          </p>
-        </div>
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger asChild>
+            <button
+              type="button"
+              className="flex-1 min-w-0 text-left hover:bg-primary/5 rounded px-1 -ml-1 transition-colors group/name"
+              title="Click for Quick Presets"
+              disabled={readOnly}
+            >
+              <div className="flex items-baseline gap-1">
+                <p className="text-[10px] font-headline font-black text-on-surface truncate uppercase tracking-tight leading-none">
+                  {instrument.customName}
+                </p>
+                {instrument.muted && <VolumeX size={8} className="text-error flex-shrink-0" />}
+                {!readOnly && (
+                  <Wand2
+                    size={8}
+                    className="text-primary opacity-0 group-hover/name:opacity-100 transition-opacity flex-shrink-0"
+                  />
+                )}
+              </div>
+              <p className="text-[8px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-widest mt-0.5 truncate">
+                {instrument.category}
+              </p>
+            </button>
+          </DropdownMenu.Trigger>
+
+          {!readOnly && (
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content
+                className="min-w-[140px] bg-surface-container-high rounded-lg p-1 shadow-xl border border-outline-variant/20 z-50 animate-in fade-in zoom-in-95 duration-100"
+                sideOffset={5}
+                align="start"
+              >
+                <DropdownMenu.Label className="px-2 py-1.5 text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
+                  Quick Presets
+                </DropdownMenu.Label>
+                {presets.map((preset) => (
+                  <DropdownMenu.Item
+                    key={preset.id}
+                    className="flex items-center gap-2 px-2 py-1.5 text-xs text-on-surface hover:bg-primary hover:text-on-primary rounded cursor-pointer outline-none transition-colors"
+                    onSelect={() => onPresetSelect?.(preset.id)}
+                  >
+                    {preset.id === 'mute' ? (
+                      instrument.muted ? (
+                        <>
+                          <Volume2 size={12} /> Unmute
+                        </>
+                      ) : (
+                        <>
+                          <VolumeX size={12} /> Mute
+                        </>
+                      )
+                    ) : (
+                      preset.label
+                    )}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          )}
+        </DropdownMenu.Root>
 
         {!readOnly && (
           <div className="flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100 transition-opacity ml-1">
@@ -142,6 +203,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
           return (
             <NoteCell
               key={noteIdx}
+              index={noteIdx}
               symbol={symbol}
               velocity={velocity}
               isBeat={noteIdx % notesPerBeat === 0}

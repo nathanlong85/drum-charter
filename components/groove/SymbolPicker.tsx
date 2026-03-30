@@ -124,6 +124,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
                   ) : (
                     <NoteCell
                       symbol={sym}
+                      index={filteredSymbols.indexOf(sym)}
                       onClick={() => {}}
                       onContextMenu={(e) => e.preventDefault()}
                       readOnly

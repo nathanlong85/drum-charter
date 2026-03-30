@@ -144,6 +144,8 @@ export function useAudioPlayback({
 
       // 2. Check each instrument at this step
       currentGrid.instruments.forEach((inst) => {
+        if (inst.muted) return;
+
         const symbol = inst.notes[step];
         if (symbol && symbol !== 'none') {
           // Check optional hit toggle

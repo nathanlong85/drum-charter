@@ -149,6 +149,10 @@ export interface DrumInstrument {
    * Velocities for each note (typically 0-1.0, but can go up to 1.2 for accents).
    */
   velocities?: number[];
+  /**
+   * Whether this instrument row is muted during playback.
+   */
+  muted?: boolean;
 }
 
 /**
