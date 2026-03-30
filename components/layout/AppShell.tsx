@@ -173,7 +173,7 @@ export function AppShell({ children }: AppShellProps) {
       </header>
 
       {/* Main Workspace Canvas */}
-      <main className="ml-[72px] lg:ml-[240px] pt-16 flex-1 transition-all duration-300 relative z-0">
+      <main className="ml-[72px] lg:ml-[240px] pt-16 flex-1 transition-all duration-300 relative">
         <TooltipProvider>{children}</TooltipProvider>
       </main>
 

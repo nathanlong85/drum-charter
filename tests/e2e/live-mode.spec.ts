@@ -42,7 +42,6 @@ test.describe('Live Mode', () => {
     await expect(page.getByTestId('go-live-button')).toBeVisible({ timeout: 20000 });
   });
 
-  // TODO: Fix live mode tests in redesigned UI. See Issue #74
   test('should enter and exit live mode from editor', async ({ page }) => {
     await waitForGoLiveAndClick(page);
 
@@ -51,13 +50,13 @@ test.describe('Live Mode', () => {
     await expect(page.getByTestId('live-mode-view')).toBeVisible({ timeout: 15000 });
     await expect(page.getByTestId('live-mode-header')).toBeVisible();
 
-    // Exit live mode - wait for UI stability
-    await page.waitForTimeout(500);
-    await page.getByTestId('exit-live-mode-btn').evaluate((el) => (el as HTMLElement).click());
+    // Exit live mode
+    const exitBtn = page.getByTestId('exit-live-mode-btn');
+    await expect(exitBtn).toBeVisible();
+    await exitBtn.click();
     await expect(page.getByTestId('go-live-button')).toBeVisible({ timeout: 15000 });
   });
 
-  // TODO: Fix live mode tests in redesigned UI. See Issue #74
   test('should navigate between sections via keyboard', async ({ page }) => {
     await waitForGoLiveAndClick(page);
 
@@ -77,7 +76,6 @@ test.describe('Live Mode', () => {
     await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 1');
   });
 
-  // TODO: Fix live mode tests in redesigned UI. See Issue #74
   test('should toggle fullscreen with F key', async ({ page }) => {
     await waitForGoLiveAndClick(page);
 
@@ -96,7 +94,6 @@ test.describe('Live Mode', () => {
     await expect(page.getByTestId('live-mode-header')).toBeVisible();
   });
 
-  // TODO: Fix live mode tests in redesigned UI. See Issue #74
   test('should display section markers and next section preview', async ({ page }) => {
     await waitForGoLiveAndClick(page);
 
