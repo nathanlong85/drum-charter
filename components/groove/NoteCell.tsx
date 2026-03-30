@@ -128,7 +128,9 @@ export const NoteCell: React.FC<NoteCellProps> = ({
 
   return (
     <Tooltip content={symbolLabels[symbol]} side="top">
-      {content}
+      <div tabIndex={0} role="button" aria-label={symbolLabels[symbol]}>
+        {content}
+      </div>
     </Tooltip>
   );
 };

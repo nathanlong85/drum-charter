@@ -14,11 +14,11 @@ const renderWithProvider = (ui: React.ReactElement) =>
 describe('Theme Class Verification', () => {
   describe('NoteCell', () => {
     it('applies new design system tokens', () => {
-      const { container } = renderWithProvider(
+      const { getByTestId } = renderWithProvider(
         <NoteCell symbol="standard" onClick={() => {}} onContextMenu={() => {}} />,
       );
 
-      const cell = container.firstChild as HTMLElement;
+      const cell = getByTestId('note-cell');
       expect(cell.className).toContain('border-outline-variant/10');
       expect(cell.className).toContain('hover:bg-primary/5');
     });

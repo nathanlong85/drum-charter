@@ -94,9 +94,14 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ## Status Board (Kanban)
 
+### 🔵 In Progress
+
+- [ ] [Epic] Drum-Aware Grid Architecture (#26)
+  - [ ] [Task] Refined Audio Engine & Sample Matrix (#30)
+  - [ ] [Task] Drum Sample Sourcing (#31)
+
 ### 🟢 Done
 
-- [x] [Feature] Groove Snippet Integration: Seamlessly insert pattern snippets into Song Charts and Notebooks (#63) `✓`
 - [x] [Fix] Offline Status False Positives: Implemented robust connectivity checking with server fetch fallbacks (#81) `✓`
 - [x] [Fix] Song Editor Layout: Resolved clumped action buttons with a new responsive EditorToolbar component (#62) `✓`
 - [x] [Fix] Dark Mode Support: Unified dark mode across all pages and expanded test coverage (#60) `✓`

@@ -79,6 +79,43 @@ export const symbolLabels: Record<DrumSymbol, string> = {
 };
 
 /**
+ * Concise labels for UI captions where space is limited.
+ */
+export const symbolShortLabels: Record<DrumSymbol, string> = {
+  none: 'None',
+  standard: 'Std',
+  standard_opt: 'Opt Std',
+  ghost: 'Ghost',
+  ghost_opt: 'Opt Gst',
+  accent: 'Accent',
+  accent_opt: 'Opt Acc',
+  buzz: 'Buzz',
+  buzz_opt: 'Opt Buz',
+  cross_stick: 'X-Stick',
+  cross_stick_opt: 'Opt X',
+  cymbal_bell: 'Bell',
+  cymbal_bell_opt: 'Opt Bel',
+  cymbal_choke: 'Choke',
+  cymbal_choke_opt: 'Opt Chk',
+  double: 'Double',
+  double_opt: 'Opt Dbl',
+  drag: 'Drag',
+  drag_opt: 'Opt Drg',
+  flam: 'Flam',
+  flam_opt: 'Opt Flm',
+  hi_hat_closed: 'Closed',
+  hi_hat_closed_opt: 'Opt Cls',
+  hi_hat_loose: 'Loose',
+  hi_hat_loose_opt: 'Opt Lse',
+  hi_hat_open: 'Open',
+  hi_hat_open_opt: 'Opt Opn',
+  hi_hat_pedal_chick: 'Pedal',
+  hi_hat_pedal_chick_opt: 'Opt Ped',
+  rim_shot: 'Rim',
+  rim_shot_opt: 'Opt Rim',
+};
+
+/**
  * Beat resolution options for the grid.
  * 4 = Quarter notes
  * 8 = 8th notes

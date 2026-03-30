@@ -8,6 +8,7 @@ import {
   type DrumSymbol,
   getSymbolsForCategory,
   symbolLabels,
+  symbolShortLabels,
 } from '@/lib/types/groove';
 import { Tooltip } from '../common/Tooltip';
 import { NoteCell } from './NoteCell';
@@ -130,7 +131,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
                   )}
                 </div>
                 <span className="text-[8px] font-headline font-bold uppercase tracking-tighter text-on-surface-variant/60 group-hover:text-primary truncate w-full text-center">
-                  {symbolLabels[sym].split(' ')[0]}
+                  {symbolShortLabels[sym]}
                 </span>
               </button>
             </Tooltip>

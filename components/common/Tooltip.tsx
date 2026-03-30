@@ -11,6 +11,10 @@ interface TooltipProps {
   open?: boolean;
 }
 
+export const TooltipProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return <TooltipPrimitive.Provider delayDuration={400}>{children}</TooltipPrimitive.Provider>;
+};
+
 export const Tooltip: React.FC<TooltipProps> = ({
   content,
   children,

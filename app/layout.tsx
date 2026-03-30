@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { OfflineStatus } from '@/components/common/OfflineStatus';
@@ -47,7 +46,7 @@ export default function RootLayout({
         className={`${inter.variable} ${spaceGrotesk.variable} antialiased font-body bg-background text-on-background`}
       >
         <ServiceWorkerRegistration />
-        <Tooltip.Provider delayDuration={400}>{children}</Tooltip.Provider>
+        {children}
         <OfflineStatus />
       </body>
     </html>
