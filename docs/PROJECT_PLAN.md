@@ -97,10 +97,10 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ### 🟢 Done
 
 - [x] [Feature] Groove Snippet Integration: Seamlessly insert pattern snippets into Song Charts and Notebooks (#63) `✓`
-- [x] [Fix] Offline Status False Positives: Implemented robust connectivity checking with server fetch fallbacks (#81) `✓`
+- [x] [Fix] Offline Support Reliability: Enabled and stabilized offline reload check in PWA tests (#81) `✓`
 - [x] [Fix] Song Editor Layout: Resolved clumped action buttons with a new responsive EditorToolbar component (#62) `✓`
 - [x] [Fix] Dark Mode Support: Unified dark mode across all pages and expanded test coverage (#60) `✓`
-- [x] [Fix] Live Mode E2E Stability: Resolved flakiness in Live Mode transition tests (#74) `✓`
+- [x] [Fix] Live Mode E2E Stability: Resolved flakiness in Live Mode transition tests and fixed overlapping UI issues (#74) `✓`
 - [x] [Bug] Groove Grid Editor: Fixed elements extending out of the side with responsive layout and wrapping toolbar (#59) `✓`
 - [x] [Fix] Grid Interaction Stability: Resolved flakiness in E2E dragging/selection tests (#73) `✓`
 - [x] [Feature] Issue #76: Address CodeRabbit Full Review Findings (completed) `✓`

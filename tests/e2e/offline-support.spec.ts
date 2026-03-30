@@ -31,8 +31,8 @@ test.describe('Offline Support (PWA)', () => {
       });
     });
 
-    // Small buffer to ensure everything is settled
-    await page.waitForTimeout(1000);
+    // Navigate again to ensure the page is cached by the now-active service worker
+    await page.goto('/');
 
     // Wait for the app shell to be visible
     const appShell = page.locator('main');
@@ -42,9 +42,6 @@ test.describe('Offline Support (PWA)', () => {
     // Force browser to report offline
     await page.context().setOffline(true);
 
-    // Wait for a small buffer to ensure the 'offline' event has propagated
-    await page.waitForTimeout(1000);
-
     // Check for indicator using a more specific locator to avoid strict mode violations
     const offlineIndicator = page
       .getByRole('alert')
@@ -52,21 +49,16 @@ test.describe('Offline Support (PWA)', () => {
       .first();
     await expect(offlineIndicator).toBeVisible({ timeout: 15000 });
 
-    /* Skipping reload check as it is unreliable in some test environments
     // Test PWA: Reload while offline
     await page.reload();
     await expect(page.locator('main')).toBeVisible();
-    await expect(
-      page.getByRole('alert').filter({ hasText: /reports you are offline/i }).first(),
-    ).toBeVisible({ timeout: 15000 });
-    */
+    await expect(offlineIndicator).toBeVisible({ timeout: 15000 });
 
     // Go back online
     await page.context().setOffline(false);
-    // Wait for event propagation
-    await page.waitForTimeout(1000);
+
     // Wait for the indicator to disappear (should be automatic via 'online' event)
-    await expect(page.getByText(/reports you are offline/i).first()).not.toBeVisible();
+    await expect(offlineIndicator).not.toBeVisible();
   });
 
   test('manifest should be linked in the head', async ({ page }) => {
