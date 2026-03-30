@@ -128,9 +128,13 @@ export const NoteCell: React.FC<NoteCellProps> = ({
 
   return (
     <Tooltip content={symbolLabels[symbol]} side="top">
-      <div tabIndex={0} role="button" aria-label={symbolLabels[symbol]}>
+      <button
+        type="button"
+        className="w-full h-full appearance-none bg-transparent border-none p-0 cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm transition-all"
+        aria-label={symbolLabels[symbol]}
+      >
         {content}
-      </div>
+      </button>
     </Tooltip>
   );
 };
