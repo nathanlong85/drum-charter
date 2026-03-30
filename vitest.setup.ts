@@ -1,6 +1,15 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+// Mock ResizeObserver for Radix UI components
+class MockResizeObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+
+(window as any).ResizeObserver = MockResizeObserver;
+
 // Mock AudioContext for all tests
 class MockAudioContext {
   createGain() {

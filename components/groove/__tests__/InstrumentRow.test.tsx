@@ -1,7 +1,14 @@
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { fireEvent, render, screen } from '@testing-library/react';
+import type React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import type { DrumInstrument, GrooveGrid } from '@/lib/types/groove';
 import { InstrumentRow } from '../InstrumentRow';
+
+const renderWithProvider = (ui: React.ReactElement) =>
+  render(ui, {
+    wrapper: ({ children }) => <Tooltip.Provider>{children}</Tooltip.Provider>,
+  });
 
 const mockInstrument: DrumInstrument = {
   id: 'i1',
@@ -26,7 +33,7 @@ describe('InstrumentRow', () => {
   const onMoveDown = vi.fn();
 
   it('renders instrument name and notes', () => {
-    render(
+    renderWithProvider(
       <InstrumentRow
         instrument={mockInstrument}
         grid={mockGrid}
@@ -41,7 +48,7 @@ describe('InstrumentRow', () => {
   });
 
   it('handles note interactions', () => {
-    render(
+    renderWithProvider(
       <InstrumentRow
         instrument={mockInstrument}
         grid={mockGrid}
@@ -58,7 +65,7 @@ describe('InstrumentRow', () => {
   });
 
   it('shows edit controls only when isEditing is true', () => {
-    const { rerender } = render(
+    const { rerender } = renderWithProvider(
       <InstrumentRow
         instrument={mockInstrument}
         grid={mockGrid}
@@ -89,7 +96,7 @@ describe('InstrumentRow', () => {
   });
 
   it('triggers edit callbacks', () => {
-    render(
+    renderWithProvider(
       <InstrumentRow
         instrument={mockInstrument}
         grid={mockGrid}
@@ -114,7 +121,7 @@ describe('InstrumentRow', () => {
 
   it('falls back to getVelocityForSymbol if velocities are missing', () => {
     const { velocities: _v, ...instWithoutVel } = mockInstrument;
-    render(
+    renderWithProvider(
       <InstrumentRow
         instrument={instWithoutVel as DrumInstrument}
         grid={mockGrid}

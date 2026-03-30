@@ -3,6 +3,7 @@
 import { ArrowRight, Cloud, Layers, Music, Play, RefreshCw, ShieldCheck, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { AuthStatus } from '@/components/auth/AuthStatus';
+import { TooltipProvider } from '@/components/common/Tooltip';
 import { GrooveDemo } from '@/components/demo/GrooveDemo';
 
 const ACCENT_CLASS_MAP: Record<string, string> = {
@@ -63,19 +64,16 @@ export default function Home() {
               V1.0 ALPHA REDESIGN NOW LIVE
             </span>
           </div>
-
           <h1 className="text-6xl md:text-8xl font-headline font-black text-on-surface mb-8 tracking-tight uppercase leading-[0.9]">
             The Workspace <br />
             <span className="bg-gradient-to-r from-primary to-primary-dim bg-clip-text text-transparent">
               Built For Rhythm.
             </span>
           </h1>
-
           <p className="text-xl md:text-2xl text-on-surface-variant mb-12 leading-relaxed max-w-3xl mx-auto font-body">
             Orchestrate complex song charts, modular practice routines, and high-fidelity groove
             libraries. A DAW-inspired environment for the modern percussionist.
           </p>
-
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-24">
             <Link
               href="/login"
@@ -93,7 +91,6 @@ export default function Home() {
               Access Library
             </Link>
           </div>
-
           {/* Interactive Engine Preview */}
           <div
             id="demo"
@@ -118,9 +115,11 @@ export default function Home() {
                   REAL-TIME SYNC
                 </div>
               </div>
-              <GrooveDemo />
+              <TooltipProvider>
+                <GrooveDemo />
+              </TooltipProvider>
             </div>
-          </div>
+          </div>{' '}
         </div>
       </section>
 

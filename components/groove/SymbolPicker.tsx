@@ -3,7 +3,14 @@
 import { X } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
-import { type DrumCategory, type DrumSymbol, getSymbolsForCategory } from '@/lib/types/groove';
+import {
+  type DrumCategory,
+  type DrumSymbol,
+  getSymbolsForCategory,
+  symbolLabels,
+  symbolShortLabels,
+} from '@/lib/types/groove';
+import { Tooltip } from '../common/Tooltip';
 import { NoteCell } from './NoteCell';
 
 interface SymbolPickerProps {
@@ -47,40 +54,6 @@ const symbolToIcon: Record<DrumSymbol, string | null> = {
   rim_shot: '/icons/drum-symbols/rim_shot_hit.svg',
   rim_shot_opt: '/icons/drum-symbols/rim_shot_hit_opt.svg',
   none: null,
-};
-
-const symbolLabels: Partial<Record<DrumSymbol, string>> = {
-  none: 'None',
-  standard: 'Standard',
-  standard_opt: 'Opt Std',
-  ghost: 'Ghost',
-  ghost_opt: 'Opt Ghost',
-  accent: 'Accent',
-  accent_opt: 'Opt Accent',
-  buzz: 'Buzz',
-  buzz_opt: 'Opt Buzz',
-  cross_stick: 'X-Stick',
-  cross_stick_opt: 'Opt X-Stick',
-  cymbal_bell: 'Bell',
-  cymbal_bell_opt: 'Opt Bell',
-  cymbal_choke: 'Choke',
-  cymbal_choke_opt: 'Opt Choke',
-  double: 'Double',
-  double_opt: 'Opt Double',
-  drag: 'Drag',
-  drag_opt: 'Opt Drag',
-  flam: 'Flam',
-  flam_opt: 'Opt Flam',
-  hi_hat_closed: 'Closed',
-  hi_hat_closed_opt: 'Opt Closed',
-  hi_hat_loose: 'Loose',
-  hi_hat_loose_opt: 'Opt Loose',
-  hi_hat_open: 'Open',
-  hi_hat_open_opt: 'Opt Open',
-  hi_hat_pedal_chick: 'Pedal',
-  hi_hat_pedal_chick_opt: 'Opt Pedal',
-  rim_shot: 'Rim Shot',
-  rim_shot_opt: 'Opt Rim',
 };
 
 const allSymbols = Object.keys(symbolToIcon) as DrumSymbol[];
@@ -134,34 +107,34 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
 
         <div className="grid grid-cols-4 gap-2">
           {filteredSymbols.map((sym) => (
-            <button
-              key={sym}
-              type="button"
-              onClick={() => {
-                onSelect(sym);
-              }}
-              className="group flex flex-col items-center gap-1 p-2 hover:bg-primary/10 rounded-xl transition-all border border-transparent hover:border-primary/20"
-              title={symbolLabels[sym] || sym.replace(/_/g, ' ')}
-              aria-label={symbolLabels[sym] || sym.replace(/_/g, ' ')}
-            >
-              <div className="w-8 h-8 flex items-center justify-center bg-surface-container-highest rounded-lg border border-outline-variant/10 group-hover:border-primary/30 transition-all pointer-events-none">
-                {sym === 'none' ? (
-                  <span className="text-xl text-on-surface-variant/20 group-hover:text-primary">
-                    ∅
-                  </span>
-                ) : (
-                  <NoteCell
-                    symbol={sym}
-                    onClick={() => {}}
-                    onContextMenu={(e) => e.preventDefault()}
-                    readOnly
-                  />
-                )}
-              </div>
-              <span className="text-[8px] font-headline font-bold uppercase tracking-tighter text-on-surface-variant/60 group-hover:text-primary truncate w-full text-center">
-                {symbolLabels[sym] || sym}
-              </span>
-            </button>
+            <Tooltip key={sym} content={symbolLabels[sym]} side="top">
+              <button
+                type="button"
+                onClick={() => {
+                  onSelect(sym);
+                }}
+                className="group flex flex-col items-center gap-1 p-2 hover:bg-primary/10 rounded-xl transition-all border border-transparent hover:border-primary/20 w-full"
+                aria-label={symbolLabels[sym]}
+              >
+                <div className="w-8 h-8 flex items-center justify-center bg-surface-container-highest rounded-lg border border-outline-variant/10 group-hover:border-primary/30 transition-all pointer-events-none">
+                  {sym === 'none' ? (
+                    <span className="text-xl text-on-surface-variant/20 group-hover:text-primary">
+                      ∅
+                    </span>
+                  ) : (
+                    <NoteCell
+                      symbol={sym}
+                      onClick={() => {}}
+                      onContextMenu={(e) => e.preventDefault()}
+                      readOnly
+                    />
+                  )}
+                </div>
+                <span className="text-[8px] font-headline font-bold uppercase tracking-tighter text-on-surface-variant/60 group-hover:text-primary truncate w-full text-center">
+                  {symbolShortLabels[sym]}
+                </span>
+              </button>
+            </Tooltip>
           ))}
         </div>
 

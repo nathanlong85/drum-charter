@@ -1,4 +1,6 @@
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { fireEvent, render, screen } from '@testing-library/react';
+import type React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SymbolPicker } from '../SymbolPicker';
 
@@ -12,8 +14,12 @@ describe('SymbolPicker', () => {
     vi.clearAllMocks();
   });
 
+  const renderWithProvider = (ui: React.ReactElement) => {
+    return render(<Tooltip.Provider>{ui}</Tooltip.Provider>);
+  };
+
   it('renders standard symbols for any category', () => {
-    render(
+    renderWithProvider(
       <SymbolPicker
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
@@ -23,12 +29,12 @@ describe('SymbolPicker', () => {
       />,
     );
 
-    // Standard hit should always be there (Capitalized label)
-    expect(screen.getByLabelText('Standard')).toBeInTheDocument();
+    // Standard hit should always be there (Full label)
+    expect(screen.getByLabelText('Standard Hit')).toBeInTheDocument();
   });
 
   it('filters symbols for kick category', () => {
-    render(
+    renderWithProvider(
       <SymbolPicker
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
@@ -39,13 +45,13 @@ describe('SymbolPicker', () => {
       />,
     );
 
-    expect(screen.getByLabelText('Standard')).toBeInTheDocument();
+    expect(screen.getByLabelText('Standard Hit')).toBeInTheDocument();
     // Rim shot should NOT be there for kick (Label: Rim Shot)
     expect(screen.queryByLabelText('Rim Shot')).not.toBeInTheDocument();
   });
 
   it('shows rim shot for snare category', () => {
-    render(
+    renderWithProvider(
       <SymbolPicker
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
@@ -61,7 +67,7 @@ describe('SymbolPicker', () => {
   });
 
   it('calls onSelect when a symbol is clicked', () => {
-    render(
+    renderWithProvider(
       <SymbolPicker
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
@@ -71,12 +77,12 @@ describe('SymbolPicker', () => {
       />,
     );
 
-    fireEvent.click(screen.getByLabelText('Accent'));
+    fireEvent.click(screen.getByLabelText('Accented Hit'));
     expect(onSelect).toHaveBeenCalledWith('accent');
   });
 
   it('handles velocity changes', () => {
-    render(
+    renderWithProvider(
       <SymbolPicker
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
@@ -92,7 +98,7 @@ describe('SymbolPicker', () => {
   });
 
   it('calls onClose when Done is clicked', () => {
-    render(
+    renderWithProvider(
       <SymbolPicker
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
@@ -107,7 +113,7 @@ describe('SymbolPicker', () => {
   });
 
   it('calls onClose when backdrop is clicked', () => {
-    render(
+    renderWithProvider(
       <SymbolPicker
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
@@ -123,7 +129,7 @@ describe('SymbolPicker', () => {
   });
 
   it('renders drag and drag_opt symbols', () => {
-    render(
+    renderWithProvider(
       <SymbolPicker
         onSelect={onSelect}
         onVelocityChange={onVelocityChange}
@@ -135,6 +141,6 @@ describe('SymbolPicker', () => {
     );
 
     expect(screen.getByLabelText('Drag')).toBeInTheDocument();
-    expect(screen.getByLabelText('Opt Drag')).toBeInTheDocument();
+    expect(screen.getByLabelText('Optional Drag')).toBeInTheDocument();
   });
 });

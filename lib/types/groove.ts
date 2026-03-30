@@ -42,6 +42,80 @@ export type DrumSymbol =
   | 'none';
 
 /**
+ * Descriptive labels for each drum symbol.
+ */
+export const symbolLabels: Record<DrumSymbol, string> = {
+  none: 'No Hit',
+  standard: 'Standard Hit',
+  standard_opt: 'Optional Standard Hit',
+  ghost: 'Ghost Note',
+  ghost_opt: 'Optional Ghost Note',
+  accent: 'Accented Hit',
+  accent_opt: 'Optional Accented Hit',
+  buzz: 'Buzz Stroke',
+  buzz_opt: 'Optional Buzz Stroke',
+  cross_stick: 'Cross-Stick',
+  cross_stick_opt: 'Optional Cross-Stick',
+  cymbal_bell: 'Cymbal Bell',
+  cymbal_bell_opt: 'Optional Cymbal Bell',
+  cymbal_choke: 'Cymbal Choke',
+  cymbal_choke_opt: 'Optional Cymbal Choke',
+  double: 'Double Hit',
+  double_opt: 'Optional Double Hit',
+  drag: 'Drag',
+  drag_opt: 'Optional Drag',
+  flam: 'Flam',
+  flam_opt: 'Optional Flam',
+  hi_hat_closed: 'Closed Hi-Hat',
+  hi_hat_closed_opt: 'Optional Closed Hi-Hat',
+  hi_hat_loose: 'Loose Hi-Hat',
+  hi_hat_loose_opt: 'Optional Loose Hi-Hat',
+  hi_hat_open: 'Open Hi-Hat',
+  hi_hat_open_opt: 'Optional Open Hi-Hat',
+  hi_hat_pedal_chick: 'Hi-Hat Pedal',
+  hi_hat_pedal_chick_opt: 'Optional Hi-Hat Pedal',
+  rim_shot: 'Rim Shot',
+  rim_shot_opt: 'Optional Rim Shot',
+};
+
+/**
+ * Concise labels for UI captions where space is limited.
+ */
+export const symbolShortLabels: Record<DrumSymbol, string> = {
+  none: 'None',
+  standard: 'Std',
+  standard_opt: 'Opt Std',
+  ghost: 'Ghost',
+  ghost_opt: 'Opt Gst',
+  accent: 'Accent',
+  accent_opt: 'Opt Acc',
+  buzz: 'Buzz',
+  buzz_opt: 'Opt Buz',
+  cross_stick: 'X-Stick',
+  cross_stick_opt: 'Opt X',
+  cymbal_bell: 'Bell',
+  cymbal_bell_opt: 'Opt Bel',
+  cymbal_choke: 'Choke',
+  cymbal_choke_opt: 'Opt Chk',
+  double: 'Double',
+  double_opt: 'Opt Dbl',
+  drag: 'Drag',
+  drag_opt: 'Opt Drg',
+  flam: 'Flam',
+  flam_opt: 'Opt Flm',
+  hi_hat_closed: 'Closed',
+  hi_hat_closed_opt: 'Opt Cls',
+  hi_hat_loose: 'Loose',
+  hi_hat_loose_opt: 'Opt Lse',
+  hi_hat_open: 'Open',
+  hi_hat_open_opt: 'Opt Opn',
+  hi_hat_pedal_chick: 'Pedal',
+  hi_hat_pedal_chick_opt: 'Opt Ped',
+  rim_shot: 'Rim',
+  rim_shot_opt: 'Opt Rim',
+};
+
+/**
  * Beat resolution options for the grid.
  * 4 = Quarter notes
  * 8 = 8th notes

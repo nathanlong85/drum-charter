@@ -1,8 +1,14 @@
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { DrumSymbol, GrooveGrid } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../GrooveGridEditor';
+
+const renderWithProvider = (ui: React.ReactElement) =>
+  render(ui, {
+    wrapper: ({ children }) => <Tooltip.Provider>{children}</Tooltip.Provider>,
+  });
 
 // Control state for the mock hook
 const mockAudioState = vi.hoisted(() => ({
@@ -157,13 +163,13 @@ describe('GrooveGridEditor', () => {
   });
 
   it('renders correctly', () => {
-    render(<TestEditor grid={initialGrid} />);
+    renderWithProvider(<TestEditor grid={initialGrid} />);
     expect(screen.getByTestId('groove-grid')).toBeInTheDocument();
     expect(screen.getByText('Kick')).toBeInTheDocument();
   });
 
   it('toggles playback', () => {
-    render(<TestEditor grid={initialGrid} />);
+    renderWithProvider(<TestEditor grid={initialGrid} />);
     const playBtn = screen.getByTestId('playback-toggle');
     fireEvent.click(playBtn);
     expect(mockAudioState.togglePlayback).toHaveBeenCalled();
@@ -171,7 +177,7 @@ describe('GrooveGridEditor', () => {
 
   it('adds an instrument', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     fireEvent.click(screen.getByTitle('Edit Instruments'));
     fireEvent.click(screen.getByTestId('add-instrument-button'));
@@ -184,7 +190,7 @@ describe('GrooveGridEditor', () => {
 
   it('removes an instrument', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     fireEvent.click(screen.getByTitle('Edit Instruments'));
     fireEvent.click(screen.getByTitle('Edit Settings'));
@@ -201,7 +207,7 @@ describe('GrooveGridEditor', () => {
 
   it('updates an instrument', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     fireEvent.click(screen.getByTitle('Edit Instruments'));
     fireEvent.click(screen.getByTitle('Edit Settings'));
@@ -219,7 +225,7 @@ describe('GrooveGridEditor', () => {
   });
 
   it('clears selection when clicking a different note than the selection', async () => {
-    render(<TestEditor grid={initialGrid} />);
+    renderWithProvider(<TestEditor grid={initialGrid} />);
     const cells = screen.getAllByTestId('note-cell');
 
     // Select two cells
@@ -235,7 +241,7 @@ describe('GrooveGridEditor', () => {
 
   it('handles paste with no text', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
     const cells = screen.getAllByTestId('note-cell');
 
     fireEvent.mouseDown(cells[0], { button: 0 });
@@ -249,7 +255,7 @@ describe('GrooveGridEditor', () => {
 
   it('updates grid settings', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     fireEvent.click(screen.getByText('+'));
     await waitFor(() => {
@@ -277,7 +283,7 @@ describe('GrooveGridEditor', () => {
 
   it('toggles optional hits', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     fireEvent.click(screen.getByTitle('Hide Optional Hits'));
     await waitFor(() => {
@@ -289,7 +295,7 @@ describe('GrooveGridEditor', () => {
 
   it('handles note interactions and symbol picker', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     const cells = screen.getAllByTestId('note-cell');
 
@@ -316,7 +322,7 @@ describe('GrooveGridEditor', () => {
   });
 
   it('syncs metronome state from props', async () => {
-    const { rerender } = render(
+    const { rerender } = renderWithProvider(
       <GrooveGridEditor initialGrid={initialGrid} metronomeEnabled={false} metronomeVolume={0.5} />,
     );
 
@@ -331,7 +337,7 @@ describe('GrooveGridEditor', () => {
 
   it('syncs with initialGrid when it changes', async () => {
     const onChange = vi.fn();
-    const { rerender } = render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    const { rerender } = renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     const newGrid: GrooveGrid = { ...initialGrid, resolution: 8 };
     rerender(<TestEditor grid={newGrid} onChange={onChange} />);
@@ -343,7 +349,7 @@ describe('GrooveGridEditor', () => {
   });
 
   it('positions the symbol picker correctly on context menu', async () => {
-    render(<TestEditor grid={initialGrid} />);
+    renderWithProvider(<TestEditor grid={initialGrid} />);
     const cells = screen.getAllByTestId('note-cell');
 
     const mockRect = { top: 100, left: 200, height: 40, width: 40, bottom: 140 };
@@ -359,7 +365,9 @@ describe('GrooveGridEditor', () => {
 
   it('handles playback toggling with metronome state', async () => {
     const onMetronomeToggle = vi.fn();
-    render(<GrooveGridEditor initialGrid={initialGrid} onMetronomeToggle={onMetronomeToggle} />);
+    renderWithProvider(
+      <GrooveGridEditor initialGrid={initialGrid} onMetronomeToggle={onMetronomeToggle} />,
+    );
     const metroToggle = screen.getByTitle(/Enable Metronome/i);
 
     fireEvent.click(metroToggle);
@@ -371,7 +379,7 @@ describe('GrooveGridEditor', () => {
 
   it('handles shift-click to toggle optional hit', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
     const cells = screen.getAllByTestId('note-cell');
 
     fireEvent.click(cells[0], { shiftKey: true });
@@ -389,7 +397,7 @@ describe('GrooveGridEditor', () => {
   });
 
   it('handles alt-click to open symbol picker directly', async () => {
-    render(<TestEditor grid={initialGrid} />);
+    renderWithProvider(<TestEditor grid={initialGrid} />);
     const cells = screen.getAllByTestId('note-cell');
 
     const mockRect = { top: 100, left: 200, height: 40, width: 40, bottom: 140 };
@@ -401,7 +409,7 @@ describe('GrooveGridEditor', () => {
 
   it('handles clicking note when already selected as a single cell', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
     const cells = screen.getAllByTestId('note-cell');
 
     // First click to toggle it from standard to accent
@@ -430,7 +438,7 @@ describe('GrooveGridEditor', () => {
   });
 
   it('handles step changes during playback', async () => {
-    render(<GrooveGridEditor initialGrid={initialGrid} />);
+    renderWithProvider(<GrooveGridEditor initialGrid={initialGrid} />);
 
     await act(async () => {
       (window as any).triggerStepChange(1);
@@ -446,7 +454,7 @@ describe('GrooveGridEditor', () => {
   it('handles BPM and metronome volume changes', async () => {
     const onBpmChange = vi.fn();
     const onMetronomeVolumeChange = vi.fn();
-    render(
+    renderWithProvider(
       <GrooveGridEditor
         initialGrid={initialGrid}
         onBpmChange={onBpmChange}
@@ -476,7 +484,7 @@ describe('GrooveGridEditor', () => {
 
   it('handles grid settings in toolbar', async () => {
     const onChange = vi.fn();
-    render(<TestEditor grid={initialGrid} onChange={onChange} />);
+    renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     // Beat value select
     const select = screen.getByRole('combobox');
@@ -506,7 +514,7 @@ describe('GrooveGridEditor', () => {
   });
 
   it('handles readOnly mode', () => {
-    render(<GrooveGridEditor initialGrid={initialGrid} readOnly={true} />);
+    renderWithProvider(<GrooveGridEditor initialGrid={initialGrid} readOnly={true} />);
     const bpmInput = screen.getByDisplayValue('120');
     expect(bpmInput).toHaveAttribute('disabled');
 
@@ -518,7 +526,7 @@ describe('GrooveGridEditor', () => {
   describe('Clear actions', () => {
     it('clears the entire grid when confirmed', async () => {
       const onChange = vi.fn();
-      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
       const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
       const clearBtn = screen.getByTitle('Clear Grid');
@@ -541,7 +549,7 @@ describe('GrooveGridEditor', () => {
 
     it('clears a specific row when confirmed during editing', async () => {
       const onChange = vi.fn();
-      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
       fireEvent.click(screen.getByTitle('Edit Instruments'));
 
@@ -567,7 +575,7 @@ describe('GrooveGridEditor', () => {
 
   describe('Multi-cell selection', () => {
     it('selects multiple cells via drag', async () => {
-      render(<TestEditor grid={initialGrid} />);
+      renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[0], { button: 0 });
@@ -580,7 +588,7 @@ describe('GrooveGridEditor', () => {
     });
 
     it('clears selected cells when clicking outside range', async () => {
-      render(<TestEditor grid={initialGrid} />);
+      renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[0], { button: 0 });
@@ -592,7 +600,7 @@ describe('GrooveGridEditor', () => {
     });
 
     it('clears selection when opening context menu outside range', async () => {
-      render(<TestEditor grid={initialGrid} />);
+      renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[0], { button: 0 });
@@ -605,7 +613,7 @@ describe('GrooveGridEditor', () => {
 
     it('applies symbol to all selected cells', async () => {
       const onChange = vi.fn();
-      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[1], { button: 0 });
@@ -630,7 +638,7 @@ describe('GrooveGridEditor', () => {
 
     it('applies velocity to all selected cells', async () => {
       const onChange = vi.fn();
-      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[0], { button: 0 });
@@ -657,7 +665,7 @@ describe('GrooveGridEditor', () => {
   describe('Keyboard Shortcuts', () => {
     it('deletes selected cells with Delete key', async () => {
       const onChange = vi.fn();
-      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[0], { button: 0 });
@@ -679,7 +687,7 @@ describe('GrooveGridEditor', () => {
     });
 
     it('copies selected data to clipboard', async () => {
-      render(<TestEditor grid={initialGrid} />);
+      renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[0], { button: 0 });
@@ -694,7 +702,7 @@ describe('GrooveGridEditor', () => {
 
     it('pastes data into the grid', async () => {
       const onChange = vi.fn();
-      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[1], { button: 0 });
@@ -723,7 +731,7 @@ describe('GrooveGridEditor', () => {
 
     it('ignores shortcuts when typing in inputs', async () => {
       const onChange = vi.fn();
-      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[0], { button: 0 });
@@ -749,7 +757,7 @@ describe('GrooveGridEditor', () => {
       const originalWriteText = navigator.clipboard.writeText;
       navigator.clipboard.writeText = vi.fn().mockRejectedValue(new Error('Copy failed'));
 
-      render(<TestEditor grid={initialGrid} />);
+      renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[0], { button: 0 });
@@ -770,7 +778,7 @@ describe('GrooveGridEditor', () => {
 
     it('handles paste with invalid JSON or wrong format', async () => {
       const onChange = vi.fn();
-      render(<TestEditor grid={initialGrid} onChange={onChange} />);
+      renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
       fireEvent.mouseDown(cells[0], { button: 0 });
@@ -805,7 +813,7 @@ describe('GrooveGridEditor', () => {
         ],
       };
       const onChange = vi.fn();
-      render(<TestEditor grid={complexGrid} onChange={onChange} />);
+      renderWithProvider(<TestEditor grid={complexGrid} onChange={onChange} />);
 
       fireEvent.click(screen.getByTitle('Edit Instruments'));
 
@@ -842,7 +850,7 @@ describe('GrooveGridEditor', () => {
   describe('Header Rendering', () => {
     it('renders 8th note sub-labels', () => {
       const grid8: GrooveGrid = { ...initialGrid, resolution: 8 };
-      render(<GrooveGridEditor initialGrid={grid8} />);
+      renderWithProvider(<GrooveGridEditor initialGrid={grid8} />);
 
       const plusLabels = screen.getAllByText('+');
       expect(plusLabels.length).toBeGreaterThan(0);
@@ -850,7 +858,7 @@ describe('GrooveGridEditor', () => {
 
     it('renders 16th note sub-labels', () => {
       const grid16: GrooveGrid = { ...initialGrid, resolution: 16 };
-      render(<GrooveGridEditor initialGrid={grid16} />);
+      renderWithProvider(<GrooveGridEditor initialGrid={grid16} />);
 
       expect(screen.getAllByText('e').length).toBeGreaterThan(0);
       expect(screen.getAllByText('a').length).toBeGreaterThan(0);

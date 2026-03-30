@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { type ReactNode, useCallback } from 'react';
 import { AuthStatus } from '@/components/auth/AuthStatus';
+import { TooltipProvider } from '@/components/common/Tooltip';
 import { useSupabaseStatus } from '@/lib/hooks/useSupabaseStatus';
 import packageJson from '@/package.json';
 
@@ -173,7 +174,7 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Main Workspace Canvas */}
       <main className="ml-[72px] lg:ml-[240px] pt-16 flex-1 transition-all duration-300 relative z-0">
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
       </main>
 
       {/* System Status Bar */}
