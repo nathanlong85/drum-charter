@@ -23,7 +23,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ---
 
 @./.gemini/rules/PAIR_PROGRAMMING_PROTOCOL.md
-
+@./.gemini/rules/GITHUB_PROTOCOL.md
 ---
 
 @./.gemini/rules/GENERAL_GUIDELINES.md
