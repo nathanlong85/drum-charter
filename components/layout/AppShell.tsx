@@ -189,7 +189,7 @@ export function AppShell({ children }: AppShellProps) {
         </div>
         <div className="flex items-center gap-2 text-primary">
           <span className="text-[9px] font-headline font-bold tracking-widest uppercase">
-            v0.1.0-alpha
+            v{version}
           </span>
         </div>
       </footer>

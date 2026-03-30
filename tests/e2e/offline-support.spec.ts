@@ -52,12 +52,7 @@ test.describe('Offline Support (PWA)', () => {
     // Test PWA: Reload while offline
     await page.reload();
     await expect(page.locator('main')).toBeVisible();
-    await expect(
-      page
-        .getByRole('alert')
-        .filter({ hasText: /reports you are offline/i })
-        .first(),
-    ).toBeVisible({ timeout: 15000 });
+    await expect(offlineIndicator).toBeVisible({ timeout: 15000 });
 
     // Go back online
     await page.context().setOffline(false);
