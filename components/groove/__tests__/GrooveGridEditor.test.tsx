@@ -363,7 +363,7 @@ describe('GrooveGridEditor', () => {
     expect(picker).toHaveAttribute('data-left', '200');
   });
 
-  it('handles platform playback toggling with metronome state', async () => {
+  it('handles playback toggling with metronome state', async () => {
     const onMetronomeToggle = vi.fn();
     renderWithProvider(
       <GrooveGridEditor initialGrid={initialGrid} onMetronomeToggle={onMetronomeToggle} />,

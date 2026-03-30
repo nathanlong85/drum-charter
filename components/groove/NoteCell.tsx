@@ -78,22 +78,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   const opacity = getOpacity();
 
   const content = (
-    <div
-      onClick={readOnly ? undefined : onClick}
-      onContextMenu={readOnly ? (e) => e.preventDefault() : onContextMenu}
-      onMouseDown={readOnly ? undefined : onMouseDown}
-      onMouseEnter={readOnly ? undefined : onMouseEnter}
-      data-testid="note-cell"
-      data-selected={isSelected ? 'true' : 'false'}
-      className={`
-        note-cell w-10 h-10 flex items-center justify-center border-r border-outline-variant/10 
-        transition-all relative select-none
-        ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-primary/5'}
-        ${isBeat ? 'bg-surface-container-high/40' : 'bg-surface-container-low/20'}
-        ${isMeasureBoundary ? 'border-r-2 border-r-outline-variant/30' : ''}
-        ${isSelected && !readOnly ? 'bg-primary/20 ring-1 ring-primary ring-inset z-10' : ''}
-      `}
-    >
+    <div className="w-full h-full flex items-center justify-center pointer-events-none">
       {iconPath && (
         <div className="w-full h-full flex items-center justify-center pointer-events-none select-none animate-in zoom-in-50 duration-200">
           {/* biome-ignore lint/performance/noImgElement: intentional for E2E reliability (SVG transitions caused flakes) */}
@@ -122,15 +107,42 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     </div>
   );
 
+  const containerClasses = `
+    note-cell w-10 h-10 flex items-center justify-center border-r border-outline-variant/10 
+    transition-all relative select-none
+    ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-primary/5'}
+    ${isBeat ? 'bg-surface-container-high/40' : 'bg-surface-container-low/20'}
+    ${isMeasureBoundary ? 'border-r-2 border-r-outline-variant/30' : ''}
+    ${isSelected && !readOnly ? 'bg-primary/20 ring-1 ring-primary ring-inset z-10' : ''}
+  `;
+
   if (readOnly || symbol === 'none') {
-    return content;
+    return (
+      <div
+        onClick={readOnly ? undefined : onClick}
+        onContextMenu={readOnly ? (e) => e.preventDefault() : onContextMenu}
+        onMouseDown={readOnly ? undefined : onMouseDown}
+        onMouseEnter={readOnly ? undefined : onMouseEnter}
+        data-testid="note-cell"
+        data-selected={isSelected ? 'true' : 'false'}
+        className={containerClasses}
+      >
+        {content}
+      </div>
+    );
   }
 
   return (
     <Tooltip content={symbolLabels[symbol]} side="top">
       <button
         type="button"
-        className="w-full h-full appearance-none bg-transparent border-none p-0 cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm transition-all"
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        onMouseDown={onMouseDown}
+        onMouseEnter={onMouseEnter}
+        data-testid="note-cell"
+        data-selected={isSelected ? 'true' : 'false'}
+        className={`${containerClasses} appearance-none bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm`}
         aria-label={symbolLabels[symbol]}
       >
         {content}
