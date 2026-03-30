@@ -6,11 +6,6 @@ test.describe('Offline Support (PWA)', () => {
   test('should show offline status indicator when connection is lost and support offline reloads', async ({
     page,
   }) => {
-    // Ensure we start in a clean state
-    test.skip(
-      process.env.RUN_OFFLINE_E2E !== 'true',
-      'Set RUN_OFFLINE_E2E=true to run offline PWA assertions',
-    );
     await page.context().setOffline(false);
     await page.goto('/');
 
