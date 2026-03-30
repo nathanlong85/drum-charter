@@ -63,7 +63,7 @@ test.describe('Offline Support (PWA)', () => {
     await page.context().setOffline(false);
 
     // Wait for the indicator to disappear (should be automatic via 'online' event)
-    await expect(page.getByText(/reports you are offline/i).first()).not.toBeVisible();
+    await expect(offlineIndicator).not.toBeVisible();
   });
 
   test('manifest should be linked in the head', async ({ page }) => {
