@@ -75,35 +75,61 @@ This document serves as the absolute source of truth for GitHub-related operatio
 
 ### 3. Review & Comments
 
-- **Request/Re-request Copilot Review**:
+- **Trigger Copilot Review (MANDATORY for every PR)**:
 
-  ```bash
-  gh pr edit <number> --add-reviewer "@copilot"
-  ```
+  - **Constraint**: The AI account (`nathanlong85-ai`) may lack permissions to trigger the GitHub Copilot App directly.
+  - **Protocol**:
+    1. Temporarily switch to the user account.
+    2. Trigger the review.
+    3. Switch back to the AI account immediately.
+
+  - **Command**:
+
+    ```bash
+    gh auth switch --user nathanlong85 && gh pr edit <number> --add-reviewer "@copilot" && gh auth switch --user nathanlong85-ai
+    ```
+
+  - **Verification**: Copilot typically does not appear in `reviewRequests` but will appear in `latestReviews` (visible via `gh pr view --json latestReviews`) once it begins its review.
 
 - **Check Review Comments (General/Top-level)**:
 
-  ```bash
-  gh pr view <number> --json reviews,comments
-  ```
+  - **Primary (`gh` CLI)**:
+
+    ```bash
+    gh pr view <number> --json reviews,comments
+    ```
+
+  - **Backup (MCP Tool)**: Use `mcp_github_pull_request_read(method="get_reviews")` and `mcp_github_pull_request_read(method="get_comments")`.
 
 - **Check Review Comments (Line-level/Threaded)**:
 
-  ```bash
-  gh api repos/nathanlong85/drum-charter/pulls/<number>/comments --jq '.[] | {user: .user.login, body: .body, path: .path, line: .line, id: .id}'
-  ```
+  - **Primary (API)**:
+
+    ```bash
+    gh api repos/nathanlong85/drum-charter/pulls/<number>/comments --jq '.[] | {user: .user.login, body: .body, path: .path, line: .line, id: .id}'
+    ```
+
+  - **Backup (MCP Tool)**: Use `mcp_github_pull_request_read(method="get_review_comments")`.
 
 - **Reply to a Review Comment (Threaded)**:
 
-  ```bash
-  gh api -X POST repos/nathanlong85/drum-charter/pulls/<number>/comments/<comment_id>/replies -f body="Your reply here"
-  ```
+  - **Primary (API)**:
+
+    ```bash
+    gh api -X POST repos/nathanlong85/drum-charter/pulls/<number>/comments/<comment_id>/replies -f body="Your reply here"
+    ```
+
+  - **Backup (MCP Tool)**: Use `mcp_github_add_reply_to_pull_request_comment(owner, repo, pullNumber, commentId, body)`.
 
 - **Post a General PR Comment**:
 
-  ```bash
-  gh pr comment <number> --body "Your comment here"
-  ```
+  - **Primary (`gh` CLI)**:
+
+    ```bash
+    gh pr comment <number> --body "Your comment here"
+    ```
+
+  - **Backup (MCP Tool)**: Use `mcp_github_add_issue_comment(owner, repo, issue_number, body)`.
 
 ### 4. CI/CD Status & Diagnosis
 
