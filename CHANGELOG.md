@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2-alpha] - 2026-03-30
+
+### Fixed
+
+- **Live Mode E2E Stability**: Resolved flakiness and pointer event interception in Live Mode tests by removing a trapping stacking context in the `AppShell` and improving Playwright wait conditions. (#74)
+- **Offline Support Reliability**: Enabled and stabilized the PWA offline reload check in `offline-support.spec.ts`. Improved reliability by ensuring the page is cached after Service Worker activation but before going offline. (#81)
+- **UI Stacking**: Fixed an issue where the `LiveModeView` (fixed inset) was being rendered behind the `AppShell` header due to a `z-0` stacking context on the `main` element.
+
+### Changed
+
+- **E2E Test Robustness**: Replaced `evaluate()` based clicks with standard Playwright `click()` in `live-mode.spec.ts` and `test-utils.ts` to ensure elements are truly clickable and not obscured.
+- **Maintenance**: Removed obsolete TODO comments and fixed linting warnings in the E2E test suite.
+
 ## [0.2.1-alpha] - 2026-03-21
 
 ### Added
