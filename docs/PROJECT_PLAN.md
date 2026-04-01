@@ -77,6 +77,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 ## V2 Feature Scope (In Planning)
 
 - [x] **Advanced Grid Ergonomics**:
+  - [x] **Quick Row Presets**: Add per-instrument dropdown actions for common patterns (On-Beats, Upbeats, etc.) and row muting. (#89) `✓`
   - [x] **Multi-cell Interaction**: Implement selection box (drag-to-select), multi-cell clear, and multi-cell symbol application. (#35) `✓`
   - [x] **Grid Clipboard**: Support copy/pasting single or multiple cells within and across grids. (#35) `✓`
   - [x] **Modifier Clicks**: Support `Shift + Click` for optional hits and other keyboard + click combos for rapid articulation entry. (#36) `✓`
@@ -96,6 +97,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done
 
+- [x] [Feature] Quick Row Presets: Per-instrument dropdown for rapid pattern entry and row muting (#89) `✓`
 - [x] [Feature] Groove Snippet Integration: Seamlessly insert pattern snippets into Song Charts and Notebooks (#63) `✓`
 - [x] [Fix] Offline Support Reliability: Enabled and stabilized offline reload check in PWA tests and integrated into CI (#81, #86) `✓`
 - [x] [Fix] Song Editor Layout: Resolved clumped action buttons with a new responsive EditorToolbar component (#62) `✓`
