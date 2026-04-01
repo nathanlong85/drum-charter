@@ -15,7 +15,7 @@ describe('Theme Class Verification', () => {
   describe('NoteCell', () => {
     it('applies new design system tokens', () => {
       const { getByTestId } = renderWithProvider(
-        <NoteCell symbol="standard" onClick={() => {}} onContextMenu={() => {}} />,
+        <NoteCell symbol="standard" index={0} onClick={() => {}} onContextMenu={() => {}} />,
       );
 
       const cell = getByTestId('note-cell');

@@ -525,6 +525,9 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = ({
                     wrappedDispatch({ type: 'MOVE_INSTRUMENT', id: inst.id, direction: 'down' })
                   }
                   onClear={() => wrappedDispatch({ type: 'CLEAR_ROW', id: inst.id })}
+                  onPresetSelect={(preset) =>
+                    wrappedDispatch({ type: 'APPLY_ROW_PRESET', id: inst.id, preset })
+                  }
                   readOnly={readOnly}
                 />
               ))}

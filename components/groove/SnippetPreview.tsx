@@ -40,9 +40,10 @@ export const SnippetPreview: React.FC<SnippetPreviewProps> = ({ grid }) => {
                 >
                   <NoteCell
                     symbol={note as DrumSymbol}
+                    index={noteIdx}
                     onClick={() => {}}
                     onContextMenu={() => {}}
-                    readOnly={true}
+                    readOnly
                   />
                 </div>
               );

@@ -6,6 +6,7 @@ import { Tooltip } from '../common/Tooltip';
 
 interface NoteCellProps {
   symbol: DrumSymbol;
+  index: number;
   velocity?: number;
   onClick: (e: React.MouseEvent) => void;
   onContextMenu: (e: React.MouseEvent) => void;
@@ -53,6 +54,7 @@ const symbolToIcon: Record<DrumSymbol, string | null> = {
 
 export const NoteCell: React.FC<NoteCellProps> = ({
   symbol,
+  index,
   velocity,
   onClick,
   onContextMenu,
@@ -124,6 +126,8 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         onMouseDown={readOnly ? undefined : onMouseDown}
         onMouseEnter={readOnly ? undefined : onMouseEnter}
         data-testid="note-cell"
+        data-index={index}
+        data-active={symbol === 'none' ? 'false' : 'true'}
         data-selected={isSelected ? 'true' : 'false'}
         className={containerClasses}
       >
@@ -141,6 +145,8 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
         data-testid="note-cell"
+        data-index={index}
+        data-active="true"
         data-selected={isSelected ? 'true' : 'false'}
         className={`${containerClasses} appearance-none bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm`}
         aria-label={symbolLabels[symbol]}

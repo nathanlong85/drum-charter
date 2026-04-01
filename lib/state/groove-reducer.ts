@@ -7,6 +7,7 @@ import {
   getNextSymbol,
   getVelocityForSymbol,
 } from '../types/groove';
+import { applyRowPreset, type RowPreset } from '../utils/rowPresets';
 
 export type GrooveAction =
   | { type: 'TOGGLE_NOTE'; id: string; noteIndex: number }
@@ -33,7 +34,7 @@ export type GrooveAction =
   | {
       type: 'UPDATE_INSTRUMENT';
       id: string;
-      updates: Partial<Pick<DrumInstrument, 'category' | 'presetVariety' | 'customName'>>;
+      updates: Partial<Pick<DrumInstrument, 'category' | 'presetVariety' | 'customName' | 'muted'>>;
     }
   | { type: 'MOVE_INSTRUMENT'; id: string; direction: 'up' | 'down' }
   | { type: 'SET_GRID_SETTINGS'; settings: Partial<Pick<GrooveGrid, 'playbackOptionalHits'>> }
@@ -42,6 +43,7 @@ export type GrooveAction =
   | { type: 'SET_TIME_SIGNATURE'; beatsPerMeasure: number; beatValue: number }
   | { type: 'CLEAR_GRID' }
   | { type: 'CLEAR_ROW'; id: string }
+  | { type: 'APPLY_ROW_PRESET'; id: string; preset: RowPreset }
   | { type: 'TOGGLE_OPTIONAL'; id: string; noteIndex: number }
   | {
       type: 'SET_SELECTION_SYMBOLS';
@@ -100,6 +102,16 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
             notes: Array(inst.notes.length).fill('none'),
             velocities: Array(inst.notes.length).fill(0),
           };
+        }),
+      };
+    }
+
+    case 'APPLY_ROW_PRESET': {
+      return {
+        ...state,
+        instruments: state.instruments.map((inst) => {
+          if (inst.id !== action.id) return inst;
+          return applyRowPreset(inst, action.preset, state);
         }),
       };
     }

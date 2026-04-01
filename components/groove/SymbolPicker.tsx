@@ -106,7 +106,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
         </div>
 
         <div className="grid grid-cols-4 gap-2">
-          {filteredSymbols.map((sym) => (
+          {filteredSymbols.map((sym, idx) => (
             <Tooltip key={sym} content={symbolLabels[sym]} side="top">
               <button
                 type="button"
@@ -124,6 +124,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
                   ) : (
                     <NoteCell
                       symbol={sym}
+                      index={idx}
                       onClick={() => {}}
                       onContextMenu={(e) => e.preventDefault()}
                       readOnly
