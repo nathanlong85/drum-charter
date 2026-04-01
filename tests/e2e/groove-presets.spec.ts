@@ -7,16 +7,6 @@ test.describe('Groove Grid Quick Presets', () => {
 
     // Wait for the groove grid to be visible
     await expect(page.getByTestId('groove-grid')).toBeVisible();
-
-    const testIds = await page.evaluate(() => {
-      return Array.from(document.querySelectorAll('[data-testid]')).map(
-        (el) => (el as HTMLElement).dataset.testid,
-      );
-    });
-    console.log('Found Test IDs:', testIds);
-
-    // Allow for hydration
-    await page.waitForTimeout(1000);
   });
 
   test('should show quick presets menu when clicking instrument name', async ({ page }) => {
@@ -83,10 +73,8 @@ test.describe('Groove Grid Quick Presets', () => {
 
   test('should filter presets for 5/4 time signature', async ({ page }) => {
     // Change to 5/4 using the toolbar inputs
-    const beatsInput = page
-      .locator('input[type="number"]')
-      .filter({ has: page.locator('..').getByText('/') })
-      .first();
+    const timeSignatureContainer = page.getByText('/').locator('..');
+    const beatsInput = timeSignatureContainer.locator('input[type="number"]').first();
     await beatsInput.fill('5');
     await beatsInput.press('Enter');
 
@@ -96,8 +84,8 @@ test.describe('Groove Grid Quick Presets', () => {
       .locator('button[title="Click for Quick Presets"]')
       .click();
 
-    // Verify Upbeats is NOT visible, but All On is
-    await expect(page.getByRole('menuitem', { name: /Upbeats/i })).not.toBeVisible();
+    // Verify Upbeats is NOT present, but All On is
+    await expect(page.getByRole('menuitem', { name: /Upbeats/i })).toHaveCount(0);
     await expect(page.getByRole('menuitem', { name: /All On/i })).toBeVisible();
   });
 });
