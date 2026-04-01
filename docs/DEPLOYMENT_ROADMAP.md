@@ -50,15 +50,15 @@ You will need to configure these in your Vercel Project Settings for both **Prod
 
 Vercel provides a built-in staging environment for free:
 1. **Production**: Every push to `main` updates the production site.
-2. **Staging**: Every Pull Request (PR) or push to a feature branch generates a unique "Preview URL" (e.g., `drum-charter-git-feature-xyz.vercel.app`).
+2. **Staging**: Every Pull Request (PR) or push to a feature branch generates a unique "Preview URL" (e.g., `drumcharter-git-feature-xyz.vercel.app`).
 3. **Validation**: You can test your full PWA and offline features on these preview URLs before merging to `main`.
 
 ---
 
 ## ✅ Phase 4: Production Checklist
 
-* [ ] **Verify Migrations**: Ensure `supabase db push` completed without errors.
-* [ ] **SSL/HTTPS**: Vercel handles this automatically, which is required for our PWA features.
-* [ ] **Service Worker**: Ensure `next-pwa` (or Serwist) is correctly building in production mode.
-* [ ] **Database Types**: Run `pnpm supabase:gen-types` to ensure types match the cloud schema.
-* [ ] **E2E Tests**: Run Playwright against the Vercel Preview URL once live.
+- [x] **Verify Migrations**: Ensure `supabase db push` completed without errors.
+- [x] **SSL/HTTPS**: Vercel handles this automatically, which is required for our PWA features.
+- [x] **Service Worker**: Ensure `next-pwa` (or Serwist) is correctly building in production mode.
+- [x] **Database Types**: Run `pnpm supabase:gen-types` to ensure types match the cloud schema.
+- [x] **Initial Deployment**: Successfully promoted `staging` to `main`.
