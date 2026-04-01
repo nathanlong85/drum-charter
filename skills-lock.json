@@ -10,6 +10,11 @@
       "source": "coderabbitai/skills",
       "sourceType": "github",
       "computedHash": "7f793b91a34e2222e54572de0f8c52abdda222d4e06c1cd4ae959117c1c976e2"
+    },
+    "supabase-postgres-best-practices": {
+      "source": "supabase/agent-skills",
+      "sourceType": "github",
+      "computedHash": "9c87c315aed143ee3b34bec8117100f5035e0df09e6b23e1ecc772cff434c9ad"
     }
   }
 }
