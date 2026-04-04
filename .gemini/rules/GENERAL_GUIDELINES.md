@@ -17,6 +17,7 @@ Work is "Done" when it is verified, in an up-to-date PR, and the Copilot loop is
 
 ### Code Changes
 
+* **Test Parity**: **Every** modified `.ts` or `.tsx` file MUST have a corresponding `.test.ts` or `.test.tsx` file containing comprehensive tests for the changes.
 * **Linting**: Project fully linted (`pnpm lint` + `pnpm lint:md`) with ZERO errors/warnings.
 * **Testing**: 100% test coverage for new code. All tests pass (`verify_done.sh`).
 * **Review**: Iterative Copilot feedback loop fully completed on the PR.

@@ -49,6 +49,7 @@ Execute the bundled verification script to ensure no regressions or formatting i
 
 In addition to the automated checks, manually verify the following:
 
+- **Test Parity**: Ensure every modified `.ts` or `.tsx` file has a corresponding `.test.ts` or `.test.tsx` file.
 - **100% Test Coverage**: Ensure all new code paths have corresponding unit or E2E tests.
 - **Project Plan Update**: If you completed a task from `docs/PROJECT_PLAN.md`, mark it as complete (`[x]`).
 - **No Residual Debugging**: Ensure no `console.log` or temporary debugging code remains.
@@ -61,6 +62,7 @@ Once all checks pass, you MUST report completion using this exact checklist form
 ```markdown
 ### ✅ Definition of Done Checklist
 
+- [ ] **Test Parity**: 1:1 test-to-code ratio for modified files.
 - [ ] **Clean Lint**: ZERO errors and ZERO warnings.
 - [ ] **Copilot Loop**: Remote iterative loop completed and addressed.
 - [ ] **Unit Tests**: 100% pass rate.
