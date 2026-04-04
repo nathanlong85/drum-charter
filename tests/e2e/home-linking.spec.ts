@@ -26,9 +26,7 @@ test.describe('Universal Home Logo Linking', () => {
   });
 
   test('top bar logo links to home and has hover effects', async ({ page }) => {
-    const topBarLogo = page
-      .locator('header')
-      .getByRole('link', { name: 'DrumCharter Home' });
+    const topBarLogo = page.locator('header').getByRole('link', { name: 'DrumCharter Home' });
 
     // Check link destination
     await expect(topBarLogo).toHaveAttribute('href', '/');
