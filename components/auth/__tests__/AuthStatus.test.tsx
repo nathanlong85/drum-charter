@@ -4,7 +4,7 @@ import { vi } from 'vitest';
 import { AuthStatus } from '../AuthStatus';
 
 const mockGetUser = vi.fn();
-const mockSignOut = vi.fn();
+const mockSignOut = vi.fn(() => Promise.resolve({ error: null }));
 const mockOnAuthStateChange = vi.fn(() => ({
   data: { subscription: { unsubscribe: vi.fn() } },
 }));
@@ -63,7 +63,8 @@ describe('AuthStatus', () => {
       expect(screen.getByText('End Session')).toBeInTheDocument();
     });
 
-    await userEvent.click(screen.getByText('End Session'));
+    const user = userEvent.setup();
+    await user.click(screen.getByText('End Session'));
     expect(mockSignOut).toHaveBeenCalled();
   });
 

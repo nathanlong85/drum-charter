@@ -4,7 +4,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import type { User } from '@supabase/supabase-js';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 export function AuthStatus() {
@@ -38,9 +38,11 @@ export function AuthStatus() {
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
+  const handleLogout = useCallback(() => {
+    supabase.auth.signOut().catch((err) => {
+      console.error('Sign out error:', err);
+    });
+  }, [supabase.auth]);
 
   const isGuest = user?.is_anonymous;
 
