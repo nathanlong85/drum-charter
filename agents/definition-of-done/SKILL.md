@@ -20,11 +20,11 @@ When you think you've finished a task (feature, bug fix, or documentation update
 
 Before final verification, you MUST complete the iterative feedback loop as defined in `CODE_REVIEW_PROTOCOL.md`.
 
-1.  **Verification**: Ensure changes are fully linted and tested (aim for 100% coverage).
-2.  **Push & PR**: Push changes and open/update a Pull Request.
-3.  **Request Review**: Request a review from **Copilot** on the PR (use `mcp_github_request_copilot_review`).
-4.  **Poll & Address**: Wait for Copilot and CI. Address ALL relevant comments or flag for discussion.
-5.  **Repeat**: Repeat until the review is clean and CI passes.
+1. **Verification**: Ensure changes are fully linted and tested (aim for 100% coverage).
+2. **Push & PR**: Push changes and open/update a Pull Request.
+3. **Request Review**: Request a review from **Copilot** on the PR (use `mcp_github_request_copilot_review`).
+4. **Poll & Address**: Wait for Copilot and CI. Address ALL relevant comments or flag for discussion.
+5. **Repeat**: Repeat until the review is clean and CI passes.
 
 ### 3. Run Linting
 
