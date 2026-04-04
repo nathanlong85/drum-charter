@@ -97,6 +97,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done
 
+- [x] [Navigation] Universal 'Home' Logo Linking: Ensure all logo instances in AppShell act as home links (#98) `✓`
 - [x] [Feature] Quick Row Presets: Per-instrument dropdown for rapid pattern entry and row muting (#89) `✓`
 - [x] [Feature] Groove Snippet Integration: Seamlessly insert pattern snippets into Song Charts and Notebooks (#63) `✓`
 - [x] [Fix] Offline Support Reliability: Enabled and stabilized offline reload check in PWA tests and integrated into CI (#81, #86) `✓`
