@@ -9,8 +9,7 @@ test.describe('Universal Home Logo Linking', () => {
   test('sidebar logo links to home and has hover effects', async ({ page }) => {
     const sidebarLogo = page
       .locator('aside')
-      .filter({ hasText: 'DrumCharter' })
-      .locator('a')
+      .getByRole('link', { name: 'DrumCharter Home' })
       .first();
 
     // Check link destination
@@ -27,7 +26,9 @@ test.describe('Universal Home Logo Linking', () => {
   });
 
   test('top bar logo links to home and has hover effects', async ({ page }) => {
-    const topBarLogo = page.locator('header').getByRole('link', { name: 'DrumCharter' });
+    const topBarLogo = page
+      .locator('header')
+      .getByRole('link', { name: 'DrumCharter Home' });
 
     // Check link destination
     await expect(topBarLogo).toHaveAttribute('href', '/');

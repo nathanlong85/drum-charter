@@ -56,6 +56,7 @@ export function AppShell({ children }: AppShellProps) {
           <Link
             href="/"
             className="flex items-center gap-3 mb-10 group hover:opacity-80 transition-opacity"
+            aria-label="DrumCharter Home"
           >
             <div className="w-10 h-10 shrink-0 bg-primary flex items-center justify-center rounded-lg shadow-[0_0_15px_var(--color-primary-dim)] transition-transform group-hover:scale-105">
               <Music className="w-6 h-6 text-on-primary" />
@@ -131,6 +132,7 @@ export function AppShell({ children }: AppShellProps) {
           <Link
             href="/"
             className="text-primary font-black text-lg font-headline tracking-widest uppercase hidden md:inline-block hover:opacity-80 transition-opacity"
+            aria-label="DrumCharter Home"
           >
             DrumCharter
           </Link>
