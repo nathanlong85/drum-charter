@@ -57,8 +57,8 @@ Vercel provides a built-in staging environment for free:
 
 ## ✅ Phase 4: Production Checklist
 
-- [x] **Verify Migrations**: Ensure `supabase db push` completed without errors.
-- [x] **SSL/HTTPS**: Vercel handles this automatically, which is required for our PWA features.
-- [x] **Service Worker**: Ensure `next-pwa` (or Serwist) is correctly building in production mode.
-- [x] **Database Types**: Run `pnpm supabase:gen-types` to ensure types match the cloud schema.
-- [x] **Initial Deployment**: Successfully promoted `staging` to `main`.
+* [x] **Verify Migrations**: Ensure `supabase db push` completed without errors.
+* [x] **SSL/HTTPS**: Vercel handles this automatically, which is required for our PWA features.
+* [x] **Service Worker**: Ensure `next-pwa` (or Serwist) is correctly building in production mode.
+* [x] **Database Types**: Run `pnpm supabase:gen-types` to ensure types match the cloud schema.
+* [x] **Initial Deployment**: Successfully promoted `staging` to `main`.
