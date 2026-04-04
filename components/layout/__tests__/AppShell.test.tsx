@@ -22,6 +22,16 @@ vi.mock('@/components/auth/AuthStatus', () => ({
   AuthStatus: () => <div data-testid="auth-status">Auth Status</div>,
 }));
 
+// Mock Tooltip and TooltipProvider
+vi.mock('@/components/common/Tooltip', () => ({
+  TooltipProvider: ({ children }: any) => <div data-testid="tooltip-provider">{children}</div>,
+  Tooltip: ({ children, content }: any) => (
+    <div data-testid="mock-tooltip" data-content={content}>
+      {children}
+    </div>
+  ),
+}));
+
 // Partially mock react to control useTransition
 vi.mock('react', async (importOriginal) => {
   const actual: any = await importOriginal();
@@ -75,25 +85,18 @@ describe('AppShell', () => {
     expect(mockRefresh).toHaveBeenCalledTimes(1);
   });
 
-  it('shows tooltip for the refresh button on hover', async () => {
-    // In JSDOM, Tooltip content might only appear after events
+  it('wraps the refresh button in a tooltip with correct content', () => {
     render(
       <AppShell>
         <div>Content</div>
       </AppShell>,
     );
 
+    const tooltip = screen.getByTestId('mock-tooltip');
+    expect(tooltip.getAttribute('data-content')).toBe('Refresh data from cloud');
+
     const refreshButton = screen.getByLabelText('Refresh data');
-
-    // Simulate hover
-    fireEvent.mouseOver(refreshButton);
-
-    // Check for tooltip content - Radix might take a moment to render the portal
-    // or it might be rendered but hidden.
-    // Given our Tooltip.test.tsx used open={true}, we can't easily test hover-triggered
-    // tooltips without more complex setup.
-    // But we know it's wrapped because we can see the button in the trigger.
-    expect(refreshButton).toBeDefined();
+    expect(tooltip.contains(refreshButton)).toBe(true);
   });
 
   it('disables the button and shows spinning icon when pending', async () => {

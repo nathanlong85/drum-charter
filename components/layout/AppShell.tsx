@@ -37,7 +37,7 @@ export function AppShell({ children }: AppShellProps) {
     startTransition(() => {
       router.refresh();
     });
-  }, [router]);
+  }, [router, startTransition]);
 
   const handleOpenSettings = useCallback(() => {
     // Open settings implementation - show a toast or alert for now
