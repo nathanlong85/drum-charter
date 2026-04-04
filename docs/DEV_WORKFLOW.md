@@ -62,11 +62,11 @@ For non-code changes (e.g., updates to `.gemini/rules/*.md`, `docs/*.md`, or `CH
 
 We leverage automated and human feedback before any code is merged into `staging`.
 
-### Step 3.1: Push & Open PR
+### Step 4.1: Push & Open PR
 
 Push your branch to GitHub and open a Pull Request against the `staging` branch. Always include a detailed Markdown description.
 
-### Step 3.2: Copilot Review Loop
+### Step 4.2: Copilot Review Loop
 
 * **Request Review**: Trigger a review from **Copilot** on the PR.
 * **Iterative Feedback**:
@@ -74,12 +74,12 @@ Push your branch to GitHub and open a Pull Request against the `staging` branch.
   * Address **ALL** relevant findings or flag conflicts for human decision.
   * Repeat until the review is clean and all CI checks pass.
 
-### Step 3.3: Human Quality Gate
+### Step 4.3: Human Quality Gate
 
 * **Discussion**: Nate (the human) will review the code and provide qualitative feedback.
 * **Final Approval**: Nate merges the PR into `staging` once satisfied.
 
-## 4. Production Release (Staging to Main)
+## 5. Production Release (Staging to Main)
 
 Once features are stable on `staging` and verified in the staging environment, they are promoted to `main`.
 
@@ -87,7 +87,7 @@ Once features are stable on `staging` and verified in the staging environment, t
 * **Squash Merge**: Features are squashed into `staging`. The promotion from `staging` to `main` is typically a merge commit or fast-forward to preserve history.
 * **Author Attribution**: Ensure the commit is correctly attributed to the human author.
 
-## 5. Security & Secret Management
+## 6. Security & Secret Management
 
 * **.env.junie**: Used for collaborative secrets (e.g., Supabase CLI tokens) shared with Junie.
 * **.env.private**: Reserved for human-only secrets. Junie is strictly forbidden from reading this file.
