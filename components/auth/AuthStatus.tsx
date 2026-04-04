@@ -1,8 +1,10 @@
 'use client';
 
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import type { User } from '@supabase/supabase-js';
-import { LogOut, User as UserIcon } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { LogOut, Settings, User as UserIcon } from 'lucide-react';
+import Link from 'next/link';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 export function AuthStatus() {
@@ -36,16 +38,22 @@ export function AuthStatus() {
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
+  const handleLogout = useCallback(() => {
+    supabase.auth.signOut().catch((err) => {
+      console.error('Sign out error:', err);
+    });
+  }, [supabase.auth]);
 
   const isGuest = user?.is_anonymous;
 
   if (loading)
     return (
-      <div className="text-[10px] font-headline font-black text-on-surface-variant uppercase tracking-widest animate-pulse">
-        Loading auth...
+      <div
+        className="w-8 h-8 rounded-full bg-surface-container-highest animate-pulse border border-outline-variant/10"
+        role="status"
+        aria-label="Loading user profile"
+      >
+        <span className="sr-only">Loading user profile</span>
       </div>
     );
 
@@ -86,37 +94,62 @@ export function AuthStatus() {
   }
 
   return (
-    <div className="flex flex-col gap-3" data-testid="auth-status-user">
-      <div className="flex items-center gap-3 px-3 py-2 bg-surface-container-highest rounded-xl border border-outline-variant/10">
-        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
+          type="button"
+          className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary hover:bg-primary/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface outline-none"
+          data-testid="auth-user-avatar"
+          aria-label="User profile menu"
+        >
           <UserIcon size={16} />
-        </div>
-        <div className="flex flex-col min-w-0">
-          <span
-            className="text-[10px] font-headline font-black text-on-surface uppercase tracking-tight truncate"
+        </button>
+      </DropdownMenu.Trigger>
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          className="min-w-[220px] bg-surface-container-highest rounded-xl border border-outline-variant/10 p-2 shadow-lg animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2 z-50 mr-4 mt-2"
+          align="end"
+          sideOffset={8}
+        >
+          <div
+            className="px-3 py-2 mb-2 flex flex-col min-w-0 border-b border-outline-variant/10 pb-3"
             data-testid="auth-user-email"
           >
-            {user.email || user.phone || 'No email provided'}
-          </span>
-          {/* TODO: Drive this from user account metadata (app_metadata.tier) when available */}
-          {user.app_metadata?.tier === 'pro' ? (
-            <span className="text-[8px] font-headline font-bold text-primary uppercase tracking-widest">
-              PRO ACCOUNT
+            <span className="text-[10px] font-headline font-black text-on-surface uppercase tracking-tight truncate">
+              {user.email || user.phone || 'No email provided'}
             </span>
-          ) : user.app_metadata?.tier === 'basic' ? (
-            <span className="text-[8px] font-headline font-bold text-on-surface-variant uppercase tracking-widest opacity-50">
-              BASIC ACCOUNT
-            </span>
-          ) : null}
-        </div>
-      </div>
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-2 text-[10px] font-headline font-bold text-on-surface-variant hover:text-error transition-colors px-1"
-      >
-        <LogOut size={12} />
-        Sign Out
-      </button>
-    </div>
+            {user.app_metadata?.tier === 'pro' ? (
+              <span className="text-[8px] font-headline font-bold text-primary uppercase tracking-widest mt-1">
+                PRO ACCOUNT
+              </span>
+            ) : user.app_metadata?.tier === 'basic' ? (
+              <span className="text-[8px] font-headline font-bold text-on-surface-variant uppercase tracking-widest opacity-50 mt-1">
+                BASIC ACCOUNT
+              </span>
+            ) : null}
+          </div>
+
+          <DropdownMenu.Item asChild>
+            <Link
+              href="/settings"
+              className="flex items-center gap-2 px-3 py-2 text-[10px] font-headline font-bold text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors cursor-pointer outline-none focus:bg-surface-container focus:text-on-surface"
+            >
+              <Settings size={14} />
+              Settings
+            </Link>
+          </DropdownMenu.Item>
+
+          <DropdownMenu.Separator className="h-px bg-outline-variant/10 my-1" />
+
+          <DropdownMenu.Item
+            onSelect={handleLogout}
+            className="flex items-center gap-2 px-3 py-2 text-[10px] font-headline font-bold text-error/80 hover:text-error hover:bg-error/10 rounded-lg transition-colors cursor-pointer outline-none focus:bg-error/10 focus:text-error"
+          >
+            <LogOut size={14} />
+            Sign Out
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }

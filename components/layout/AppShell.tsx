@@ -9,7 +9,6 @@ import {
   Music,
   RefreshCw,
   Search,
-  Settings,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -27,8 +26,8 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const currentTab = searchParams.get('tab');
   const supabaseStatus = useSupabaseStatus();
@@ -38,11 +37,6 @@ export function AppShell({ children }: AppShellProps) {
       router.refresh();
     });
   }, [router]);
-
-  const handleOpenSettings = useCallback(() => {
-    // Open settings implementation - show a toast or alert for now
-    alert('System settings are not yet available.');
-  }, []);
 
   const navItems = [
     { name: 'Songs', href: '/library?tab=song', icon: Music, tab: 'song' },
@@ -166,8 +160,8 @@ export function AppShell({ children }: AppShellProps) {
               />
             </div>
             <div className="flex items-center gap-4 text-on-surface-variant/60">
-              <Tooltip content="Refresh data from cloud" side="bottom">
-                <span className="inline-block">
+              <Tooltip content="Refresh data" side="bottom">
+                <span className="flex">
                   <button
                     onClick={handleRefresh}
                     className="hover:text-primary transition-colors p-2 hover:bg-surface-container-highest/50 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
@@ -179,14 +173,6 @@ export function AppShell({ children }: AppShellProps) {
                   </button>
                 </span>
               </Tooltip>
-              <button
-                onClick={handleOpenSettings}
-                className="hover:text-primary transition-colors p-2 hover:bg-surface-container-highest/50 rounded-full"
-                type="button"
-                aria-label="System settings"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </header>
