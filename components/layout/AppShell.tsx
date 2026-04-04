@@ -160,7 +160,7 @@ export function AppShell({ children }: AppShellProps) {
               />
             </div>
             <div className="flex items-center gap-4 text-on-surface-variant/60">
-              <Tooltip content="Refresh data (R)" side="bottom">
+              <Tooltip content="Refresh data" side="bottom">
                 <span className="flex">
                   <button
                     onClick={handleRefresh}

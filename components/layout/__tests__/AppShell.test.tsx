@@ -93,7 +93,7 @@ describe('AppShell', () => {
     );
 
     const tooltip = screen.getByTestId('mock-tooltip');
-    expect(tooltip.getAttribute('data-content')).toBe('Refresh data (R)');
+    expect(tooltip.getAttribute('data-content')).toBe('Refresh data');
 
     const refreshButton = screen.getByLabelText('Refresh data');
     expect(tooltip.contains(refreshButton)).toBe(true);

@@ -46,7 +46,13 @@ export function AuthStatus() {
 
   if (loading)
     return (
-      <div className="w-8 h-8 rounded-full bg-surface-container-highest animate-pulse border border-outline-variant/10"></div>
+      <div
+        className="w-8 h-8 rounded-full bg-surface-container-highest animate-pulse border border-outline-variant/10"
+        role="status"
+        aria-label="Loading user profile"
+      >
+        <span className="sr-only">Loading user profile</span>
+      </div>
     );
 
   if (!user) {
@@ -89,6 +95,7 @@ export function AuthStatus() {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
         <button
+          type="button"
           className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary hover:bg-primary/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface outline-none"
           data-testid="auth-user-avatar"
           aria-label="User profile menu"
@@ -133,7 +140,7 @@ export function AuthStatus() {
           <DropdownMenu.Separator className="h-px bg-outline-variant/10 my-1" />
 
           <DropdownMenu.Item
-            onClick={handleLogout}
+            onSelect={handleLogout}
             className="flex items-center gap-2 px-3 py-2 text-[10px] font-headline font-bold text-error/80 hover:text-error hover:bg-error/10 rounded-lg transition-colors cursor-pointer outline-none focus:bg-error/10 focus:text-error"
           >
             <LogOut size={14} />
