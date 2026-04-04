@@ -12,10 +12,10 @@ import {
   Settings,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { type ReactNode, useCallback } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { type ReactNode, useCallback, useTransition } from 'react';
 import { AuthStatus } from '@/components/auth/AuthStatus';
-import { TooltipProvider } from '@/components/common/Tooltip';
+import { Tooltip, TooltipProvider } from '@/components/common/Tooltip';
 import { useSupabaseStatus } from '@/lib/hooks/useSupabaseStatus';
 import packageJson from '@/package.json';
 
@@ -28,13 +28,16 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const currentTab = searchParams.get('tab');
   const supabaseStatus = useSupabaseStatus();
 
   const handleRefresh = useCallback(() => {
-    // Refresh implementation - revalidate current page
-    window.location.reload();
-  }, []);
+    startTransition(() => {
+      router.refresh();
+    });
+  }, [router]);
 
   const handleOpenSettings = useCallback(() => {
     // Open settings implementation - show a toast or alert for now
@@ -49,12 +52,17 @@ export function AppShell({ children }: AppShellProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col font-body antialiased">
-      {/* Sidebar Navigation Shell */}
-      <aside className="fixed left-0 top-0 h-full flex flex-col w-[72px] lg:w-[240px] bg-surface-container-low border-r border-outline-variant/10 z-50 transition-all duration-300 no-print">
+    <TooltipProvider>
+      <div className="min-h-screen bg-surface flex flex-col font-body antialiased">
+        {/* Sidebar Navigation Shell */}
+        <aside className="fixed left-0 top-0 h-full flex flex-col w-[72px] lg:w-[240px] bg-surface-container-low border-r border-outline-variant/10 z-50 transition-all duration-300 no-print">
         <div className="p-6 flex-1 flex flex-col">
-          <div className="flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 shrink-0 bg-primary flex items-center justify-center rounded-lg shadow-[0_0_15px_var(--color-primary-dim)]">
+          <Link
+            href="/"
+            className="flex items-center gap-3 mb-10 group hover:opacity-80 transition-opacity"
+            aria-label="DrumCharter Home"
+          >
+            <div className="w-10 h-10 shrink-0 bg-primary flex items-center justify-center rounded-lg shadow-[0_0_15px_var(--color-primary-dim)] transition-transform group-hover:scale-105">
               <Music className="w-6 h-6 text-on-primary" />
             </div>
             <div className="hidden lg:block overflow-hidden">
@@ -65,7 +73,7 @@ export function AppShell({ children }: AppShellProps) {
                 Pro Console
               </p>
             </div>
-          </div>
+          </Link>
 
           <nav className="space-y-1 font-label text-sm tracking-tight">
             {navItems.map((item) => {
@@ -125,9 +133,13 @@ export function AppShell({ children }: AppShellProps) {
       {/* Top App Bar Shell */}
       <header className="fixed top-0 right-0 left-[72px] lg:left-[240px] z-40 flex justify-between items-center px-6 h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 transition-all duration-300 no-print">
         <div className="flex items-center gap-6">
-          <span className="text-primary font-black text-lg font-headline tracking-widest uppercase hidden md:inline-block">
+          <Link
+            href="/"
+            className="text-primary font-black text-lg font-headline tracking-widest uppercase hidden md:inline-block hover:opacity-80 transition-opacity"
+            aria-label="DrumCharter Home"
+          >
             DrumCharter
-          </span>
+          </Link>
           <div className="hidden md:block h-4 w-[1px] bg-outline-variant/20"></div>
           <div className="flex items-center gap-2 text-primary/60 font-label text-[10px] tracking-[0.25em] font-bold">
             <Cloud className={`w-4 h-4 ${supabaseStatus === 'connected' ? 'animate-pulse' : ''}`} />
@@ -152,14 +164,19 @@ export function AppShell({ children }: AppShellProps) {
             />
           </div>
           <div className="flex items-center gap-4 text-on-surface-variant/60">
-            <button
-              onClick={handleRefresh}
-              className="hover:text-primary transition-colors p-2 hover:bg-surface-container-highest/50 rounded-full"
-              type="button"
-              aria-label="Refresh data"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
+            <Tooltip content="Refresh data from cloud" side="bottom">
+              <span className="inline-block">
+                <button
+                  onClick={handleRefresh}
+                  className="hover:text-primary transition-colors p-2 hover:bg-surface-container-highest/50 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                  type="button"
+                  aria-label="Refresh data"
+                  disabled={isPending}
+                >
+                  <RefreshCw className={`w-4 h-4 ${isPending ? 'animate-spin' : ''}`} />
+                </button>
+              </span>
+            </Tooltip>
             <button
               onClick={handleOpenSettings}
               className="hover:text-primary transition-colors p-2 hover:bg-surface-container-highest/50 rounded-full"
@@ -174,7 +191,7 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Main Workspace Canvas */}
       <main className="ml-[72px] lg:ml-[240px] pt-16 flex-1 transition-all duration-300 relative">
-        <TooltipProvider>{children}</TooltipProvider>
+        {children}
       </main>
 
       {/* System Status Bar */}
@@ -193,6 +210,7 @@ export function AppShell({ children }: AppShellProps) {
           </span>
         </div>
       </footer>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 }

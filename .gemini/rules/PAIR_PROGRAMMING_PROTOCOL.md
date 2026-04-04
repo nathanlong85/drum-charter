@@ -9,7 +9,16 @@ Before starting ANY new work on an issue or task:
 3. **Branch**: Switch to a new, appropriately-named branch for the task (e.g., `git checkout -b feature/issue-number-description`).
 4. **Project Status**: Mark the corresponding issue/task as "In Progress" on the project status board (e.g., using `gh project item-edit`).
 
-## 2. Pre-Push & PR Protocol (Mandatory)
+## 2. Testing Lockdown (Mandatory)
+
+I am strictly FORBIDDEN from staging any `.ts` or `.tsx` file unless it is accompanied by its corresponding `.test.ts` or `.test.tsx` file.
+
+1. **Verify Existing Tests**: Search for existing tests for the modified component/module.
+2. **Add Coverage**: If tests exist, add cases for the new behavior.
+3. **Create New Tests**: If no tests exist, I must create a new test file that follows the project's established testing patterns (e.g., using `@testing-library/react` and `vitest`).
+4. **Failure State**: If I cannot write tests for a specific reason (e.g., untestable side-effect), I MUST explain this and seek user approval before committing.
+
+## 3. Pre-Push & PR Protocol (Mandatory)
 
 I am strictly FORBIDDEN from considering a task "Done" unless the following conditions are met:
 
