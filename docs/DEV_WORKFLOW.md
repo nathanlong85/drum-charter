@@ -16,11 +16,11 @@ We use a strict branching and PR-based feedback loop for all code changes.
 
 ### Step 2.1: Branching
 
-Always create a new branch from `main` for any new task:
+Always create a new branch from `staging` for any new task:
 
 ```bash
-git checkout main
-git pull origin main
+git checkout staging
+git pull origin staging
 git checkout -b feature/your-feature-name
 ```
 
@@ -60,13 +60,13 @@ For non-code changes (e.g., updates to `.gemini/rules/*.md`, `docs/*.md`, or `CH
 
 ## 4. Pull Request & Code Review
 
-We leverage automated and human feedback before any code is merged into `main`.
+We leverage automated and human feedback before any code is merged into `staging`.
 
-### Step 3.1: Push & Open PR
+### Step 4.1: Push & Open PR
 
-Push your branch to GitHub and open a Pull Request. Always include a detailed Markdown description.
+Push your branch to GitHub and open a Pull Request against the `staging` branch. Always include a detailed Markdown description.
 
-### Step 3.2: Copilot Review Loop
+### Step 4.2: Copilot Review Loop
 
 * **Request Review**: Trigger a review from **Copilot** on the PR.
 * **Iterative Feedback**:
@@ -74,18 +74,20 @@ Push your branch to GitHub and open a Pull Request. Always include a detailed Ma
   * Address **ALL** relevant findings or flag conflicts for human decision.
   * Repeat until the review is clean and all CI checks pass.
 
-### Step 3.3: Human Quality Gate
+### Step 4.3: Human Quality Gate
 
 * **Discussion**: Nate (the human) will review the code and provide qualitative feedback.
-* **Final Approval**: Nate merges the PR once satisfied.
+* **Final Approval**: Nate merges the PR into `staging` once satisfied.
 
-## 4. Merging
+## 5. Production Release (Staging to Main)
 
-* **Responsibility**: Merging is a human-only task.
-* **Squash Merge**: All features are squashed into a single commit on `main` to keep the history clean.
-* **Author Attribution**: Ensure the squashed commit is correctly attributed to the human author.
+Once features are stable on `staging` and verified in the staging environment, they are promoted to `main`.
 
-## 5. Security & Secret Management
+* **Responsibility**: Merging into `main` is a human-only task, usually automated via the `release-manager` skill which creates the PR.
+* **Squash Merge**: Features are squashed into `staging`. The promotion from `staging` to `main` is typically a merge commit or fast-forward to preserve history.
+* **Author Attribution**: Ensure the commit is correctly attributed to the human author.
+
+## 6. Security & Secret Management
 
 * **.env.junie**: Used for collaborative secrets (e.g., Supabase CLI tokens) shared with Junie.
 * **.env.private**: Reserved for human-only secrets. Junie is strictly forbidden from reading this file.

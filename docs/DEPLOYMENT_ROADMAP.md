@@ -48,17 +48,18 @@ You will need to configure these in your Vercel Project Settings for both **Prod
 
 ## 🔄 Phase 3: The Staging Workflow (Vercel Previews)
 
-Vercel provides a built-in staging environment for free:
-1. **Production**: Every push to `main` updates the production site.
-2. **Staging**: Every Pull Request (PR) or push to a feature branch generates a unique "Preview URL" (e.g., `drum-charter-git-feature-xyz.vercel.app`).
-3. **Validation**: You can test your full PWA and offline features on these preview URLs before merging to `main`.
+We use a staging-first development workflow:
+1. **Production**: Every merge to `main` updates the production site (`drum-charter.vercel.app`).
+2. **Staging**: The `staging` branch is our default branch. Every push to `staging` updates the stable staging environment.
+3. **Previews**: Every Pull Request (PR) against `staging` generates a unique "Preview URL" (e.g., `drum-charter-git-feature-xyz.vercel.app`).
+4. **Validation**: Test full PWA and offline features on these preview URLs before merging to `staging`. Promoting from `staging` to `main` is done when a release is stable.
 
 ---
 
 ## ✅ Phase 4: Production Checklist
 
-* [ ] **Verify Migrations**: Ensure `supabase db push` completed without errors.
-* [ ] **SSL/HTTPS**: Vercel handles this automatically, which is required for our PWA features.
-* [ ] **Service Worker**: Ensure `next-pwa` (or Serwist) is correctly building in production mode.
-* [ ] **Database Types**: Run `pnpm supabase:gen-types` to ensure types match the cloud schema.
-* [ ] **E2E Tests**: Run Playwright against the Vercel Preview URL once live.
+* [x] **Verify Migrations**: Ensure `supabase db push` completed without errors.
+* [x] **SSL/HTTPS**: Vercel handles this automatically, which is required for our PWA features.
+* [x] **Service Worker**: Ensure `next-pwa` (or Serwist) is correctly building in production mode.
+* [x] **Database Types**: Run `pnpm supabase:gen-types` to ensure types match the cloud schema.
+* [x] **Initial Deployment**: Successfully promoted `staging` to `main`.

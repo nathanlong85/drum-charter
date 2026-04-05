@@ -18,6 +18,7 @@
 * **Next.js**: Runs on port `3001`.
 * **Supabase**: Local Docker instance on `http://localhost:54321`.
 * **Database**: Migrations in `supabase/migrations/`.
+* **Default Branch**: `staging` is the default branch for active development. `main` is reserved for production releases.
 
 ## 🛠️ Engineering Excellence
 

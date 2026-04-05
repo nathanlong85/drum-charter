@@ -1,5 +1,7 @@
 # 🥁 DrumCharter
 
+**Live App**: [https://drumcharter.vercel.app](https://drumcharter.vercel.app)
+
 DrumCharter is a web application tailored for drummers to create, manage, and share drum charts, practice exercises, and groove snippets. It aims to replace cumbersome word processor templates with a streamlined, interactive tool.
 
 ## 🚀 Features

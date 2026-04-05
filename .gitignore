@@ -61,3 +61,6 @@ coderabbit_full_review.txt
 .output.txt
 
 tmp/
+
+/.agents/
+/.gemini/skills/
