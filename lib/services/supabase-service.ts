@@ -262,7 +262,7 @@ export const supabaseService = {
     const supabase = supabaseParam || createBrowserClient();
     const { data, error } = await supabase
       .from('song_charts')
-      .select('id, title, bpm, created_at')
+      .select('id, title, bpm, created_at, updated_at')
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
@@ -349,7 +349,7 @@ export const supabaseService = {
     const supabase = supabaseParam || createBrowserClient();
     const { data, error } = await supabase
       .from('notebooks')
-      .select('id, title, created_at')
+      .select('id, title, created_at, updated_at')
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
