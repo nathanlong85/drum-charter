@@ -19,7 +19,12 @@ import { type MouseEvent, useState } from 'react';
 import { LibraryCard } from '@/components/library/LibraryCard';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { RecentItem } from '@/lib/types/dashboard';
-import type { GrooveSnippet, Notebook, SongChart } from '@/lib/types/groove';
+import {
+  createDefaultDrumInstruments,
+  type GrooveSnippet,
+  type Notebook,
+  type SongChart,
+} from '@/lib/types/groove';
 
 interface DashboardViewProps {
   user: User;
@@ -68,15 +73,22 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
         const saved = await supabaseService.saveNotebook(newNotebook);
         savedId = saved?.id;
       } else if (type === 'snippet') {
+        const timeSignature = { beatsPerMeasure: 4, beatValue: 4 };
+        const resolution = 16;
+        const measures = 1;
         const newSnippet: GrooveSnippet = {
           id: crypto.randomUUID(),
           userId,
           title: 'Untitled Snippet',
           bpm: 100,
-          measures: 1,
-          timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-          resolution: 16,
-          instruments: [],
+          measures,
+          timeSignature,
+          resolution,
+          instruments: createDefaultDrumInstruments({
+            timeSignature,
+            resolution,
+            measures,
+          }),
           isPublic: false,
           tags: [],
           createdAt: null,

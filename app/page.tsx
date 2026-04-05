@@ -38,22 +38,22 @@ async function DashboardContent({ user }: { user: User | null }) {
         type: 'song' as const,
         title: s.title,
         bpm: s.bpm ?? undefined,
-        createdAt: s.created_at ?? '',
-        updatedAt: s.updated_at ?? '',
+        createdAt: s.created_at ?? null,
+        updatedAt: s.updated_at ?? null,
       })),
       ...(notebooks || []).map((n) => ({
         id: n.id,
         type: 'notebook' as const,
         title: n.title,
-        createdAt: n.created_at ?? '',
-        updatedAt: n.updated_at ?? '',
+        createdAt: n.created_at ?? null,
+        updatedAt: n.updated_at ?? null,
       })),
       ...(snippets || []).map((s) => ({
         id: s.id,
         type: 'snippet' as const,
         title: s.title,
-        createdAt: s.created_at ?? '',
-        updatedAt: s.updated_at ?? '',
+        createdAt: s.created_at ?? null,
+        updatedAt: s.updated_at ?? null,
       })),
     ];
 

@@ -12,6 +12,7 @@ const mockSupabase: any = {
   eq: vi.fn(),
   delete: vi.fn(),
   order: vi.fn(),
+  limit: vi.fn(),
   maybeSingle: vi.fn(),
   single: vi.fn(),
 };
@@ -29,6 +30,7 @@ const mockResponse = <TData = any, TError = any>(
     eq: vi.fn().mockReturnThis(),
     delete: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
     maybeSingle: vi.fn().mockResolvedValue({ data, error }),
     single: vi.fn().mockResolvedValue({ data, error }),
   };
@@ -38,6 +40,7 @@ const mockResponse = <TData = any, TError = any>(
   mockSupabase.eq = mock.eq;
   mockSupabase.delete = mock.delete;
   mockSupabase.order = mock.order;
+  mockSupabase.limit = mock.limit;
   mockSupabase.maybeSingle = mock.maybeSingle;
   mockSupabase.single = mock.single;
   return mock;
@@ -297,6 +300,16 @@ describe('supabaseService', () => {
       await expect(supabaseService.listSongCharts(mockSupabase)).rejects.toThrow('List error');
       await expect(supabaseService.listNotebooks(mockSupabase)).rejects.toThrow('List error');
       await expect(supabaseService.listGrooveSnippets(mockSupabase)).rejects.toThrow('List error');
+    });
+
+    it('list operations support limit parameter', async () => {
+      mockSupabase.from.mockReturnValue(mockResponse([{ id: '1' }]));
+      await supabaseService.listSongCharts(mockSupabase, 5);
+      await supabaseService.listNotebooks(mockSupabase, 5);
+      await supabaseService.listGrooveSnippets(mockSupabase, 5);
+
+      expect(mockSupabase.limit).toHaveBeenCalledWith(5);
+      expect(mockSupabase.limit).toHaveBeenCalledTimes(3);
     });
 
     it('delete operations call supabase delete', async () => {
