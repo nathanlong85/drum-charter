@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Groove Grid Quick Presets', () => {
+  // Use unauthenticated state to see the home page demo
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   test.beforeEach(async ({ page }) => {
     // Use the demo on the home page for testing
     await page.goto('/');
