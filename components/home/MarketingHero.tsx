@@ -42,7 +42,7 @@ export function MarketingHero() {
               className="group relative px-10 py-5 bg-primary text-on-primary font-headline font-black text-xs uppercase tracking-widest rounded-2xl transition-all shadow-2xl shadow-primary/30 hover:shadow-primary/50 hover:-translate-y-1"
             >
               <span className="flex items-center gap-3">
-                Start Creating (Guest Mode)
+                Sign In to Start Creating
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
             </Link>

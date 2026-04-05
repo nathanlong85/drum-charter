@@ -5,7 +5,7 @@ import { DashboardView } from '@/components/home/DashboardView';
 import { MarketingHero } from '@/components/home/MarketingHero';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
-import type { GrooveSnippet, Notebook, SongChart } from '@/lib/types/groove';
+import type { RecentItem } from '@/lib/types/dashboard';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -13,27 +13,48 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  let recentItems: (SongChart | Notebook | GrooveSnippet | any)[] = [];
+  let recentItems: RecentItem[] = [];
 
   if (user) {
     try {
+      // Fetch only top 3 of each to ensure we have enough for sorting,
+      // and to avoid pulling unnecessary data.
       const [songs, notebooks, snippets] = await Promise.all([
-        supabaseService.listSongCharts(supabase),
-        supabaseService.listNotebooks(supabase),
-        supabaseService.listGrooveSnippets(supabase),
+        supabaseService.listSongCharts(supabase, 3),
+        supabaseService.listNotebooks(supabase, 3),
+        supabaseService.listGrooveSnippets(supabase, 3),
       ]);
 
-      const items = [
-        ...(songs || []).map((s) => ({ ...s, type: 'song' as const })),
-        ...(notebooks || []).map((n) => ({ ...n, type: 'notebook' as const })),
-        ...(snippets || []).map((s) => ({ ...s, type: 'snippet' as const })),
+      const items: RecentItem[] = [
+        ...(songs || []).map((s) => ({
+          id: s.id,
+          type: 'song' as const,
+          title: s.title,
+          bpm: s.bpm ?? undefined,
+          createdAt: s.created_at || '',
+          updatedAt: s.updated_at || '',
+        })),
+        ...(notebooks || []).map((n) => ({
+          id: n.id,
+          type: 'notebook' as const,
+          title: n.title,
+          createdAt: n.created_at || '',
+          updatedAt: n.updated_at || '',
+        })),
+        ...(snippets || []).map((s) => ({
+          id: s.id,
+          type: 'snippet' as const,
+          title: s.title,
+          createdAt: s.created_at || '',
+          updatedAt: s.updated_at || '',
+        })),
       ];
 
-      // Sort by updated_at or created_at descending
-      recentItems = (items as any[])
+      // Sort by updated_at or created_at descending and take top 3 total
+      recentItems = items
         .sort((a, b) => {
-          const dateA = new Date(a.updated_at || a.created_at || 0).getTime();
-          const dateB = new Date(b.updated_at || b.created_at || 0).getTime();
+          const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+          const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
           return dateB - dateA;
         })
         .slice(0, 3);

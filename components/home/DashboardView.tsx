@@ -15,14 +15,15 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { type MouseEvent, useState } from 'react';
 import { LibraryCard } from '@/components/library/LibraryCard';
 import { supabaseService } from '@/lib/services/supabase-service';
+import type { RecentItem } from '@/lib/types/dashboard';
 import type { GrooveSnippet, Notebook, SongChart } from '@/lib/types/groove';
 
 interface DashboardViewProps {
   user: User;
-  recentItems: (SongChart | Notebook | GrooveSnippet | any)[];
+  recentItems: RecentItem[];
 }
 
 export function DashboardView({ user, recentItems }: DashboardViewProps) {
@@ -33,6 +34,7 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
     setIsCreating(true);
     try {
       const userId = user.id;
+      let savedId: string | undefined;
 
       if (type === 'song') {
         const newSong: SongChart = {
@@ -51,9 +53,7 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
           updatedAt: null,
         };
         const saved = await supabaseService.saveSongChart(newSong);
-        if (saved?.id) {
-          router.push(`/songs/${saved.id}`);
-        }
+        savedId = saved?.id;
       } else if (type === 'notebook') {
         const newNotebook: Notebook = {
           id: crypto.randomUUID(),
@@ -66,9 +66,7 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
           updatedAt: null,
         };
         const saved = await supabaseService.saveNotebook(newNotebook);
-        if (saved?.id) {
-          router.push(`/notebooks/${saved.id}`);
-        }
+        savedId = saved?.id;
       } else if (type === 'snippet') {
         const newSnippet: GrooveSnippet = {
           id: crypto.randomUUID(),
@@ -85,18 +83,26 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
           updatedAt: null,
         };
         const saved = await supabaseService.saveGrooveSnippet(newSnippet);
-        if (saved?.id) {
-          router.push(`/snippets/${saved.id}`);
-        }
+        savedId = saved?.id;
+      }
+
+      if (savedId) {
+        const routePrefix =
+          type === 'song' ? 'songs' : type === 'notebook' ? 'notebooks' : 'snippets';
+        router.push(`/${routePrefix}/${savedId}`);
+      } else {
+        throw new Error('Failed to obtain ID for new item');
       }
     } catch (e) {
       console.error('Failed to create new item:', e);
       alert('Failed to create new item. Please try again.');
       setIsCreating(false);
     }
+    // We don't setIsCreating(false) in finally because we are navigating away on success.
+    // If it fails, we reset it in the catch.
   };
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, _href: string) => {
+  const handleLinkClick = (e: MouseEvent<HTMLAnchorElement>, _href: string) => {
     if (isCreating) {
       e.preventDefault();
     }
@@ -238,16 +244,16 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
                     key={item.id}
                     item={{
                       id: item.id,
-                      title: item.title || item.header?.title || 'Untitled',
+                      title: item.title || 'Untitled',
                       type: item.type,
-                      bpm: item.bpm || item.header?.bpm,
-                      createdAt: item.created_at || item.createdAt || new Date().toISOString(),
+                      bpm: item.bpm,
+                      createdAt: item.createdAt || new Date().toISOString(),
                     }}
-                    onDelete={() => {
+                    onDelete={(_id, _type) => {
                       /* Not implemented on dashboard */
                       alert('Please visit the Library to delete items.');
                     }}
-                    onDuplicate={() => {
+                    onDuplicate={(_id, _type) => {
                       /* Not implemented on dashboard */
                       alert('Please visit the Library to duplicate items.');
                     }}

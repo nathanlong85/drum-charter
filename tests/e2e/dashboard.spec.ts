@@ -1,17 +1,18 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Dashboard (Mission Control)', () => {
-  test('Guest user sees Marketing Hero', async ({ page }) => {
-    // Ensure we are not logged in for this test
-    await page.context().clearCookies();
-    await page.goto('/');
+  test.describe('Guest', () => {
+    test.use({ storageState: { cookies: [], origins: [] } });
 
-    // Check for Marketing Hero elements
-    await expect(page.getByText(/The Workspace Built For Rhythm/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /Start Creating \(Guest Mode\)/i })).toBeVisible();
-    await expect(page.getByText(/V1.0 ALPHA REDESIGN NOW LIVE/i)).toBeVisible();
+    test('Guest user sees Marketing Hero', async ({ page }) => {
+      await page.goto('/');
+
+      // Check for Marketing Hero elements
+      await expect(page.getByText(/The Workspace Built For Rhythm/i)).toBeVisible();
+      await expect(page.getByRole('link', { name: /Sign In to Start Creating/i })).toBeVisible();
+      await expect(page.getByText(/V1.0 ALPHA REDESIGN NOW LIVE/i)).toBeVisible();
+    });
   });
-
   test.describe('Authenticated Dashboard', () => {
     // Use the storage state from auth.setup.ts
     test.use({ storageState: 'playwright/.auth/user.json' });
