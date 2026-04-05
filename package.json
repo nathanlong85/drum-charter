@@ -13,7 +13,7 @@
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
-    "skills:link": "gemini skills link agents/onboard --scope workspace --consent && gemini skills link agents/release-manager --scope workspace --consent && gemini skills link agents/definition-of-done --scope workspace --consent",
+    "skills:link": "gemini skills link agents/skills/ --scope workspace --consent",
     "format": "prettier --write ."
   },
   "dependencies": {
