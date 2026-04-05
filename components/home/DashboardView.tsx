@@ -249,14 +249,6 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
                       bpm: item.bpm,
                       createdAt: item.createdAt || new Date().toISOString(),
                     }}
-                    onDelete={(_id, _type) => {
-                      /* Not implemented on dashboard */
-                      alert('Please visit the Library to delete items.');
-                    }}
-                    onDuplicate={(_id, _type) => {
-                      /* Not implemented on dashboard */
-                      alert('Please visit the Library to duplicate items.');
-                    }}
                   />
                 ))}
               </div>

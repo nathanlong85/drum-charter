@@ -1,5 +1,6 @@
 import { Music } from 'lucide-react';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { AuthStatus } from '@/components/auth/AuthStatus';
 import { DashboardView } from '@/components/home/DashboardView';
 import { MarketingHero } from '@/components/home/MarketingHero';
@@ -7,61 +8,87 @@ import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
 import type { RecentItem } from '@/lib/types/dashboard';
 
-export default async function Home() {
+async function DashboardContent() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  if (!user) return <MarketingHero />;
+
   let recentItems: RecentItem[] = [];
 
-  if (user) {
-    try {
-      // Fetch only top 3 of each to ensure we have enough for sorting,
-      // and to avoid pulling unnecessary data.
-      const [songs, notebooks, snippets] = await Promise.all([
-        supabaseService.listSongCharts(supabase, 3),
-        supabaseService.listNotebooks(supabase, 3),
-        supabaseService.listGrooveSnippets(supabase, 3),
-      ]);
+  try {
+    // Fetch only top 3 of each to ensure we have enough for sorting,
+    // and to avoid pulling unnecessary data.
+    const [songs, notebooks, snippets] = await Promise.all([
+      supabaseService.listSongCharts(supabase, 3),
+      supabaseService.listNotebooks(supabase, 3),
+      supabaseService.listGrooveSnippets(supabase, 3),
+    ]);
 
-      const items: RecentItem[] = [
-        ...(songs || []).map((s) => ({
-          id: s.id,
-          type: 'song' as const,
-          title: s.title,
-          bpm: s.bpm ?? undefined,
-          createdAt: s.created_at || '',
-          updatedAt: s.updated_at || '',
-        })),
-        ...(notebooks || []).map((n) => ({
-          id: n.id,
-          type: 'notebook' as const,
-          title: n.title,
-          createdAt: n.created_at || '',
-          updatedAt: n.updated_at || '',
-        })),
-        ...(snippets || []).map((s) => ({
-          id: s.id,
-          type: 'snippet' as const,
-          title: s.title,
-          createdAt: s.created_at || '',
-          updatedAt: s.updated_at || '',
-        })),
-      ];
+    const items: RecentItem[] = [
+      ...(songs || []).map((s) => ({
+        id: s.id,
+        type: 'song' as const,
+        title: s.title,
+        bpm: s.bpm ?? undefined,
+        createdAt: s.created_at || '',
+        updatedAt: s.updated_at || '',
+      })),
+      ...(notebooks || []).map((n) => ({
+        id: n.id,
+        type: 'notebook' as const,
+        title: n.title,
+        createdAt: n.created_at || '',
+        updatedAt: n.updated_at || '',
+      })),
+      ...(snippets || []).map((s) => ({
+        id: s.id,
+        type: 'snippet' as const,
+        title: s.title,
+        createdAt: s.created_at || '',
+        updatedAt: s.updated_at || '',
+      })),
+    ];
 
-      // Sort by updated_at or created_at descending and take top 3 total
-      recentItems = items
-        .sort((a, b) => {
-          const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
-          const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
-          return dateB - dateA;
-        })
-        .slice(0, 3);
-    } catch (e) {
-      console.error('Failed to fetch recent activity:', e);
-    }
+    // Sort by updated_at or created_at descending and take top 3 total
+    recentItems = items
+      .sort((a, b) => {
+        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+        return dateB - dateA;
+      })
+      .slice(0, 3);
+  } catch (e) {
+    console.error('Failed to fetch recent activity:', e);
   }
+
+  return <DashboardView user={user} recentItems={recentItems} />;
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="pt-32 pb-24 px-6 max-w-7xl mx-auto animate-pulse">
+      <div className="h-12 w-64 bg-outline-variant/10 rounded-xl mb-12" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 space-y-8">
+          <div className="h-64 bg-outline-variant/5 rounded-3xl" />
+          <div className="h-48 bg-outline-variant/5 rounded-3xl" />
+        </div>
+        <div className="lg:col-span-2">
+          <div className="h-full min-h-[400px] bg-outline-variant/5 rounded-3xl" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <main className="min-h-screen bg-surface font-body selection:bg-primary/30 selection:text-primary transition-colors overflow-x-hidden">
@@ -106,7 +133,9 @@ export default async function Home() {
         </div>
       </header>
 
-      {user ? <DashboardView user={user} recentItems={recentItems} /> : <MarketingHero />}
+      <Suspense fallback={user ? <DashboardSkeleton /> : <div className="pt-32" />}>
+        <DashboardContent />
+      </Suspense>
 
       {/* Footer */}
       <footer className="py-20 bg-surface px-6">

@@ -64,31 +64,34 @@ test.describe('Dashboard (Mission Control)', () => {
     });
 
     test('Navigation links work', async ({ page }) => {
-      // Navigate to Library
-      await page
-        .getByRole('link', { name: /Library/i })
-        .first()
-        .click();
-      await expect(page).toHaveURL(/\/library/);
-      await expect(page.getByRole('heading', { name: /My Library/i })).toBeVisible();
+      await test.step('Navigate to Library', async () => {
+        await page
+          .getByRole('link', { name: /Library/i })
+          .first()
+          .click();
+        await expect(page).toHaveURL(/\/library/);
+        await expect(page.getByRole('heading', { name: /My Library/i })).toBeVisible();
+      });
 
       await page.goto('/');
 
-      // Navigate to Setlists
-      await page
-        .getByRole('link', { name: /Setlists/i })
-        .first()
-        .click();
-      await expect(page).toHaveURL(/\/setlists/);
+      await test.step('Navigate to Setlists', async () => {
+        await page
+          .getByRole('link', { name: /Setlists/i })
+          .first()
+          .click();
+        await expect(page).toHaveURL(/\/setlists/);
+      });
 
       await page.goto('/');
 
-      // Navigate to Manual
-      await page
-        .getByRole('link', { name: /User Manual/i })
-        .first()
-        .click();
-      await expect(page).toHaveURL(/\/manual/);
+      await test.step('Navigate to Manual', async () => {
+        await page
+          .getByRole('link', { name: /User Manual/i })
+          .first()
+          .click();
+        await expect(page).toHaveURL(/\/manual/);
+      });
     });
   });
 });
