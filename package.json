@@ -7,12 +7,13 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "biome check .",
-    "lint:md": "markdownlint --ignore node_modules --ignore playwright-report --ignore test-results --ignore tmp --ignore .agents . .gemini",
+    "lint:md": "markdownlint --ignore node_modules --ignore playwright-report --ignore test-results --ignore tmp --ignore .agents --ignore .gemini/skills . .gemini",
     "lint:fix": "biome check . --write --unsafe",
     "test": "vitest",
     "test:run": "vitest run",
     "test:ui": "vitest --ui",
     "test:e2e": "playwright test",
+    "skills:link": "gemini skills link agents/onboard --scope workspace --consent && gemini skills link agents/release-manager --scope workspace --consent && gemini skills link agents/definition-of-done --scope workspace --consent",
     "format": "prettier --write ."
   },
   "dependencies": {
