@@ -97,6 +97,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done
 
+- [x] [Chore] Architectural Refactor: Separate Custom Skills from Vendor Skills (#103) `✓`
 - [x] [UX] User Profile Dropdown: Compact Radix UI menu for AuthStatus and removed legacy Settings icon (#97) `✓`
 - [x] [Infra] Automated Deployment Pipeline: Dual-environment (Staging/Prod) sync with GitHub Actions and Vercel. (#91, #92) `✓`
 - [x] [Feature] Enhance AppShell Refresh Button: Data re-validation (router.refresh), tooltip, and loading state visuals (#94) `✓`
