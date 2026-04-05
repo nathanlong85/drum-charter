@@ -1,3 +1,4 @@
+import type { User } from '@supabase/supabase-js';
 import { Music } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -8,14 +9,10 @@ import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
 import type { RecentItem } from '@/lib/types/dashboard';
 
-async function DashboardContent() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+async function DashboardContent({ user }: { user: User | null }) {
   if (!user) return <MarketingHero />;
 
+  const supabase = await createClient();
   let recentItems: RecentItem[] = [];
 
   try {
@@ -27,38 +24,42 @@ async function DashboardContent() {
       supabaseService.listGrooveSnippets(supabase, 3),
     ]);
 
+    const getRecentItemSortTime = (item: RecentItem) => {
+      const timestamp = item.updatedAt || item.createdAt;
+      if (!timestamp) return 0;
+
+      const parsed = Date.parse(timestamp);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    };
+
     const items: RecentItem[] = [
       ...(songs || []).map((s) => ({
         id: s.id,
         type: 'song' as const,
         title: s.title,
         bpm: s.bpm ?? undefined,
-        createdAt: s.created_at || '',
-        updatedAt: s.updated_at || '',
+        createdAt: s.created_at ?? '',
+        updatedAt: s.updated_at ?? '',
       })),
       ...(notebooks || []).map((n) => ({
         id: n.id,
         type: 'notebook' as const,
         title: n.title,
-        createdAt: n.created_at || '',
-        updatedAt: n.updated_at || '',
+        createdAt: n.created_at ?? '',
+        updatedAt: n.updated_at ?? '',
       })),
       ...(snippets || []).map((s) => ({
         id: s.id,
         type: 'snippet' as const,
         title: s.title,
-        createdAt: s.created_at || '',
-        updatedAt: s.updated_at || '',
+        createdAt: s.created_at ?? '',
+        updatedAt: s.updated_at ?? '',
       })),
     ];
 
     // Sort by updated_at or created_at descending and take top 3 total
     recentItems = items
-      .sort((a, b) => {
-        const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
-        const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
-        return dateB - dateA;
-      })
+      .sort((a, b) => getRecentItemSortTime(b) - getRecentItemSortTime(a))
       .slice(0, 3);
   } catch (e) {
     console.error('Failed to fetch recent activity:', e);
@@ -134,7 +135,7 @@ export default async function Home() {
       </header>
 
       <Suspense fallback={user ? <DashboardSkeleton /> : <div className="pt-32" />}>
-        <DashboardContent />
+        <DashboardContent user={user} />
       </Suspense>
 
       {/* Footer */}

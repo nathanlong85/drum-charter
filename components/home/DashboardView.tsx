@@ -90,6 +90,7 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
         const routePrefix =
           type === 'song' ? 'songs' : type === 'notebook' ? 'notebooks' : 'snippets';
         router.push(`/${routePrefix}/${savedId}`);
+        // We stay in creating state while router navigates
       } else {
         throw new Error('Failed to obtain ID for new item');
       }
@@ -98,8 +99,6 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
       alert('Failed to create new item. Please try again.');
       setIsCreating(false);
     }
-    // We don't setIsCreating(false) in finally because we are navigating away on success.
-    // If it fails, we reset it in the catch.
   };
 
   const handleLinkClick = (e: MouseEvent<HTMLAnchorElement>, _href: string) => {
@@ -247,7 +246,7 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
                       title: item.title || 'Untitled',
                       type: item.type,
                       bpm: item.bpm,
-                      createdAt: item.createdAt || new Date().toISOString(),
+                      createdAt: item.updatedAt || item.createdAt || '1970-01-01T00:00:00.000Z',
                     }}
                   />
                 ))}

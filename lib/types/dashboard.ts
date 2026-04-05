@@ -5,6 +5,6 @@ export interface RecentItem {
   type: RecentItemType;
   title: string;
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
   bpm?: number;
 }

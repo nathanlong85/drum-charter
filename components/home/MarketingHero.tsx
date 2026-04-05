@@ -81,7 +81,7 @@ export function MarketingHero() {
                 <GrooveDemo />
               </TooltipProvider>
             </div>
-          </div>{' '}
+          </div>
         </div>
       </section>
 
