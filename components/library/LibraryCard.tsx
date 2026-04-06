@@ -21,8 +21,8 @@ interface LibraryCardProps {
     tags?: string[];
     createdAt: string;
   };
-  onDelete: (id: string, type: 'song' | 'notebook' | 'snippet' | 'setlist') => void;
-  onDuplicate: (id: string, type: 'song' | 'notebook' | 'snippet' | 'setlist') => void;
+  onDelete?: (id: string, type: 'song' | 'notebook' | 'snippet' | 'setlist') => void;
+  onDuplicate?: (id: string, type: 'song' | 'notebook' | 'snippet' | 'setlist') => void;
 }
 
 export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDuplicate }) => {
@@ -49,36 +49,42 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
           </span>
         </div>
 
-        <div className="flex gap-2 z-10 opacity-100 translate-y-0 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 md:translate-y-2 md:group-hover:translate-y-0 md:group-focus-within:translate-y-0 transition-all duration-300">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onDuplicate(item.id, item.type);
-            }}
-            className="p-2 text-on-surface-variant/40 hover:text-primary focus-visible:text-primary transition-all rounded-lg hover:bg-primary/10 focus-visible:bg-primary/10 border border-transparent hover:border-primary/20 focus-visible:border-primary/20 outline-none"
-            title="Duplicate"
-            data-testid={`duplicate-${item.type}-${item.id}`}
-            aria-label={`Duplicate ${item.type}: ${item.title}`}
-            type="button"
-          >
-            <Copy className="w-4 h-4" />
-          </button>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onDelete(item.id, item.type);
-            }}
-            className="p-2 text-on-surface-variant/40 hover:text-error focus-visible:text-error transition-all rounded-lg hover:bg-error/10 focus-visible:bg-error/10 border border-transparent hover:border-error/20 focus-visible:border-error/20 outline-none"
-            title="Delete"
-            data-testid={`delete-${item.type}-${item.id}`}
-            aria-label={`Delete ${item.type}: ${item.title}`}
-            type="button"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
+        {(onDuplicate || onDelete) && (
+          <div className="flex gap-2 z-10 opacity-100 translate-y-0 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 md:translate-y-2 md:group-hover:translate-y-0 md:group-focus-within:translate-y-0 transition-all duration-300">
+            {onDuplicate && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDuplicate(item.id, item.type);
+                }}
+                className="p-2 text-on-surface-variant/40 hover:text-primary focus-visible:text-primary transition-all rounded-lg hover:bg-primary/10 focus-visible:bg-primary/10 border border-transparent hover:border-primary/20 focus-visible:border-primary/20 outline-none"
+                title="Duplicate"
+                data-testid={`duplicate-${item.type}-${item.id}`}
+                aria-label={`Duplicate ${item.type}: ${item.title}`}
+                type="button"
+              >
+                <Copy className="w-4 h-4" />
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete(item.id, item.type);
+                }}
+                className="p-2 text-on-surface-variant/40 hover:text-error focus-visible:text-error transition-all rounded-lg hover:bg-error/10 focus-visible:bg-error/10 border border-transparent hover:border-error/20 focus-visible:border-error/20 outline-none"
+                title="Delete"
+                data-testid={`delete-${item.type}-${item.id}`}
+                aria-label={`Delete ${item.type}: ${item.title}`}
+                type="button"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <h3 className="text-xl font-headline font-black text-on-surface mb-3 line-clamp-2 leading-tight group-hover:text-primary transition-colors uppercase tracking-tight">

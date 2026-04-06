@@ -8,8 +8,8 @@ test.describe('Guest Access & Library Flow', () => {
     // Start at landing page
     await page.goto('/');
 
-    // Click "Start Creating (Guest Mode)" link which goes to /login
-    await page.getByRole('link', { name: /Start Creating \(Guest Mode\)/i }).click();
+    // Click "Sign In to Start Creating" link which goes to /login
+    await page.getByRole('link', { name: /Sign In to Start Creating/i }).click();
     await page.waitForURL('/login');
 
     // Click "Continue as Guest" on login page and wait for auth response

@@ -258,12 +258,18 @@ export const supabaseService = {
     };
   },
 
-  async listSongCharts(supabaseParam?: SupabaseClient<Database>) {
+  async listSongCharts(supabaseParam?: SupabaseClient<Database>, limit?: number) {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from('song_charts')
-      .select('id, title, bpm, created_at')
+      .select('id, title, bpm, created_at, updated_at')
       .order('updated_at', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return data;
@@ -345,12 +351,18 @@ export const supabaseService = {
     };
   },
 
-  async listNotebooks(supabaseParam?: SupabaseClient<Database>) {
+  async listNotebooks(supabaseParam?: SupabaseClient<Database>, limit?: number) {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from('notebooks')
-      .select('id, title, created_at')
+      .select('id, title, created_at, updated_at')
       .order('updated_at', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return data;
@@ -501,12 +513,18 @@ export const supabaseService = {
     return data;
   },
 
-  async listGrooveSnippets(supabaseParam?: SupabaseClient<Database>) {
+  async listGrooveSnippets(supabaseParam?: SupabaseClient<Database>, limit?: number) {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from('groove_snippets')
-      .select('*')
+      .select('id, title, created_at, updated_at')
       .order('updated_at', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return data;
