@@ -40,6 +40,7 @@ Work is "Done" when it is verified, in an up-to-date PR, and the Copilot loop is
 
 * **Linking**: Always link PRs to issues (e.g., "Closes #60").
 * **Sub-issues**: Use the GitHub CLI to link sub-issues (Parent/Child). Checklist Markdown is NOT a substitute.
+
   ```bash
   # To link an existing sub-issue to a parent:
   gh api graphql -H "GraphQL-Features: sub_issues" -f query='
@@ -49,5 +50,6 @@ Work is "Done" when it is verified, in an up-to-date PR, and the Copilot loop is
       }
     }' -f parentId="PARENT_NODE_ID" -f subIssueId="SUB_ISSUE_NODE_ID"
   ```
+
 * **Project**: Always link PRs to the "DrumCharter" project.
 * **PR Descriptions**: Must be fenced Markdown.
