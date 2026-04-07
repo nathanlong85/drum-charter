@@ -32,15 +32,22 @@ export function DashboardView({ user, profile, recentItems }: DashboardViewProps
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateNew = async (type: 'song' | 'notebook' | 'snippet') => {
-    setIsCreating(true);
-    // Note: We don't use try/catch here because createItemAction performs a redirect,
-    // which throws a special NEXT_REDIRECT error that should not be caught on the client.
     const defaultTimeSig = profile?.preferences?.defaultTimeSignature || {
       numerator: 4,
       denominator: 4,
     };
 
-    await createItemAction(type, defaultTimeSig);
+    try {
+      setIsCreating(true);
+      await createItemAction(type, defaultTimeSig);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+        throw error;
+      }
+      console.error('Failed to create item:', error);
+      setIsCreating(false);
+      alert('Failed to create item. Please try again.');
+    }
   };
 
   const handleLinkClick = (e: MouseEvent<HTMLAnchorElement>, _href: string) => {

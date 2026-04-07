@@ -6,7 +6,6 @@ import {
   listGrooveSnippetsAction,
   saveNotebookAction,
 } from '@/lib/actions/item-actions';
-import { supabaseService } from '@/lib/services/supabase-service';
 import type { GrooveSnippet, Notebook } from '@/lib/types/groove';
 import { NotebookEditor } from '../NotebookEditor';
 

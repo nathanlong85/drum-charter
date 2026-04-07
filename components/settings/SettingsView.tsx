@@ -132,15 +132,17 @@ export default function SettingsView({ profile }: SettingsViewProps) {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[
-              { id: 'light', icon: Sun, label: 'Light' },
-              { id: 'dark', icon: Moon, label: 'Dark' },
-              { id: 'system', icon: Monitor, label: 'System' },
-            ].map((option) => (
+            {(
+              [
+                { id: 'light', icon: Sun, label: 'Light' },
+                { id: 'dark', icon: Moon, label: 'Dark' },
+                { id: 'system', icon: Monitor, label: 'System' },
+              ] as const
+            ).map((option) => (
               <button
                 key={option.id}
                 type="button"
-                onClick={() => setTheme(option.id as any)}
+                onClick={() => setTheme(option.id)}
                 className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border transition-all ${
                   theme === option.id
                     ? 'bg-primary/10 border-primary text-primary shadow-lg shadow-primary/5'
@@ -182,7 +184,10 @@ export default function SettingsView({ profile }: SettingsViewProps) {
                   min="1"
                   max="32"
                   value={defaultNumerator}
-                  onChange={(e) => setDefaultNumerator(parseInt(e.target.value, 10))}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10);
+                    if (!Number.isNaN(val)) setDefaultNumerator(val);
+                  }}
                   className="w-20 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl px-4 py-4 text-on-surface text-center outline-none transition-all"
                 />
                 <span className="text-2xl font-headline font-black text-outline-variant">/</span>
@@ -190,7 +195,10 @@ export default function SettingsView({ profile }: SettingsViewProps) {
                   id="default_denominator"
                   aria-label="Default Denominator"
                   value={defaultDenominator}
-                  onChange={(e) => setDefaultDenominator(parseInt(e.target.value, 10))}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10);
+                    if (!Number.isNaN(val)) setDefaultDenominator(val);
+                  }}
                   className="w-20 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl px-4 py-4 text-on-surface text-center outline-none transition-all appearance-none"
                 >
                   {[2, 4, 8, 16].map((d) => (

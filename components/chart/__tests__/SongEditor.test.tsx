@@ -6,7 +6,6 @@ import {
   listGrooveSnippetsAction,
   saveSongChartAction,
 } from '@/lib/actions/item-actions';
-import { supabaseService } from '@/lib/services/supabase-service';
 import type { GrooveSnippet, SongChart } from '@/lib/types/groove';
 import SongEditor from '../SongEditor';
 

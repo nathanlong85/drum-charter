@@ -5,14 +5,6 @@ test.describe('User Identity & Preferences', () => {
   test.use({ storageState: 'playwright/.auth/user.json' });
 
   test.beforeEach(async ({ page }) => {
-    page.on('console', (msg) => {
-      if (msg.type() === 'error' || msg.type() === 'warning' || msg.type() === 'log') {
-        console.log(`[Browser ${msg.type()}] ${msg.text()}`);
-      }
-    });
-    page.on('requestfailed', (request) => {
-      console.log(`[Browser requestfailed] ${request.url()} - ${request.failure()?.errorText}`);
-    });
     await page.goto('/');
   });
 

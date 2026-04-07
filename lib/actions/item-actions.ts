@@ -14,6 +14,7 @@ import {
 
 /**
  * Server Action for creating new items.
+ * Throws errors on failure so callers can catch them (and NEXT_REDIRECT handled correctly by Next.js).
  */
 export async function createItemAction(
   type: 'song' | 'notebook' | 'snippet' | 'setlist',
@@ -118,8 +119,12 @@ export async function createItemAction(
       throw new Error('Failed to create item');
     }
   } catch (error) {
+    // If it's already a NEXT_REDIRECT, let it bubble up
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error;
+    }
     console.error('Error in createItemAction:', error);
-    return { error: 'Failed to create item' };
+    throw new Error('Failed to create item');
   }
 
   if (savedId && routePrefix) {

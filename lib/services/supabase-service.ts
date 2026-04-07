@@ -723,7 +723,10 @@ export const supabaseService = {
         username: null,
         display_name: null,
         avatar_url: null,
-        preferences: DEFAULT_PREFERENCES,
+        preferences: {
+          ...DEFAULT_PREFERENCES,
+          defaultTimeSignature: { ...DEFAULT_PREFERENCES.defaultTimeSignature },
+        },
         updated_at: null,
       };
     }
@@ -737,7 +740,7 @@ export const supabaseService = {
       avatar_url: dbProfile.avatar_url,
       preferences: {
         ...DEFAULT_PREFERENCES,
-        ...(dbProfile.preferences as UserPreferences),
+        ...((dbProfile.preferences as UserPreferences | null) ?? {}),
       },
       updated_at: dbProfile.updated_at,
     };

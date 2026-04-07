@@ -108,6 +108,7 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
           onTogglePublic={() => dispatch({ type: 'UPDATE_PUBLIC', isPublic: !state.isPublic })}
           onDuplicate={async () => {
             try {
+              await settleAutosave();
               const result = await duplicateItemAction(state.id, 'snippet');
               if (result.success && result.data && 'id' in result.data) {
                 router.push(`/snippets/${result.data.id}`);

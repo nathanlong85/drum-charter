@@ -12,8 +12,13 @@ Follow these steps for every code change:
 2. **Verification**: Ensure the changes are fully linted and tested. Aim for 100% coverage and ensure all user journeys are verified.
 3. **PR Management**: Push the changes and open a Pull Request (if one does not already exist).
 4. **Request Review (MANDATORY)**: You MUST initiate the review loop by requesting a review from **Copilot** on the PR.
-    * **Autonomy**: Use the `mcp_github_request_copilot_review` tool immediately after opening the PR.
-    * **Notification**: If the tool is unavailable, fails, or if you are unable to trigger the review for any reason, you MUST notify the user immediately so they can request it manually. **Do not start polling until the review has been successfully requested.**
+    * **Autonomy**: Use the following verified CLI command immediately after opening the PR:
+
+      ```bash
+      gh auth switch --user nathanlong85 && gh pr edit <number> --add-reviewer "@copilot" && gh auth switch --user nathanlong85-ai
+      ```
+
+    * **Notification**: If the command fails for any reason, you MUST notify the user immediately so they can request it manually. **Do not start polling until the review has been successfully requested.**
 5. **Monitoring**: Poll for the completion of all CI check results and the Copilot review.
 6. **CI Remediation**: Address any CI failures immediately.
 7. **Address Findings**: Address **ALL** relevant Copilot review comments.

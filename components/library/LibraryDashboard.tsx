@@ -102,6 +102,10 @@ export default function LibraryDashboard({
   };
 
   const handleDelete = async (id: string, type: ItemType) => {
+    if (!confirm(`Are you sure you want to delete this ${type}?`)) {
+      return;
+    }
+
     try {
       const result = await deleteItemAction(id, type);
       if (result.success) {
@@ -189,8 +193,11 @@ export default function LibraryDashboard({
     try {
       await createItemAction(activeTab as ItemType);
     } catch (error) {
+      if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+        throw error;
+      }
       console.error('Failed to create item:', error);
-      alert('Failed to create item.');
+      alert('Failed to create item. Please try again.');
     }
   };
 
