@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { waitForSave } from './test-utils';
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe('Snippet Integration', () => {
   test.beforeEach(async ({ page }) => {
     // 1. Sign in as guest
@@ -11,13 +13,9 @@ test.describe('Snippet Integration', () => {
     // 2. Create a snippet to use for integration
     // Use direct navigation to be sure
     await page.goto('/library?tab=snippet');
+    await page.waitForURL(/tab=snippet/);
 
-    const createPromise = page.waitForResponse(
-      (resp) =>
-        resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
-    );
     await page.getByTestId('create-new-button').click();
-    await createPromise;
 
     await page.waitForURL(/\/snippets\/.+/);
 
@@ -31,11 +29,8 @@ test.describe('Snippet Integration', () => {
   test('should insert a snippet into a song chart', async ({ page }) => {
     // 1. Create a new song
     await page.goto('/library?tab=song');
-    const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/song_charts') && resp.request().method() === 'POST',
-    );
+    await page.waitForURL(/tab=song/);
     await page.getByTestId('create-new-button').click();
-    await createPromise;
     await page.waitForURL(/\/songs\/.+/);
 
     // 2. Add a section
@@ -65,11 +60,8 @@ test.describe('Snippet Integration', () => {
   test('should insert a snippet into a notebook', async ({ page }) => {
     // 1. Create a new notebook
     await page.goto('/library?tab=notebook');
-    const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
-    );
+    await page.waitForURL(/tab=notebook/);
     await page.getByTestId('create-new-button').click();
-    await createPromise;
     await page.waitForURL(/\/notebooks\/.+/);
 
     // 2. Add a section

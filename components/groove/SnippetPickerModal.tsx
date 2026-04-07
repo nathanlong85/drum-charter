@@ -5,7 +5,7 @@ import { Search, X } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { SnippetPreview } from '@/components/groove/SnippetPreview';
-import { supabaseService } from '@/lib/services/supabase-service';
+import { listGrooveSnippetsAction } from '@/lib/actions/item-actions';
 import type { GrooveSnippet } from '@/lib/types/groove';
 
 interface SnippetPickerModalProps {
@@ -23,7 +23,7 @@ export const SnippetPickerModal: React.FC<SnippetPickerModalProps> = ({ onClose,
     const fetchSnippets = async () => {
       try {
         setIsLoading(true);
-        const data = await supabaseService.listGrooveSnippetsMapped();
+        const data = await listGrooveSnippetsAction();
         setSnippets(data);
       } catch (err) {
         console.error('Failed to fetch snippets:', err);

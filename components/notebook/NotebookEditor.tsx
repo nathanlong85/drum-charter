@@ -5,8 +5,12 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { SnippetPickerModal } from '@/components/groove/SnippetPickerModal';
+import {
+  deleteItemAction,
+  duplicateItemAction,
+  saveNotebookAction,
+} from '@/lib/actions/item-actions';
 import { useAutosave } from '@/lib/hooks/useAutosave';
-import { supabaseService } from '@/lib/services/supabase-service';
 import {
   createDefaultDrumInstruments,
   type GrooveSnippet,
@@ -106,7 +110,7 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
 
   const { isSaving, error, triggerSave, settleAutosave } = useAutosave<Notebook>(
     async (notebook) => {
-      await supabaseService.saveNotebook(notebook);
+      await saveNotebookAction(notebook);
     },
     2000,
   );
@@ -141,8 +145,10 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
           onDuplicate={async () => {
             try {
               await settleAutosave();
-              const duplicated = await supabaseService.duplicateNotebook(state.id);
-              router.push(`/notebooks/${duplicated.id}`);
+              const result = await duplicateItemAction(state.id, 'notebook');
+              if (result.success && result.data && 'id' in result.data) {
+                router.push(`/notebooks/${result.data.id}`);
+              }
             } catch (error) {
               console.error('Failed to duplicate notebook:', error);
               alert('Failed to duplicate notebook.');
@@ -152,7 +158,7 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
             if (confirm('Are you sure you want to delete this notebook?')) {
               try {
                 await settleAutosave();
-                await supabaseService.deleteNotebook(state.id);
+                await deleteItemAction(state.id, 'notebook');
                 router.push('/library');
               } catch (error) {
                 console.error('Failed to delete notebook:', error);

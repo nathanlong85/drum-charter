@@ -3,18 +3,12 @@
 import { Filter, Plus, Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { supabaseService } from '@/lib/services/supabase-service';
-import { createClient } from '@/lib/supabase/client';
 import {
-  createDefaultDrumInstruments,
-  type GrooveSnippet,
-  type Notebook,
-  type Setlist,
-  type SongChart,
-} from '@/lib/types/groove';
+  createItemAction,
+  deleteItemAction,
+  duplicateItemAction,
+} from '@/lib/actions/item-actions';
 import { LibraryCard } from './LibraryCard';
-
-const supabase = createClient();
 
 type ItemType = 'song' | 'notebook' | 'snippet' | 'setlist';
 
@@ -42,7 +36,7 @@ interface SupabaseErrorLike {
   code?: string;
 }
 
-function isSupabaseError(error: unknown): error is SupabaseErrorLike {
+function _isSupabaseError(error: unknown): error is SupabaseErrorLike {
   return (
     typeof error === 'object' &&
     error !== null &&
@@ -108,64 +102,49 @@ export default function LibraryDashboard({
   };
 
   const handleDelete = async (id: string, type: ItemType) => {
-    if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
-
     try {
-      if (type === 'song') {
-        await supabaseService.deleteSongChart(id);
-        setSongs((prev) => prev.filter((s) => s.id !== id));
-      } else if (type === 'notebook') {
-        await supabaseService.deleteNotebook(id);
-        setNotebooks((prev) => prev.filter((n) => n.id !== id));
-      } else if (type === 'snippet') {
-        await supabaseService.deleteGrooveSnippet(id);
-        setSnippets((prev) => prev.filter((s) => s.id !== id));
-      } else if (type === 'setlist') {
-        await supabaseService.deleteSetlist(id);
-        setSetlists((prev) => prev.filter((s) => s.id !== id));
+      const result = await deleteItemAction(id, type);
+      if (result.success) {
+        if (type === 'song') {
+          setSongs((prev) => prev.filter((s) => s.id !== id));
+        } else if (type === 'notebook') {
+          setNotebooks((prev) => prev.filter((s) => s.id !== id));
+        } else if (type === 'snippet') {
+          setSnippets((prev) => prev.filter((s) => s.id !== id));
+        } else if (type === 'setlist') {
+          setSetlists((prev) => prev.filter((s) => s.id !== id));
+        }
       }
     } catch (error) {
-      if (isSupabaseError(error)) {
-        console.error('Error deleting item:', {
-          message: error.message,
-          details: error.details,
-          code: error.code,
-        });
-      } else {
-        console.error('Error deleting item:', error);
-      }
+      console.error('Error deleting item:', error);
       alert('Failed to delete item.');
     }
   };
 
   const handleDuplicate = async (id: string, type: ItemType) => {
     try {
-      let duplicated: LibraryItemData;
-      if (type === 'song') {
-        duplicated = await supabaseService.duplicateSongChart(id);
-        setSongs((prev) => [duplicated, ...prev]);
-      } else if (type === 'notebook') {
-        duplicated = await supabaseService.duplicateNotebook(id);
-        setNotebooks((prev) => [duplicated, ...prev]);
-      } else if (type === 'snippet') {
-        duplicated = await supabaseService.duplicateGrooveSnippet(id);
-        setSnippets((prev) => [duplicated, ...prev]);
-      } else if (type === 'setlist') {
-        duplicated = await supabaseService.duplicateSetlist(id);
-        setSetlists((prev) => [duplicated, ...prev]);
-      } else {
-        throw new Error(`Unsupported type for duplication: ${type}`);
+      const result = await duplicateItemAction(id, type);
+      if (result.success && result.data) {
+        const row = result.data as any;
+        const duplicated: LibraryItemData = {
+          id: row.id,
+          title: row.title,
+          bpm: row.bpm || undefined,
+          tags: row.tags || [],
+          createdAt: row.created_at || new Date().toISOString(),
+        };
+        if (type === 'song') {
+          setSongs((prev) => [duplicated, ...prev]);
+        } else if (type === 'notebook') {
+          setNotebooks((prev) => [duplicated, ...prev]);
+        } else if (type === 'snippet') {
+          setSnippets((prev) => [duplicated, ...prev]);
+        } else if (type === 'setlist') {
+          setSetlists((prev) => [duplicated, ...prev]);
+        }
       }
     } catch (error) {
-      if (isSupabaseError(error)) {
-        console.error('Error duplicating item:', {
-          message: error.message,
-          details: error.details,
-          code: error.code,
-        });
-      } else {
-        console.error('Error duplicating item:', error);
-      }
+      console.error('Error duplicating item:', error);
       alert('Failed to duplicate item.');
     }
   };
@@ -208,108 +187,10 @@ export default function LibraryDashboard({
 
   const handleCreateNew = async () => {
     try {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
-
-      if (authError || !user) {
-        console.error('Authentication required to create items:', authError);
-        alert('Please log in or continue as a guest to create items.');
-        return;
-      }
-
-      const userId = user.id;
-
-      if (activeTab === 'song') {
-        const newSong: SongChart = {
-          id: crypto.randomUUID(),
-          userId,
-          header: {
-            title: 'Untitled Song',
-            timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-            metronomeEnabled: false,
-            metronomeVolume: 0.5,
-          },
-          sections: [],
-          tags: [],
-          isPublic: false,
-          createdAt: null,
-          updatedAt: null,
-        };
-        const saved = await supabaseService.saveSongChart(newSong);
-        if (saved?.id) {
-          window.location.assign(`/songs/${saved.id}`);
-        } else {
-          throw new Error('Failed to create song - no ID returned');
-        }
-      } else if (activeTab === 'notebook') {
-        const newNotebook: Notebook = {
-          id: crypto.randomUUID(),
-          userId,
-          title: 'Untitled Notebook',
-          sections: [],
-          tags: [],
-          isPublic: false,
-          createdAt: null,
-          updatedAt: null,
-        };
-        const saved = await supabaseService.saveNotebook(newNotebook);
-        if (saved?.id) {
-          window.location.assign(`/notebooks/${saved.id}`);
-        } else {
-          throw new Error('Failed to create notebook - no ID returned');
-        }
-      } else if (activeTab === 'snippet') {
-        const newSnippet: GrooveSnippet = {
-          id: crypto.randomUUID(),
-          userId,
-          title: 'Untitled Snippet',
-          tags: [],
-          isPublic: false,
-          timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-          resolution: 16,
-          measures: 1,
-          instruments: createDefaultDrumInstruments({
-            timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-            resolution: 16,
-            measures: 1,
-          }),
-          createdAt: null,
-          updatedAt: null,
-        };
-        const saved = await supabaseService.saveGrooveSnippet(newSnippet);
-        if (saved?.id) {
-          window.location.assign(`/snippets/${saved.id}`);
-        } else {
-          throw new Error('Failed to create snippet - no ID returned');
-        }
-      } else if (activeTab === 'setlist') {
-        const newSetlist: Setlist = {
-          id: crypto.randomUUID(),
-          userId,
-          title: 'Untitled Setlist',
-          songs: [],
-          isPublic: false,
-          createdAt: null,
-          updatedAt: null,
-        };
-        const saved = await supabaseService.saveSetlist(newSetlist);
-        if (saved?.id) {
-          window.location.assign(`/setlists/${saved.id}`);
-        } else {
-          throw new Error('Failed to create setlist - no ID returned');
-        }
-      }
+      await createItemAction(activeTab as ItemType);
     } catch (error) {
-      console.error('Error creating new item:', error);
-      let message = 'Unknown error occurred';
-      if (error instanceof Error) {
-        message = error.message;
-      } else if (isSupabaseError(error)) {
-        message = error.message;
-      }
-      alert(`Failed to create item: ${message}`);
+      console.error('Failed to create item:', error);
+      alert('Failed to create item.');
     }
   };
 

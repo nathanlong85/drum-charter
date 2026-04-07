@@ -13,18 +13,18 @@ import {
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { type ReactNode, useCallback, useTransition } from 'react';
-import { AuthStatus } from '@/components/auth/AuthStatus';
+import { AuthStatus, type AuthStatusProps } from '@/components/auth/AuthStatus';
 import { Tooltip, TooltipProvider } from '@/components/common/Tooltip';
 import { useSupabaseStatus } from '@/lib/hooks/useSupabaseStatus';
 import packageJson from '@/package.json';
 
 const { version } = packageJson;
 
-interface AppShellProps {
+interface AppShellProps extends AuthStatusProps {
   children: ReactNode;
 }
 
-export function AppShell({ children }: AppShellProps) {
+export function AppShell({ children, initialUser, initialProfile }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -120,7 +120,7 @@ export function AppShell({ children }: AppShellProps) {
                 v{version}
               </span>
             </div>
-            <AuthStatus />
+            <AuthStatus initialUser={initialUser} initialProfile={initialProfile} />
           </div>
         </aside>
 

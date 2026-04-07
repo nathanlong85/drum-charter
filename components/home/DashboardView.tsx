@@ -17,100 +17,30 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type MouseEvent, useState } from 'react';
 import { LibraryCard } from '@/components/library/LibraryCard';
-import { supabaseService } from '@/lib/services/supabase-service';
+import { createItemAction } from '@/lib/actions/item-actions';
 import type { RecentItem } from '@/lib/types/dashboard';
-import {
-  createDefaultDrumInstruments,
-  type GrooveSnippet,
-  type Notebook,
-  type SongChart,
-} from '@/lib/types/groove';
+import type { UserProfile } from '@/lib/types/user';
 
 interface DashboardViewProps {
   user: User;
+  profile: UserProfile | null;
   recentItems: RecentItem[];
 }
 
-export function DashboardView({ user, recentItems }: DashboardViewProps) {
-  const router = useRouter();
+export function DashboardView({ user, profile, recentItems }: DashboardViewProps) {
+  const _router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateNew = async (type: 'song' | 'notebook' | 'snippet') => {
     setIsCreating(true);
-    try {
-      const userId = user.id;
-      let savedId: string | undefined;
+    // Note: We don't use try/catch here because createItemAction performs a redirect,
+    // which throws a special NEXT_REDIRECT error that should not be caught on the client.
+    const defaultTimeSig = profile?.preferences?.defaultTimeSignature || {
+      numerator: 4,
+      denominator: 4,
+    };
 
-      if (type === 'song') {
-        const newSong: SongChart = {
-          id: crypto.randomUUID(),
-          userId,
-          header: {
-            title: 'Untitled Song',
-            timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-            metronomeEnabled: false,
-            metronomeVolume: 0.5,
-          },
-          sections: [],
-          tags: [],
-          isPublic: false,
-          createdAt: null,
-          updatedAt: null,
-        };
-        const saved = await supabaseService.saveSongChart(newSong);
-        savedId = saved?.id;
-      } else if (type === 'notebook') {
-        const newNotebook: Notebook = {
-          id: crypto.randomUUID(),
-          userId,
-          title: 'Untitled Notebook',
-          sections: [],
-          tags: [],
-          isPublic: false,
-          createdAt: null,
-          updatedAt: null,
-        };
-        const saved = await supabaseService.saveNotebook(newNotebook);
-        savedId = saved?.id;
-      } else if (type === 'snippet') {
-        const timeSignature = { beatsPerMeasure: 4, beatValue: 4 };
-        const resolution = 16;
-        const measures = 1;
-        const newSnippet: GrooveSnippet = {
-          id: crypto.randomUUID(),
-          userId,
-          title: 'Untitled Snippet',
-          bpm: 100,
-          measures,
-          timeSignature,
-          resolution,
-          instruments: createDefaultDrumInstruments({
-            timeSignature,
-            resolution,
-            measures,
-          }),
-          isPublic: false,
-          tags: [],
-          createdAt: null,
-          updatedAt: null,
-        };
-        const saved = await supabaseService.saveGrooveSnippet(newSnippet);
-        savedId = saved?.id;
-      }
-
-      if (savedId) {
-        const routePrefix =
-          type === 'song' ? 'songs' : type === 'notebook' ? 'notebooks' : 'snippets';
-        router.push(`/${routePrefix}/${savedId}`);
-        // We stay in creating state while router navigates
-      } else {
-        throw new Error('Failed to obtain ID for new item');
-      }
-    } catch (e) {
-      console.error('Failed to create new item:', e);
-      alert('Failed to create new item. Please try again.');
-      setIsCreating(false);
-    }
+    await createItemAction(type, defaultTimeSig);
   };
 
   const handleLinkClick = (e: MouseEvent<HTMLAnchorElement>, _href: string) => {
@@ -128,7 +58,9 @@ export function DashboardView({ user, recentItems }: DashboardViewProps) {
             Mission <span className="text-primary">Control</span>
           </h1>
           <p className="text-on-surface-variant font-body mt-2">
-            Welcome back, {user.email?.split('@')[0] || 'Drummer'}. Your workspace is ready.
+            Welcome back,{' '}
+            {profile?.display_name || profile?.username || user.email?.split('@')[0] || 'Drummer'}.
+            Your workspace is ready.
           </p>
         </div>
       </div>

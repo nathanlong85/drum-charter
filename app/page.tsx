@@ -14,15 +14,19 @@ async function DashboardContent({ user }: { user: User | null }) {
 
   const supabase = await createClient();
   let recentItems: RecentItem[] = [];
+  let profile = null;
 
   try {
     // Fetch only top 3 of each to ensure we have enough for sorting,
     // and to avoid pulling unnecessary data.
-    const [songs, notebooks, snippets] = await Promise.all([
+    const [songs, notebooks, snippets, profileData] = await Promise.all([
       supabaseService.listSongCharts(supabase, 3),
       supabaseService.listNotebooks(supabase, 3),
       supabaseService.listGrooveSnippets(supabase, 3),
+      supabaseService.getProfile(user.id, supabase),
     ]);
+
+    profile = profileData;
 
     const getRecentItemSortTime = (item: RecentItem) => {
       const timestamp = item.updatedAt || item.createdAt;
@@ -65,7 +69,7 @@ async function DashboardContent({ user }: { user: User | null }) {
     console.error('Failed to fetch recent activity:', e);
   }
 
-  return <DashboardView user={user} recentItems={recentItems} />;
+  return <DashboardView user={user} profile={profile} recentItems={recentItems} />;
 }
 
 function DashboardSkeleton() {

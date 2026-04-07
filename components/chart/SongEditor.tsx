@@ -5,8 +5,12 @@ import { useEffect, useReducer, useRef, useState } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { SnippetPickerModal } from '@/components/groove/SnippetPickerModal';
+import {
+  deleteItemAction,
+  duplicateItemAction,
+  saveSongChartAction,
+} from '@/lib/actions/item-actions';
 import { useAutosave } from '@/lib/hooks/useAutosave';
-import { supabaseService } from '@/lib/services/supabase-service';
 import {
   createDefaultDrumInstruments,
   type GrooveSnippet,
@@ -217,7 +221,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
   const isInitialRender = useRef(true);
 
   const { isSaving, error, triggerSave, settleAutosave } = useAutosave<SongChart>(async (chart) => {
-    await supabaseService.saveSongChart(chart);
+    await saveSongChartAction(chart);
   }, 2000);
 
   useEffect(() => {
@@ -254,8 +258,10 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
             onDuplicate={async () => {
               try {
                 await settleAutosave();
-                const duplicated = await supabaseService.duplicateSongChart(state.id);
-                router.push(`/songs/${duplicated.id}`);
+                const result = await duplicateItemAction(state.id, 'song');
+                if (result.success && result.data && 'id' in result.data) {
+                  router.push(`/songs/${result.data.id}`);
+                }
               } catch (error) {
                 console.error('Failed to duplicate song chart:', error);
                 alert('Failed to duplicate song chart.');
@@ -265,7 +271,7 @@ export default function SongEditor({ initialSong }: SongEditorProps) {
               if (confirm('Are you sure you want to delete this song?')) {
                 try {
                   await settleAutosave();
-                  await supabaseService.deleteSongChart(state.id);
+                  await deleteItemAction(state.id, 'song');
                   router.push('/library');
                 } catch (error) {
                   console.error('Failed to delete song chart:', error);

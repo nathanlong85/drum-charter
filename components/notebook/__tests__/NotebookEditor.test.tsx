@@ -1,11 +1,18 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  deleteItemAction,
+  duplicateItemAction,
+  listGrooveSnippetsAction,
+  saveNotebookAction,
+} from '@/lib/actions/item-actions';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { GrooveSnippet, Notebook } from '@/lib/types/groove';
 import { NotebookEditor } from '../NotebookEditor';
 
 const mockNotebook: Notebook = {
   id: 'n1',
+  userId: 'u1',
   title: 'My Notebook',
   sections: [
     {
@@ -26,6 +33,14 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+}));
+
+// Mock item-actions
+vi.mock('@/lib/actions/item-actions', () => ({
+  saveNotebookAction: vi.fn().mockResolvedValue({ success: true }),
+  duplicateItemAction: vi.fn().mockResolvedValue({ success: true, data: { id: 'n2' } }),
+  deleteItemAction: vi.fn().mockResolvedValue({ success: true }),
+  listGrooveSnippetsAction: vi.fn().mockResolvedValue([]),
 }));
 
 // Mock supabase-service
@@ -60,12 +75,10 @@ describe('NotebookEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+      expect(saveNotebookAction).toHaveBeenCalled();
     });
 
-    expect(supabaseService.saveNotebook).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'New Name' }),
-    );
+    expect(saveNotebookAction).toHaveBeenCalledWith(expect.objectContaining({ title: 'New Name' }));
   });
 
   it('adds a new section', async () => {
@@ -78,10 +91,10 @@ describe('NotebookEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+      expect(saveNotebookAction).toHaveBeenCalled();
     });
 
-    const lastCall = vi.mocked(supabaseService.saveNotebook).mock.calls.at(-1)![0] as Notebook;
+    const lastCall = vi.mocked(saveNotebookAction).mock.calls.at(-1)![0] as Notebook;
     expect(lastCall.sections).toHaveLength(2);
   });
 
@@ -95,10 +108,10 @@ describe('NotebookEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+      expect(saveNotebookAction).toHaveBeenCalled();
     });
 
-    const lastCall = vi.mocked(supabaseService.saveNotebook).mock.calls.at(-1)![0] as Notebook;
+    const lastCall = vi.mocked(saveNotebookAction).mock.calls.at(-1)![0] as Notebook;
     expect(lastCall.sections).toHaveLength(0);
   });
 
@@ -112,10 +125,10 @@ describe('NotebookEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+      expect(saveNotebookAction).toHaveBeenCalled();
     });
 
-    const lastCall = vi.mocked(supabaseService.saveNotebook).mock.calls.at(-1)![0] as Notebook;
+    const lastCall = vi.mocked(saveNotebookAction).mock.calls.at(-1)![0] as Notebook;
     expect(lastCall.sections[0].name).toBe('Updated Section');
   });
 
@@ -129,10 +142,10 @@ describe('NotebookEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+      expect(saveNotebookAction).toHaveBeenCalled();
     });
 
-    const lastCall = vi.mocked(supabaseService.saveNotebook).mock.calls.at(-1)![0] as Notebook;
+    const lastCall = vi.mocked(saveNotebookAction).mock.calls.at(-1)![0] as Notebook;
     expect(lastCall.sections[0].notes).toBe('New practice notes');
   });
 
@@ -147,10 +160,10 @@ describe('NotebookEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+      expect(saveNotebookAction).toHaveBeenCalled();
     });
 
-    const lastCall = vi.mocked(supabaseService.saveNotebook).mock.calls.at(-1)![0] as Notebook;
+    const lastCall = vi.mocked(saveNotebookAction).mock.calls.at(-1)![0] as Notebook;
     expect(lastCall.tags).toContain('technique');
   });
 
@@ -163,7 +176,7 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    expect(supabaseService.duplicateNotebook).toHaveBeenCalledWith('n1');
+    expect(duplicateItemAction).toHaveBeenCalledWith('n1', 'notebook');
   });
 
   it('adds and removes a grid in a section', async () => {
@@ -210,16 +223,16 @@ describe('NotebookEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+      expect(saveNotebookAction).toHaveBeenCalled();
     });
 
-    const lastCall = vi.mocked(supabaseService.saveNotebook).mock.calls.at(-1)![0] as Notebook;
+    const lastCall = vi.mocked(saveNotebookAction).mock.calls.at(-1)![0] as Notebook;
     expect(lastCall.isPublic).toBe(true);
   });
 
   it('handles auto-save error gracefully ', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.mocked(supabaseService.saveNotebook).mockRejectedValueOnce(new Error('Save failed'));
+    vi.mocked(saveNotebookAction).mockRejectedValueOnce(new Error('Save failed'));
 
     render(<NotebookEditor initialNotebook={mockNotebook} />);
     const titleInput = screen.getByPlaceholderText('Notebook Title');
@@ -250,7 +263,7 @@ describe('NotebookEditor', () => {
 
     // Save was called because unmount cleanup flushes
     await waitFor(() => {
-      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+      expect(saveNotebookAction).toHaveBeenCalled();
     });
   });
 
@@ -264,12 +277,13 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    expect(supabaseService.deleteNotebook).toHaveBeenCalledWith('n1');
+    expect(deleteItemAction).toHaveBeenCalledWith('n1', 'notebook');
   });
 
   it('inserts a snippet into a section', async () => {
     const mockSnippet: GrooveSnippet = {
       id: 'snip1',
+      userId: 'u1',
       title: 'Test Snippet',
       tags: [],
       timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
@@ -280,7 +294,7 @@ describe('NotebookEditor', () => {
       createdAt: null,
       updatedAt: null,
     };
-    vi.mocked(supabaseService.listGrooveSnippetsMapped).mockResolvedValue([mockSnippet]);
+    vi.mocked(listGrooveSnippetsAction).mockResolvedValue([mockSnippet]);
 
     render(<NotebookEditor initialNotebook={mockNotebook} />);
 
@@ -296,10 +310,10 @@ describe('NotebookEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveNotebook).toHaveBeenCalled();
+      expect(saveNotebookAction).toHaveBeenCalled();
     });
 
-    const lastCall = vi.mocked(supabaseService.saveNotebook).mock.calls.at(-1)![0] as Notebook;
+    const lastCall = vi.mocked(saveNotebookAction).mock.calls.at(-1)![0] as Notebook;
     expect(lastCall.sections[0].grid).toBeDefined();
     expect(lastCall.sections[0].grid?.timeSignature.beatsPerMeasure).toBe(4);
   });

@@ -4,8 +4,12 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useReducer, useRef } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
+import {
+  deleteItemAction,
+  duplicateItemAction,
+  saveGrooveSnippetAction,
+} from '@/lib/actions/item-actions';
 import { useAutosave } from '@/lib/hooks/useAutosave';
-import { supabaseService } from '@/lib/services/supabase-service';
 import type { GrooveGrid, GrooveSnippet } from '@/lib/types/groove';
 import { EditorToolbar } from '../layout/EditorToolbar';
 
@@ -83,7 +87,7 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
 
   const { isSaving, error, triggerSave, settleAutosave, cancelAutosave } =
     useAutosave<GrooveSnippet>(async (snippet) => {
-      await supabaseService.saveGrooveSnippet(snippet);
+      await saveGrooveSnippetAction(snippet);
     }, 2000);
 
   useEffect(() => {
@@ -104,11 +108,12 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
           onTogglePublic={() => dispatch({ type: 'UPDATE_PUBLIC', isPublic: !state.isPublic })}
           onDuplicate={async () => {
             try {
-              await settleAutosave();
-              const duplicated = await supabaseService.duplicateGrooveSnippet(state.id);
-              router.push(`/snippets/${duplicated.id}`);
+              const result = await duplicateItemAction(state.id, 'snippet');
+              if (result.success && result.data && 'id' in result.data) {
+                router.push(`/snippets/${result.data.id}`);
+              }
             } catch (error) {
-              console.error('Failed to duplicate snippet:', error);
+              console.error('Error duplicating snippet:', error);
               alert('Failed to duplicate snippet.');
             }
           }}
@@ -117,7 +122,7 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
               try {
                 cancelAutosave();
                 await settleAutosave();
-                await supabaseService.deleteGrooveSnippet(state.id);
+                await deleteItemAction(state.id, 'snippet');
                 router.push('/library');
               } catch (error) {
                 console.error('Failed to delete snippet:', error);
