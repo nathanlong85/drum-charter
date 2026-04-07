@@ -1,6 +1,11 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { debounce } from 'lodash';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  deleteItemAction,
+  duplicateItemAction,
+  saveSetlistAction,
+} from '@/lib/actions/item-actions';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { SetlistEditor } from '../SetlistEditor';
 
@@ -13,6 +18,13 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => ({
     get: vi.fn().mockReturnValue(null),
   }),
+}));
+
+// Mock item-actions
+vi.mock('@/lib/actions/item-actions', () => ({
+  saveSetlistAction: vi.fn().mockResolvedValue({ success: true }),
+  duplicateItemAction: vi.fn().mockResolvedValue({ success: true, data: { id: 'set2' } }),
+  deleteItemAction: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 // Mock debounce to be synchronous but expose cancel/flush
@@ -32,6 +44,7 @@ vi.mock('lodash', async (importOriginal) => {
 vi.mock('@/lib/services/supabase-service', () => ({
   supabaseService: {
     saveSetlist: vi.fn(),
+    deleteSetlist: vi.fn(),
     listSongCharts: vi.fn().mockResolvedValue([
       { id: 's1', title: 'First Song' },
       { id: 's2', title: 'Second Song' },
@@ -85,7 +98,7 @@ describe('SetlistEditor', () => {
     expect(screen.getByDisplayValue('New Setlist Title')).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
+      expect(saveSetlistAction).toHaveBeenCalledWith(
         expect.objectContaining({ title: 'New Setlist Title' }),
       );
     });
@@ -103,9 +116,7 @@ describe('SetlistEditor', () => {
     expect(screen.getByTestId('toggle-public-button')).toHaveTextContent(/Public/i);
 
     await waitFor(() => {
-      expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
-        expect.objectContaining({ isPublic: true }),
-      );
+      expect(saveSetlistAction).toHaveBeenCalledWith(expect.objectContaining({ isPublic: true }));
     });
   });
 
@@ -132,7 +143,7 @@ describe('SetlistEditor', () => {
     expect(screen.getAllByText('Third Song').length).toBeGreaterThan(0);
 
     await waitFor(() => {
-      expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
+      expect(saveSetlistAction).toHaveBeenCalledWith(
         expect.objectContaining({
           songs: expect.arrayContaining([expect.objectContaining({ songId: 's3', order: 2 })]),
         }),
@@ -157,7 +168,7 @@ describe('SetlistEditor', () => {
     expect(screen.queryByText('First Song')).toBeNull();
 
     await waitFor(() => {
-      expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
+      expect(saveSetlistAction).toHaveBeenCalledWith(
         expect.objectContaining({
           songs: [
             { songId: 's2', order: 0 }, // Re-ordered
@@ -182,7 +193,7 @@ describe('SetlistEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveSetlist).toHaveBeenCalledWith(
+      expect(saveSetlistAction).toHaveBeenCalledWith(
         expect.objectContaining({
           songs: [
             { songId: 's2', order: 0 },
@@ -194,7 +205,7 @@ describe('SetlistEditor', () => {
   });
 
   it('handles save error gracefully', async () => {
-    vi.mocked(supabaseService).saveSetlist.mockRejectedValueOnce(new Error('Save failed'));
+    vi.mocked(saveSetlistAction).mockRejectedValueOnce(new Error('Save failed'));
 
     render(<SetlistEditor initialSetlist={mockSetlist} />);
 
@@ -231,6 +242,29 @@ describe('SetlistEditor', () => {
     await waitFor(() => {
       expect(screen.getByText(/Initial Set Empty/i)).toBeInTheDocument();
     });
+  });
+
+  it('duplicates the setlist', async () => {
+    render(<SetlistEditor initialSetlist={mockSetlist} />);
+    const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
+
+    await act(async () => {
+      fireEvent.click(duplicateBtn);
+    });
+
+    expect(duplicateItemAction).toHaveBeenCalledWith('test-setlist', 'setlist');
+  });
+
+  it('deletes the setlist', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    render(<SetlistEditor initialSetlist={mockSetlist} />);
+    const deleteBtn = screen.getByRole('button', { name: /Delete This Item/i });
+
+    await act(async () => {
+      fireEvent.click(deleteBtn);
+    });
+
+    expect(deleteItemAction).toHaveBeenCalledWith('test-setlist', 'setlist');
   });
 
   it('flushes pending saves on unmount', () => {

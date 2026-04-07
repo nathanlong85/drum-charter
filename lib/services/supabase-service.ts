@@ -17,6 +17,7 @@ import {
   type SongSection,
   type TimeSignature,
 } from '../types/groove';
+import { DEFAULT_PREFERENCES, type UserPreferences, type UserProfile } from '../types/user';
 
 type DbSongChart = Database['public']['Tables']['song_charts']['Row'];
 type DbNotebook = Database['public']['Tables']['notebooks']['Row'];
@@ -258,12 +259,18 @@ export const supabaseService = {
     };
   },
 
-  async listSongCharts(supabaseParam?: SupabaseClient<Database>) {
+  async listSongCharts(supabaseParam?: SupabaseClient<Database>, limit?: number) {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from('song_charts')
-      .select('id, title, bpm, created_at')
+      .select('id, title, bpm, created_at, updated_at')
       .order('updated_at', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return data;
@@ -345,12 +352,18 @@ export const supabaseService = {
     };
   },
 
-  async listNotebooks(supabaseParam?: SupabaseClient<Database>) {
+  async listNotebooks(supabaseParam?: SupabaseClient<Database>, limit?: number) {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from('notebooks')
-      .select('id, title, created_at')
+      .select('id, title, created_at, updated_at')
       .order('updated_at', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return data;
@@ -501,12 +514,18 @@ export const supabaseService = {
     return data;
   },
 
-  async listGrooveSnippets(supabaseParam?: SupabaseClient<Database>) {
+  async listGrooveSnippets(supabaseParam?: SupabaseClient<Database>, limit?: number) {
     const supabase = supabaseParam || createBrowserClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from('groove_snippets')
-      .select('*')
+      .select('id, title, created_at, updated_at')
       .order('updated_at', { ascending: false });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return data;
@@ -685,5 +704,84 @@ export const supabaseService = {
     } as Setlist;
 
     return this.saveSetlist(duplicate, supabase);
+  },
+
+  // --- Profiles & Preferences ---
+  async getProfile(userId: string, supabaseParam?: SupabaseClient<Database>): Promise<UserProfile> {
+    const supabase = supabaseParam || createBrowserClient();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) {
+      // Return a default profile if not found
+      return {
+        id: userId,
+        username: null,
+        display_name: null,
+        avatar_url: null,
+        preferences: {
+          ...DEFAULT_PREFERENCES,
+          defaultTimeSignature: { ...DEFAULT_PREFERENCES.defaultTimeSignature },
+        },
+        updated_at: null,
+      };
+    }
+
+    const dbProfile = data as any; // Cast until types are updated
+
+    return {
+      id: dbProfile.id,
+      username: dbProfile.username,
+      display_name: dbProfile.display_name || null,
+      avatar_url: dbProfile.avatar_url,
+      preferences: {
+        ...DEFAULT_PREFERENCES,
+        ...((dbProfile.preferences as UserPreferences | null) ?? {}),
+      },
+      updated_at: dbProfile.updated_at,
+    };
+  },
+
+  async updateProfile(
+    userId: string,
+    updates: Partial<UserProfile>,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<UserProfile> {
+    const supabase = supabaseParam || createBrowserClient();
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        username: updates.username,
+        display_name: updates.display_name,
+        avatar_url: updates.avatar_url,
+        preferences: updates.preferences as any,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return this.getProfile(userId, supabase);
+  },
+
+  async updatePreferences(
+    userId: string,
+    updates: Partial<UserPreferences>,
+    supabaseParam?: SupabaseClient<Database>,
+  ): Promise<UserProfile> {
+    const supabase = supabaseParam || createBrowserClient();
+    const currentProfile = await this.getProfile(userId, supabase);
+
+    const newPreferences: UserPreferences = {
+      ...currentProfile.preferences,
+      ...updates,
+    };
+
+    return this.updateProfile(userId, { preferences: newPreferences }, supabase);
   },
 };

@@ -22,7 +22,12 @@ Before final verification, you MUST complete the iterative feedback loop as defi
 
 1. **Verification**: Ensure changes are fully linted and tested (aim for 100% coverage).
 2. **Push & PR**: Push changes and open/update a Pull Request.
-3. **Request Review**: Request a review from **Copilot** on the PR (use `mcp_github_request_copilot_review`).
+3. **Request Review**: Request a review from **Copilot** on the PR using the verified CLI command:
+
+   ```bash
+   gh auth switch --user nathanlong85 && gh pr edit <number> --add-reviewer "@copilot" && gh auth switch --user nathanlong85-ai
+   ```
+
 4. **Poll & Address**: Wait for Copilot and CI. Address ALL relevant comments or flag for discussion.
 5. **Repeat**: Repeat until the review is clean and CI passes.
 

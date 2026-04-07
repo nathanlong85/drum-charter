@@ -3,6 +3,11 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import {
+  deleteItemAction,
+  duplicateItemAction,
+  saveSetlistAction,
+} from '@/lib/actions/item-actions';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import { supabaseService } from '@/lib/services/supabase-service';
 import type { Setlist, SetlistItem } from '@/lib/types/groove';
@@ -28,7 +33,7 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
     triggerSave,
     settleAutosave,
     cancelAutosave,
-  } = useAutosave<Setlist>((dataToSave) => supabaseService.saveSetlist(dataToSave), 1000);
+  } = useAutosave<Setlist>((dataToSave) => saveSetlistAction(dataToSave), 1000);
 
   useEffect(() => {
     isMounted.current = true;
@@ -116,12 +121,24 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
           id={setlist.id}
           isPublic={setlist.isPublic}
           onTogglePublic={handleVisibilityToggle}
+          onDuplicate={async () => {
+            try {
+              await settleAutosave();
+              const result = await duplicateItemAction(setlist.id, 'setlist');
+              if (result.success && result.data && 'id' in result.data) {
+                router.push(`/setlists/${result.data.id}`);
+              }
+            } catch (error) {
+              console.error('Failed to duplicate setlist:', error);
+              alert('Failed to duplicate setlist.');
+            }
+          }}
           onDelete={async () => {
             if (confirm('Are you sure you want to delete this setlist?')) {
               try {
                 cancelAutosave();
                 await settleAutosave();
-                await supabaseService.deleteSetlist(setlist.id);
+                await deleteItemAction(setlist.id, 'setlist');
                 router.push('/library');
               } catch (error) {
                 console.error('Failed to delete setlist:', error);

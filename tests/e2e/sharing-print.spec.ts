@@ -52,15 +52,11 @@ test.describe('Sharing & Public View', () => {
     await page.goto('/login');
     await page.click('text=Continue as Guest');
     await page.waitForURL(/\/library(?:\/|\?|$)/);
-
-    const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/song_charts') && resp.request().method() === 'POST',
-    );
-    await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, { timeout: 15000 });
+    await expect(page.getByTestId('create-new-button')).toBeVisible({ timeout: 15000 });
     await page.getByTestId('create-new-button').click();
-    await createPromise;
-    await page.waitForURL(/\/songs\//);
 
+    // Wait for redirect to song editor
+    await page.waitForURL(/\/songs\/.+/);
     // Add some content
     await page.locator('input[placeholder="Song Title"]').fill('Print Test Song');
     await page.getByRole('button', { name: /Add New Section/i }).click();

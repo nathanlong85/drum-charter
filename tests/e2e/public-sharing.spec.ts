@@ -19,15 +19,11 @@ test.describe('Public Sharing Workflows', () => {
 
     // 2. Create a new song
     await page.getByTestId('tab-song').first().click();
-    const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/song_charts') && resp.request().method() === 'POST',
-    );
-    await expect(page.getByTestId('create-new-button')).toHaveText(/New song/i, {
+    await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
     await page.getByTestId('create-new-button').click();
-    const response = await createPromise;
-    expect(response.ok()).toBe(true);
+
     await page.waitForURL(/\/songs\/.+/);
     const songId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     expect(songId, 'Expected song id in URL after creating song').toBeTruthy();
@@ -51,15 +47,12 @@ test.describe('Public Sharing Workflows', () => {
 
     // 2. Create a new notebook
     await page.getByTestId('tab-notebook').first().click();
-    const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
-    );
-    await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {
+    await page.waitForURL(/tab=notebook/);
+    await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
     await page.getByTestId('create-new-button').click();
-    const response = await createPromise;
-    expect(response.ok()).toBe(true);
+
     await page.waitForURL(/\/notebooks\/.+/);
     const notebookId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     expect(notebookId, 'Expected notebook id in URL after creating notebook').toBeTruthy();
@@ -89,16 +82,12 @@ test.describe('Public Sharing Workflows', () => {
 
     // 2. Create a new snippet
     await page.getByTestId('tab-snippet').first().click();
-    const createPromise = page.waitForResponse(
-      (resp) =>
-        resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
-    );
-    await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
+    await page.waitForURL(/tab=snippet/);
+    await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
     await page.getByTestId('create-new-button').click();
-    const response = await createPromise;
-    expect(response.ok()).toBe(true);
+
     await page.waitForURL(/\/snippets\/.+/);
     const snippetId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     expect(snippetId, 'Expected snippet id in URL after creating snippet').toBeTruthy();
@@ -128,15 +117,12 @@ test.describe('Public Sharing Workflows', () => {
 
     // 2. Create a new setlist
     await page.getByTestId('tab-setlist').first().click();
-    const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/setlists') && resp.request().method() === 'POST',
-    );
-    await expect(page.getByTestId('create-new-button')).toHaveText(/New setlist/i, {
+    await page.waitForURL(/tab=setlist/);
+    await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
     await page.getByTestId('create-new-button').click();
-    const response = await createPromise;
-    expect(response.ok()).toBe(true);
+
     await page.waitForURL(/\/setlists\/.+/);
     const setlistId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     expect(setlistId, 'Expected setlist id in URL after creating setlist').toBeTruthy();

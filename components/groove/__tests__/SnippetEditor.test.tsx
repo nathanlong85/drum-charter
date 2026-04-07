@@ -1,6 +1,10 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { supabaseService } from '@/lib/services/supabase-service';
+import {
+  deleteItemAction,
+  duplicateItemAction,
+  saveGrooveSnippetAction,
+} from '@/lib/actions/item-actions';
 import type { GrooveSnippet } from '@/lib/types/groove';
 import { SnippetEditor } from '../SnippetEditor';
 
@@ -9,6 +13,13 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
   }),
+}));
+
+// Mock item-actions
+vi.mock('@/lib/actions/item-actions', () => ({
+  saveGrooveSnippetAction: vi.fn().mockResolvedValue({ success: true }),
+  duplicateItemAction: vi.fn().mockResolvedValue({ success: true, data: { id: 'sn2' } }),
+  deleteItemAction: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 // Mock supabase-service
@@ -26,7 +37,7 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 describe('SnippetEditor', () => {
   const mockSnippet: GrooveSnippet = {
     id: 'sn1',
-    ownerId: 'u1',
+    userId: 'u1',
     title: 'Test Snippet',
     tags: [],
     isPublic: false,
@@ -57,7 +68,7 @@ describe('SnippetEditor', () => {
       await wait(2100);
     });
 
-    expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
+    expect(saveGrooveSnippetAction).toHaveBeenCalledWith(
       expect.objectContaining({ title: 'New Title' }),
     );
   });
@@ -72,18 +83,12 @@ describe('SnippetEditor', () => {
       await wait(2100);
     });
 
-    expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
+    expect(saveGrooveSnippetAction).toHaveBeenCalledWith(
       expect.objectContaining({ tags: ['funk'] }),
     );
   });
 
   it('duplicates the snippet', async () => {
-    vi.mocked(supabaseService.duplicateGrooveSnippet).mockResolvedValue({
-      ...mockSnippet,
-      id: 'sn2',
-      title: 'Test Snippet (Copy)',
-    });
-
     render(<SnippetEditor initialSnippet={mockSnippet} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
 
@@ -92,7 +97,7 @@ describe('SnippetEditor', () => {
       await wait(2100);
     });
 
-    expect(supabaseService.duplicateGrooveSnippet).toHaveBeenCalledWith('sn1');
+    expect(duplicateItemAction).toHaveBeenCalledWith('sn1', 'snippet');
   });
 
   it('handles public state toggle', async () => {
@@ -104,7 +109,7 @@ describe('SnippetEditor', () => {
       await wait(2100);
     });
 
-    expect(supabaseService.saveGrooveSnippet).toHaveBeenCalledWith(
+    expect(saveGrooveSnippetAction).toHaveBeenCalledWith(
       expect.objectContaining({ isPublic: true }),
     );
   });
@@ -122,7 +127,7 @@ describe('SnippetEditor', () => {
   });
 
   it('handles auto-save error gracefully', async () => {
-    vi.mocked(supabaseService.saveGrooveSnippet).mockRejectedValueOnce(new Error('Save failed'));
+    vi.mocked(saveGrooveSnippetAction).mockRejectedValueOnce(new Error('Save failed'));
     render(<SnippetEditor initialSnippet={mockSnippet} />);
 
     const titleInput = screen.getByDisplayValue('Test Snippet');
@@ -138,8 +143,8 @@ describe('SnippetEditor', () => {
   });
 
   it('does not attempt to update state if unmounted during save', async () => {
-    const saveSpy = vi.fn().mockResolvedValue({});
-    vi.mocked(supabaseService.saveGrooveSnippet).mockImplementation(saveSpy);
+    const saveSpy = vi.fn().mockResolvedValue({ success: true });
+    vi.mocked(saveGrooveSnippetAction).mockImplementation(saveSpy);
 
     const { unmount } = render(<SnippetEditor initialSnippet={mockSnippet} />);
 
@@ -169,6 +174,6 @@ describe('SnippetEditor', () => {
       await wait(2100);
     });
 
-    expect(supabaseService.deleteGrooveSnippet).toHaveBeenCalledWith('sn1');
+    expect(deleteItemAction).toHaveBeenCalledWith('sn1', 'snippet');
   });
 });

@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { waitForSave } from './test-utils';
 
+test.use({ storageState: { cookies: [], origins: [] } });
+
 test.describe('Library Management & Guest Flow', () => {
   test.beforeEach(async ({ page }) => {
     // Start as a guest for these tests
