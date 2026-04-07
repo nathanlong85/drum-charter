@@ -4,10 +4,14 @@
 
 Before starting ANY new work on an issue or task:
 
-1. **Switch to Staging**: Ensure you are on the `staging` branch (`git checkout staging`).
-2. **Pull Remote Changes**: Ensure `staging` is up-to-date with all remote changes (`git pull origin staging`).
-3. **Branch**: Switch to a new, appropriately-named branch for the task (e.g., `git checkout -b feature/issue-number-description`).
-4. **Project Status**: Mark the corresponding issue/task as "In Progress" on the project status board (e.g., using `gh project item-edit`).
+1. **Proactive Skill Check**:
+    * **Scan Available Skills**: Review the `<available_skills>` block in your system instructions to identify all specialized expertise relevant to the task (e.g., `web-audio-api` for sound, `accessibility` for UI, `vitest` for tests).
+    * **Activate & Internalize**: Call `activate_skill` for every relevant skill. You MUST read the provided `<instructions>` in full before taking any action.
+    * **Apply Expert Guidance**: Integrate the skill's specific best practices into your initial strategy and execution plan.
+2. **Switch to Staging**: Ensure you are on the `staging` branch (`git checkout staging`).
+3. **Pull Remote Changes**: Ensure `staging` is up-to-date with all remote changes (`git pull origin staging`).
+4. **Branch**: Switch to a new, appropriately-named branch for the task (e.g., `git checkout -b feature/issue-number-description`).
+5. **Project Status**: Mark the corresponding issue/task as "In Progress" on the project status board (e.g., using `gh project item-edit`).
 
 ## 2. Pre-Push & PR Protocol (Mandatory)
 

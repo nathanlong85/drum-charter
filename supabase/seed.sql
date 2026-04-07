@@ -63,4 +63,5 @@ INSERT INTO auth.identities (
 );
 
 INSERT INTO public.profiles (id, username)
-VALUES ('d739833a-1f81-4b1f-9993-90d56c071644', 'testuser');
+VALUES ('d739833a-1f81-4b1f-9993-90d56c071644', 'testuser')
+ON CONFLICT (id) DO UPDATE SET username = EXCLUDED.username;

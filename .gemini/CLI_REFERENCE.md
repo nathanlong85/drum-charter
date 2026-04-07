@@ -127,6 +127,7 @@ query($id:ID!) {
 - **Run Unit/Integration Tests**: `pnpm test:run` (Use `run` to avoid interactive watch mode).
 - **Run Specific Test File**: `pnpm vitest run <path_to_test>` (Always use `run`).
 - **Run E2E Tests**: `pnpm test:e2e`
+- **Run Specific E2E Test File**: `pnpm playwright test <path_to_test> --project=chromium`
 - **Run E2E in UI Mode**: `pnpm playwright test --ui`
 
 ### Linting & Formatting

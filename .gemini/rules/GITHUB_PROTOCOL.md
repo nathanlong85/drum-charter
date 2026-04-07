@@ -99,8 +99,6 @@ This document serves as the absolute source of truth for GitHub-related operatio
     gh pr view <number> --json reviews,comments
     ```
 
-  - **Backup (MCP Tool)**: Use `mcp_github_pull_request_read(method="get_reviews")` and `mcp_github_pull_request_read(method="get_comments")`.
-
 - **Check Review Comments (Line-level/Threaded)**:
 
   - **Primary (API)**:
@@ -108,8 +106,6 @@ This document serves as the absolute source of truth for GitHub-related operatio
     ```bash
     gh api repos/nathanlong85/drum-charter/pulls/<number>/comments --jq '.[] | {user: .user.login, body: .body, path: .path, line: .line, id: .id}'
     ```
-
-  - **Backup (MCP Tool)**: Use `mcp_github_pull_request_read(method="get_review_comments")`.
 
 - **Reply to a Review Comment (Threaded)**:
 
@@ -119,8 +115,6 @@ This document serves as the absolute source of truth for GitHub-related operatio
     gh api -X POST repos/nathanlong85/drum-charter/pulls/<number>/comments/<comment_id>/replies -f body="Your reply here"
     ```
 
-  - **Backup (MCP Tool)**: Use `mcp_github_add_reply_to_pull_request_comment(owner, repo, pullNumber, commentId, body)`.
-
 - **Post a General PR Comment**:
 
   - **Primary (`gh` CLI)**:
@@ -128,8 +122,6 @@ This document serves as the absolute source of truth for GitHub-related operatio
     ```bash
     gh pr comment <number> --body "Your comment here"
     ```
-
-  - **Backup (MCP Tool)**: Use `mcp_github_add_issue_comment(owner, repo, issue_number, body)`.
 
 ### 4. CI/CD Status & Diagnosis
 

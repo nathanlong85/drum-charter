@@ -1,11 +1,17 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { supabaseService } from '@/lib/services/supabase-service';
+import {
+  deleteItemAction,
+  duplicateItemAction,
+  listGrooveSnippetsAction,
+  saveSongChartAction,
+} from '@/lib/actions/item-actions';
 import type { GrooveSnippet, SongChart } from '@/lib/types/groove';
 import SongEditor from '../SongEditor';
 
 const mockSong: SongChart = {
   id: 's1',
+  userId: 'u1',
   header: {
     title: 'Test Song',
     bpm: 120,
@@ -34,6 +40,14 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
   }),
+}));
+
+// Mock item-actions
+vi.mock('@/lib/actions/item-actions', () => ({
+  saveSongChartAction: vi.fn().mockResolvedValue({ success: true }),
+  duplicateItemAction: vi.fn().mockResolvedValue({ success: true, data: { id: 's2' } }),
+  deleteItemAction: vi.fn().mockResolvedValue({ success: true }),
+  listGrooveSnippetsAction: vi.fn().mockResolvedValue([]),
 }));
 
 // Mock supabase-service
@@ -69,10 +83,10 @@ describe('SongEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveSongChart).toHaveBeenCalled();
+      expect(saveSongChartAction).toHaveBeenCalled();
     });
 
-    expect(supabaseService.saveSongChart).toHaveBeenCalledWith(
+    expect(saveSongChartAction).toHaveBeenCalledWith(
       expect.objectContaining({
         header: expect.objectContaining({ title: 'Updated Song' }),
       }),
@@ -89,10 +103,10 @@ describe('SongEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveSongChart).toHaveBeenCalled();
+      expect(saveSongChartAction).toHaveBeenCalled();
     });
 
-    const lastCall = vi.mocked(supabaseService.saveSongChart).mock.calls.at(-1)![0] as SongChart;
+    const lastCall = vi.mocked(saveSongChartAction).mock.calls.at(-1)![0] as SongChart;
     expect(lastCall.sections.length).toBe(2);
   });
 
@@ -106,10 +120,10 @@ describe('SongEditor', () => {
     });
 
     await waitFor(() => {
-      expect(supabaseService.saveSongChart).toHaveBeenCalled();
+      expect(saveSongChartAction).toHaveBeenCalled();
     });
 
-    const lastCall = vi.mocked(supabaseService.saveSongChart).mock.calls.at(-1)![0] as SongChart;
+    const lastCall = vi.mocked(saveSongChartAction).mock.calls.at(-1)![0] as SongChart;
     expect(lastCall.sections.length).toBe(0);
   });
 
@@ -122,7 +136,7 @@ describe('SongEditor', () => {
       await wait(2100);
     });
 
-    expect(supabaseService.duplicateSongChart).toHaveBeenCalledWith('s1');
+    expect(duplicateItemAction).toHaveBeenCalledWith('s1', 'song');
   });
 
   it('deletes the song', async () => {
@@ -135,12 +149,13 @@ describe('SongEditor', () => {
       await wait(2100);
     });
 
-    expect(supabaseService.deleteSongChart).toHaveBeenCalledWith('s1');
+    expect(deleteItemAction).toHaveBeenCalledWith('s1', 'song');
   });
 
   it('inserts a snippet into a section', async () => {
     const mockSnippet: GrooveSnippet = {
       id: 'snip1',
+      userId: 'u1',
       title: 'Test Snippet',
       tags: [],
       timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
@@ -151,7 +166,7 @@ describe('SongEditor', () => {
       createdAt: null,
       updatedAt: null,
     };
-    vi.mocked(supabaseService.listGrooveSnippetsMapped).mockResolvedValue([mockSnippet]);
+    vi.mocked(listGrooveSnippetsAction).mockResolvedValue([mockSnippet]);
 
     render(<SongEditor initialSong={mockSong} />);
 
@@ -166,7 +181,7 @@ describe('SongEditor', () => {
       await wait(2100);
     });
 
-    const lastCall = vi.mocked(supabaseService.saveSongChart).mock.calls.at(-1)![0] as SongChart;
+    const lastCall = vi.mocked(saveSongChartAction).mock.calls.at(-1)![0] as SongChart;
     expect(lastCall.sections[0].grid).toBeDefined();
     expect(lastCall.sections[0].grid?.timeSignature.beatsPerMeasure).toBe(4);
   });

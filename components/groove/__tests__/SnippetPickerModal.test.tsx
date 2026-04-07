@@ -1,35 +1,43 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { supabaseService } from '@/lib/services/supabase-service';
+import { listGrooveSnippetsAction } from '@/lib/actions/item-actions';
 import type { GrooveSnippet } from '@/lib/types/groove';
 import { SnippetPickerModal } from '../SnippetPickerModal';
 
-const mockSnippets: GrooveSnippet[] = [
-  {
-    id: 's1',
-    title: 'Funky Groove',
-    tags: ['funk'],
-    timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-    resolution: 16,
-    measures: 1,
-    instruments: [],
-    isPublic: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: 's2',
-    title: 'Jazz Swing',
-    tags: ['jazz'],
-    timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-    resolution: 16,
-    measures: 1,
-    instruments: [],
-    isPublic: true,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+const { mockSnippets } = vi.hoisted(() => {
+  const snippets: GrooveSnippet[] = [
+    {
+      id: 's1',
+      title: 'Funky Groove',
+      tags: ['funk'],
+      timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+      resolution: 16,
+      measures: 1,
+      instruments: [],
+      isPublic: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: 's2',
+      title: 'Jazz Swing',
+      tags: ['jazz'],
+      timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+      resolution: 16,
+      measures: 1,
+      instruments: [],
+      isPublic: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+  ];
+  return { mockSnippets: snippets };
+});
+
+// Mock item-actions
+vi.mock('@/lib/actions/item-actions', () => ({
+  listGrooveSnippetsAction: vi.fn().mockResolvedValue(mockSnippets),
+}));
 
 describe('SnippetPickerModal', () => {
   const onClose = vi.fn();
@@ -37,7 +45,7 @@ describe('SnippetPickerModal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(supabaseService, 'listGrooveSnippetsMapped').mockResolvedValue(mockSnippets);
+    vi.mocked(listGrooveSnippetsAction).mockResolvedValue(mockSnippets);
   });
 
   it('renders loading state then snippets', async () => {
@@ -91,9 +99,7 @@ describe('SnippetPickerModal', () => {
   });
 
   it('shows error state on failure', async () => {
-    vi.spyOn(supabaseService, 'listGrooveSnippetsMapped').mockRejectedValue(
-      new Error('Fetch failed'),
-    );
+    vi.mocked(listGrooveSnippetsAction).mockRejectedValueOnce(new Error('Fetch failed'));
 
     render(<SnippetPickerModal onClose={onClose} onSelect={onSelect} />);
 

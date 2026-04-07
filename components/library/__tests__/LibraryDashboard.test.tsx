@@ -1,6 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { supabaseService } from '@/lib/services/supabase-service';
+import {
+  createItemAction,
+  deleteItemAction,
+  duplicateItemAction,
+} from '@/lib/actions/item-actions';
 
 interface MockLibraryItem {
   id: string;
@@ -12,17 +16,9 @@ interface MockLibraryItem {
 }
 
 // Use vi.hoisted to ensure these are available inside vi.mock factory
-const { mockGetUser, mockSupabase, navState, mockRouter } = vi.hoisted(() => {
-  const getUser = vi.fn().mockResolvedValue({
-    data: { user: { id: 'test-user-id' } },
-    error: null,
-  });
+const { navState, mockRouter } = vi.hoisted(() => {
   const state = { currentTab: 'song', listeners: [] as ((val: string) => void)[] };
   return {
-    mockGetUser: getUser,
-    mockSupabase: {
-      auth: { getUser },
-    },
     navState: state,
     mockRouter: {
       push: vi.fn((url: string) => {
@@ -36,9 +32,14 @@ const { mockGetUser, mockSupabase, navState, mockRouter } = vi.hoisted(() => {
   };
 });
 
-// Mock Supabase client module
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: vi.fn(() => mockSupabase),
+// Mock item-actions
+vi.mock('@/lib/actions/item-actions', () => ({
+  createItemAction: vi.fn().mockResolvedValue({ success: true }),
+  duplicateItemAction: vi.fn().mockResolvedValue({
+    success: true,
+    data: { id: 'dup-1', title: 'Song 1 (Copy)', type: 'song' },
+  }),
+  deleteItemAction: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 // Mock next/navigation
@@ -126,15 +127,6 @@ describe('LibraryDashboard', () => {
     vi.clearAllMocks();
     navState.currentTab = 'song'; // Reset URL state
 
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: 'test-user-id' } },
-      error: null,
-    });
-
-    // Mock window.location.assign
-    const location = { assign: vi.fn() };
-    vi.stubGlobal('location', location);
-
     // Mock window.alert
     vi.stubGlobal('alert', vi.fn());
   });
@@ -196,72 +188,47 @@ describe('LibraryDashboard', () => {
   });
 
   describe('Creation Flow', () => {
-    it('successfully creates a new song chart and redirects', async () => {
-      vi.mocked(supabaseService.saveSongChart).mockResolvedValue({ id: 'new-song-id' } as any);
-
+    it('calls createItemAction for song', async () => {
       render(<LibraryDashboard {...mockProps} />);
 
       // Button is dynamic: "New song"
       fireEvent.click(screen.getByTestId('create-new-button'));
 
       await waitFor(() => {
-        expect(supabaseService.saveSongChart).toHaveBeenCalled();
-        expect(window.location.assign).toHaveBeenCalledWith('/songs/new-song-id');
+        expect(createItemAction).toHaveBeenCalledWith('song');
       });
     });
 
-    it('successfully creates a new notebook and redirects', async () => {
-      vi.mocked(supabaseService.saveNotebook).mockResolvedValue({ id: 'new-nb-id' } as any);
-
+    it('calls createItemAction for notebook', async () => {
       render(<LibraryDashboard {...mockProps} />);
       await switchTab('notebook');
 
-      // The button text is updated by activeTab state
-      await waitFor(() =>
-        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/notebook/i),
-      );
-
       fireEvent.click(screen.getByTestId('create-new-button'));
 
       await waitFor(() => {
-        expect(supabaseService.saveNotebook).toHaveBeenCalled();
-        expect(window.location.assign).toHaveBeenCalledWith('/notebooks/new-nb-id');
+        expect(createItemAction).toHaveBeenCalledWith('notebook');
       });
     });
 
-    it('successfully creates a new snippet and redirects', async () => {
-      vi.mocked(supabaseService.saveGrooveSnippet).mockResolvedValue({ id: 'new-snip-id' } as any);
-
+    it('calls createItemAction for snippet', async () => {
       render(<LibraryDashboard {...mockProps} />);
       await switchTab('snippet');
 
-      await waitFor(() =>
-        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/snippet/i),
-      );
-
       fireEvent.click(screen.getByTestId('create-new-button'));
 
       await waitFor(() => {
-        expect(supabaseService.saveGrooveSnippet).toHaveBeenCalled();
-        expect(window.location.assign).toHaveBeenCalledWith('/snippets/new-snip-id');
+        expect(createItemAction).toHaveBeenCalledWith('snippet');
       });
     });
 
-    it('successfully creates a new setlist and redirects', async () => {
-      vi.mocked(supabaseService.saveSetlist).mockResolvedValue({ id: 'new-setlist-id' } as any);
-
+    it('calls createItemAction for setlist', async () => {
       render(<LibraryDashboard {...mockProps} />);
       await switchTab('setlist');
-
-      await waitFor(() =>
-        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/setlist/i),
-      );
 
       fireEvent.click(screen.getByTestId('create-new-button'));
 
       await waitFor(() => {
-        expect(supabaseService.saveSetlist).toHaveBeenCalled();
-        expect(window.location.assign).toHaveBeenCalledWith('/setlists/new-setlist-id');
+        expect(createItemAction).toHaveBeenCalledWith('setlist');
       });
     });
   });
@@ -272,8 +239,10 @@ describe('LibraryDashboard', () => {
       render(<LibraryDashboard {...mockProps} />);
 
       fireEvent.click(screen.getByTestId('delete-song-s1'));
-      expect(supabaseService.deleteSongChart).toHaveBeenCalledWith('s1');
-      await waitFor(() => expect(screen.queryByText('Song 1')).toBeNull());
+      await waitFor(() => {
+        expect(deleteItemAction).toHaveBeenCalledWith('s1', 'song');
+        expect(screen.queryByText('Song 1')).toBeNull();
+      });
     });
 
     it('deletes notebook', async () => {
@@ -284,52 +253,26 @@ describe('LibraryDashboard', () => {
       await waitFor(() => expect(screen.getByTestId('delete-notebook-n1')).toBeDefined());
 
       fireEvent.click(screen.getByTestId('delete-notebook-n1'));
-      expect(supabaseService.deleteNotebook).toHaveBeenCalledWith('n1');
-      await waitFor(() => expect(screen.queryByText('Notebook 1')).toBeNull());
+      await waitFor(() => {
+        expect(deleteItemAction).toHaveBeenCalledWith('n1', 'notebook');
+        expect(screen.queryByText('Notebook 1')).toBeNull();
+      });
     });
 
     it('handles item duplication', async () => {
-      vi.mocked(supabaseService.duplicateSongChart).mockResolvedValue({
-        id: 's2',
-        title: 'Song 1 (Copy)',
-        type: 'song',
-        tags: [],
-        created_at: new Date().toISOString(),
-      } as any);
-
       render(<LibraryDashboard {...mockProps} />);
 
       fireEvent.click(screen.getByTestId('duplicate-song-s1'));
       await waitFor(() => {
-        expect(supabaseService.duplicateSongChart).toHaveBeenCalledWith('s1');
+        expect(duplicateItemAction).toHaveBeenCalledWith('s1', 'song');
         expect(screen.getByText('Song 1 (Copy)')).toBeDefined();
       });
     });
 
-    it('handles snippet creation error', async () => {
-      vi.mocked(supabaseService.saveGrooveSnippet).mockRejectedValue(new Error('Snip Fail'));
+    it('handles creation error', async () => {
+      vi.mocked(createItemAction).mockRejectedValueOnce(new Error('Fail'));
 
       render(<LibraryDashboard {...mockProps} />);
-      await switchTab('snippet');
-      await waitFor(() =>
-        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/snippet/i),
-      );
-
-      fireEvent.click(screen.getByTestId('create-new-button'));
-      await waitFor(() =>
-        expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Failed to create item')),
-      );
-    });
-
-    it('handles notebook creation error', async () => {
-      vi.mocked(supabaseService.saveNotebook).mockRejectedValue(new Error('NB Fail'));
-
-      render(<LibraryDashboard {...mockProps} />);
-      await switchTab('notebook');
-      await waitFor(() =>
-        expect(screen.getByTestId('create-new-button')).toHaveTextContent(/notebook/i),
-      );
-
       fireEvent.click(screen.getByTestId('create-new-button'));
       await waitFor(() =>
         expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Failed to create item')),

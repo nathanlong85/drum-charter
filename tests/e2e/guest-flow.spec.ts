@@ -51,20 +51,15 @@ test.describe('Guest Access & Library Flow', () => {
     // Switch to Notebooks tab
     const notebookTab = page.getByTestId('tab-notebook').first();
     await notebookTab.click();
+    await page.waitForURL(/tab=notebook/);
     await expect(notebookTab).toHaveAttribute('aria-selected', 'true');
 
-    // Click "New notebook" and wait for creation response
-    const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
-      { timeout: 30000 },
-    );
     const newNotebookBtn = page.getByTestId('create-new-button');
     await expect(newNotebookBtn).toBeVisible();
     await newNotebookBtn.click();
-    await createPromise;
 
     // Wait for redirect
-    await page.waitForURL(/\/notebooks\/.+/, { timeout: 10000 });
+    await page.waitForURL(/\/notebooks\/.+/, { timeout: 30000 });
     await expect(page).toHaveURL(/\/notebooks\/.+/);
 
     // Should be able to edit title
@@ -91,19 +86,14 @@ test.describe('Guest Access & Library Flow', () => {
     // Switch to Snippets tab and wait for it to be active
     const snippetTab = page.getByTestId('tab-snippet');
     await snippetTab.click();
+    await page.waitForURL(/tab=snippet/);
     await expect(snippetTab).toHaveAttribute('aria-selected', 'true');
 
     // Create new snippet
-    const createPromise = page.waitForResponse(
-      (resp) =>
-        resp.url().includes('/rest/v1/groove_snippets') && resp.request().method() === 'POST',
-      { timeout: 30000 },
-    );
     await page.getByTestId('create-new-button').click();
-    await createPromise;
 
     // Wait for redirect
-    await page.waitForURL(/\/snippets\/.+/, { timeout: 10000 });
+    await page.waitForURL(/\/snippets\/.+/, { timeout: 30000 });
     await expect(page).toHaveURL(/\/snippets\/.+/);
 
     const titleInput = page.getByPlaceholder(/Snippet Title/i);
@@ -133,21 +123,16 @@ test.describe('Guest Access & Library Flow', () => {
     // Switch to Notebooks tab and wait for it to be active
     const notebookTab = page.getByTestId('tab-notebook');
     await notebookTab.click();
+    await page.waitForURL(/tab=notebook/);
     await expect(notebookTab).toHaveAttribute('aria-selected', 'true');
 
-    // Create new notebook
-    const createPromise = page.waitForResponse(
-      (resp) => resp.url().includes('/rest/v1/notebooks') && resp.request().method() === 'POST',
-      { timeout: 30000 },
-    );
     await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {
       timeout: 15000,
     });
     await page.getByTestId('create-new-button').click();
-    await createPromise;
 
     // Wait for redirect
-    await page.waitForURL(/\/notebooks\/.+/, { timeout: 10000 });
+    await page.waitForURL(/\/notebooks\/.+/, { timeout: 30000 });
     await expect(page).toHaveURL(/\/notebooks\/.+/);
 
     // Check for "Guest Mode" indicator

@@ -33,7 +33,9 @@ test.describe('Dashboard (Mission Control)', () => {
       await expect(page.getByRole('button', { name: /New Practice Notebook/i })).toBeVisible();
 
       // Check for Recent Activity section
-      await expect(page.getByRole('heading', { name: /Recent Activity/i })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: 'Recent Activity', exact: true }),
+      ).toBeVisible();
     });
 
     test('Quick Start "New Song Chart" works', async ({ page }) => {

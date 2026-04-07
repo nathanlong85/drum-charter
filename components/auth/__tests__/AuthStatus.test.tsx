@@ -8,6 +8,11 @@ const mockSignOut = vi.fn(() => Promise.resolve({ error: null }));
 const mockOnAuthStateChange = vi.fn(() => ({
   data: { subscription: { unsubscribe: vi.fn() } },
 }));
+const mockFrom = vi.fn().mockReturnValue({
+  select: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+});
 
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
@@ -16,6 +21,7 @@ vi.mock('@/lib/supabase/client', () => ({
       signOut: mockSignOut,
       onAuthStateChange: mockOnAuthStateChange,
     },
+    from: mockFrom,
   }),
 }));
 
