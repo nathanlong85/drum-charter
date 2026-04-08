@@ -17,6 +17,7 @@ interface NoteCellProps {
   isSelected?: boolean;
   isActive?: boolean;
   readOnly?: boolean;
+  'data-testid'?: string;
 }
 
 const symbolToIcon: Record<DrumSymbol, string | null> = {

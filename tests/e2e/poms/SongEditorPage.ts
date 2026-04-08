@@ -101,7 +101,7 @@ export class SongEditorPage {
   }
 
   async setVelocity(type: string) {
-    const btn = this.symbolPicker.locator('button').filter({ hasText: type });
+    const btn = this.symbolPicker.getByRole('button', { name: type, exact: true });
     await expect(btn).toBeVisible({ timeout: 10000 });
     await btn.click({ force: true });
   }
