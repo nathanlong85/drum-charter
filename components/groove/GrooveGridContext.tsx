@@ -240,7 +240,6 @@ export function GrooveGridProvider({
         noteIndex: pickerPos.noteIndex,
         symbol: symbol || 'none',
       });
-      setPickerPos(null);
     },
     [pickerPos, readOnly, wrappedDispatch],
   );
