@@ -139,7 +139,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         }}
         onMouseDown={readOnly ? undefined : onMouseDown}
         onMouseEnter={readOnly ? undefined : onMouseEnter}
-        data-testid={testId}
+        data-testid={`note-cell ${testId}`}
         data-index={index}
         data-active={symbol === 'none' ? 'false' : 'true'}
         data-selected={isSelected ? 'true' : 'false'}
@@ -161,7 +161,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         }}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
-        data-testid={testId}
+        data-testid={`note-cell ${testId}`}
         data-index={index}
         data-active="true"
         data-selected={isSelected ? 'true' : 'false'}
