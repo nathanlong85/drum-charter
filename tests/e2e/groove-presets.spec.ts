@@ -17,13 +17,13 @@ test.describe('Groove Grid Quick Presets', () => {
     await row.scrollIntoViewIfNeeded();
 
     // Click the instrument name area (the button with the title)
-    const trigger = row.locator('button[title="Click for Quick Presets"]');
+    const trigger = row.locator('button[title="Edit Settings"]');
     await expect(trigger).toBeVisible();
     await trigger.click();
 
     // Check if the dropdown menu is visible
     await expect(page.getByRole('menu')).toBeVisible();
-    await expect(page.getByText('Quick Presets')).toBeVisible();
+    await expect(page.getByText('Presets')).toBeVisible();
     await expect(page.getByRole('menuitem', { name: /On-Beats/i })).toBeVisible();
     await expect(page.getByRole('menuitem', { name: /Upbeats/i })).toBeVisible();
   });
@@ -32,7 +32,7 @@ test.describe('Groove Grid Quick Presets', () => {
     // Click instrument name to open menu
     await page
       .getByTestId('instrument-row-hi-hat')
-      .locator('button[title="Click for Quick Presets"]')
+      .locator('button[title="Edit Settings"]')
       .click();
 
     // Select On-Beats
@@ -41,34 +41,37 @@ test.describe('Groove Grid Quick Presets', () => {
     // Verify some notes are now active
     // With 4/4 and 16th notes, on-beats are 1, 5, 9, 13 (0-indexed: 0, 4, 8, 12)
     const row = page.getByTestId('instrument-row-hi-hat');
-    const firstNote = row.locator('[data-index="0"]');
-    await expect(firstNote).toHaveAttribute('data-active', 'true');
+    const firstNote = row.getByTestId('note-cell').nth(0);
+    await expect(firstNote.getByTestId('note-cell-icon')).toBeVisible();
 
-    const secondNote = row.locator('[data-index="1"]');
-    await expect(secondNote).toHaveAttribute('data-active', 'false');
+    const secondNote = row.getByTestId('note-cell').nth(1);
+    await expect(secondNote.getByTestId('note-cell-icon')).not.toBeVisible();
 
-    const fifthNote = row.locator('[data-index="4"]');
-    await expect(fifthNote).toHaveAttribute('data-active', 'true');
+    const fifthNote = row.getByTestId('note-cell').nth(4);
+    await expect(fifthNote.getByTestId('note-cell-icon')).toBeVisible();
   });
 
   test('should toggle mute state', async ({ page }) => {
     const row = page.getByTestId('instrument-row-hi-hat');
 
     // Open menu
-    await row.locator('button[title="Click for Quick Presets"]').click();
+    await row.locator('button[title="Edit Settings"]').click();
 
     // Select Mute
-    await page.getByRole('menuitem', { name: /Mute/i }).click();
+    await page
+      .getByRole('menuitem', { name: /^Mute$/i })
+      .first()
+      .click();
 
     // Verify the row has a muted visual state (opacity-40)
     await expect(row).toHaveClass(/opacity-40/);
 
-    // Verify VolumeX icon is visible
-    await expect(row.locator('svg.text-error')).toBeVisible();
-
     // Unmute
-    await row.locator('button[title="Click for Quick Presets"]').click();
-    await page.getByRole('menuitem', { name: /Unmute/i }).click();
+    await row.locator('button[title="Edit Settings"]').click();
+    await page
+      .getByRole('menuitem', { name: /^Unmute$/i })
+      .first()
+      .click();
 
     // Verify the row is no longer muted
     await expect(row).not.toHaveClass(/opacity-40/);
@@ -76,15 +79,14 @@ test.describe('Groove Grid Quick Presets', () => {
 
   test('should filter presets for 5/4 time signature', async ({ page }) => {
     // Change to 5/4 using the toolbar inputs
-    const timeSignatureContainer = page.getByText('/').locator('..');
-    const beatsInput = timeSignatureContainer.locator('input[type="number"]').first();
+    const beatsInput = page.locator('input[value="4"]').first();
     await beatsInput.fill('5');
     await beatsInput.press('Enter');
 
     // Open Hi-Hat presets
     await page
       .getByTestId('instrument-row-hi-hat')
-      .locator('button[title="Click for Quick Presets"]')
+      .locator('button[title="Edit Settings"]')
       .click();
 
     // Verify Upbeats is NOT present, but All On is

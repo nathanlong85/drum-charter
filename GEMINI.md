@@ -1,42 +1,31 @@
-<!-- BEGIN:nextjs-agent-rules -->
-@AGENTS.md
-<!-- END:nextjs-agent-rules -->
-
 # Project: DrumCharter
 
 ## Description and Goal
 
 DrumCharter is a web application tailored for drummers to create, manage, and share drum charts, practice exercises, and groove snippets. It aims to replace cumbersome word processor templates with a streamlined, interactive tool.
 
-## Agent Capabilities
+---
 
-- You are free to recommend and use additional packages beyond those already included if they improve outcomes (for example, UI libraries like Radix to enhance accessibility and UX).
+# 📖 Core Concepts & Tech Stack
 
-## GitHub Identity
-
-- My dedicated GitHub account is **`nathanlong85-ai`**. Use this login for search queries and when identifying assigned issues/PRs.
+@./.gemini/rules/CORE_CONCEPTS.md
 
 ---
 
-@./.gemini/rules/PROJECT_STRUCTURE_AND_STANDARDS.md
+# 🛠️ Workflow & "Done" Protocols
+
+@./.gemini/rules/WORKFLOW_PROTOCOL.md
+@./.gemini/rules/PR_REVIEW_PROTOCOL.md
 
 ---
 
-# Rulesets
+# 🤝 Behavioral Guidelines
 
-@./.gemini/rules/PAIR_PROGRAMMING_PROTOCOL.md
-@./.gemini/rules/GITHUB_PROTOCOL.md
-
----
-
-# General Guidelines
-
-@./.gemini/rules/GENERAL_GUIDELINES.md
+@./.gemini/rules/BEHAVIORAL_GUIDELINES.md
 
 ---
 
-@./.gemini/rules/CODE_REVIEW_PROTOCOL.md
+# ⚠️ Project Constraints
 
----
-
-@./.gemini/rules/CLI_AND_TERMINAL_OPERATIONS.md
+## Epic #26: Drum-Aware Grid Architecture
+- **STRICT RESTRICTION**: Do NOT touch Epic #26 (Drum-Aware Grid Architecture) or any related tasks (#27, #28, #29, #30, #31) until the user has explicitly provided the drum samples and given permission to start. Always wait for a clear directive before starting ANY new feature work.

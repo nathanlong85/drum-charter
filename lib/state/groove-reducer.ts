@@ -28,7 +28,7 @@ export type GrooveAction =
       id: string;
       category: DrumCategory;
       presetVariety: string;
-      label: string;
+      customName: string;
     }
   | { type: 'REMOVE_INSTRUMENT'; id: string }
   | {
@@ -70,6 +70,12 @@ export type GrooveAction =
       }>;
     }
   | { type: 'SET_GRID'; payload: DrumInstrument[] }
+  | {
+      type: 'PASTE_DATA';
+      id: string;
+      noteIndex: number;
+      data: Array<{ notes: DrumSymbol[]; velocities: number[] }>;
+    }
   | { type: 'SET_FULL_GRID'; grid: GrooveGrid };
 
 export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGrid {
@@ -224,6 +230,37 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
         }),
       };
     }
+
+    case 'PASTE_DATA': {
+      const { id, noteIndex, data } = action;
+      const startInstIdx = state.instruments.findIndex((inst) => inst.id === id);
+      if (startInstIdx === -1) return state;
+
+      return {
+        ...state,
+        instruments: state.instruments.map((inst, i) => {
+          const relativeInstIdx = i - startInstIdx;
+          if (relativeInstIdx < 0 || relativeInstIdx >= data.length) return inst;
+
+          const pasteData = data[relativeInstIdx];
+          const newNotes = [...inst.notes];
+          const newVelocities = inst.velocities
+            ? [...inst.velocities]
+            : Array(inst.notes.length).fill(0);
+
+          for (let j = 0; j < pasteData.notes.length; j++) {
+            const targetNoteIdx = noteIndex + j;
+            if (targetNoteIdx < newNotes.length) {
+              newNotes[targetNoteIdx] = pasteData.notes[j];
+              newVelocities[targetNoteIdx] =
+                pasteData.velocities?.[j] ?? getVelocityForSymbol(pasteData.notes[j]);
+            }
+          }
+
+          return { ...inst, notes: newNotes, velocities: newVelocities };
+        }),
+      };
+    }
     case 'TOGGLE_NOTE': {
       return {
         ...state,
@@ -287,7 +324,7 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
             id: action.id,
             category: action.category,
             presetVariety: action.presetVariety,
-            customName: action.label,
+            customName: action.customName,
             notes: Array(totalNotes).fill('none'),
             velocities: Array(totalNotes).fill(0),
           },

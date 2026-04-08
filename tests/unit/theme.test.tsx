@@ -26,11 +26,10 @@ describe('Theme Class Verification', () => {
 
   describe('GrooveGridEditor', () => {
     const mockGrid = {
-      id: 'g1',
       measures: 1,
       resolution: 4 as const,
       timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
-      playbackOptionalHits: [],
+      playbackOptionalHits: false,
       instruments: createDefaultDrumInstruments({
         measures: 1,
         resolution: 4,

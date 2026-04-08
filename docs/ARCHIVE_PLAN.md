@@ -1,0 +1,75 @@
+# DrumCharter Project Plan Archive
+
+This file contains the historical record of completed tasks and milestones for the DrumCharter project.
+
+## 🟢 Archived Done Items
+
+- [x] [Fix] Dark Mode Support: Unified dark mode across all pages and expanded test coverage (#60) `✓`
+- [x] [Fix] Live Mode E2E Stability: Resolved flakiness in Live Mode transition tests and fixed overlapping UI issues (#74) `✓`
+- [x] [Bug] Groove Grid Editor: Fixed elements extending out of the side with responsive layout and wrapping toolbar (#59) `✓`
+- [x] [Fix] Grid Interaction Stability: Resolved flakiness in E2E dragging/selection tests (#73) `✓`
+- [x] [Feature] Issue #76: Address CodeRabbit Full Review Findings (completed) `✓`
+- [x] [Epic] Apply UI Redesign from Stitch Exports (#70) `✓`
+- [x] [Epic] Upgrade to Next.js 16.2 & AI Agent Optimization (#52) `✓`
+  - [x] [Task] Upgrade next and eslint-config-next to 16.2.1 (#53) `✓`
+  - [x] [Task] Setup AGENTS.md and CLAUDE.md for AI Optimization (#54) `✓`
+  - [x] [Task] Enable browser-to-terminal logging in Next.js config (#55) `✓`
+  - [x] [Task] Document next-browser usage for the project (#56) `✓`
+- [x] [Chore] Expand E2E test coverage for all core UI flows (#22) `✓`
+- [x] [Task] PNG Fallback Icons for PWA (#13) `✓`
+- [x] [Feature] Section Markers: Clear visual indicators for song sections in Live Mode (#49) `✓`
+- [x] [Documentation] Create Comprehensive User Manual (#48) `✓`
+- [x] [Feature] Remote Control Support (Foot Switch/MIDI) (#39) `✓`
+- [x] [Feature] Setlist Management (#38) `✓`
+- [x] [Feature] Keyboard Modifiers for Rapid Editing (#36) `✓`
+- [x] [Feature] Multi-cell Selection & Copy/Paste (#35) `✓`
+- [x] [Feature] Quick Clear Grid/Row functionality (#34) `✓`
+- [x] [Task] Optional Hit Playback Toggle (#32) `✓`
+- [x] [Chore] Comprehensive Codebase Audit and Standardization (#24) `✓`
+- [x] [Task] Context-Aware Symbol Picker (#29) `✓`
+- [x] [Task] Instrument Customization UI (#28) `✓`
+- [x] [Task] Data Model Update (JSON) & Migration (#27) `✓`
+- [x] [Chore] Standardize PWA architecture and Enable HTTPS/Offline Verification (#18) `✓`
+- [x] [Feature] Dark Mode Support (#4) `✓`
+- [x] [Chore] GitHub Actions CI Pipeline (Linting, Unit Tests, E2E) (#20) `✓`
+- [x] [Chore] CI Security Hardening (SHA pinning, least-privilege permissions, pinned Supabase CLI) (#20) `✓`
+- [x] [Fix] Resolve Playwright CI failure (missing `dotenv`) and optimize Supabase startup (#20) `✓`
+- [x] [Feature] Offline Support (PWA) (#5) `✓`
+- [x] [Feature] Audio Playback: Metronome Support (#2) `✓`
+- [x] GitHub Formalization (Issues, Kanban, Templates) `✓`
+- [x] Local-First Development Environment (Supabase Docker) `✓`
+- [x] Schema Baselining & Migration Repair `✓`
+- [x] Synchronized Local Seed Data `✓`
+- [x] Audio Playback MVP (Kick, Snare, Hi-Hat) with sample-accurate Web Audio API scheduler `✓`
+- [x] Full Drum Kit Overhaul (17 sounds, Symbol Mapping) `✓`
+- [x] Fix: RLS Violation (42501) on item creation `✓`
+- [x] Fix: Audio Decoding and Supabase Error Visibility `✓`
+- [x] Visual Playhead synchronization and BPM management for all entity types `✓`
+- [x] Public routes and read-only views for Notebooks and Snippets `✓`
+- [x] Clone/Duplicate Item logic and UI `✓`
+- [x] v0.1.1-alpha: Management Layer (Duplicate, Sharing) `✓`
+- [x] v0.1.0-alpha: Core Editors & Testing Baseline `✓`
+- [x] Print-Friendly Layout & @media print styles `✓`
+- [x] Public Sharing & Public Routes (Songs) `✓`
+- [x] Library Navigation and AuthStatus improvements `✓`
+- [x] Guest Mode (Anonymous Sign-In) `✓`
+- [x] Landing Page Redesign (Hero, Demo, Features) `✓`
+- [x] Snippet Editor UI `✓`
+- [x] Interactive Song Editor UI `✓`
+- [x] Dynamic Time Signatures & Resolution `✓`
+- [x] Notebook Editor UI `✓`
+- [x] Supabase Connection & Schema `✓`
+- [x] Groove Grid Engine `✓`
+- [x] Project Documentation & Use Cases `✓`
+- [x] Document CLI usage patterns in `.junie/CLI_REFERENCE.md` `✓`
+- [x] Fix: Create missing `notebooks` table in Supabase via CLI migration `✓`
+- [x] Restore full type safety for Notebook operations in `supabaseService` `✓`
+- [x] Supabase TypeScript Type Generation and Service Refactor `✓`
+- [x] Initialize CHANGELOG.md (v0.1.0-alpha) `✓`
+- [x] Implement Unit Tests for all core editors (Song, Notebook, Snippet) `✓`
+- [x] Move dev server and Playwright to Port 3001 `✓`
+- [x] Fix "Error creating new item" in Library and add creation flow unit tests `✓`
+- [x] Rebrand to DrumCharter and landing page redesign `✓`
+- [x] [E2E] Stabilization (timeouts, persistence anchors) `✓`
+- [x] Implement Anonymous Sign-In (Guest Mode) `✓`
+- [x] Groove Grid Core (Resolutions, Measures, Symbols) `✓`

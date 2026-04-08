@@ -1,5 +1,15 @@
 import '@testing-library/jest-dom';
+import type React from 'react';
 import { vi } from 'vitest';
+
+// Mock ViewTransition for Vitest
+vi.mock('react', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react')>();
+  return {
+    ...actual,
+    ViewTransition: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
 
 // Mock ResizeObserver for Radix UI components
 class MockResizeObserver {
