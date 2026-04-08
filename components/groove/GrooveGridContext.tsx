@@ -296,7 +296,7 @@ export function GrooveGridProvider({
 
         const copyData = state.instruments.slice(minInst, maxInst + 1).map((inst) => ({
           notes: inst.notes.slice(minNote, maxNote + 1),
-          velocities: inst.velocities.slice(minNote, maxNote + 1),
+          velocities: (inst.velocities || []).slice(minNote, maxNote + 1),
         }));
 
         navigator.clipboard

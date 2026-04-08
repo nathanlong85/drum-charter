@@ -3,7 +3,7 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown, ChevronUp, Settings2, Trash2, Volume2, VolumeX, Wand2 } from 'lucide-react';
 import type React from 'react';
-import { type DrumInstrument, getVelocityForSymbol } from '@/lib/types/groove';
+import type { DrumInstrument } from '@/lib/types/groove';
 import { getFilteredPresets } from '@/lib/utils/rowPresets';
 import { useGrooveGrid } from './GrooveGridContext';
 import { NoteCell } from './NoteCell';
@@ -138,22 +138,14 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
                       className="flex items-center gap-2 px-2 py-1.5 text-[10px] font-headline font-bold text-on-surface-variant hover:bg-primary/10 hover:text-primary rounded-lg cursor-pointer outline-none transition-colors"
                       onSelect={() =>
                         dispatch({
-                          type: 'UPDATE_INSTRUMENT',
+                          type: 'APPLY_ROW_PRESET',
                           id: instrument.id,
-                          updates: {
-                            notes: instrument.notes.map(
-                              (_, idx) => preset.pattern[idx % preset.pattern.length] || 'none',
-                            ),
-                            velocities: instrument.notes.map((_, idx) => {
-                              const symbol = preset.pattern[idx % preset.pattern.length];
-                              return symbol ? getVelocityForSymbol(symbol) : 0;
-                            }),
-                          },
+                          preset: preset.id,
                         })
                       }
                     >
                       <Wand2 size={12} />
-                      {preset.name}
+                      {preset.label}
                     </DropdownMenu.Item>
                   ))}
                   <DropdownMenu.Separator className="h-px bg-outline-variant/10 my-1" />

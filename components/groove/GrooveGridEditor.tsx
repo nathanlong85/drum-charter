@@ -2,6 +2,7 @@
 
 import { Plus } from 'lucide-react';
 import React, { useCallback, useRef } from 'react';
+import type { GrooveGrid } from '@/lib/types/groove';
 import { GrooveGridProvider, useGrooveGrid } from './GrooveGridContext';
 import { GrooveGridToolbar } from './GrooveGridToolbar';
 import { InstrumentRow } from './InstrumentRow';
@@ -177,14 +178,16 @@ function GridOverlays() {
     <>
       {pickerPos && (
         <SymbolPicker
-          top={pickerPos.top}
-          left={pickerPos.left}
+          position={pickerPos}
           onSelect={handleSymbolSelect}
           onClose={() => setPickerPos(null)}
           onVelocityChange={handleVelocitySelect}
-          currentNote={
-            state.instruments.find((i) => i.id === pickerPos.id)?.notes[pickerPos.noteIndex]
+          currentVelocity={
+            state.instruments.find((i) => i.id === pickerPos.id)?.velocities?.[
+              pickerPos.noteIndex
+            ] || 0
           }
+          category={state.instruments.find((i) => i.id === pickerPos.id)?.category}
         />
       )}
 

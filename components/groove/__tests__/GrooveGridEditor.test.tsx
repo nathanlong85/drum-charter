@@ -596,7 +596,7 @@ describe('GrooveGridEditor', () => {
 
   describe('Header Rendering', () => {
     it('renders 8th note sub-labels', () => {
-      const grid8 = { ...initialGrid, resolution: 8 };
+      const grid8: GrooveGrid = { ...initialGrid, resolution: 8 as const };
       renderWithProvider(<GrooveGridEditor initialGrid={grid8} />);
 
       const plusLabels = screen.getAllByText('+');
@@ -604,7 +604,7 @@ describe('GrooveGridEditor', () => {
     });
 
     it('renders 16th note sub-labels', () => {
-      const grid16 = { ...initialGrid, resolution: 16 };
+      const grid16: GrooveGrid = { ...initialGrid, resolution: 16 as const };
       renderWithProvider(<GrooveGridEditor initialGrid={grid16} />);
 
       expect(screen.getAllByText('e').length).toBeGreaterThan(0);

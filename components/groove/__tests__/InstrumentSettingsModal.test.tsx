@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { DrumInstrument } from '@/lib/types/groove';
 import { InstrumentSettingsModal } from '../InstrumentSettingsModal';
 
@@ -75,14 +75,14 @@ const mockInstrument: DrumInstrument = {
 };
 
 describe('InstrumentSettingsModal', () => {
-  let onSave: ReturnType<typeof vi.fn>;
-  let onClose: ReturnType<typeof vi.fn>;
-  let onDelete: ReturnType<typeof vi.fn>;
+  let onSave: Mock<(updates: Partial<DrumInstrument>) => void>;
+  let onClose: Mock<() => void>;
+  let onDelete: Mock<() => void>;
 
   beforeEach(() => {
-    onSave = vi.fn();
-    onClose = vi.fn();
-    onDelete = vi.fn();
+    onSave = vi.fn() as Mock<(updates: Partial<DrumInstrument>) => void>;
+    onClose = vi.fn() as Mock<() => void>;
+    onDelete = vi.fn() as Mock<() => void>;
     vi.clearAllMocks();
     vi.useFakeTimers();
   });
