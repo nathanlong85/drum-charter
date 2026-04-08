@@ -208,7 +208,7 @@ describe('GrooveGridEditor', () => {
 
   it('clears selection when clicking a different note than the selection', async () => {
     renderWithProvider(<TestEditor grid={initialGrid} />);
-    const cells = screen.getAllByTestId(/^step-/);
+    const cells = screen.getAllByTestId(/step-/);
 
     fireEvent.mouseDown(cells[0], { button: 0 });
     fireEvent.mouseEnter(cells[1]);
@@ -222,7 +222,7 @@ describe('GrooveGridEditor', () => {
   it('handles paste with no text', async () => {
     const onChange = vi.fn();
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-    const cells = screen.getAllByTestId(/^step-/);
+    const cells = screen.getAllByTestId(/step-/);
 
     fireEvent.mouseDown(cells[0], { button: 0 });
     fireEvent.mouseUp(window);
@@ -271,7 +271,7 @@ describe('GrooveGridEditor', () => {
   it('handles note interactions and symbol picker', async () => {
     const onChange = vi.fn();
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-    const cells = screen.getAllByTestId(/^step-/);
+    const cells = screen.getAllByTestId(/step-/);
 
     fireEvent.contextMenu(cells[1]);
     expect(screen.getByTestId('symbol-picker')).toBeInTheDocument();
@@ -306,7 +306,7 @@ describe('GrooveGridEditor', () => {
 
   it('positions the symbol picker correctly on context menu', () => {
     renderWithProvider(<TestEditor grid={initialGrid} />);
-    const cells = screen.getAllByTestId(/^step-/);
+    const cells = screen.getAllByTestId(/step-/);
 
     fireEvent.contextMenu(cells[0], { clientX: 100, clientY: 200 });
     const picker = screen.getByTestId('symbol-picker');
@@ -323,7 +323,7 @@ describe('GrooveGridEditor', () => {
   it('handles shift-click to toggle optional hit', async () => {
     const onChange = vi.fn();
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-    const cells = screen.getAllByTestId(/^step-/);
+    const cells = screen.getAllByTestId(/step-/);
 
     fireEvent.click(cells[0], { shiftKey: true });
 
@@ -335,7 +335,7 @@ describe('GrooveGridEditor', () => {
   it('handles clicking note when already selected as a single cell', async () => {
     const onChange = vi.fn();
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-    const cells = screen.getAllByTestId(/^step-/);
+    const cells = screen.getAllByTestId(/step-/);
 
     fireEvent.click(cells[1]);
     await waitFor(() => expect(onChange).toHaveBeenCalled());
@@ -419,7 +419,7 @@ describe('GrooveGridEditor', () => {
   describe('Multi-cell selection', () => {
     it('selects multiple cells via drag', () => {
       renderWithProvider(<TestEditor grid={initialGrid} />);
-      const cells = screen.getAllByTestId(/^step-/);
+      const cells = screen.getAllByTestId(/step-/);
 
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseEnter(cells[1]);
@@ -431,7 +431,7 @@ describe('GrooveGridEditor', () => {
 
     it('clears selected cells when clicking outside range', () => {
       renderWithProvider(<TestEditor grid={initialGrid} />);
-      const cells = screen.getAllByTestId(/^step-/);
+      const cells = screen.getAllByTestId(/step-/);
 
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseEnter(cells[1]);
@@ -443,7 +443,7 @@ describe('GrooveGridEditor', () => {
 
     it('clears selection when opening context menu outside range', () => {
       renderWithProvider(<TestEditor grid={initialGrid} />);
-      const cells = screen.getAllByTestId(/^step-/);
+      const cells = screen.getAllByTestId(/step-/);
 
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseEnter(cells[1]);
@@ -456,7 +456,7 @@ describe('GrooveGridEditor', () => {
     it('applies symbol to all selected cells', async () => {
       const onChange = vi.fn();
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-      const cells = screen.getAllByTestId(/^step-/);
+      const cells = screen.getAllByTestId(/step-/);
 
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseEnter(cells[1]);
@@ -473,7 +473,7 @@ describe('GrooveGridEditor', () => {
     it('applies velocity to all selected cells', async () => {
       const onChange = vi.fn();
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-      const cells = screen.getAllByTestId(/^step-/);
+      const cells = screen.getAllByTestId(/step-/);
 
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseEnter(cells[1]);
@@ -501,7 +501,7 @@ describe('GrooveGridEditor', () => {
     it('deletes selected cells with Delete key', async () => {
       const onChange = vi.fn();
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-      const cells = screen.getAllByTestId(/^step-/);
+      const cells = screen.getAllByTestId(/step-/);
 
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseUp(window);
@@ -515,7 +515,7 @@ describe('GrooveGridEditor', () => {
 
     it('copies selected data to clipboard', () => {
       renderWithProvider(<TestEditor grid={initialGrid} />);
-      const cells = screen.getAllByTestId(/^step-/);
+      const cells = screen.getAllByTestId(/step-/);
 
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseUp(window);
@@ -528,7 +528,7 @@ describe('GrooveGridEditor', () => {
     it('pastes data into the grid', async () => {
       const onChange = vi.fn();
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-      const cells = screen.getAllByTestId(/^step-/);
+      const cells = screen.getAllByTestId(/step-/);
 
       fireEvent.mouseDown(cells[2], { button: 0 });
       fireEvent.mouseUp(window);
@@ -558,7 +558,7 @@ describe('GrooveGridEditor', () => {
       navigator.clipboard.writeText = vi.fn().mockRejectedValue(new Error('Copy failed'));
 
       renderWithProvider(<TestEditor grid={initialGrid} />);
-      const cells = screen.getAllByTestId(/^step-/);
+      const cells = screen.getAllByTestId(/step-/);
       fireEvent.mouseDown(cells[0], { button: 0 });
       fireEvent.mouseUp(window);
 
