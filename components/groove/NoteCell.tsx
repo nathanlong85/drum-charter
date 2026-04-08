@@ -67,6 +67,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   isSelected,
   isActive,
   readOnly = false,
+  'data-testid': testId = 'note-cell',
 }) => {
   const iconPath = symbolToIcon[symbol];
 
@@ -132,10 +133,13 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     return (
       <div
         onClick={readOnly ? undefined : onClick}
-        onContextMenu={readOnly ? (e) => e.preventDefault() : onContextMenu}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          if (!readOnly) onContextMenu(e);
+        }}
         onMouseDown={readOnly ? undefined : onMouseDown}
         onMouseEnter={readOnly ? undefined : onMouseEnter}
-        data-testid="note-cell"
+        data-testid={testId}
         data-index={index}
         data-active={symbol === 'none' ? 'false' : 'true'}
         data-selected={isSelected ? 'true' : 'false'}
@@ -151,10 +155,13 @@ export const NoteCell: React.FC<NoteCellProps> = ({
       <button
         type="button"
         onClick={onClick}
-        onContextMenu={onContextMenu}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          onContextMenu(e);
+        }}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
-        data-testid="note-cell"
+        data-testid={testId}
         data-index={index}
         data-active="true"
         data-selected={isSelected ? 'true' : 'false'}
