@@ -15,6 +15,7 @@ interface NoteCellProps {
   isBeat?: boolean;
   isMeasureBoundary?: boolean;
   isSelected?: boolean;
+  isActive?: boolean;
   readOnly?: boolean;
 }
 
@@ -63,6 +64,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   isBeat,
   isMeasureBoundary,
   isSelected,
+  isActive,
   readOnly = false,
 }) => {
   const iconPath = symbolToIcon[symbol];
@@ -72,6 +74,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     if (velocity !== undefined && velocity > 0) {
       return Math.max(0.2, velocity);
     }
+    if (symbol === 'none') return 0.8;
     if (symbol.includes('accent')) return 1.0;
     if (symbol.includes('ghost')) return 0.4;
     return 0.8; // standard
@@ -81,6 +84,12 @@ export const NoteCell: React.FC<NoteCellProps> = ({
 
   const content = (
     <div className="w-full h-full flex items-center justify-center pointer-events-none">
+      {isActive && (
+        <div
+          className="absolute inset-0 bg-primary/20 z-0 animate-pulse border-x-2 border-primary"
+          data-testid="active-step"
+        />
+      )}
       {iconPath && (
         <div className="w-full h-full flex items-center justify-center pointer-events-none select-none animate-in zoom-in-50 duration-200">
           {/* biome-ignore lint/performance/noImgElement: intentional for E2E reliability (SVG transitions caused flakes) */}

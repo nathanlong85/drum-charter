@@ -9,55 +9,22 @@ interface SnippetPageProps {
 }
 
 export default async function SnippetPage({ params }: SnippetPageProps) {
-  const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [{ id }, supabase] = await Promise.all([params, createClient()]);
 
-  if (!user) {
+  const [authResult, snippetResult] = await Promise.allSettled([
+    supabase.auth.getUser(),
+    supabaseService.getGrooveSnippet(id, supabase),
+  ]);
+
+  if (authResult.status === 'rejected' || !authResult.value.data.user) {
     redirect('/login');
   }
 
+  const user = authResult.value.data.user;
   console.log(`[SnippetPage] Loading snippet: ${id} (User: ${user?.id || 'Anonymous'})`);
 
-  try {
-    const rawSnippet = await supabaseService.getGrooveSnippet(id, supabase);
-
-    console.log(
-      `[SnippetPage] Snippet found: ${rawSnippet.title} (Owner: ${rawSnippet.userId}, Public: ${rawSnippet.isPublic})`,
-    );
-
-    return (
-      <div className="max-w-[1400px] mx-auto p-8 space-y-12">
-        <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4">
-          <div>
-            <div className="flex items-center gap-3 text-primary font-headline text-xs font-bold uppercase tracking-[0.3em] mb-4">
-              <Link
-                href="/library"
-                className="hover:text-primary-dim flex items-center gap-2 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="3"
-                    d="M10 19l-7-7m0 0l7-7m-7 7h18"
-                  />
-                </svg>
-                BACK TO LIBRARY
-              </Link>
-              <div className="text-on-surface-variant/40 hidden sm:block">
-                DrumCharter / Snippet / {id.slice(0, 8)}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <SnippetEditor initialSnippet={rawSnippet} />
-      </div>
-    );
-  } catch (error: unknown) {
+  if (snippetResult.status === 'rejected') {
+    const error = snippetResult.reason;
     if (
       error &&
       typeof error === 'object' &&
@@ -69,4 +36,47 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
     console.error('Error loading snippet:', error);
     throw error;
   }
+
+  const rawSnippet = snippetResult.value;
+
+  console.log(
+    `[SnippetPage] Snippet found: ${rawSnippet.title} (Owner: ${rawSnippet.userId}, Public: ${rawSnippet.isPublic})`,
+  );
+
+  return (
+    <div className="max-w-[1400px] mx-auto p-8 space-y-12">
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4">
+        <div>
+          <div className="flex items-center gap-3 text-primary font-headline text-xs font-bold uppercase tracking-[0.3em] mb-4">
+            <Link
+              href="/library"
+              className="hover:text-primary-dim flex items-center gap-2 transition-colors"
+              aria-label="Back to Library"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="3"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+              BACK TO LIBRARY
+            </Link>
+            <div className="text-on-surface-variant/40 hidden sm:block">
+              DrumCharter / Snippet / {id.slice(0, 8)}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <SnippetEditor initialSnippet={rawSnippet} />
+    </div>
+  );
 }

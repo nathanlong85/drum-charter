@@ -14,8 +14,11 @@ const mockState: GrooveGrid = {
 describe('GrooveGridToolbar', () => {
   const props = {
     state: mockState,
-    isPlaying: false,
-    isSamplesLoaded: true,
+    status: {
+      isPlaying: false,
+      isSamplesLoaded: true,
+      isEditingInstruments: false,
+    },
     togglePlayback: vi.fn(),
     bpm: 120,
     onBpmChange: vi.fn(),
@@ -26,9 +29,9 @@ describe('GrooveGridToolbar', () => {
     updateMeasures: vi.fn(),
     updateResolution: vi.fn(),
     updateTimeSignature: vi.fn(),
-    isEditingInstruments: false,
     onToggleEditInstruments: vi.fn(),
     onToggleOptionalHits: vi.fn(),
+    readOnly: false,
   };
 
   it('handles playback toggle', () => {

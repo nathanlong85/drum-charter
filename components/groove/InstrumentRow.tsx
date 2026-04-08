@@ -3,49 +3,31 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown, ChevronUp, Settings2, Trash2, Volume2, VolumeX, Wand2 } from 'lucide-react';
 import type React from 'react';
-import { type DrumInstrument, type GrooveGrid, getVelocityForSymbol } from '@/lib/types/groove';
-import { getFilteredPresets, type RowPreset } from '@/lib/utils/rowPresets';
+import { type DrumInstrument, getVelocityForSymbol } from '@/lib/types/groove';
+import { getFilteredPresets } from '@/lib/utils/rowPresets';
+import { useGrooveGrid } from './GrooveGridContext';
 import { NoteCell } from './NoteCell';
 
 interface InstrumentRowProps {
   instrument: DrumInstrument;
-  grid: Pick<GrooveGrid, 'timeSignature' | 'resolution' | 'measures'>;
-  onNoteClick: (index: number, e: React.MouseEvent) => void;
-  onNoteContextMenu: (index: number, e: React.MouseEvent) => void;
-  onNoteMouseDown?: (index: number, e: React.MouseEvent) => void;
-  onNoteMouseEnter?: (index: number) => void;
-  selectionRange?: {
-    start: { instIdx: number; noteIdx: number };
-    end: { instIdx: number; noteIdx: number };
-  } | null;
   instIdx: number;
-  isEditing?: boolean;
-  onSettingsClick?: () => void;
-  onMoveUp?: () => void;
-  onMoveDown?: () => void;
-  onClear?: () => void;
-  onPresetSelect?: (preset: RowPreset) => void;
-  readOnly?: boolean;
 }
 
-export const InstrumentRow: React.FC<InstrumentRowProps> = ({
-  instrument,
-  grid,
-  onNoteClick,
-  onNoteContextMenu,
-  onNoteMouseDown,
-  onNoteMouseEnter,
-  selectionRange,
-  instIdx,
-  isEditing = false,
-  onSettingsClick,
-  onMoveUp,
-  onMoveDown,
-  onClear,
-  onPresetSelect,
-  readOnly = false,
-}) => {
-  const { timeSignature, resolution } = grid;
+export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instIdx }) => {
+  const {
+    state,
+    dispatch,
+    activeStep,
+    isEditingInstruments: isEditing,
+    setEditingInstrumentId,
+    selectionRange,
+    setSelectionRange,
+    readOnly,
+    handleNoteClick,
+    handleNoteRightClick,
+  } = useGrooveGrid();
+
+  const { timeSignature, resolution } = state;
   const notesPerBeat = resolution / timeSignature.beatValue;
   const totalNotesPerMeasure = timeSignature.beatsPerMeasure * notesPerBeat;
 
@@ -61,159 +43,204 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
     return instIdx >= minInst && instIdx <= maxInst && noteIdx >= minNote && noteIdx <= maxNote;
   };
 
+  const handleDragStart = (noteIdx: number) => {
+    if (readOnly) return;
+    setSelectionRange({ start: { instIdx, noteIdx }, end: { instIdx, noteIdx } });
+  };
+
+  const handleDragEnter = (noteIdx: number) => {
+    if (!selectionRange) return;
+    setSelectionRange({ ...selectionRange, end: { instIdx, noteIdx } });
+  };
+
+  const instrumentRowTestId = `instrument-row-${(
+    instrument.customName ||
+    instrument.category ||
+    'instrument'
+  )
+    .toLowerCase()
+    .replace(/\s+/g, '-')}`;
+
   return (
     <div
       className={`flex group/row border-b border-outline-variant/10 hover:bg-surface-container-high/30 transition-colors ${
         instrument.muted ? 'opacity-40' : ''
       }`}
-      data-testid={`instrument-row-${instrument.customName.toLowerCase().replace(/\s+/g, '-')}`}
+      data-testid={instrumentRowTestId}
     >
       {/* Instrument Info Panel */}
       <div className="w-32 h-10 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0">
         {!readOnly && isEditing && (
           <div className="flex flex-col mr-1">
-            {onMoveUp && (
-              <button
-                type="button"
-                onClick={onMoveUp}
-                className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
-                title="Move Up"
-                aria-label="Move instrument up"
-              >
-                <ChevronUp size={10} strokeWidth={4} />
-              </button>
-            )}
-            {onMoveDown && (
-              <button
-                type="button"
-                onClick={onMoveDown}
-                className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
-                title="Move Down"
-                aria-label="Move instrument down"
-              >
-                <ChevronDown size={10} strokeWidth={4} />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() =>
+                dispatch({
+                  type: 'MOVE_INSTRUMENT',
+                  id: instrument.id,
+                  direction: 'up',
+                })
+              }
+              className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
+              title="Move Up"
+              aria-label="Move instrument up"
+            >
+              <ChevronUp size={10} strokeWidth={4} />
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                dispatch({
+                  type: 'MOVE_INSTRUMENT',
+                  id: instrument.id,
+                  direction: 'down',
+                })
+              }
+              className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
+              title="Move Down"
+              aria-label="Move instrument down"
+            >
+              <ChevronDown size={10} strokeWidth={4} />
+            </button>
           </div>
         )}
 
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button
-              type="button"
-              className="flex-1 min-w-0 text-left hover:bg-primary/5 rounded px-1 -ml-1 transition-colors group/name"
-              title="Click for Quick Presets"
-              disabled={readOnly}
+              className="flex-1 flex items-center justify-between group/name hover:bg-primary/5 px-2 py-1 rounded transition-colors overflow-hidden"
+              data-testid={`instrument-settings-trigger-${instrument.id}`}
+              title="Edit Settings"
             >
-              <div className="flex items-baseline gap-1">
-                <p className="text-[10px] font-headline font-black text-on-surface truncate uppercase tracking-tight leading-none">
-                  {instrument.customName}
-                </p>
-                {instrument.muted && <VolumeX size={8} className="text-error flex-shrink-0" />}
-                {!readOnly && (
-                  <Wand2
-                    size={8}
-                    className="text-primary opacity-0 group-hover/name:opacity-100 transition-opacity flex-shrink-0"
-                  />
-                )}
-              </div>
-              <p className="text-[8px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-widest mt-0.5 truncate">
-                {instrument.category}
-              </p>
+              <span className="text-[10px] font-headline font-black uppercase tracking-wider truncate mr-1">
+                {instrument.customName || instrument.category}
+              </span>
+              <Wand2
+                size={10}
+                className="opacity-0 group-hover/name:opacity-40 transition-opacity text-primary"
+              />
             </button>
           </DropdownMenu.Trigger>
 
-          {!readOnly && (
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                className="min-w-[140px] bg-surface-container-high rounded-lg p-1 shadow-xl border border-outline-variant/20 z-50 animate-in fade-in zoom-in-95 duration-100"
-                sideOffset={5}
-                align="start"
-              >
-                <DropdownMenu.Label className="px-2 py-1.5 text-[9px] font-bold text-on-surface-variant/60 uppercase tracking-widest">
-                  Quick Presets
-                </DropdownMenu.Label>
-                {presets.map((preset) => (
-                  <DropdownMenu.Item
-                    key={preset.id}
-                    className="flex items-center gap-2 px-2 py-1.5 text-xs text-on-surface hover:bg-primary hover:text-on-primary rounded cursor-pointer outline-none transition-colors"
-                    onSelect={() => onPresetSelect?.(preset.id)}
-                  >
-                    {preset.id === 'mute' ? (
-                      instrument.muted ? (
-                        <>
-                          <Volume2 size={12} /> Unmute
-                        </>
-                      ) : (
-                        <>
-                          <VolumeX size={12} /> Mute
-                        </>
-                      )
-                    ) : (
-                      preset.label
-                    )}
-                  </DropdownMenu.Item>
-                ))}
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          )}
-        </DropdownMenu.Root>
+          <DropdownMenu.Portal>
+            <DropdownMenu.Content
+              className="z-50 min-w-[160px] bg-surface-container-low border border-outline-variant/20 rounded-xl shadow-2xl p-1 animate-in fade-in zoom-in-95"
+              sideOffset={5}
+            >
+              {!readOnly && (
+                <>
+                  <DropdownMenu.Label className="px-2 py-1.5 text-[9px] font-headline font-black text-on-surface-variant/40 uppercase tracking-widest">
+                    Presets
+                  </DropdownMenu.Label>
+                  {presets.map((preset) => (
+                    <DropdownMenu.Item
+                      key={preset.id}
+                      className="flex items-center gap-2 px-2 py-1.5 text-[10px] font-headline font-bold text-on-surface-variant hover:bg-primary/10 hover:text-primary rounded-lg cursor-pointer outline-none transition-colors"
+                      onSelect={() =>
+                        dispatch({
+                          type: 'UPDATE_INSTRUMENT',
+                          id: instrument.id,
+                          updates: {
+                            notes: instrument.notes.map(
+                              (_, idx) => preset.pattern[idx % preset.pattern.length] || 'none',
+                            ),
+                            velocities: instrument.notes.map((_, idx) => {
+                              const symbol = preset.pattern[idx % preset.pattern.length];
+                              return symbol ? getVelocityForSymbol(symbol) : 0;
+                            }),
+                          },
+                        })
+                      }
+                    >
+                      <Wand2 size={12} />
+                      {preset.name}
+                    </DropdownMenu.Item>
+                  ))}
+                  <DropdownMenu.Separator className="h-px bg-outline-variant/10 my-1" />
+                </>
+              )}
 
-        {!readOnly && (
-          <div className="flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100 transition-opacity ml-1">
-            {onSettingsClick && (
-              <button
-                type="button"
-                onClick={onSettingsClick}
-                className="p-1 hover:bg-primary/10 text-on-surface-variant hover:text-primary rounded transition-colors"
-                title="Edit Settings"
-                aria-label="Edit instrument settings"
+              <DropdownMenu.Item
+                className="flex items-center gap-2 px-2 py-1.5 text-[10px] font-headline font-bold text-on-surface-variant hover:bg-primary/10 hover:text-primary rounded-lg cursor-pointer outline-none transition-colors"
+                onSelect={() => setEditingInstrumentId(instrument.id)}
               >
                 <Settings2 size={12} />
-              </button>
-            )}
-            {isEditing && onClear && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (window.confirm(`Clear all notes for ${instrument.customName}?`)) {
-                    onClear();
-                  }
-                }}
-                className="p-1 hover:bg-error/10 text-on-surface-variant hover:text-error rounded transition-colors"
-                title="Clear Row"
-                aria-label={`Clear all notes for ${instrument.customName}`}
-                data-testid={`clear-row-${instrument.id}`}
+                Settings
+              </DropdownMenu.Item>
+
+              <DropdownMenu.Item
+                className="flex items-center gap-2 px-2 py-1.5 text-[10px] font-headline font-bold text-on-surface-variant hover:bg-primary/10 hover:text-primary rounded-lg cursor-pointer outline-none transition-colors"
+                onSelect={() =>
+                  dispatch({
+                    type: 'UPDATE_INSTRUMENT',
+                    id: instrument.id,
+                    updates: { muted: !instrument.muted },
+                  })
+                }
               >
-                <Trash2 size={12} />
-              </button>
-            )}
-          </div>
-        )}
+                {instrument.muted ? <Volume2 size={12} /> : <VolumeX size={12} />}
+                {instrument.muted ? 'Unmute' : 'Mute'}
+              </DropdownMenu.Item>
+
+              {!readOnly && (
+                <>
+                  <DropdownMenu.Separator className="h-px bg-outline-variant/10 my-1" />
+                  <DropdownMenu.Item
+                    className="flex items-center gap-2 px-2 py-1.5 text-[10px] font-headline font-bold text-error hover:bg-error/10 rounded-lg cursor-pointer outline-none transition-colors"
+                    onSelect={() => {
+                      if (confirm('Clear this instrument row?')) {
+                        dispatch({
+                          type: 'CLEAR_ROW',
+                          id: instrument.id,
+                        });
+                      }
+                    }}
+                  >
+                    <Trash2 size={12} />
+                    Clear Row
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    className="flex items-center gap-2 px-2 py-1.5 text-[10px] font-headline font-bold text-error hover:bg-error/10 rounded-lg cursor-pointer outline-none transition-colors"
+                    onSelect={() => dispatch({ type: 'REMOVE_INSTRUMENT', id: instrument.id })}
+                  >
+                    <Trash2 size={12} />
+                    Delete Instrument
+                  </DropdownMenu.Item>
+                </>
+              )}
+            </DropdownMenu.Content>
+          </DropdownMenu.Portal>
+        </DropdownMenu.Root>
       </div>
 
       {/* Notes Grid */}
-      <div className="flex">
-        {instrument.notes.map((symbol, noteIdx) => {
-          const velocity =
-            instrument.velocities && instrument.velocities[noteIdx] !== undefined
-              ? instrument.velocities[noteIdx]
-              : getVelocityForSymbol(symbol);
+      <div className="flex bg-surface-container-high/10">
+        {instrument.notes.map((note, idx) => {
+          const isBeatStart = idx % notesPerBeat === 0;
+          const _beatIndex = Math.floor(idx / notesPerBeat);
+          const isMeasureStart = idx % (totalNotesPerMeasure || 1) === 0;
 
           return (
             <NoteCell
-              key={noteIdx}
-              index={noteIdx}
-              symbol={symbol}
-              velocity={velocity}
-              isBeat={noteIdx % notesPerBeat === 0}
-              isMeasureBoundary={(noteIdx + 1) % totalNotesPerMeasure === 0}
-              isSelected={isSelected(noteIdx)}
-              onClick={(e) => onNoteClick(noteIdx, e)}
-              onContextMenu={(e) => onNoteContextMenu(noteIdx, e)}
-              onMouseDown={(e) => onNoteMouseDown?.(noteIdx, e)}
-              onMouseEnter={() => onNoteMouseEnter?.(noteIdx)}
+              key={`${instrument.id}-${idx}`}
+              symbol={note || 'none'}
+              velocity={instrument.velocities?.[idx] || 0}
+              index={idx}
+              isBeat={isBeatStart}
+              isMeasureBoundary={isMeasureStart}
+              isActive={activeStep === idx}
+              onClick={(e) => handleNoteClick(instrument.id, idx, e)}
+              onContextMenu={(e) => handleNoteRightClick(instrument.id, idx, e)}
+              onMouseDown={(e) => {
+                if (e.button === 0) {
+                  // Left click
+                  handleDragStart(idx);
+                }
+              }}
+              onMouseEnter={() => handleDragEnter(idx)}
+              isSelected={isSelected(idx)}
               readOnly={readOnly}
+              data-testid={`note-${idx}`}
             />
           );
         })}

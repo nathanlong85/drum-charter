@@ -1,30 +1,28 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
+import { ViewTransition } from 'react';
 import SongEditor from '@/components/chart/SongEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
-import type { SongChart } from '@/lib/types/groove';
 
 interface SongPageProps {
   params: Promise<{ id: string }>;
 }
 
 export default async function SongPage({ params }: SongPageProps) {
-  const { id } = await params;
-  const supabase = await createClient();
+  const [{ id }, supabase] = await Promise.all([params, createClient()]);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [authResult, rawChartResult] = await Promise.allSettled([
+    supabase.auth.getUser(),
+    supabaseService.getSongChart(id, supabase),
+  ]);
 
-  if (!user) {
+  if (authResult.status === 'rejected' || !authResult.value.data.user) {
     redirect('/login');
   }
 
-  let rawChart: SongChart;
-  try {
-    rawChart = await supabaseService.getSongChart(id, supabase);
-  } catch (error: unknown) {
+  if (rawChartResult.status === 'rejected') {
+    const error = rawChartResult.reason;
     // Trigger notFound for "no rows" PostgREST error (PGRST116) or thrown "not found" message
     if (
       error &&
@@ -34,10 +32,11 @@ export default async function SongPage({ params }: SongPageProps) {
     ) {
       notFound();
     }
-
     console.error('Error loading song chart:', error);
     throw error; // Rethrow real DB/network failures
   }
+
+  const rawChart = rawChartResult.value;
 
   return (
     <div className="max-w-[1400px] mx-auto p-8 space-y-12">
@@ -47,8 +46,15 @@ export default async function SongPage({ params }: SongPageProps) {
             <Link
               href="/library"
               className="hover:text-primary-dim flex items-center gap-2 transition-colors"
+              aria-label="Back to Library"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -65,7 +71,9 @@ export default async function SongPage({ params }: SongPageProps) {
         </div>
       </section>
 
-      <SongEditor initialSong={rawChart} />
+      <ViewTransition name={`song-card-${id}`} share="morph">
+        <SongEditor initialSong={rawChart} />
+      </ViewTransition>
     </div>
   );
 }

@@ -28,7 +28,7 @@ export type GrooveAction =
       id: string;
       category: DrumCategory;
       presetVariety: string;
-      label: string;
+      customName: string;
     }
   | { type: 'REMOVE_INSTRUMENT'; id: string }
   | {
@@ -287,7 +287,7 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
             id: action.id,
             category: action.category,
             presetVariety: action.presetVariety,
-            customName: action.label,
+            customName: action.customName,
             notes: Array(totalNotes).fill('none'),
             velocities: Array(totalNotes).fill(0),
           },
