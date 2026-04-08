@@ -58,14 +58,20 @@ test.describe('Groove Grid Quick Presets', () => {
     await row.locator('button[title="Edit Settings"]').click();
 
     // Select Mute
-    await page.getByRole('menuitem', { name: /^Mute$/i }).first().click();
+    await page
+      .getByRole('menuitem', { name: /^Mute$/i })
+      .first()
+      .click();
 
     // Verify the row has a muted visual state (opacity-40)
     await expect(row).toHaveClass(/opacity-40/);
 
     // Unmute
     await row.locator('button[title="Edit Settings"]').click();
-    await page.getByRole('menuitem', { name: /^Unmute$/i }).first().click();
+    await page
+      .getByRole('menuitem', { name: /^Unmute$/i })
+      .first()
+      .click();
 
     // Verify the row is no longer muted
     await expect(row).not.toHaveClass(/opacity-40/);

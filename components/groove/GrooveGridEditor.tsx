@@ -45,14 +45,8 @@ function GridHeader() {
 }
 
 function GridBody() {
-  const {
-    state,
-    dispatch,
-    selectionRange,
-    setSelectionRange,
-    readOnly,
-    isEditingInstruments,
-  } = useGrooveGrid();
+  const { state, dispatch, selectionRange, setSelectionRange, readOnly, isEditingInstruments } =
+    useGrooveGrid();
 
   const isDraggingRef = useRef(false);
 
