@@ -45,7 +45,14 @@ function GridHeader() {
 }
 
 function GridBody() {
-  const { state, dispatch, selectionRange, setSelectionRange, readOnly } = useGrooveGrid();
+  const {
+    state,
+    dispatch,
+    selectionRange,
+    setSelectionRange,
+    readOnly,
+    isEditingInstruments,
+  } = useGrooveGrid();
 
   const isDraggingRef = useRef(false);
 
@@ -89,7 +96,7 @@ function GridBody() {
           <InstrumentRow key={instrument.id} instrument={instrument} instIdx={instIdx} />
         ))}
 
-        {!readOnly && (
+        {!readOnly && isEditingInstruments && (
           <button
             onClick={() =>
               dispatch({

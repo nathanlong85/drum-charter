@@ -162,6 +162,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
               <button
                 key={btn.label}
                 onClick={() => onVelocityChange(btn.val)}
+                data-testid={`velocity-btn-${btn.label.toLowerCase()}`}
                 className={`flex-1 text-[9px] font-headline font-black py-1.5 rounded-lg transition-all ${
                   Math.abs(currentVelocity - btn.val) < 0.05
                     ? 'bg-primary text-on-primary shadow-lg shadow-primary/20'
