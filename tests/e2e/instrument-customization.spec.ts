@@ -34,6 +34,9 @@ test.describe('Instrument Customization', () => {
     const newRow = page.getByTestId('instrument-row-misc');
     await newRow.getByTitle('Edit Settings').click();
 
+    // Click "Settings" in the menu to open the modal
+    await page.getByRole('menuitem', { name: /^Settings$/i }).click();
+
     // Modal should appear
     const modal = page.locator('div[role="dialog"]');
     await expect(modal).toBeVisible();
@@ -59,6 +62,7 @@ test.describe('Instrument Customization', () => {
 
     // Remove an instrument
     await page.getByTestId('instrument-row-snare').getByTitle('Edit Settings').click();
+    await page.getByRole('menuitem', { name: /^Settings$/i }).click();
 
     // Setup dialog handler for confirm
     page.once('dialog', (dialog) => dialog.accept());

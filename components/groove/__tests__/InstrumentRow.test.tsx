@@ -37,7 +37,7 @@ describe('InstrumentRow', () => {
 
     expect(screen.getByText('Main Snare')).toBeInTheDocument();
     // 4 notes rendered
-    expect(screen.getAllByTestId(/step-/)).toHaveLength(4);
+    expect(screen.getAllByTestId('note-cell')).toHaveLength(4);
   });
 
   it('handles note interactions', async () => {
@@ -50,13 +50,13 @@ describe('InstrumentRow', () => {
       </Tooltip.Provider>,
     );
 
-    fireEvent.click(screen.getAllByTestId(/step-/)[0]);
+    fireEvent.click(screen.getAllByTestId('note-cell')[0]);
     expect(onChange).toHaveBeenCalled();
 
     // Context menu should trigger state change in provider (setting pickerPos)
     // but since we only render the row, we can't see the picker.
     // We can verify it doesn't crash and the right-click is handled.
-    fireEvent.contextMenu(screen.getAllByTestId(/step-/)[1]);
+    fireEvent.contextMenu(screen.getAllByTestId('note-cell')[1]);
   });
 
   // We can't easily reach into the provider to set isEditing without a test helper component

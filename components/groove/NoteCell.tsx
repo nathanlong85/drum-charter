@@ -67,7 +67,6 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   isSelected,
   isActive,
   readOnly = false,
-  'data-testid': testId = 'note-cell',
 }) => {
   const iconPath = symbolToIcon[symbol];
 
@@ -129,8 +128,6 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     ${isSelected && !readOnly ? 'bg-primary/20 ring-1 ring-primary ring-inset z-10' : ''}
   `;
 
-  const finalTestId = testId === 'note-cell' ? 'note-cell' : `note-cell ${testId}`;
-
   if (readOnly || symbol === 'none') {
     return (
       <div
@@ -141,7 +138,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         }}
         onMouseDown={readOnly ? undefined : onMouseDown}
         onMouseEnter={readOnly ? undefined : onMouseEnter}
-        data-testid={finalTestId}
+        data-testid="note-cell"
         data-index={index}
         data-active={symbol === 'none' ? 'false' : 'true'}
         data-selected={isSelected ? 'true' : 'false'}
@@ -163,7 +160,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         }}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
-        data-testid={finalTestId}
+        data-testid="note-cell"
         data-index={index}
         data-active="true"
         data-selected={isSelected ? 'true' : 'false'}

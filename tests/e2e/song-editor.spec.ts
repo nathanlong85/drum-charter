@@ -87,7 +87,7 @@ test.describe('Song Chart Editor', () => {
 
     // Wait for it to move
     await page.waitForTimeout(500); // Playback is happening
-    await expect(page.getByTestId('step-0').first()).toBeVisible();
+    await expect(page.getByTestId('note-cell').first()).toBeVisible();
 
     // Stop playback
     await songEditorPage.togglePlayback();

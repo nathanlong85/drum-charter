@@ -98,6 +98,6 @@ test.describe('Playback & Metronome', () => {
 
     // Verify measure boundary (border-r-2) on the last beat of measure 1
     // The note at index 15 (end of measure 1 in 4/4 16th res)
-    await expect(grid.getByTestId('step-15').first()).toHaveClass(/border-r-2/);
+    await expect(grid.getByTestId('note-cell').nth(15)).toHaveClass(/border-r-2/);
   });
 });

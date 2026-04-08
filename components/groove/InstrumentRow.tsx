@@ -232,7 +232,6 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
               onMouseEnter={() => handleDragEnter(idx)}
               isSelected={isSelected(idx)}
               readOnly={readOnly}
-              data-testid={`step-${idx}`}
             />
           );
         })}
