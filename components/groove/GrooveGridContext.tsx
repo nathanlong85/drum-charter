@@ -202,6 +202,10 @@ export function GrooveGridProvider({
   const handleNoteClick = useCallback(
     (id: string, noteIndex: number, e: React.MouseEvent) => {
       if (readOnly) return;
+      if (e.altKey) {
+        handleNoteRightClick(id, noteIndex, e);
+        return;
+      }
       if (e.shiftKey) {
         wrappedDispatch({ type: 'TOGGLE_OPTIONAL', id, noteIndex });
         return;
@@ -209,7 +213,7 @@ export function GrooveGridProvider({
       setSelectionRange(null);
       wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
     },
-    [readOnly, wrappedDispatch],
+    [readOnly, wrappedDispatch, handleNoteRightClick],
   );
 
   const handleNoteRightClick = useCallback(

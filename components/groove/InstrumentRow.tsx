@@ -210,7 +210,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
         {instrument.notes.map((note, idx) => {
           const isBeatStart = idx % notesPerBeat === 0;
           const _beatIndex = Math.floor(idx / notesPerBeat);
-          const isMeasureStart = idx % (totalNotesPerMeasure || 1) === 0;
+          const isMeasureEnd = idx % (totalNotesPerMeasure || 1) === totalNotesPerMeasure - 1;
 
           return (
             <NoteCell
@@ -219,7 +219,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
               velocity={instrument.velocities?.[idx] || 0}
               index={idx}
               isBeat={isBeatStart}
-              isMeasureBoundary={isMeasureStart}
+              isMeasureBoundary={isMeasureEnd}
               isActive={activeStep === idx}
               onClick={(e) => handleNoteClick(instrument.id, idx, e)}
               onContextMenu={(e) => handleNoteRightClick(instrument.id, idx, e)}
@@ -232,7 +232,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
               onMouseEnter={() => handleDragEnter(idx)}
               isSelected={isSelected(idx)}
               readOnly={readOnly}
-              data-testid={`note-${idx}`}
+              data-testid={`step-${idx}`}
             />
           );
         })}

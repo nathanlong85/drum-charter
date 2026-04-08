@@ -36,7 +36,7 @@ export class SongEditorPage {
     this.symbolPicker = page.getByTestId('symbol-picker');
 
     this.playButton = page.locator('button', { hasText: /Play|Stop|Loading/i }).first();
-    this.activeStep = page.getByTestId('active-step');
+    this.activeStep = page.getByTestId('active-step').first();
   }
 
   async createNewSongFromLibrary() {
@@ -123,5 +123,8 @@ export class SongEditorPage {
 
   async waitForSave() {
     await waitForSave(this.page);
+  }
+}
+his.page);
   }
 }

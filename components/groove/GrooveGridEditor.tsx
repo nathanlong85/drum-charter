@@ -147,6 +147,7 @@ function GridColumnLabels() {
           return (
             <div
               key={`label-${idx}`}
+              data-testid={isBeatStart ? `beat-label-${label}` : undefined}
               className={`w-10 h-6 flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/5 ${
                 isBeatStart ? 'text-primary' : 'text-on-surface-variant/30'
               }`}
