@@ -91,7 +91,7 @@ describe('grooveReducer', () => {
       id: 'snare',
       category: 'snare' as const,
       presetVariety: 'Snare',
-      label: 'Main Snare',
+      customName: 'Main Snare',
     } as const;
     const nextState = grooveReducer(initialGrid, action);
     expect(nextState.instruments.length).toBe(2);
@@ -122,7 +122,7 @@ describe('grooveReducer', () => {
       id: 'sn',
       category: 'snare',
       presetVariety: 'Snare',
-      label: 'Snare',
+      customName: 'Snare',
     });
 
     const moveUp = grooveReducer(withSnare, { type: 'MOVE_INSTRUMENT', id: 'sn', direction: 'up' });

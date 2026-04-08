@@ -1,6 +1,5 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type React from 'react';
-import { useEffect, useState } from 'react';
+import { fireEvent, render, screen, waitFor, act } from '@testing-library/react';
+import React, { useEffect, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GrooveGrid } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../GrooveGridEditor';
@@ -18,14 +17,12 @@ const mockAudioState = {
 
 vi.mock('@/lib/hooks/useAudioPlayback', () => ({
   useAudioPlayback: ({ onStepChange, initialMetronomeEnabled, initialMetronomeVolume }: any) => {
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional for testing
     useEffect(() => {
       mockAudioState.metronomeEnabled = initialMetronomeEnabled ?? false;
       mockAudioState.metronomeVolume = initialMetronomeVolume ?? 0.5;
     }, [initialMetronomeEnabled, initialMetronomeVolume]);
 
     // Expose a way to trigger step change for testing
-    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional for testing
     useEffect(() => {
       (window as any).triggerStepChange = (step: number) => onStepChange?.(step);
     }, [onStepChange]);
@@ -70,38 +67,23 @@ vi.mock('@radix-ui/react-dialog', () => ({
   Close: ({ children }: any) => <button>{children}</button>,
 }));
 
-vi.mock('@radix-ui/react-dropdown-menu', () => {
-  const _isOpen = false;
-  return {
-    Root: ({ children, open, onOpenChange }: any) => {
-      const [localOpen, setLocalOpen] = useState(open ?? false);
-      useEffect(() => {
-        if (open !== undefined) setLocalOpen(open);
-      }, [open]);
-      const _handleOpenChange = (val: boolean) => {
-        setLocalOpen(val);
-        onOpenChange?.(val);
-      };
-      return <div data-state={localOpen ? 'open' : 'closed'}>{children}</div>;
-    },
-    Trigger: ({ children, asChild }: any) => (
-      <div data-testid="dropdown-trigger">{asChild ? children : <button>{children}</button>}</div>
-    ),
-    Portal: ({ children }: any) => <div>{children}</div>,
-    Content: ({ children }: any) => (
-      <div data-testid="dropdown-content" role="menu">
-        {children}
-      </div>
-    ),
-    Item: ({ children, onSelect }: any) => (
-      <button role="menuitem" onClick={() => onSelect?.()}>
-        {children}
-      </button>
-    ),
-    Label: ({ children }: any) => <div>{children}</div>,
-    Separator: () => <hr />,
-  };
-});
+vi.mock('@radix-ui/react-dropdown-menu', () => ({
+  Root: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Trigger: ({ children, asChild }: any) => (asChild ? children : <button>{children}</button>),
+  Portal: ({ children }: any) => <div>{children}</div>,
+  Content: ({ children }: any) => (
+    <div data-testid="dropdown-content" role="menu">
+      {children}
+    </div>
+  ),
+  Item: ({ children, onSelect }: any) => (
+    <button role="menuitem" onClick={() => onSelect?.()}>
+      {children}
+    </button>
+  ),
+  Label: ({ children }: any) => <div>{children}</div>,
+  Separator: () => <hr />,
+}));
 
 const initialGrid: GrooveGrid = {
   measures: 1,
@@ -132,13 +114,7 @@ const renderWithProvider = (ui: React.ReactElement) => {
   return render(ui);
 };
 
-const TestEditor = ({
-  grid,
-  onChange,
-}: {
-  grid: GrooveGrid;
-  onChange?: (g: GrooveGrid) => void;
-}) => {
+const TestEditor = ({ grid, onChange }: { grid: GrooveGrid; onChange?: (g: GrooveGrid) => void }) => {
   const [currentGrid, setCurrentGrid] = useState(grid);
   const handleChange = (newGrid: GrooveGrid) => {
     setCurrentGrid(newGrid);
@@ -188,13 +164,12 @@ describe('GrooveGridEditor', () => {
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     fireEvent.click(screen.getByTitle('Edit Instruments'));
-    // Click the settings trigger which now opens a dropdown
     fireEvent.click(screen.getByTestId('instrument-settings-trigger-i1'));
 
     vi.spyOn(window, 'confirm').mockReturnValue(true);
-    // Find all "Delete Instrument" buttons and click the first one (from the mock)
-    const deleteBtns = screen.getAllByRole('button', { name: /Delete Instrument/i });
-    fireEvent.click(deleteBtns[0]);
+    // Find "Delete Instrument" in the mocked dropdown using menuitem role
+    const deleteBtn = screen.getAllByRole('menuitem', { name: /Delete Instrument/i })[0];
+    fireEvent.click(deleteBtn);
 
     await waitFor(() => {
       expect(screen.queryByText('Kick')).not.toBeInTheDocument();
@@ -207,29 +182,21 @@ describe('GrooveGridEditor', () => {
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     fireEvent.click(screen.getByTitle('Edit Instruments'));
-
-    // Target the specific instrument's settings trigger
+    
     const trigger = screen.getByTestId('instrument-settings-trigger-i1');
-    await act(async () => {
-      fireEvent.click(trigger);
-    });
+    fireEvent.click(trigger);
 
-    // Find "Settings" in the mocked dropdown for this specific instrument
-    const settingsBtns = screen.getAllByRole('button', { name: /Settings/i });
-    await act(async () => {
-      fireEvent.click(settingsBtns[0]);
-    });
+    // Find "Settings" in the mocked dropdown
+    const settingsBtn = screen.getAllByRole('menuitem', { name: /Settings/i })[0];
+    fireEvent.click(settingsBtn);
 
     // Modal should be open (using Dialog mock)
     await waitFor(() => {
-      const dialog = screen.getByRole('dialog');
-      expect(dialog).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
-
+    
     const saveBtn = screen.getByRole('button', { name: /Save Changes/i });
-    await act(async () => {
-      fireEvent.click(saveBtn);
-    });
+    fireEvent.click(saveBtn);
 
     await waitFor(() => {
       expect(onChange).toHaveBeenCalled();
@@ -345,7 +312,6 @@ describe('GrooveGridEditor', () => {
 
     fireEvent.contextMenu(cells[0], { clientX: 100, clientY: 200 });
     const picker = screen.getByTestId('symbol-picker');
-    // Note: Our mock doesn't show positioning but we verify it's open
     expect(picker).toBeInTheDocument();
   });
 
@@ -366,10 +332,6 @@ describe('GrooveGridEditor', () => {
     await waitFor(() => {
       expect(onChange).toHaveBeenCalled();
     });
-  });
-
-  it('handles alt-click to open symbol picker directly', async () => {
-    // Currently not explicitly handled in handleNoteClick, skipping
   });
 
   it('handles clicking note when already selected as a single cell', async () => {
@@ -450,7 +412,7 @@ describe('GrooveGridEditor', () => {
       fireEvent.click(screen.getByTestId('instrument-settings-trigger-i1'));
 
       vi.spyOn(window, 'confirm').mockReturnValue(true);
-      const clearRowBtns = screen.getAllByRole('button', { name: /Clear Row/i });
+      const clearRowBtns = screen.getAllByRole('menuitem', { name: /Clear Row/i });
       fireEvent.click(clearRowBtns[0]);
 
       await waitFor(() => {
@@ -581,6 +543,9 @@ describe('GrooveGridEditor', () => {
       pasteEvent.clipboardData = {
         getData: () => pasteData,
       };
+      // Mock readText to return the pasteData
+      navigator.clipboard.readText = vi.fn().mockResolvedValue(pasteData);
+      
       fireEvent(window, pasteEvent);
 
       await waitFor(() => {
@@ -612,7 +577,7 @@ describe('GrooveGridEditor', () => {
     it('handles paste with invalid JSON or wrong format', () => {
       const onChange = vi.fn();
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-
+      
       const pasteEvent = new Event('paste') as any;
       pasteEvent.clipboardData = {
         getData: () => 'invalid-json',

@@ -192,11 +192,17 @@ function GridOverlays() {
         <InstrumentSettingsModal
           instrument={editingInstrument}
           onClose={() => setEditingInstrumentId(null)}
-          onUpdate={(updates) =>
+          onSave={(updates) =>
             dispatch({
               type: 'UPDATE_INSTRUMENT',
               id: editingInstrument.id,
               updates,
+            })
+          }
+          onDelete={() =>
+            dispatch({
+              type: 'REMOVE_INSTRUMENT',
+              id: editingInstrument.id,
             })
           }
         />

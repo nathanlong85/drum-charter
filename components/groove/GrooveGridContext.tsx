@@ -289,28 +289,43 @@ export function GrooveGridProvider({
       }
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'v' && selectionRange) {
-        // Paste at selection start
-        navigator.clipboard.readText().then((text) => {
-          try {
-            const pasteData = JSON.parse(text);
-            if (Array.isArray(pasteData)) {
-              wrappedDispatch({
-                type: 'PASTE_DATA',
-                id: state.instruments[selectionRange.start.instIdx].id,
-                noteIndex: selectionRange.start.noteIdx,
-                data: pasteData,
-              });
-            }
-          } catch (_err) {
-            // Ignore non-JSON or wrong format
-          }
-        });
+        // keydown logic handled by paste listener
       }
-    };
+      };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [readOnly, selectionRange, pickerPos, state.instruments, wrappedDispatch]);
+      const handlePaste = (e: ClipboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
+      }
+
+      if (!selectionRange) return;
+
+      const text = e.clipboardData?.getData('text');
+      if (!text) return;
+
+      try {
+        const pasteData = JSON.parse(text);
+        if (Array.isArray(pasteData)) {
+          wrappedDispatch({
+            type: 'PASTE_DATA',
+            id: state.instruments[selectionRange.start.instIdx].id,
+            noteIndex: selectionRange.start.noteIdx,
+            data: pasteData,
+          });
+        }
+      } catch (err) {
+        // Ignore non-JSON
+      }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('paste', handlePaste);
+      return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('paste', handlePaste);
+      };
+      }, [readOnly, selectionRange, pickerPos, state.instruments, wrappedDispatch]);
 
   const value = {
     state,
