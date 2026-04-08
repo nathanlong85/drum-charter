@@ -188,7 +188,7 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    expect(screen.getByTestId('groove-editor')).toBeDefined();
+    expect(screen.getByTestId('groove-grid')).toBeDefined();
 
     const removeGridBtn = screen.getByRole('button', { name: /Remove Grid/i });
 
@@ -197,7 +197,7 @@ describe('NotebookEditor', () => {
       await wait(2100);
     });
 
-    expect(screen.queryByTestId('groove-editor')).toBeNull();
+    expect(screen.queryByTestId('groove-grid')).toBeNull();
   });
 
   it('handles public link for notebooks', async () => {

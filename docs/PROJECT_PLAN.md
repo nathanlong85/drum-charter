@@ -53,6 +53,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done (Recent)
 
+- [x] [Chore] Architectural Refactor & Test Modernization: Decomposed monolithic components (`SongEditor`, `GrooveGridEditor`), parallelized data waterfalls, and migrated E2E tests to Page Object Model (POM). `✓`
 - [x] [Feature] Authenticated Dashboard (Mission Control): Streamlined access to recent activity and creation tools for logged-in users (#96) `✓`
 - [x] [Chore] Architectural Refactor: Separate Custom Skills from Vendor Skills (#103) `✓`
 - [x] [UX] User Profile Dropdown: Compact Radix UI menu for AuthStatus and removed legacy Settings icon (#97) `✓`

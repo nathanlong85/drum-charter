@@ -60,7 +60,7 @@ describe('groove utils', () => {
       expect(inst.notes).toHaveLength(16);
       expect(inst.notes.every((n) => n === 'none')).toBe(true);
       expect(inst.velocities).toHaveLength(16);
-      expect(inst.velocities.every((v) => v === 0)).toBe(true);
+      expect(inst.velocities!.every((v) => v === 0)).toBe(true);
     });
   });
 

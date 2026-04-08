@@ -9,21 +9,19 @@ interface NotebookPageProps {
 }
 
 export default async function NotebookPage({ params }: NotebookPageProps) {
-  const { id } = await params;
-  const supabase = await createClient();
+  const [{ id }, supabase] = await Promise.all([params, createClient()]);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [authResult, notebookResult] = await Promise.allSettled([
+    supabase.auth.getUser(),
+    supabaseService.getNotebook(id, supabase),
+  ]);
 
-  if (!user) {
+  if (authResult.status === 'rejected' || !authResult.value.data.user) {
     redirect('/login');
   }
 
-  let formattedNotebook;
-  try {
-    formattedNotebook = await supabaseService.getNotebook(id, supabase);
-  } catch (error: unknown) {
+  if (notebookResult.status === 'rejected') {
+    const error = notebookResult.reason;
     if (
       error &&
       typeof error === 'object' &&
@@ -36,6 +34,8 @@ export default async function NotebookPage({ params }: NotebookPageProps) {
     throw error;
   }
 
+  const formattedNotebook = notebookResult.value;
+
   return (
     <div className="max-w-[1400px] mx-auto p-8 space-y-12">
       <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4">
@@ -44,8 +44,15 @@ export default async function NotebookPage({ params }: NotebookPageProps) {
             <Link
               href="/library"
               className="hover:text-primary-dim flex items-center gap-2 transition-colors"
+              aria-label="Back to Library"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

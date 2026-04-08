@@ -49,12 +49,12 @@ test.describe('Snippet Integration', () => {
     await snippetItem.click();
 
     // 5. Verify grid is visible in the song section
-    await expect(page.getByTestId('groove-editor')).toBeVisible();
+    await expect(page.getByTestId('groove-grid')).toBeVisible();
 
     // 6. Verify persistence
     await waitForSave(page);
     await page.reload();
-    await expect(page.getByTestId('groove-editor')).toBeVisible();
+    await expect(page.getByTestId('groove-grid')).toBeVisible();
   });
 
   test('should insert a snippet into a notebook', async ({ page }) => {
@@ -80,11 +80,11 @@ test.describe('Snippet Integration', () => {
     await snippetItem.click();
 
     // 5. Verify grid is visible in the notebook section
-    await expect(page.getByTestId('groove-editor')).toBeVisible();
+    await expect(page.getByTestId('groove-grid')).toBeVisible();
 
     // 6. Verify persistence
     await waitForSave(page);
     await page.reload();
-    await expect(page.getByTestId('groove-editor')).toBeVisible();
+    await expect(page.getByTestId('groove-grid')).toBeVisible();
   });
 });

@@ -1,7 +1,24 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import type React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import type { GrooveGrid } from '@/lib/types/groove';
+import { GrooveGridProvider } from '../GrooveGridContext';
 import { GrooveGridToolbar } from '../GrooveGridToolbar';
+
+// Mock audio playback hook
+const mockAudioState = {
+  isPlaying: false,
+  isSamplesLoaded: true,
+  togglePlayback: vi.fn(),
+  metronomeEnabled: false,
+  setMetronomeEnabled: vi.fn(),
+  metronomeVolume: 0.5,
+  setMetronomeVolume: vi.fn(),
+};
+
+vi.mock('@/lib/hooks/useAudioPlayback', () => ({
+  useAudioPlayback: () => mockAudioState,
+}));
 
 const mockState: GrooveGrid = {
   timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
@@ -11,76 +28,77 @@ const mockState: GrooveGrid = {
   playbackOptionalHits: true,
 };
 
-describe('GrooveGridToolbar', () => {
-  const props = {
-    state: mockState,
-    isPlaying: false,
-    isSamplesLoaded: true,
-    togglePlayback: vi.fn(),
-    bpm: 120,
-    onBpmChange: vi.fn(),
-    metronomeEnabled: false,
-    onMetronomeToggle: vi.fn(),
-    metronomeVolume: 0.5,
-    onMetronomeVolumeChange: vi.fn(),
-    updateMeasures: vi.fn(),
-    updateResolution: vi.fn(),
-    updateTimeSignature: vi.fn(),
-    isEditingInstruments: false,
-    onToggleEditInstruments: vi.fn(),
-    onToggleOptionalHits: vi.fn(),
-  };
+const renderWithProvider = (ui: React.ReactElement, onChange = vi.fn(), onBpmChange = vi.fn()) =>
+  render(
+    <GrooveGridProvider
+      initialGrid={mockState}
+      bpm={120}
+      onChange={onChange}
+      onBpmChange={onBpmChange}
+    >
+      {ui}
+    </GrooveGridProvider>,
+  );
 
+describe('GrooveGridToolbar', () => {
   it('handles playback toggle', () => {
-    render(<GrooveGridToolbar {...props} />);
+    renderWithProvider(<GrooveGridToolbar />);
     fireEvent.click(screen.getByTestId('playback-toggle'));
-    expect(props.togglePlayback).toHaveBeenCalled();
+    expect(mockAudioState.togglePlayback).toHaveBeenCalled();
   });
 
   it('handles BPM change', () => {
-    render(<GrooveGridToolbar {...props} />);
+    const onBpmChange = vi.fn();
+    renderWithProvider(<GrooveGridToolbar />, vi.fn(), onBpmChange);
     const bpmInput = screen.getByDisplayValue('120');
     fireEvent.change(bpmInput, { target: { value: '140' } });
-    expect(props.onBpmChange).toHaveBeenCalledWith(140);
+    expect(onBpmChange).toHaveBeenCalledWith(140);
   });
 
   it('handles metronome toggle', () => {
-    render(<GrooveGridToolbar {...props} />);
+    renderWithProvider(<GrooveGridToolbar />);
     fireEvent.click(screen.getByTitle('Enable Metronome'));
-    expect(props.onMetronomeToggle).toHaveBeenCalledWith(true);
+    expect(mockAudioState.setMetronomeEnabled).toHaveBeenCalledWith(true);
   });
 
   it('handles measures update', () => {
-    render(<GrooveGridToolbar {...props} />);
+    const onChange = vi.fn();
+    renderWithProvider(<GrooveGridToolbar />, onChange);
     fireEvent.click(screen.getByText('+'));
-    expect(props.updateMeasures).toHaveBeenCalledWith(1);
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ measures: 2 }));
 
     fireEvent.click(screen.getByText('-'));
-    expect(props.updateMeasures).toHaveBeenCalledWith(-1);
+    // Since we started at 1, + then - brings us back to 1
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ measures: 1 }));
   });
 
   it('handles resolution update', () => {
-    render(<GrooveGridToolbar {...props} />);
+    const onChange = vi.fn();
+    renderWithProvider(<GrooveGridToolbar />, onChange);
     // Target button text '8' specifically by role to avoid select options
     const res8Btn = screen.getByRole('button', { name: '8' });
     fireEvent.click(res8Btn);
-    expect(props.updateResolution).toHaveBeenCalledWith(8);
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ resolution: 8 }));
   });
 
   it('handles edit instruments toggle', () => {
-    render(<GrooveGridToolbar {...props} />);
+    // This is internal state in context, harder to verify without checking sub-components
+    // but we can verify it doesn't crash.
+    renderWithProvider(<GrooveGridToolbar />);
     fireEvent.click(screen.getByTitle('Edit Instruments'));
-    expect(props.onToggleEditInstruments).toHaveBeenCalled();
+    expect(screen.getByTitle('Finish Editing')).toBeInTheDocument();
   });
 
   it('handles optional hits toggle', () => {
-    render(<GrooveGridToolbar {...props} />);
+    const onChange = vi.fn();
+    renderWithProvider(<GrooveGridToolbar />, onChange);
     fireEvent.click(screen.getByTitle('Hide Optional Hits'));
-    expect(props.onToggleOptionalHits).toHaveBeenCalledWith(false);
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ playbackOptionalHits: false }));
   });
 
   it('handles time signature change', () => {
-    render(<GrooveGridToolbar {...props} />);
+    const onChange = vi.fn();
+    renderWithProvider(<GrooveGridToolbar />, onChange);
 
     // Get the input by display value, but we need to disambiguate from the select
     const inputs = screen.getAllByDisplayValue('4');
@@ -88,10 +106,12 @@ describe('GrooveGridToolbar', () => {
     if (!sigBeats) throw new Error('Input not found');
 
     fireEvent.change(sigBeats, { target: { value: '3' } });
-    expect(props.updateTimeSignature).toHaveBeenCalledWith(
+    expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        beatsPerMeasure: 3,
-        beatValue: 4,
+        timeSignature: expect.objectContaining({
+          beatsPerMeasure: 3,
+          beatValue: 4,
+        }),
       }),
     );
   });

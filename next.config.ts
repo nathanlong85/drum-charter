@@ -15,4 +15,7 @@ export default withSerwist({
   logging: {
     browserToTerminal: true,
   },
+  experimental: {
+    viewTransition: true,
+  },
 });

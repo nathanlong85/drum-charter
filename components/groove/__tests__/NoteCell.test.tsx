@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NoteCell } from '../NoteCell';
 
 describe('NoteCell', () => {

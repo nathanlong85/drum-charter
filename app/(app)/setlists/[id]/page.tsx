@@ -10,21 +10,19 @@ interface SetlistPageProps {
 }
 
 export default async function SetlistPage({ params }: SetlistPageProps) {
-  const { id } = await params;
-  const supabase = await createClient();
+  const [{ id }, supabase] = await Promise.all([params, createClient()]);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [authResult, setlistResult] = await Promise.allSettled([
+    supabase.auth.getUser(),
+    supabaseService.getSetlist(id, supabase),
+  ]);
 
-  if (!user) {
+  if (authResult.status === 'rejected' || !authResult.value.data.user) {
     redirect('/login');
   }
 
-  let formattedSetlist;
-  try {
-    formattedSetlist = await supabaseService.getSetlist(id, supabase);
-  } catch (error: unknown) {
+  if (setlistResult.status === 'rejected') {
+    const error = setlistResult.reason;
     if (
       error &&
       typeof error === 'object' &&
@@ -37,6 +35,8 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
     throw error;
   }
 
+  const formattedSetlist = setlistResult.value;
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       <nav className="bg-surface-container-low border border-outline-variant/10 rounded-2xl py-4 px-8 mb-8 shadow-sm">
@@ -45,8 +45,15 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
             <Link
               href="/library"
               className="text-xs font-headline font-black text-on-surface-variant/60 hover:text-primary flex items-center gap-2 transition-all uppercase tracking-widest"
+              aria-label="Back to Library"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

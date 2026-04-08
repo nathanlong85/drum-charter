@@ -2,35 +2,5 @@
   "experimental": {
     "enableAgents": true
   },
-  "mcpServers": {
-    "next-devtools-mcp": {
-      "command": "npx",
-      "args": ["@vercel/next-devtools-mcp@0.x"]
-    },
-    "supabase": {
-      "command": "npx",
-      "args": ["@supabase/mcp-server@0.x"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["@microsoft/playwright-mcp@0.x"]
-    },
-    "tailwind": {
-      "command": "npx",
-      "args": ["tailwindcss-mcp-server@0.x"]
-    },
-    "github": {
-      "httpUrl": "https://api.githubcopilot.com/mcp",
-      "headers": {
-        "Authorization": "Bearer $GITHUB_PERSONAL_ACCESS_TOKEN"
-      },
-      "excludeTools": [
-        "mcp_github_create_repository",
-        "mcp_github_fork_repository",
-        "mcp_github_merge_pull_request",
-        "mcp_github_run_secret_scanning",
-        "mcp_github_search_repositories"
-      ]
-    }
-  }
+  "mcpServers": {}
 }

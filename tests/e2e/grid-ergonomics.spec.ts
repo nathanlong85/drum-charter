@@ -47,12 +47,14 @@ test.describe('Grid Ergonomics', () => {
     // Enter Edit mode
     await page.getByTitle('Edit Instruments').click({ force: true });
 
+    // Open settings for the row
+    await snareRow.getByTitle('Edit Settings').click();
+
     // Handle confirm dialog - register BEFORE trigger
     page.once('dialog', (dialog) => dialog.accept());
 
-    // Click Clear Row button
-    const clearRowBtn = snareRow.locator('button[data-testid^="clear-row-"]');
-    await clearRowBtn.click();
+    // Click Clear Row button in dropdown
+    await page.getByRole('menuitem', { name: /Clear Row/i }).click();
 
     // Verify cell is empty
     await expect(firstCell.getByTestId('note-cell-icon')).not.toBeVisible();
