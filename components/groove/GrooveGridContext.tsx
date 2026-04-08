@@ -120,9 +120,9 @@ export function GrooveGridProvider({
     isSamplesLoaded,
     togglePlayback,
     metronomeEnabled,
-    setMetronomeEnabled,
+    setMetronomeEnabled: internalSetMetronomeEnabled,
     metronomeVolume,
-    setMetronomeVolume,
+    setMetronomeVolume: internalSetMetronomeVolume,
   } = useAudioPlayback({
     grid: state,
     bpm: parentBpm,
@@ -131,17 +131,33 @@ export function GrooveGridProvider({
     initialMetronomeVolume: parentMetronomeVolume,
   });
 
+  const setMetronomeEnabled = useCallback(
+    (enabled: boolean) => {
+      internalSetMetronomeEnabled(enabled);
+      onMetronomeToggle?.(enabled);
+    },
+    [internalSetMetronomeEnabled, onMetronomeToggle],
+  );
+
+  const setMetronomeVolume = useCallback(
+    (volume: number) => {
+      internalSetMetronomeVolume(volume);
+      onMetronomeVolumeChange?.(volume);
+    },
+    [internalSetMetronomeVolume, onMetronomeVolumeChange],
+  );
+
   useEffect(() => {
     if (parentMetronomeEnabled !== undefined && parentMetronomeEnabled !== metronomeEnabled) {
-      setMetronomeEnabled(parentMetronomeEnabled);
+      internalSetMetronomeEnabled(parentMetronomeEnabled);
     }
-  }, [parentMetronomeEnabled, setMetronomeEnabled, metronomeEnabled]);
+  }, [parentMetronomeEnabled, internalSetMetronomeEnabled, metronomeEnabled]);
 
   useEffect(() => {
     if (parentMetronomeVolume !== undefined && parentMetronomeVolume !== metronomeVolume) {
-      setMetronomeVolume(parentMetronomeVolume);
+      internalSetMetronomeVolume(parentMetronomeVolume);
     }
-  }, [parentMetronomeVolume, setMetronomeVolume, metronomeVolume]);
+  }, [parentMetronomeVolume, internalSetMetronomeVolume, metronomeVolume]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -291,9 +307,9 @@ export function GrooveGridProvider({
       if ((e.ctrlKey || e.metaKey) && e.key === 'v' && selectionRange) {
         // keydown logic handled by paste listener
       }
-      };
+    };
 
-      const handlePaste = (e: ClipboardEvent) => {
+    const handlePaste = (e: ClipboardEvent) => {
       const target = e.target as HTMLElement;
       if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return;
@@ -314,18 +330,18 @@ export function GrooveGridProvider({
             data: pasteData,
           });
         }
-      } catch (err) {
+      } catch (_err) {
         // Ignore non-JSON
       }
-      };
+    };
 
-      window.addEventListener('keydown', handleKeyDown);
-      window.addEventListener('paste', handlePaste);
-      return () => {
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('paste', handlePaste);
+    return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('paste', handlePaste);
-      };
-      }, [readOnly, selectionRange, pickerPos, state.instruments, wrappedDispatch]);
+    };
+  }, [readOnly, selectionRange, pickerPos, state.instruments, wrappedDispatch]);
 
   const value = {
     state,

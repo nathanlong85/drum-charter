@@ -59,27 +59,9 @@ describe('InstrumentRow', () => {
     fireEvent.contextMenu(screen.getAllByTestId('note-cell')[1]);
   });
 
-  it('shows edit controls only when isEditing is true', () => {
-    const TestWrapper = ({ isEditing }: { isEditing: boolean }) => (
-      <Tooltip.Provider>
-        <GrooveGridProvider initialGrid={initialGrid} bpm={120}>
-          <InstrumentRow instrument={mockInstrument} instIdx={0} />
-          <button
-            onClick={() => {
-              // Internal way to toggle isEditing for testing if needed,
-              // but we can just use the provided context toggle.
-            }}
-          >
-            Toggle
-          </button>
-        </GrooveGridProvider>
-      </Tooltip.Provider>
-    );
-
-    // We can't easily reach into the provider to set isEditing without a test helper component
-    // or just checking if it reacts to the button in the real UI.
-    // For unit tests of InstrumentRow, we might need to expose isEditing via props again
-    // OR just test it within GrooveGridEditor.
-    // Actually, InstrumentRow still reads isEditing from context.
-  });
+  // We can't easily reach into the provider to set isEditing without a test helper component
+  // or just checking if it reacts to the button in the real UI.
+  // For unit tests of InstrumentRow, we might need to expose isEditing via props again
+  // OR just test it within GrooveGridEditor.
+  // Actually, InstrumentRow still reads isEditing from context.
 });

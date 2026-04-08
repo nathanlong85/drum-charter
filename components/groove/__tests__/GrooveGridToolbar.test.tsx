@@ -30,7 +30,12 @@ const mockState: GrooveGrid = {
 
 const renderWithProvider = (ui: React.ReactElement, onChange = vi.fn(), onBpmChange = vi.fn()) =>
   render(
-    <GrooveGridProvider initialGrid={mockState} bpm={120} onChange={onChange} onBpmChange={onBpmChange}>
+    <GrooveGridProvider
+      initialGrid={mockState}
+      bpm={120}
+      onChange={onChange}
+      onBpmChange={onBpmChange}
+    >
       {ui}
     </GrooveGridProvider>,
   );
@@ -88,9 +93,7 @@ describe('GrooveGridToolbar', () => {
     const onChange = vi.fn();
     renderWithProvider(<GrooveGridToolbar />, onChange);
     fireEvent.click(screen.getByTitle('Hide Optional Hits'));
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ playbackOptionalHits: false }),
-    );
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ playbackOptionalHits: false }));
   });
 
   it('handles time signature change', () => {

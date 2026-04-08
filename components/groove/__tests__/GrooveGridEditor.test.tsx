@@ -1,5 +1,6 @@
-import { fireEvent, render, screen, waitFor, act } from '@testing-library/react';
-import React, { useEffect, useState } from 'react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GrooveGrid } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../GrooveGridEditor';
@@ -114,7 +115,13 @@ const renderWithProvider = (ui: React.ReactElement) => {
   return render(ui);
 };
 
-const TestEditor = ({ grid, onChange }: { grid: GrooveGrid; onChange?: (g: GrooveGrid) => void }) => {
+const TestEditor = ({
+  grid,
+  onChange,
+}: {
+  grid: GrooveGrid;
+  onChange?: (g: GrooveGrid) => void;
+}) => {
   const [currentGrid, setCurrentGrid] = useState(grid);
   const handleChange = (newGrid: GrooveGrid) => {
     setCurrentGrid(newGrid);
@@ -182,7 +189,7 @@ describe('GrooveGridEditor', () => {
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
     fireEvent.click(screen.getByTitle('Edit Instruments'));
-    
+
     const trigger = screen.getByTestId('instrument-settings-trigger-i1');
     fireEvent.click(trigger);
 
@@ -194,7 +201,7 @@ describe('GrooveGridEditor', () => {
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
-    
+
     const saveBtn = screen.getByRole('button', { name: /Save Changes/i });
     fireEvent.click(saveBtn);
 
@@ -545,7 +552,7 @@ describe('GrooveGridEditor', () => {
       };
       // Mock readText to return the pasteData
       navigator.clipboard.readText = vi.fn().mockResolvedValue(pasteData);
-      
+
       fireEvent(window, pasteEvent);
 
       await waitFor(() => {
@@ -577,7 +584,7 @@ describe('GrooveGridEditor', () => {
     it('handles paste with invalid JSON or wrong format', () => {
       const onChange = vi.fn();
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
-      
+
       const pasteEvent = new Event('paste') as any;
       pasteEvent.clipboardData = {
         getData: () => 'invalid-json',
