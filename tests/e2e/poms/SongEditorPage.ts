@@ -101,8 +101,8 @@ export class SongEditorPage {
   }
 
   async setVelocity(type: string) {
-    const btn = this.symbolPicker.locator('button', { hasText: type });
-    await expect(btn).toBeVisible();
+    const btn = this.symbolPicker.locator('button').filter({ hasText: type });
+    await expect(btn).toBeVisible({ timeout: 10000 });
     await btn.click({ force: true });
   }
 
@@ -123,8 +123,5 @@ export class SongEditorPage {
 
   async waitForSave() {
     await waitForSave(this.page);
-  }
-}
-his.page);
   }
 }

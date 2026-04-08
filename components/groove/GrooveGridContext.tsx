@@ -199,6 +199,21 @@ export function GrooveGridProvider({
     [onChange, readOnly],
   );
 
+  const handleNoteRightClick = useCallback(
+    (id: string, noteIndex: number, e: React.MouseEvent) => {
+      e.preventDefault();
+      if (readOnly) return;
+      setSelectionRange(null);
+      setPickerPos({
+        top: e.clientY,
+        left: e.clientX,
+        id,
+        noteIndex,
+      });
+    },
+    [readOnly],
+  );
+
   const handleNoteClick = useCallback(
     (id: string, noteIndex: number, e: React.MouseEvent) => {
       if (readOnly) return;
@@ -214,21 +229,6 @@ export function GrooveGridProvider({
       wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
     },
     [readOnly, wrappedDispatch, handleNoteRightClick],
-  );
-
-  const handleNoteRightClick = useCallback(
-    (id: string, noteIndex: number, e: React.MouseEvent) => {
-      e.preventDefault();
-      if (readOnly) return;
-      setSelectionRange(null);
-      setPickerPos({
-        top: e.clientY,
-        left: e.clientX,
-        id,
-        noteIndex,
-      });
-    },
-    [readOnly],
   );
 
   const handleSymbolSelect = useCallback(
