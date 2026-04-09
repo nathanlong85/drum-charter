@@ -39,10 +39,6 @@ test.describe('Dark Mode Support', () => {
     }
 
     // Authenticated pages
-    await page.goto('/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
-
     const authPages = [
       { path: '/library', name: 'Library' },
       { path: '/manual', name: 'Manual' },
@@ -60,9 +56,7 @@ test.describe('Dark Mode Support', () => {
 
   test('should apply dark mode to editor pages', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
-    await page.goto('/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+    await page.goto('/library');
 
     // Check Song Editor
     await page.getByTestId('tab-song').click();

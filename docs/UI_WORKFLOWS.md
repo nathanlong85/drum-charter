@@ -4,16 +4,9 @@ This document outlines the core user journeys and system interactions for DrumCh
 
 ---
 
-## 1. Authentication & Guest Access
+## 1. Authentication
 
-### Workflow: Guest Login
-
-- **Trigger**: Click "Continue as Guest" on the `/login` page.
-- **Action**: Calls `supabase.auth.signInAnonymously()`.
-- **Transition**: Redirects to `/library`.
-- **State**: `is_anonymous` is true. UI shows a "Guest Mode" indicator.
-
-### Workflow: Permanent Sign-In
+### Workflow: Sign-In
 
 - **Trigger**: Submit valid email and password on `/login`.
 - **Action**: Calls `supabase.auth.signInWithPassword()`.

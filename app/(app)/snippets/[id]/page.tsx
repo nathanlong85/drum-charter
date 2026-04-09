@@ -21,7 +21,7 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
   }
 
   const user = authResult.value.data.user;
-  console.log(`[SnippetPage] Loading snippet: ${id} (User: ${user?.id || 'Anonymous'})`);
+  console.log(`[SnippetPage] Loading snippet: ${id} (User: ${user?.id})`);
 
   if (snippetResult.status === 'rejected') {
     const error = snippetResult.reason;

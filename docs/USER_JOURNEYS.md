@@ -6,8 +6,7 @@ This document outlines the core user journeys currently supported by DrumCharter
 
 ### 1. Authentication & Onboarding
 
-* **Guest Access**: A new user can instantly try the app by "Continuing as Guest" without creating an account. Data is persisted to an anonymous profile.
-* **Permanent Account**: A user can sign up or sign in with an email and password to securely manage their charts across devices.
+* **User Account**: A user can sign up or sign in with an email and password to securely manage their charts across devices.
 * **Onboarding**: New users can access the **User Manual** directly from the app to learn about the Groove Grid and editor features.
 
 ### 2. Library Management

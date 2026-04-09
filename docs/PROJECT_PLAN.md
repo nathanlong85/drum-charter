@@ -53,6 +53,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done (Recent)
 
+- [x] [Arch] Remove Guest Mode & Migrate Tests: Ripped out Supabase Anonymous Sign-in and "Continue as Guest" flow. Enforced strict route protection for app workspace. Refactored full Playwright E2E suite to use standard test user authentication, resolving data collisions and flakiness (#116) `✓`
 - [x] [Fix] Auth Status & User Menu Reliability: Resolved "stuck loading" state in AuthStatus by ensuring `setLoading(false)` on auth change and passing server-side props on Home and Setlist pages. Enhanced menu button visibility and interactivity (#105) `✓`
 - [x] [Chore] Architectural Refactor & Test Modernization: Decomposed monolithic components (`SongEditor`, `GrooveGridEditor`), parallelized data waterfalls, and migrated E2E tests to Page Object Model (POM). `✓`
 - [x] [Feature] Authenticated Dashboard (Mission Control): Streamlined access to recent activity and creation tools for logged-in users (#96) `✓`

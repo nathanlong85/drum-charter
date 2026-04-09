@@ -1,3 +1,5 @@
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { type ReactNode, Suspense } from 'react';
 import { AppShell } from '@/components/layout/AppShell';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -8,6 +10,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Allow /manual to be public
+  const headersList = await headers();
+  const fullPath = headersList.get('x-pathname') || '';
+  const isManual = fullPath === '/manual' || fullPath.startsWith('/manual/');
+
+  if (!user && !isManual) {
+    redirect('/login');
+  }
+
   const profile = user ? await supabaseService.getProfile(user.id, supabase) : null;
 
   return (

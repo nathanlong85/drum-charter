@@ -4,9 +4,7 @@ import { waitForSave } from './test-utils';
 test.describe('Sharing & Public View', () => {
   test('should view a public snippet as a guest', async ({ page }) => {
     // 1. Create a public snippet as a guest
-    await page.goto('/login');
-    await page.click('text=Continue as Guest');
-    await expect(page).toHaveURL('/library');
+    await page.goto('/library');
 
     await page.getByTestId('tab-snippet').click();
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
@@ -49,9 +47,7 @@ test.describe('Sharing & Public View', () => {
   });
 
   test('should adapt UI for printing', async ({ page }) => {
-    await page.goto('/login');
-    await page.click('text=Continue as Guest');
-    await page.waitForURL(/\/library(?:\/|\?|$)/);
+    await page.goto('/library');
     await expect(page.getByTestId('create-new-button')).toBeVisible({ timeout: 15000 });
     await page.getByTestId('create-new-button').click();
 

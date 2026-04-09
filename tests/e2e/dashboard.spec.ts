@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Dashboard (Mission Control)', () => {
-  test.describe('Guest', () => {
+  test.describe('Public', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
-    test('Guest user sees Marketing Hero', async ({ page }) => {
+    test('Unauthenticated user sees Marketing Hero', async ({ page }) => {
       await page.goto('/');
 
       // Check for Marketing Hero elements
