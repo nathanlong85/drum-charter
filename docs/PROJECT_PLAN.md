@@ -53,7 +53,8 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done (Recent)
 
-- [x] [UX] Universal Header User Menu: Moved user profile from sidebar to top-right header for global accessibility and consistency. Grouped with data refresh controls. Resolved redundant component instances (#117) `✓`
+- [x] [Arch/UX] Modernize Web App (Phase 1): Unified Dashboard and AppShell into \`(app)\` group. Implemented server-side logout for cookie reliability. Updated global navigation to favor the new authenticated workspace structure (#120) \`✓\`
+- [x] [UX] Universal Header User Menu: Moved user profile from sidebar to top-right header for global accessibility and consistency. Grouped with data refresh controls. Resolved redundant component instances (#117) \`✓\`
 - [x] [Fix] Sign Out Reliability: Fixed non-functional "Sign Out" button by ensuring proper client-side redirection and session clearance. Added E2E verification (#116) `✓`
 - [x] [Arch] Remove Guest Mode & Migrate Tests: Ripped out Supabase Anonymous Sign-in and "Continue as Guest" flow. Enforced strict route protection for app workspace. Refactored full Playwright E2E suite to use standard test user authentication, resolving data collisions and flakiness (#116) `✓`
 - [x] [Fix] Auth Status & User Menu Reliability: Resolved "stuck loading" state in AuthStatus by ensuring `setLoading(false)` on auth change and passing server-side props on Home and Setlist pages. Enhanced menu button visibility and interactivity (#105) `✓`

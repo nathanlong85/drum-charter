@@ -47,10 +47,10 @@ export function MarketingHero() {
               </span>
             </Link>
             <Link
-              href="/library"
+              href="/login"
               className="px-10 py-5 bg-surface-container-highest text-on-surface font-headline font-black text-xs uppercase tracking-widest rounded-2xl border border-outline-variant/20 hover:bg-surface-bright transition-all"
             >
-              Access Library
+              Access Console
             </Link>
           </div>
           {/* Interactive Engine Preview */}

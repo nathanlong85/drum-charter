@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { signOutAction } from '@/app/auth/actions';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/client';
 import type { UserProfile } from '@/lib/types/user';
@@ -92,13 +93,11 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
 
   const handleLogout = useCallback(async () => {
     try {
-      await supabase.auth.signOut();
-      // Use window.location for a full refresh to clear all client-side state
-      window.location.href = '/';
+      await signOutAction();
     } catch (err) {
       console.error('Sign out error:', err);
     }
-  }, [supabase.auth]);
+  }, []);
 
   if (loading)
     return (

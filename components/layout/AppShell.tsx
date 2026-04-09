@@ -39,6 +39,7 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
   }, [router]);
 
   const navItems = [
+    { name: 'Dashboard', href: '/dashboard', icon: Library, tab: 'dashboard' },
     { name: 'Songs', href: '/library?tab=song', icon: Music, tab: 'song' },
     { name: 'Notebooks', href: '/library?tab=notebook', icon: FileText, tab: 'notebook' },
     { name: 'Snippets', href: '/library?tab=snippet', icon: Library, tab: 'snippet' },
@@ -52,9 +53,9 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
         <aside className="fixed left-0 top-0 h-full flex flex-col w-[72px] lg:w-[240px] bg-surface-container-low border-r border-outline-variant/10 z-50 transition-all duration-300 no-print">
           <div className="p-6 flex-1 flex flex-col">
             <Link
-              href="/"
+              href="/dashboard"
               className="flex items-center gap-3 mb-10 group hover:opacity-80 transition-opacity"
-              aria-label="DrumCharter Home"
+              aria-label="DrumCharter Dashboard"
             >
               <div className="w-10 h-10 shrink-0 bg-primary flex items-center justify-center rounded-lg shadow-[0_0_15px_var(--color-primary-dim)] transition-transform group-hover:scale-105">
                 <Music className="w-6 h-6 text-on-primary" />
@@ -72,8 +73,10 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
             <nav className="space-y-1 font-label text-sm tracking-tight">
               {navItems.map((item) => {
                 const isActive =
-                  pathname === '/library' &&
-                  (currentTab === item.tab || (!currentTab && item.tab === 'song'));
+                  item.href === '/dashboard'
+                    ? pathname === '/dashboard'
+                    : pathname === '/library' &&
+                      (currentTab === item.tab || (!currentTab && item.tab === 'song'));
                 const Icon = item.icon;
                 return (
                   <Link
@@ -125,9 +128,9 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
         <header className="fixed top-0 right-0 left-[72px] lg:left-[240px] z-40 flex justify-between items-center px-6 h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 transition-all duration-300 no-print">
           <div className="flex items-center gap-6">
             <Link
-              href="/"
+              href="/dashboard"
               className="text-primary font-black text-lg font-headline tracking-widest uppercase hidden md:inline-block hover:opacity-80 transition-opacity"
-              aria-label="DrumCharter Home"
+              aria-label="DrumCharter Dashboard"
             >
               DrumCharter
             </Link>

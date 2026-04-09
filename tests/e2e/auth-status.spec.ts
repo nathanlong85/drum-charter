@@ -25,10 +25,10 @@ test.describe('Auth Status & User Menu', () => {
     await signOutBtn.click();
 
     // Verify redirect to landing page
-    await page.waitForURL('http://localhost:3001/', { timeout: 15000 });
+    await expect(page).toHaveURL(/\/$/, { timeout: 15000 });
 
-    // Verify we are actually logged out (Landing page specific text)
-    await expect(page.getByText(/Sonic Architect/i).first()).toBeVisible();
+    // Verify we are actually logged out (Sign In button should be visible)
+    await expect(page.getByRole('link', { name: 'Sign In' }).first()).toBeVisible();
   });
 
   test('Should not be stuck in loading state', async ({ page }) => {
