@@ -37,6 +37,8 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
 
   const formattedSetlist = setlistResult.value;
 
+  const user = authResult.value.data.user;
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       <nav className="bg-surface-container-low border border-outline-variant/10 rounded-2xl py-4 px-8 mb-8 shadow-sm">
