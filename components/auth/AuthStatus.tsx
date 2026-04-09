@@ -5,6 +5,7 @@ import type { User } from '@supabase/supabase-js';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/client';
@@ -20,6 +21,7 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
   const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
   const [loading, setLoading] = useState(!initialUser && !initialProfile);
   const supabase = useMemo(() => createClient(), []);
+  const router = useRouter();
 
   useEffect(() => {
     let mounted = true;
@@ -88,10 +90,14 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
     };
   }, [supabase, initialProfile, initialUser]);
 
-  const handleLogout = useCallback(() => {
-    supabase.auth.signOut().catch((err) => {
+  const handleLogout = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+      // Use window.location for a full refresh to clear all client-side state
+      window.location.href = '/';
+    } catch (err) {
       console.error('Sign out error:', err);
-    });
+    }
   }, [supabase.auth]);
 
   if (loading)
