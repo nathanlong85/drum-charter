@@ -111,11 +111,11 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
             </nav>
           </div>
 
-          <div className="mt-auto p-6 border-t border-outline-variant/10 flex flex-col gap-2 bg-surface-container-lowest/30">
+          <div className="mt-auto p-6 border-t border-outline-variant/10 flex flex-col gap-0.5 bg-surface-container-lowest/30">
             <span className="text-[10px] font-headline font-black text-on-surface uppercase tracking-tight px-1">
               DrumCharter
             </span>
-            <span className="text-[9px] font-label font-bold text-on-surface-variant/30 uppercase tracking-[0.2em] px-1">
+            <span className="text-[10px] font-label font-bold text-on-surface-variant/30 uppercase tracking-[0.2em] px-1">
               v{version}
             </span>
           </div>
@@ -147,7 +147,7 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
           </div>
 
           <div className="flex items-center gap-4 lg:gap-8">
-            <div className="relative group hidden xl:block">
+            <div className="relative group hidden lg:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 w-4 h-4" />
               <input
                 className="bg-surface-container-low border-none text-[10px] font-label font-bold tracking-widest w-64 pl-10 pr-4 py-2.5 rounded-full focus:ring-1 focus:ring-primary/30 text-on-surface placeholder:text-on-surface-variant/30 outline-none transition-all"
@@ -157,7 +157,7 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
               />
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 text-on-surface-variant/60">
               <Tooltip content="Refresh data" side="bottom">
                 <button
                   onClick={handleRefresh}
