@@ -8,6 +8,16 @@ const mockSignOut = vi.fn(() => Promise.resolve({ error: null }));
 const mockOnAuthStateChange = vi.fn(() => ({
   data: { subscription: { unsubscribe: vi.fn() } },
 }));
+const mockPush = vi.fn();
+const mockRefresh = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    refresh: mockRefresh,
+  }),
+}));
+
 const mockFrom = vi.fn().mockReturnValue({
   select: vi.fn().mockReturnThis(),
   eq: vi.fn().mockReturnThis(),
@@ -95,7 +105,13 @@ describe('AuthStatus', () => {
       expect(screen.getByText('Sign Out')).toBeInTheDocument();
     });
 
+    const locationMock = { href: '' };
+    vi.stubGlobal('location', locationMock);
+
     await user.click(screen.getByText('Sign Out'));
     expect(mockSignOut).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(locationMock.href).toBe('/');
+    });
   });
 });

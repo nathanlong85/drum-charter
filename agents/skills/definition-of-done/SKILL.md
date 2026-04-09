@@ -9,7 +9,12 @@ This skill automates the verification process for DrumCharter, ensuring that all
 
 ## Workflow
 
-When you think you've finished a task (feature, bug fix, or documentation update), follow these steps in order:
+### 0. Implementation (MANDATORY)
+
+- **Test-First Mandate**: No code changes are allowed without an accompanying test plan and verification logic.
+- **Bug Reproduction**: You **MUST** reproduce reported bugs with a failing test before applying a fix.
+- **Feature Verification**: Every feature requirement **MUST** be translated into a test case during implementation.
+- **No Test = Failure**: Any code modification that is not covered by an automated test is a failure to meet the Senior Engineer standard.
 
 ### 1. Determine Verification Path
 
