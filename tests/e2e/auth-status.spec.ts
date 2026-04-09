@@ -34,10 +34,8 @@ test.describe('Auth Status & User Menu', () => {
 
     // It might be visible briefly, but it should disappear
     // We wait for the actual avatar or the sign in button
-    await Promise.race([
-      expect(page.getByTestId('auth-user-avatar')).toBeVisible(),
-      expect(page.getByText('Sign In')).toBeVisible(),
-    ]);
+    const authState = page.getByTestId('auth-user-avatar').or(page.getByText('Sign In'));
+    await expect(authState).toBeVisible();
 
     await expect(skeleton).not.toBeVisible();
   });

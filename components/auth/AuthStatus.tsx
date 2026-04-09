@@ -65,11 +65,11 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
       setUser(newUser);
 
       if (newUser) {
+        if (mounted) setLoading(false);
         try {
           const profileData = await supabaseService.getProfile(newUser.id, supabase);
           if (mounted) {
             setProfile(profileData);
-            setLoading(false);
           }
         } catch (err) {
           console.error('Error fetching profile on auth change:', err);
@@ -82,7 +82,6 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
         }
       }
     });
-
     return () => {
       mounted = false;
       subscription.unsubscribe();
