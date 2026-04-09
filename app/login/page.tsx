@@ -11,7 +11,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [guestLoading, setGuestLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'error' | 'success'>('error');
 
@@ -19,7 +18,6 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (guestLoading) return;
     setLoading(true);
     setMessage('');
     setMessageType('error');
@@ -40,7 +38,7 @@ export default function LoginPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loading || guestLoading) return;
+    if (loading) return;
     setLoading(true);
     setMessage('');
     setMessageType('error');
@@ -60,23 +58,6 @@ export default function LoginPage() {
       setMessage('Check your email for the confirmation link.');
     }
     setLoading(false);
-  };
-
-  const handleGuestSignIn = async () => {
-    if (loading || guestLoading) return;
-    setGuestLoading(true);
-    setMessage('');
-    setMessageType('error');
-
-    const { error } = await supabase.auth.signInAnonymously();
-
-    if (error) {
-      setMessage(`Error: ${error.message}`);
-      setGuestLoading(false);
-    } else {
-      router.push('/library');
-      router.refresh();
-    }
   };
 
   return (
@@ -151,40 +132,19 @@ export default function LoginPage() {
             <div className="flex flex-col gap-3 pt-2">
               <button
                 className="w-full bg-primary text-on-primary font-headline font-black text-xs uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all disabled:opacity-50"
-                disabled={loading || guestLoading}
+                disabled={loading}
               >
                 {loading ? 'Processing...' : 'Authenticate'}
               </button>
               <button
                 onClick={handleSignup}
                 className="w-full bg-surface-container-highest text-on-surface font-headline font-black text-xs uppercase tracking-widest py-4 rounded-2xl border border-outline-variant/10 hover:bg-surface-bright transition-all disabled:opacity-50"
-                disabled={loading || guestLoading}
+                disabled={loading}
                 type="button"
               >
                 Create Account
               </button>
             </div>
-
-            <div className="relative my-2">
-              <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                <div className="w-full border-t border-outline-variant/10"></div>
-              </div>
-              <div className="relative flex justify-center text-[10px]">
-                <span className="px-4 bg-surface-container-low text-on-surface-variant/40 font-headline font-black uppercase tracking-[0.3em]">
-                  Or
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={handleGuestSignIn}
-              className="w-full bg-surface-container-highest text-primary font-headline font-black text-xs uppercase tracking-widest py-4 rounded-2xl border border-primary/10 hover:border-primary/30 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
-              disabled={loading || guestLoading}
-              type="button"
-            >
-              {guestLoading ? 'Starting Session...' : 'Continue as Guest'}
-              <Zap className="w-4 h-4 fill-primary/20" />
-            </button>
           </form>
 
           {message && (

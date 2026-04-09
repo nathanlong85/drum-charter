@@ -1,14 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { waitForSave } from './test-utils';
 
-test.use({ storageState: { cookies: [], origins: [] } });
-
-test.describe('Library Management & Guest Flow', () => {
+test.describe('Library Management', () => {
   test.beforeEach(async ({ page }) => {
-    // Start as a guest for these tests
-    await page.goto('/login');
-    await page.click('text=Continue as Guest');
-    await expect(page).toHaveURL('/library');
+    // Navigate to library
+    await page.goto('/library');
   });
 
   test('should create and search for a new song', async ({ page }) => {

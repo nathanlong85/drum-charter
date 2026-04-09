@@ -38,6 +38,9 @@ test.describe('Live Mode', () => {
       .nth(1)
       .fill('Section 2');
 
+    // Wait for auto-save to ensure names are in DB
+    await page.waitForTimeout(2000);
+
     // Ensure GO LIVE is ready
     await expect(page.getByTestId('go-live-button')).toBeVisible({ timeout: 20000 });
   });

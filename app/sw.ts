@@ -61,7 +61,7 @@ const serwist = new Serwist({
             },
             cachedResponseWillBeUsed: async ({ cachedResponse, request }) => {
               // Safety fallback: only use cache if no Authorization header.
-              // This is the critical "read" check to prevent serving anonymous data to auth'd users.
+              // This is the critical "read" check to prevent cross-user data leakage.
               if (request.headers.has('Authorization')) {
                 return undefined;
               }

@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { waitForSave } from './test-utils';
 
-test.use({ storageState: { cookies: [], origins: [] } });
-
 test.describe('Public Sharing Workflows', () => {
   test('Should handle private or missing songs with 404', async ({ page }) => {
     // Navigate to a likely non-existent or private ID
@@ -12,10 +10,8 @@ test.describe('Public Sharing Workflows', () => {
   });
 
   test('Should allow viewing a public song', async ({ page }) => {
-    // 1. Sign in as guest
-    await page.goto('http://localhost:3001/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+    // 1. Setup - Create a new song while authenticated
+    await page.goto('/library');
 
     // 2. Create a new song
     await page.getByTestId('tab-song').first().click();
@@ -40,10 +36,8 @@ test.describe('Public Sharing Workflows', () => {
   });
 
   test('Should allow viewing a public notebook', async ({ page }) => {
-    // 1. Sign in as guest
-    await page.goto('http://localhost:3001/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+    // 1. Setup - Create a new song while authenticated
+    await page.goto('/library');
 
     // 2. Create a new notebook
     await page.getByTestId('tab-notebook').first().click();
@@ -75,10 +69,8 @@ test.describe('Public Sharing Workflows', () => {
   });
 
   test('Should allow viewing a public snippet', async ({ page }) => {
-    // 1. Sign in as guest
-    await page.goto('http://localhost:3001/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+    // 1. Setup - Create a new song while authenticated
+    await page.goto('/library');
 
     // 2. Create a new snippet
     await page.getByTestId('tab-snippet').first().click();
@@ -110,10 +102,8 @@ test.describe('Public Sharing Workflows', () => {
   });
 
   test('Should allow viewing a public setlist', async ({ page }) => {
-    // 1. Sign in as guest
-    await page.goto('http://localhost:3001/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+    // 1. Setup - Create a new song while authenticated
+    await page.goto('/library');
 
     // 2. Create a new setlist
     await page.getByTestId('tab-setlist').first().click();

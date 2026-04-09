@@ -3,10 +3,8 @@ import { waitForSave } from './test-utils';
 
 test.describe('Notebook Editor', () => {
   test.beforeEach(async ({ page }) => {
-    // Start as a guest
-    await page.goto('/login');
-    await page.click('text=Continue as Guest');
-    await expect(page).toHaveURL('/library');
+    // Navigate to library
+    await page.goto('/library');
 
     // Navigate to Notebooks tab and create new notebook
     await page.getByTestId('tab-notebook').click();

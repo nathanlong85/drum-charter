@@ -2,11 +2,6 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Manual Page', () => {
   test('should render the manual correctly', async ({ page }) => {
-    // Start in guest mode
-    await page.goto('/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
-
     // Navigate to manual
     await page.goto('/manual');
 
