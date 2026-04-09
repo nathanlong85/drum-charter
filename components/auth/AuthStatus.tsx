@@ -22,6 +22,8 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
+    let mounted = true;
+
     // If we have initial user/profile, we can skip the first fetch
     if (initialUser || initialProfile) {
       setLoading(false);
@@ -31,44 +33,61 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
       // If we already have a user, only re-fetch if needed (e.g., to get fresh profile)
       // but onAuthStateChange handles updates usually.
       if (!initialUser) {
-        setLoading(true);
         try {
           const {
-            data: { user },
+            data: { user: currentUser },
           } = await supabase.auth.getUser();
-          setUser(user);
 
-          if (user) {
-            const profileData = await supabaseService.getProfile(user.id, supabase);
-            setProfile(profileData);
+          if (!mounted) return;
+          setUser(currentUser);
+
+          if (currentUser) {
+            const profileData = await supabaseService.getProfile(currentUser.id, supabase);
+            if (mounted) setProfile(profileData);
           }
         } catch (err) {
           console.error('Error fetching user or profile:', err);
-          setUser(null);
+          if (mounted) setUser(null);
         } finally {
-          setLoading(false);
+          if (mounted) setLoading(false);
         }
       }
     };
 
     getUser();
-    // ... rest of the code ...
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!mounted) return;
+
       const newUser = session?.user ?? null;
       setUser(newUser);
+
       if (newUser) {
-        const profileData = await supabaseService.getProfile(newUser.id, supabase);
-        setProfile(profileData);
+        try {
+          const profileData = await supabaseService.getProfile(newUser.id, supabase);
+          if (mounted) {
+            setProfile(profileData);
+            setLoading(false);
+          }
+        } catch (err) {
+          console.error('Error fetching profile on auth change:', err);
+          if (mounted) setLoading(false);
+        }
       } else {
-        setProfile(null);
+        if (mounted) {
+          setProfile(null);
+          setLoading(false);
+        }
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, [supabase.auth, supabase, initialProfile, initialUser]);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase, initialProfile, initialUser]);
 
   const handleLogout = useCallback(() => {
     supabase.auth.signOut().catch((err) => {
@@ -81,7 +100,7 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
   if (loading)
     return (
       <div
-        className="w-8 h-8 rounded-full bg-surface-container-highest animate-pulse border border-outline-variant/10"
+        className="w-10 h-10 rounded-full bg-surface-container-highest animate-pulse border border-outline-variant/10"
         role="status"
         aria-label="Loading user profile"
       >
@@ -130,12 +149,12 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
       <DropdownMenu.Trigger asChild>
         <button
           type="button"
-          className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary hover:bg-primary/30 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface outline-none"
+          className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 hover:scale-105 active:scale-95 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface outline-none border border-primary/20"
           data-testid="auth-user-avatar"
           aria-label="User profile menu"
         >
           {profile?.avatar_url ? (
-            <div className="w-full h-full relative">
+            <div className="w-full h-full relative p-0.5">
               <Image
                 src={profile.avatar_url}
                 alt=""
@@ -145,15 +164,15 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
               />
             </div>
           ) : (
-            <UserIcon size={16} />
+            <UserIcon size={20} strokeWidth={2.5} />
           )}
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
-          className="min-w-[220px] bg-surface-container-highest rounded-xl border border-outline-variant/10 p-2 shadow-lg animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2 z-50 mr-4 mt-2"
+          className="min-w-[220px] bg-surface-container-highest rounded-xl border border-outline-variant/20 p-2 shadow-xl animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2 z-[100]"
           align="end"
-          sideOffset={8}
+          sideOffset={12}
         >
           <div
             className="px-3 py-2 mb-2 flex flex-col min-w-0 border-b border-outline-variant/10 pb-3"

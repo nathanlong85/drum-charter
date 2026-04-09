@@ -37,6 +37,9 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
 
   const formattedSetlist = setlistResult.value;
 
+  const user = authResult.value.data.user;
+  const profile = await supabaseService.getProfile(user.id, supabase);
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       <nav className="bg-surface-container-low border border-outline-variant/10 rounded-2xl py-4 px-8 mb-8 shadow-sm">
@@ -67,7 +70,7 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
               DrumCharter / Setlist / {id.slice(0, 8)}
             </div>
           </div>
-          <AuthStatus />
+          <AuthStatus initialUser={user} initialProfile={profile} />
         </div>
       </nav>
 

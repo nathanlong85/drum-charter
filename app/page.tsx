@@ -94,6 +94,7 @@ export default async function Home() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const profile = user ? await supabaseService.getProfile(user.id, supabase) : null;
 
   return (
     <main className="min-h-screen bg-surface font-body selection:bg-primary/30 selection:text-primary transition-colors overflow-x-hidden">
@@ -133,7 +134,7 @@ export default async function Home() {
               </Link>
             </nav>
             <div className="h-6 w-px bg-outline-variant/20 hidden md:block"></div>
-            <AuthStatus />
+            <AuthStatus initialUser={user} initialProfile={profile} />
           </div>
         </div>
       </header>
