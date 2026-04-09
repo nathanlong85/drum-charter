@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Manual Page', () => {
-  test('should render the manual correctly', async ({ page }) => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test('should render the manual correctly while unauthenticated', async ({ page }) => {
     // Navigate to manual
     await page.goto('/manual');
 

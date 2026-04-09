@@ -37,7 +37,7 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
 
   const formattedSetlist = setlistResult.value;
 
-  const user = authResult.value.data.user;
+  const _user = authResult.value.data.user;
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">

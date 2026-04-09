@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   // Allow /manual to be public
   const headersList = await headers();
   const fullPath = headersList.get('x-pathname') || '';
-  const isManual = fullPath.includes('/manual');
+  const isManual = fullPath === '/manual' || fullPath.startsWith('/manual/');
 
   if (!user && !isManual) {
     redirect('/login');

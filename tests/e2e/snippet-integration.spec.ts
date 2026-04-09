@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 import { waitForSave } from './test-utils';
 
 test.describe('Snippet Integration', () => {
+  let snippetTitle: string;
+
   test.beforeEach(async ({ page }) => {
     // 1. Create a snippet to use for integration
     // Use direct navigation to be sure
@@ -17,14 +19,13 @@ test.describe('Snippet Integration', () => {
     await waitForSave(page);
 
     // Store title for use in tests
-    (test as any).snippetTitle = uniqueTitle;
+    snippetTitle = uniqueTitle;
 
     // Go back to library
     await page.goto('/library');
   });
 
   test('should insert a snippet into a song chart', async ({ page }) => {
-    const snippetTitle = (test as any).snippetTitle;
     // 1. Create a new song
     await page.goto('/library?tab=song');
     await page.waitForURL(/tab=song/);
@@ -56,7 +57,6 @@ test.describe('Snippet Integration', () => {
   });
 
   test('should insert a snippet into a notebook', async ({ page }) => {
-    const snippetTitle = (test as any).snippetTitle;
     // 1. Create a new notebook
     await page.goto('/library?tab=notebook');
     await page.waitForURL(/tab=notebook/);

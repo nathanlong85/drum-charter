@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitForGoLiveAndClick } from './test-utils';
+import { waitForGoLiveAndClick, waitForSave } from './test-utils';
 
 test.use({ storageState: 'playwright/.auth/user.json' });
 
@@ -39,7 +39,7 @@ test.describe('Live Mode', () => {
       .fill('Section 2');
 
     // Wait for auto-save to ensure names are in DB
-    await page.waitForTimeout(2000);
+    await waitForSave(page);
 
     // Ensure GO LIVE is ready
     await expect(page.getByTestId('go-live-button')).toBeVisible({ timeout: 20000 });

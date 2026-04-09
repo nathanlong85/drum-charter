@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Lock, Mail, Music, Zap } from 'lucide-react';
+import { ArrowLeft, Lock, Mail, Music } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
