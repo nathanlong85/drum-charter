@@ -13,7 +13,14 @@ Before starting ANY new work on an issue or task:
 4. **Branch**: Switch to a new, appropriately-named branch for the task (e.g., `git checkout -b feature/issue-number-description`).
 5. **Project Status**: Mark the corresponding issue/task as "In Progress" on the project status board (e.g., using `gh project item-edit`).
 
-## 2. Pre-Push & PR Protocol (Mandatory)
+## 2. Implementation Standards (MANDATORY)
+
+* **Test-First Mandate**: Every code change is a failure if not accompanied by a test plan and verification logic.
+* **Bug Reproduction**: You **MUST** reproduce reported bugs with a failing test before applying a fix.
+* **Feature Verification**: Every feature requirement **MUST** be translated into a test case during implementation.
+* **Surgical Logic**: Maintain high-signal changes only. Follow existing project patterns and standards.
+
+## 3. Pre-Push & PR Protocol (Mandatory)
 
 I am strictly FORBIDDEN from considering a task "Done" unless the following conditions are met:
 

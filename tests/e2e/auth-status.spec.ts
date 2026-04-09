@@ -18,11 +18,17 @@ test.describe('Auth Status & User Menu', () => {
     // but let's check for its content.
     await expect(page.getByTestId('auth-user-email')).toBeVisible();
     await expect(page.getByText('Settings')).toBeVisible();
-    await expect(page.getByText('Sign Out')).toBeVisible();
+    const signOutBtn = page.getByText('Sign Out');
+    await expect(signOutBtn).toBeVisible();
 
-    // Close the menu by clicking outside or pressing Escape
-    await page.keyboard.press('Escape');
-    await expect(page.getByTestId('auth-user-email')).not.toBeVisible();
+    // Perform Sign Out
+    await signOutBtn.click();
+
+    // Verify redirect to landing page
+    await page.waitForURL('http://localhost:3001/', { timeout: 15000 });
+
+    // Verify we are actually logged out (Landing page specific text)
+    await expect(page.getByText(/Sonic Architect/i).first()).toBeVisible();
   });
 
   test('Should not be stuck in loading state', async ({ page }) => {

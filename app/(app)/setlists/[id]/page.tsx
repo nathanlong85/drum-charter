@@ -69,7 +69,6 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
               DrumCharter / Setlist / {id.slice(0, 8)}
             </div>
           </div>
-          <AuthStatus />
         </div>
       </nav>
 
