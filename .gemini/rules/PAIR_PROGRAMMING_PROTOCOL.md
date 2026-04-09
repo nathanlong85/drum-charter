@@ -15,10 +15,10 @@ Before starting ANY new work on an issue or task:
 
 ## 2. Implementation Standards (MANDATORY)
 
-- **Test-First Mandate**: Every code change is a failure if not accompanied by a test plan and verification logic.
-- **Bug Reproduction**: You **MUST** reproduce reported bugs with a failing test before applying a fix.
-- **Feature Verification**: Every feature requirement **MUST** be translated into a test case during implementation.
-- **Surgical Logic**: Maintain high-signal changes only. Follow existing project patterns and standards.
+* **Test-First Mandate**: Every code change is a failure if not accompanied by a test plan and verification logic.
+* **Bug Reproduction**: You **MUST** reproduce reported bugs with a failing test before applying a fix.
+* **Feature Verification**: Every feature requirement **MUST** be translated into a test case during implementation.
+* **Surgical Logic**: Maintain high-signal changes only. Follow existing project patterns and standards.
 
 ## 3. Pre-Push & PR Protocol (Mandatory)
 
