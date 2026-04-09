@@ -156,7 +156,7 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
                 aria-label="Search library"
               />
             </div>
-            
+
             <div className="flex items-center gap-3">
               <Tooltip content="Refresh data" side="bottom">
                 <button
@@ -166,12 +166,14 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
                   aria-label="Refresh data"
                   disabled={isPending}
                 >
-                  <RefreshCw className={`w-4 h-4 ${isPending ? 'animate-spin' : ''} group-active:scale-90 transition-transform`} />
+                  <RefreshCw
+                    className={`w-4 h-4 ${isPending ? 'animate-spin' : ''} group-active:scale-90 transition-transform`}
+                  />
                 </button>
               </Tooltip>
-              
+
               <div className="h-6 w-px bg-outline-variant/20 mx-1"></div>
-              
+
               <AuthStatus initialUser={initialUser} initialProfile={initialProfile} />
             </div>
           </div>
