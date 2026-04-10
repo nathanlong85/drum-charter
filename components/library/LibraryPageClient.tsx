@@ -1,7 +1,7 @@
 'use client';
 
 import { Filter, Plus, Search } from 'lucide-react';
-import { useState } from 'react';
+import { useOptimistic, useState, useTransition } from 'react';
 import {
   createItemAction,
   deleteItemAction,
@@ -29,12 +29,28 @@ interface LibraryPageClientProps {
 export default function LibraryPageClient({ initialItems, type }: LibraryPageClientProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [items, setItems] = useState(initialItems);
   const [isCreating, setIsCreating] = useState(false);
+  const [_isPending, startTransition] = useTransition();
+
+  const [optimisticItems, addOptimisticAction] = useOptimistic(
+    initialItems,
+    (state, action: { type: 'delete' | 'duplicate' | 'add'; payload: any }) => {
+      switch (action.type) {
+        case 'delete':
+          return state.filter((item) => item.id !== action.payload.id);
+        case 'duplicate':
+          return [action.payload, ...state];
+        case 'add':
+          return [action.payload, ...state];
+        default:
+          return state;
+      }
+    },
+  );
 
   const allAvailableTags = Array.from(
     new Set([
-      ...items.flatMap((item) =>
+      ...optimisticItems.flatMap((item) =>
         (item.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
       ),
     ]),
@@ -50,40 +66,45 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
     });
   };
 
-  const handleDelete = async (id: string, type: ItemType) => {
-    if (!confirm(`Are you sure you want to delete this ${type}?`)) {
+  const handleDelete = async (id: string, itemType: ItemType) => {
+    if (!confirm(`Are you sure you want to delete this ${itemType}?`)) {
       return;
     }
 
-    try {
-      const result = await deleteItemAction(id, type);
-      if (result.success) {
-        setItems((prev) => prev.filter((item) => item.id !== id));
+    startTransition(async () => {
+      addOptimisticAction({ type: 'delete', payload: { id } });
+      try {
+        await deleteItemAction(id, itemType);
+      } catch (error) {
+        console.error('Error deleting item:', error);
+        alert('Failed to delete item.');
       }
-    } catch (error) {
-      console.error('Error deleting item:', error);
-      alert('Failed to delete item.');
-    }
+    });
   };
 
-  const handleDuplicate = async (id: string, type: ItemType) => {
-    try {
-      const result = await duplicateItemAction(id, type);
-      if (result.success && result.data) {
-        const row = result.data as any;
-        const duplicated: LibraryItemData = {
-          id: row.id,
-          title: row.title,
-          bpm: row.bpm || undefined,
-          tags: row.tags || [],
-          createdAt: row.created_at || new Date().toISOString(),
-        };
-        setItems((prev) => [duplicated, ...prev]);
+  const handleDuplicate = async (id: string, itemType: ItemType) => {
+    startTransition(async () => {
+      // Create a temporary item for optimistic UI
+      const itemToDuplicate = optimisticItems.find((i) => i.id === id);
+      if (itemToDuplicate) {
+        const tempId = `temp-${Date.now()}`;
+        addOptimisticAction({
+          type: 'duplicate',
+          payload: {
+            ...itemToDuplicate,
+            id: tempId,
+            title: `${itemToDuplicate.title} (Copy)`,
+          },
+        });
       }
-    } catch (error) {
-      console.error('Error duplicating item:', error);
-      alert('Failed to duplicate item.');
-    }
+
+      try {
+        await duplicateItemAction(id, itemType);
+      } catch (error) {
+        console.error('Error duplicating item:', error);
+        alert('Failed to duplicate item.');
+      }
+    });
   };
 
   const filterItems = (items: LibraryItemData[]) => {
@@ -106,7 +127,7 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
     });
   };
 
-  const currentItems = filterItems(items);
+  const currentItems = filterItems(optimisticItems);
 
   const handleCreateNew = async () => {
     try {
@@ -134,14 +155,14 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               data-testid="search-library-input"
-              className="bg-surface-container-low border border-outline-variant/10 text-[10px] font-label font-bold tracking-[0.2em] w-full md:w-64 pl-12 pr-6 py-3.5 rounded-full focus:ring-1 focus:ring-primary/40 text-on-surface placeholder:text-on-surface-variant/30 outline-none transition-all shadow-sm"
+              className="bg-surface-container-low border border-outline-variant/10 text-[10px] font-label font-bold tracking-[0.2em] w-full md:w-64 pl-12 pr-6 py-3.5 rounded-full focus:ring-2 focus:ring-primary/40 text-on-surface placeholder:text-on-surface-variant/30 outline-none transition-all shadow-sm"
             />
           </div>
           <button
             onClick={handleCreateNew}
             disabled={isCreating}
             data-testid="create-new-button"
-            className="bg-primary text-on-primary font-headline text-[11px] font-black tracking-[0.2em] uppercase px-8 py-3.5 rounded-full shadow-[0_8px_25px_var(--color-primary-dim)] hover:translate-y-[-2px] hover:shadow-[0_12px_30px_var(--color-primary-dim)] transition-all flex items-center gap-3 active:translate-y-[1px] disabled:opacity-50"
+            className="bg-primary text-on-primary font-headline text-[11px] font-black tracking-[0.2em] uppercase px-8 py-3.5 rounded-full shadow-[0_8px_25px_var(--color-primary-dim)] hover:translate-y-[-2px] hover:shadow-[0_12px_30px_var(--color-primary-dim)] transition-all flex items-center gap-3 active:translate-y-[1px] disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
           >
             <Plus className="w-5 h-5 stroke-[3px]" />
             NEW {type.toUpperCase()}
