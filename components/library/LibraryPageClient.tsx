@@ -1,7 +1,8 @@
 'use client';
 
 import { Filter, Plus, Search } from 'lucide-react';
-import { useOptimistic, useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { useMemo, useOptimistic, useState, useTransition } from 'react';
 import {
   createItemAction,
   deleteItemAction,
@@ -27,6 +28,7 @@ interface LibraryPageClientProps {
 }
 
 export default function LibraryPageClient({ initialItems, type }: LibraryPageClientProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
@@ -34,7 +36,7 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
 
   const [optimisticItems, addOptimisticAction] = useOptimistic(
     initialItems,
-    (state, action: { type: 'delete' | 'duplicate' | 'add'; payload: any }) => {
+    (state, action: { type: 'delete' | 'duplicate' | 'add' | 'rollback'; payload: any }) => {
       switch (action.type) {
         case 'delete':
           return state.filter((item) => item.id !== action.payload.id);
@@ -42,19 +44,23 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
           return [action.payload, ...state];
         case 'add':
           return [action.payload, ...state];
+        case 'rollback':
+          return action.payload;
         default:
           return state;
       }
     },
   );
 
-  const allAvailableTags = Array.from(
-    new Set([
-      ...optimisticItems.flatMap((item) =>
-        (item.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
-      ),
-    ]),
-  ).sort();
+  const allAvailableTags = useMemo(() => {
+    return Array.from(
+      new Set([
+        ...optimisticItems.flatMap((item) =>
+          (item.tags || []).map((t: string) => t.trim().toLowerCase()).filter(Boolean),
+        ),
+      ]),
+    ).sort();
+  }, [optimisticItems]);
 
   const toggleTag = (tag: string) => {
     const normalizedTag = tag.trim().toLowerCase();
@@ -71,18 +77,21 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
       return;
     }
 
+    const previousItems = [...optimisticItems];
     startTransition(async () => {
       addOptimisticAction({ type: 'delete', payload: { id } });
       try {
         await deleteItemAction(id, itemType);
       } catch (error) {
         console.error('Error deleting item:', error);
+        addOptimisticAction({ type: 'rollback', payload: previousItems });
         alert('Failed to delete item.');
       }
     });
   };
 
   const handleDuplicate = async (id: string, itemType: ItemType) => {
+    const previousItems = [...optimisticItems];
     startTransition(async () => {
       // Create a temporary item for optimistic UI
       const itemToDuplicate = optimisticItems.find((i) => i.id === id);
@@ -100,34 +109,33 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
 
       try {
         await duplicateItemAction(id, itemType);
+        // After successful duplication, the server-side revalidation
+        // will update initialItems and clear optimistic state.
+        router.refresh();
       } catch (error) {
         console.error('Error duplicating item:', error);
+        addOptimisticAction({ type: 'rollback', payload: previousItems });
         alert('Failed to duplicate item.');
       }
     });
   };
 
-  const filterItems = (items: LibraryItemData[]) => {
-    return items.filter((item) => {
+  const currentItems = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    return optimisticItems.filter((item) => {
       const normalizedItemTags = (item.tags || [])
         .map((t: string) => t.trim().toLowerCase())
         .filter(Boolean);
 
-      const titleMatch = (item.title || '')
-        .toLowerCase()
-        .includes(searchQuery.trim().toLowerCase());
-      const queryTagMatch = normalizedItemTags.some((tag: string) =>
-        tag.includes(searchQuery.trim().toLowerCase()),
-      );
+      const titleMatch = (item.title || '').toLowerCase().includes(query);
+      const queryTagMatch = normalizedItemTags.some((tag: string) => tag.includes(query));
 
       const selectedTagsMatch =
         selectedTags.length === 0 || selectedTags.every((tag) => normalizedItemTags.includes(tag));
 
       return (titleMatch || queryTagMatch) && selectedTagsMatch;
     });
-  };
-
-  const currentItems = filterItems(optimisticItems);
+  }, [optimisticItems, searchQuery, selectedTags]);
 
   const handleCreateNew = async () => {
     try {
