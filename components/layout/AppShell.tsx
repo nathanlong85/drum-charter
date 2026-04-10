@@ -11,7 +11,7 @@ import {
   Search,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { type ReactNode, useCallback, useTransition } from 'react';
 import { AuthStatus, type AuthStatusProps } from '@/components/auth/AuthStatus';
 import { Tooltip, TooltipProvider } from '@/components/common/Tooltip';

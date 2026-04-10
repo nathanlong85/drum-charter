@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const [supabase, headersList] = await Promise.all([createClient(), headers()]);
-  
+
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -1,7 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
-import type { SongChart } from '@/lib/types/groove';
 import { LiveModeViewContainer } from './LiveModeViewContainer';
 
 interface LiveSongPageProps {

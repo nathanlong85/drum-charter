@@ -11,7 +11,7 @@ test.describe('Visual Regression', () => {
     await page.goto('/dashboard');
     await page.waitForSelector('h1:has-text("Mission Control")');
     // Wait for any animations/streaming to settle
-    await page.waitForTimeout(2000); 
+    await page.waitForTimeout(2000);
 
     await expect(page).toHaveScreenshot('dashboard-baseline.png', {
       ...screenshotOptions,
@@ -31,7 +31,7 @@ test.describe('Visual Regression', () => {
     await page.goto('/library/snippets');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/snippets\/.+/);
-    
+
     const grid = page.getByTestId('groove-grid');
     await expect(grid).toBeVisible();
     await page.waitForTimeout(2000);
@@ -43,10 +43,10 @@ test.describe('Visual Regression', () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/dashboard');
     await page.waitForTimeout(2000);
-    
+
     const bottomNav = page.locator('nav').filter({ has: page.getByText(/Home/i) });
     await expect(bottomNav).toBeVisible();
-    
+
     await expect(page).toHaveScreenshot('mobile-nav-baseline.png', screenshotOptions);
   });
 });

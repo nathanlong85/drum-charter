@@ -22,7 +22,7 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
   const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
   const [loading, setLoading] = useState(!initialUser && !initialProfile);
   const supabase = useMemo(() => createClient(), []);
-  const router = useRouter();
+  const _router = useRouter();
 
   useEffect(() => {
     let mounted = true;

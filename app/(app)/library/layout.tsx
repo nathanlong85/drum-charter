@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import LibraryHeader from '@/components/library/LibraryHeader';
 
 export default function LibraryLayout({ children }: { children: ReactNode }) {
