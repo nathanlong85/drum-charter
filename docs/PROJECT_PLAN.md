@@ -53,6 +53,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done (Recent)
 
+- [x] [Arch/UX] Modernize Web App (Phase 2): Refactored Library into nested route segments (\`/library/songs\`, etc.) for better caching and RSC alignment. Implemented mobile-first bottom tab bar in \`AppShell\`. Updated all E2E tests for new routing structure. (#120) \`✓\`
 - [x] [Arch/UX] Modernize Web App (Phase 1): Unified Dashboard and AppShell into \`(app)\` group. Implemented server-side logout for cookie reliability. Updated global navigation to favor the new authenticated workspace structure (#120) \`✓\`
 - [x] [UX] Universal Header User Menu: Moved user profile from sidebar to top-right header for global accessibility and consistency. Grouped with data refresh controls. Resolved redundant component instances (#117) \`✓\`
 - [x] [Fix] Sign Out Reliability: Fixed non-functional "Sign Out" button by ensuring proper client-side redirection and session clearance. Added E2E verification (#116) `✓`

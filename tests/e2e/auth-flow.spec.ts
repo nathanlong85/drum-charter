@@ -3,19 +3,19 @@ import { waitForSave } from './test-utils';
 
 test.describe('Authentication and Core Flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/library');
+    await page.goto('/library/songs');
   });
 
   test('User can see library and navigate to existing items', async ({ page }) => {
     await expect(page.getByRole('heading', { name: /My Library/i })).toBeVisible();
-    await expect(page.getByTestId('tab-song')).toBeVisible();
-    await expect(page.getByTestId('tab-notebook')).toBeVisible();
-    await expect(page.getByTestId('tab-snippet')).toBeVisible();
+    await expect(page.getByTestId('tab-songs')).toBeVisible();
+    await expect(page.getByTestId('tab-notebooks')).toBeVisible();
+    await expect(page.getByTestId('tab-snippets')).toBeVisible();
   });
 
   test('User can create and edit a new snippet with persistence', async ({ page }) => {
     // Switch to Snippets tab
-    await page.getByTestId('tab-snippet').click();
+    await page.getByTestId('tab-snippets').click();
 
     // Create new snippet
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
@@ -46,7 +46,7 @@ test.describe('Authentication and Core Flow', () => {
 
   test('User can create and edit a new notebook', async ({ page }) => {
     // Switch to Notebooks tab
-    await page.getByTestId('tab-notebook').click();
+    await page.getByTestId('tab-notebooks').click();
 
     // Create new notebook
     await expect(page.getByTestId('create-new-button')).toHaveText(/New notebook/i, {

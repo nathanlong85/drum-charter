@@ -5,7 +5,7 @@ test.describe('Instrument Customization', () => {
     // Go to library and create a new snippet to test customization
     await page.goto('/library');
     // Switch to Snippets tab
-    await page.getByTestId('tab-snippet').click();
+    await page.getByTestId('tab-snippets').click();
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
       timeout: 15000,
     });

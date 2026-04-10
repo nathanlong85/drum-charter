@@ -7,8 +7,8 @@ test.describe('Snippet Integration', () => {
   test.beforeEach(async ({ page }) => {
     // 1. Create a snippet to use for integration
     // Use direct navigation to be sure
-    await page.goto('/library?tab=snippet');
-    await page.waitForURL(/tab=snippet/);
+    await page.goto('/library/snippets');
+    await page.waitForURL(/\/library\/snippets/);
 
     await page.getByTestId('create-new-button').click();
 
@@ -27,8 +27,8 @@ test.describe('Snippet Integration', () => {
 
   test('should insert a snippet into a song chart', async ({ page }) => {
     // 1. Create a new song
-    await page.goto('/library?tab=song');
-    await page.waitForURL(/tab=song/);
+    await page.goto('/library/songs');
+    await page.waitForURL(/\/library\/songs/);
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/songs\/.+/);
 
@@ -58,8 +58,8 @@ test.describe('Snippet Integration', () => {
 
   test('should insert a snippet into a notebook', async ({ page }) => {
     // 1. Create a new notebook
-    await page.goto('/library?tab=notebook');
-    await page.waitForURL(/tab=notebook/);
+    await page.goto('/library/notebooks');
+    await page.waitForURL(/\/library\/notebooks/);
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/notebooks\/.+/);
 

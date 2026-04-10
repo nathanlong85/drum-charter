@@ -27,9 +27,7 @@ interface AppShellProps extends AuthStatusProps {
 export function AppShell({ children, initialUser, initialProfile }: AppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const currentTab = searchParams.get('tab');
   const supabaseStatus = useSupabaseStatus();
 
   const handleRefresh = useCallback(() => {
@@ -40,17 +38,17 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: Library, tab: 'dashboard' },
-    { name: 'Songs', href: '/library?tab=song', icon: Music, tab: 'song' },
-    { name: 'Notebooks', href: '/library?tab=notebook', icon: FileText, tab: 'notebook' },
-    { name: 'Snippets', href: '/library?tab=snippet', icon: Library, tab: 'snippet' },
-    { name: 'Set Lists', href: '/library?tab=setlist', icon: ListMusic, tab: 'setlist' },
+    { name: 'Songs', href: '/library/songs', icon: Music, tab: 'song' },
+    { name: 'Notebooks', href: '/library/notebooks', icon: FileText, tab: 'notebook' },
+    { name: 'Snippets', href: '/library/snippets', icon: Library, tab: 'snippet' },
+    { name: 'Set Lists', href: '/library/setlists', icon: ListMusic, tab: 'setlist' },
   ];
 
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-surface flex flex-col font-body antialiased">
-        {/* Sidebar Navigation Shell */}
-        <aside className="fixed left-0 top-0 h-full flex flex-col w-[72px] lg:w-[240px] bg-surface-container-low border-r border-outline-variant/10 z-50 transition-all duration-300 no-print">
+        {/* Sidebar Navigation Shell (Desktop) */}
+        <aside className="fixed left-0 top-0 h-full hidden md:flex flex-col w-[72px] lg:w-[240px] bg-surface-container-low border-r border-outline-variant/10 z-50 transition-all duration-300 no-print">
           <div className="p-6 flex-1 flex flex-col">
             <Link
               href="/dashboard"
@@ -72,11 +70,7 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
 
             <nav className="space-y-1 font-label text-sm tracking-tight">
               {navItems.map((item) => {
-                const isActive =
-                  item.href === '/dashboard'
-                    ? pathname === '/dashboard'
-                    : pathname === '/library' &&
-                      (currentTab === item.tab || (!currentTab && item.tab === 'song'));
+                const isActive = pathname.startsWith(item.href);
                 const Icon = item.icon;
                 return (
                   <Link
@@ -125,7 +119,7 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
         </aside>
 
         {/* Top App Bar Shell */}
-        <header className="fixed top-0 right-0 left-[72px] lg:left-[240px] z-40 flex justify-between items-center px-6 h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 transition-all duration-300 no-print">
+        <header className="fixed top-0 right-0 left-0 md:left-[72px] lg:left-[240px] z-40 flex justify-between items-center px-6 h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/10 transition-all duration-300 no-print">
           <div className="flex items-center gap-6">
             <Link
               href="/dashboard"
@@ -183,12 +177,34 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
         </header>
 
         {/* Main Workspace Canvas */}
-        <main className="ml-[72px] lg:ml-[240px] pt-16 flex-1 transition-all duration-300 relative">
+        <main className="md:ml-[72px] lg:ml-[240px] pt-16 pb-16 md:pb-0 flex-1 transition-all duration-300 relative">
           {children}
         </main>
 
-        {/* System Status Bar */}
-        <footer className="fixed bottom-0 right-0 left-[72px] lg:left-[240px] px-6 py-2 bg-background/90 backdrop-blur-md border-t border-outline-variant/10 flex justify-between items-center z-40 transition-all duration-300 no-print">
+        {/* Bottom Navigation (Mobile Only) */}
+        <nav className="fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/10 flex items-center justify-around md:hidden z-50 no-print">
+          {navItems.slice(0, 4).map((item) => {
+            const isActive = pathname.startsWith(item.href);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex flex-col items-center gap-1 p-2 transition-all duration-200 ${
+                  isActive ? 'text-primary' : 'text-on-surface-variant/60'
+                }`}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''}`} />
+                <span className="text-[8px] font-headline font-black uppercase tracking-widest">
+                  {item.name === 'Dashboard' ? 'Home' : item.name}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* System Status Bar (Desktop Only) */}
+        <footer className="fixed bottom-0 right-0 left-[72px] lg:left-[240px] px-6 py-2 bg-background/90 backdrop-blur-md border-t border-outline-variant/10 hidden md:flex justify-between items-center z-40 transition-all duration-300 no-print">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>

@@ -49,7 +49,7 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
         <div>
           <div className="flex items-center gap-3 text-primary font-headline text-xs font-bold uppercase tracking-[0.3em] mb-4">
             <Link
-              href="/library"
+              href="/library/snippets"
               className="hover:text-primary-dim flex items-center gap-2 transition-colors"
               aria-label="Back to Library"
             >

@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('Playback & Metronome', () => {
   test.beforeEach(async ({ page }) => {
     // Create new snippet for a clean grid
-    await page.goto('/library?tab=snippet');
+    await page.goto('/library/snippets');
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
       timeout: 15000,
     });

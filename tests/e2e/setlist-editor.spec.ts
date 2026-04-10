@@ -2,12 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Setlist Editor', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to library
-    await page.goto('/library');
-
-    // Switch to Setlists tab
-    await page.getByTestId('tab-setlist').click();
-    await expect(page.getByTestId('tab-setlist')).toHaveAttribute('aria-selected', 'true');
+    // Navigate directly to Setlists tab
+    await page.goto('/library/setlists');
   });
 
   test('should create and edit a setlist', async ({ page }) => {

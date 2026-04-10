@@ -124,7 +124,7 @@ export function SnippetEditor({ initialSnippet }: SnippetEditorProps) {
                 cancelAutosave();
                 await settleAutosave();
                 await deleteItemAction(state.id, 'snippet');
-                router.push('/library');
+                router.push('/library/snippets');
               } catch (error) {
                 console.error('Failed to delete snippet:', error);
                 alert('Failed to delete snippet.');

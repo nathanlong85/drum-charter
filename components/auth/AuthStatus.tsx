@@ -92,11 +92,7 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
   }, [supabase, initialProfile, initialUser]);
 
   const handleLogout = useCallback(async () => {
-    try {
-      await signOutAction();
-    } catch (err) {
-      console.error('Sign out error:', err);
-    }
+    await signOutAction();
   }, []);
 
   if (loading)

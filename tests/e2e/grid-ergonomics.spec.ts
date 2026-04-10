@@ -6,7 +6,7 @@ test.describe('Grid Ergonomics', () => {
     await page.goto('/library');
 
     // Create a new snippet
-    await page.getByTestId('tab-snippet').click();
+    await page.getByTestId('tab-snippets').click();
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
       timeout: 15000,
     });
