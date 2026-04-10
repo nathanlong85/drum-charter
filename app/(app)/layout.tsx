@@ -6,13 +6,13 @@ import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const supabase = await createClient();
+  const [supabase, headersList] = await Promise.all([createClient(), headers()]);
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   // Allow /manual to be public
-  const headersList = await headers();
   const fullPath = headersList.get('x-pathname') || '';
   const isManual = fullPath === '/manual' || fullPath.startsWith('/manual/');
 

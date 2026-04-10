@@ -9,7 +9,7 @@ test.describe('Live Mode', () => {
     await page.goto('/library');
 
     // Switch to Songs tab
-    await page.getByTestId('tab-song').click();
+    await page.getByTestId('tab-songs').click();
     await page.waitForTimeout(500);
 
     // Click New song

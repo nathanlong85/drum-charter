@@ -273,7 +273,7 @@ export function SongEditorProvider({
       try {
         await settleAutosave();
         await deleteItemAction(state.id, 'song');
-        router.push('/library');
+        router.push('/library/songs');
       } catch (error) {
         console.error('Failed to delete song chart:', error);
         alert('Failed to delete song chart.');

@@ -40,8 +40,9 @@ test.describe('Dark Mode Support', () => {
 
     // Authenticated pages
     const authPages = [
-      { path: '/library', name: 'Library' },
+      { path: '/library/songs', name: 'Library' },
       { path: '/manual', name: 'Manual' },
+      { path: '/dashboard', name: 'Dashboard' },
     ];
 
     for (const p of authPages) {
@@ -56,10 +57,10 @@ test.describe('Dark Mode Support', () => {
 
   test('should apply dark mode to editor pages', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
-    await page.goto('/library');
+    await page.goto('/library/songs');
 
     // Check Song Editor
-    await page.getByTestId('tab-song').click();
+    await page.getByTestId('tab-songs').click();
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/songs\/.+/);
     let bgColor = await page
@@ -68,7 +69,7 @@ test.describe('Dark Mode Support', () => {
     expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
 
     // Check Snippet Editor
-    await page.goto('/library?tab=snippet');
+    await page.goto('/library/snippets');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/snippets\/.+/);
     bgColor = await page
@@ -77,7 +78,7 @@ test.describe('Dark Mode Support', () => {
     expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
 
     // Check Notebook Editor
-    await page.goto('/library?tab=notebook');
+    await page.goto('/library/notebooks');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/notebooks\/.+/);
     bgColor = await page
@@ -86,7 +87,7 @@ test.describe('Dark Mode Support', () => {
     expect(['rgb(14, 14, 14)', 'rgb(0, 0, 0)']).toContain(bgColor);
 
     // Check Setlist Editor
-    await page.goto('/library?tab=setlist');
+    await page.goto('/library/setlists');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/setlists\/.+/);
     bgColor = await page

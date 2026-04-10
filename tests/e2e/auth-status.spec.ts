@@ -14,21 +14,34 @@ test.describe('Auth Status & User Menu', () => {
 
     // Check if the dropdown menu is visible
     const _menu = page.getByRole('menu');
-    // Note: Radix UI dropdown might not use role="menu" by default depending on configuration,
-    // but let's check for its content.
     await expect(page.getByTestId('auth-user-email')).toBeVisible();
     await expect(page.getByText('Settings')).toBeVisible();
     const signOutBtn = page.getByText('Sign Out');
     await expect(signOutBtn).toBeVisible();
+  });
 
-    // Perform Sign Out
-    await signOutBtn.click();
+  test.describe('Logout Flow', () => {
+    // Use fresh context for logout to avoid breaking shared auth state
+    test.use({ storageState: { cookies: [], origins: [] } });
 
-    // Verify redirect to landing page
-    await page.waitForURL('http://localhost:3001/', { timeout: 15000 });
+    test('Should allow user to sign out and redirect to landing page', async ({ page }) => {
+      // Manual login first since we're using empty storageState
+      await page.goto('/login');
+      await page.getByLabel(/Email Identity/i).fill('test@example.com');
+      await page.getByLabel(/Security Key/i).fill('password123');
+      await page.getByRole('button', { name: /Authenticate/i }).click();
+      await page.waitForURL('/dashboard');
 
-    // Verify we are actually logged out (Landing page specific text)
-    await expect(page.getByText(/Sonic Architect/i).first()).toBeVisible();
+      const avatar = page.getByTestId('auth-user-avatar');
+      await avatar.click();
+
+      const signOutBtn = page.getByText('Sign Out');
+      await signOutBtn.click();
+
+      // Verify redirect to landing page
+      await page.waitForURL('http://localhost:3001/', { timeout: 15000 });
+      await expect(page.getByText(/Sonic Architect/i).first()).toBeVisible();
+    });
   });
 
   test('Should not be stuck in loading state', async ({ page }) => {

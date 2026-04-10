@@ -40,7 +40,7 @@ export const LibraryCard: React.FC<LibraryCardProps> = ({ item, onDelete, onDupl
     <ViewTransition name={`${item.type}-card-${item.id}`} share="morph">
       <div
         data-testid="library-card"
-        className="group relative bg-surface-container-lowest rounded-2xl p-6 hover:bg-surface-container-low transition-all duration-300 cursor-pointer overflow-hidden border border-outline-variant/10 hover:border-primary/20 hover:shadow-2xl shadow-sm"
+        className="group relative bg-surface-container-lowest rounded-2xl p-6 hover:bg-surface-container-low transition-all duration-300 cursor-pointer overflow-hidden border border-outline-variant/10 hover:border-primary/20 hover:shadow-2xl shadow-sm focus-within:ring-2 focus-within:ring-primary/40"
       >
         <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
 

@@ -3,8 +3,8 @@ import { waitForSave } from './test-utils';
 
 test.describe('Library Management', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to library
-    await page.goto('/library');
+    // Navigate to library (will redirect to /library/songs)
+    await page.goto('/library/songs');
   });
 
   test('should create and search for a new song', async ({ page }) => {
@@ -21,7 +21,7 @@ test.describe('Library Management', () => {
     await waitForSave(page);
 
     // Go back to library
-    await page.goto('/library');
+    await page.goto('/library/songs');
 
     // Search for the song
     const searchInput = page.getByTestId('search-library-input');
@@ -39,20 +39,22 @@ test.describe('Library Management', () => {
 
   test('should switch between library tabs', async ({ page }) => {
     // Default is Songs
-    await expect(page.getByTestId('tab-song')).toHaveClass(/bg-surface-container-highest/);
+    await expect(page.getByTestId('tab-songs')).toHaveClass(/bg-surface-container-highest/);
 
     // Switch to Notebooks
-    await page.getByTestId('tab-notebook').click();
-    await expect(page.getByTestId('tab-notebook')).toHaveClass(/bg-surface-container-highest/);
+    await page.getByTestId('tab-notebooks').click();
+    await expect(page).toHaveURL(/\/library\/notebooks/);
+    await expect(page.getByTestId('tab-notebooks')).toHaveClass(/bg-surface-container-highest/);
 
     // Switch to Snippets
-    await page.getByTestId('tab-snippet').click();
-    await expect(page.getByTestId('tab-snippet')).toHaveClass(/bg-surface-container-highest/);
+    await page.getByTestId('tab-snippets').click();
+    await expect(page).toHaveURL(/\/library\/snippets/);
+    await expect(page.getByTestId('tab-snippets')).toHaveClass(/bg-surface-container-highest/);
   });
 
   test('should manage tags for a snippet', async ({ page }) => {
     // Navigate to Snippets tab
-    await page.getByTestId('tab-snippet').click();
+    await page.goto('/library/snippets');
 
     // Create new snippet
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
@@ -73,8 +75,7 @@ test.describe('Library Management', () => {
     await waitForSave(page);
 
     // Go back to library and check filter
-    await page.goto('/library');
-    await page.getByTestId('tab-snippet').click();
+    await page.goto('/library/snippets');
 
     // Verify tag appears in filter list
     const tagFilter = page.getByTestId('tag-filter-rock');
@@ -95,7 +96,7 @@ test.describe('Library Management', () => {
     await waitForSave(page);
 
     // Library
-    await page.goto('/library');
+    await page.goto('/library/songs');
 
     // Find song card
     const songCard = page

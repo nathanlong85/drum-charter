@@ -7,7 +7,7 @@ test.describe('Groove Snippet Editor', () => {
     await page.goto('/library');
 
     // Navigate to Snippets tab and create new snippet
-    await page.getByTestId('tab-snippet').click();
+    await page.getByTestId('tab-snippets').click();
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
       timeout: 15000,
     });

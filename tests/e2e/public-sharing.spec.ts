@@ -14,7 +14,7 @@ test.describe('Public Sharing Workflows', () => {
     await page.goto('/library');
 
     // 2. Create a new song
-    await page.getByTestId('tab-song').first().click();
+    await page.getByTestId('tab-songs').first().click();
     await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
@@ -48,8 +48,8 @@ test.describe('Public Sharing Workflows', () => {
     await page.goto('/library');
 
     // 2. Create a new notebook
-    await page.getByTestId('tab-notebook').first().click();
-    await page.waitForURL(/tab=notebook/);
+    await page.getByTestId('tab-notebooks').first().click();
+    await page.waitForURL(/\/library\/notebooks/);
     await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
@@ -89,8 +89,8 @@ test.describe('Public Sharing Workflows', () => {
     await page.goto('/library');
 
     // 2. Create a new snippet
-    await page.getByTestId('tab-snippet').first().click();
-    await page.waitForURL(/tab=snippet/);
+    await page.getByTestId('tab-snippets').first().click();
+    await page.waitForURL(/\/library\/snippets/);
     await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
@@ -130,8 +130,8 @@ test.describe('Public Sharing Workflows', () => {
     await page.goto('/library');
 
     // 2. Create a new setlist
-    await page.getByTestId('tab-setlist').first().click();
-    await page.waitForURL(/tab=setlist/);
+    await page.getByTestId('tab-setlists').first().click();
+    await page.waitForURL(/\/library\/setlists/);
     await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });

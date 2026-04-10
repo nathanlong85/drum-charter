@@ -105,6 +105,14 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ env.SUPABASE_SERVICE_ROLE_KEY }}
           CI: true
 
+      - name: Upload Playwright Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 7
+
   test-pwa:
     name: PWA Verification
     runs-on: ubuntu-latest

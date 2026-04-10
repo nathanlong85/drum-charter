@@ -4,18 +4,22 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthStatus } from '../AuthStatus';
 
 const mockGetUser = vi.fn();
-const mockSignOut = vi.fn(() => Promise.resolve({ error: null }));
 const mockOnAuthStateChange = vi.fn(() => ({
   data: { subscription: { unsubscribe: vi.fn() } },
 }));
 const mockPush = vi.fn();
 const mockRefresh = vi.fn();
+const mockSignOutAction = vi.fn();
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockPush,
     refresh: mockRefresh,
   }),
+}));
+
+vi.mock('@/app/auth/actions', () => ({
+  signOutAction: (...args: any[]) => mockSignOutAction(...args),
 }));
 
 const mockFrom = vi.fn().mockReturnValue({
@@ -28,7 +32,7 @@ vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
     auth: {
       getUser: mockGetUser,
-      signOut: mockSignOut,
+      signOut: vi.fn(),
       onAuthStateChange: mockOnAuthStateChange,
     },
     from: mockFrom,
@@ -88,7 +92,7 @@ describe('AuthStatus', () => {
     expect(screen.getByText('Sign Out')).toBeInTheDocument();
   });
 
-  it('calls signOut when Sign Out is selected from dropdown', async () => {
+  it('calls signOutAction when Sign Out is selected from dropdown', async () => {
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1', email: 'test@example.com' } },
     });
@@ -105,13 +109,7 @@ describe('AuthStatus', () => {
       expect(screen.getByText('Sign Out')).toBeInTheDocument();
     });
 
-    const locationMock = { href: '' };
-    vi.stubGlobal('location', locationMock);
-
     await user.click(screen.getByText('Sign Out'));
-    expect(mockSignOut).toHaveBeenCalled();
-    await waitFor(() => {
-      expect(locationMock.href).toBe('/');
-    });
+    expect(mockSignOutAction).toHaveBeenCalled();
   });
 });

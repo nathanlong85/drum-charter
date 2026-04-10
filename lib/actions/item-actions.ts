@@ -113,7 +113,8 @@ export async function createItemAction(
     }
 
     if (savedId && routePrefix) {
-      revalidatePath('/library');
+      revalidatePath('/library', 'layout');
+      revalidatePath('/dashboard');
       revalidatePath('/');
     } else {
       throw new Error('Failed to create item');
@@ -244,7 +245,8 @@ export async function duplicateItemAction(
       duplicated = await supabaseService.duplicateSetlist(id, supabase);
     }
 
-    revalidatePath('/library');
+    revalidatePath('/library', 'layout');
+    revalidatePath('/dashboard');
     revalidatePath('/');
     return { success: true, data: duplicated };
   } catch (error) {
@@ -280,7 +282,8 @@ export async function deleteItemAction(
       await supabaseService.deleteSetlist(id, supabase);
     }
 
-    revalidatePath('/library');
+    revalidatePath('/library', 'layout');
+    revalidatePath('/dashboard');
     revalidatePath('/');
     return { success: true };
   } catch (error) {

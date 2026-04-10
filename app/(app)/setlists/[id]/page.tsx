@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { AuthStatus } from '@/components/auth/AuthStatus';
 import { SetlistEditor } from '@/components/setlist/SetlistEditor';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
@@ -45,7 +44,7 @@ export default async function SetlistPage({ params }: SetlistPageProps) {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-6">
             <Link
-              href="/library"
+              href="/library/setlists"
               className="text-xs font-headline font-black text-on-surface-variant/60 hover:text-primary flex items-center gap-2 transition-all uppercase tracking-widest"
               aria-label="Back to Library"
             >
