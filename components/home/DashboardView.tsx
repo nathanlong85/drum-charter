@@ -135,8 +135,8 @@ export function DashboardView({ user, profile, recentItems }: DashboardViewProps
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Link
-                href="/library"
-                onClick={(e) => handleLinkClick(e, '/library')}
+                href="/library/songs"
+                onClick={(e) => handleLinkClick(e, '/library/songs')}
                 className="flex flex-col items-center justify-center p-4 bg-surface rounded-2xl border border-outline-variant/10 hover:border-primary/30 hover:bg-primary/5 transition-all group"
               >
                 <LibraryIcon className="w-6 h-6 text-on-surface-variant group-hover:text-primary mb-2 transition-colors" />
@@ -145,8 +145,8 @@ export function DashboardView({ user, profile, recentItems }: DashboardViewProps
                 </span>
               </Link>
               <Link
-                href="/setlists"
-                onClick={(e) => handleLinkClick(e, '/setlists')}
+                href="/library/setlists"
+                onClick={(e) => handleLinkClick(e, '/library/setlists')}
                 className="flex flex-col items-center justify-center p-4 bg-surface rounded-2xl border border-outline-variant/10 hover:border-primary/30 hover:bg-primary/5 transition-all group"
               >
                 <ListMusic className="w-6 h-6 text-on-surface-variant group-hover:text-primary mb-2 transition-colors" />
@@ -179,8 +179,8 @@ export function DashboardView({ user, profile, recentItems }: DashboardViewProps
                 </h2>
               </div>
               <Link
-                href="/library"
-                onClick={(e) => handleLinkClick(e, '/library')}
+                href="/library/songs"
+                onClick={(e) => handleLinkClick(e, '/library/songs')}
                 className="text-xs font-headline font-bold uppercase tracking-widest text-primary hover:text-primary-dim transition-colors flex items-center gap-2"
               >
                 View All <ArrowRight className="w-3 h-3" />

@@ -53,6 +53,13 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done (Recent)
 
+- [x] [Arch/UX] Modernize Web App (Phase 4): Enhanced testing infrastructure with **Visual Regression Tests** for Dashboard, Library, and GrooveGrid. Expanded Vitest component coverage for \`AppShell\` and \`LibraryHeader\`. (#120) \`✓\`
+- [x] [Arch/UX] Modernize Web App (Phase 3): Implemented React 19 \`useOptimistic\` for instant library item mutations. Audited and improved WCAG accessibility (focus rings on cards and inputs). Eliminated data waterfalls in \`AppLayout\` and Live Mode views using \`Promise.all\`. (#120) \`✓\`
+- [x] [Arch/UX] Modernize Web App (Phase 2): Refactored Library into nested route segments (\`/library/songs\`, etc.) for better caching and RSC alignment. Implemented mobile-first bottom tab bar in \`AppShell\`. Updated all E2E tests for new routing structure. (#120) \`✓\`
+- [x] [Arch/UX] Modernize Web App (Phase 1): Unified Dashboard and AppShell into \`(app)\` group. Implemented server-side logout for cookie reliability. Updated global navigation to favor the new authenticated workspace structure (#120) \`✓\`
+- [x] [UX] Universal Header User Menu: Moved user profile from sidebar to top-right header for global accessibility and consistency. Grouped with data refresh controls. Resolved redundant component instances (#117) \`✓\`
+- [x] [Fix] Sign Out Reliability: Fixed non-functional "Sign Out" button by ensuring proper client-side redirection and session clearance. Added E2E verification (#116) `✓`
+- [x] [Arch] Remove Guest Mode & Migrate Tests: Ripped out Supabase Anonymous Sign-in and "Continue as Guest" flow. Enforced strict route protection for app workspace. Refactored full Playwright E2E suite to use standard test user authentication, resolving data collisions and flakiness (#116) `✓`
 - [x] [Fix] Auth Status & User Menu Reliability: Resolved "stuck loading" state in AuthStatus by ensuring `setLoading(false)` on auth change and passing server-side props on Home and Setlist pages. Enhanced menu button visibility and interactivity (#105) `✓`
 - [x] [Chore] Architectural Refactor & Test Modernization: Decomposed monolithic components (`SongEditor`, `GrooveGridEditor`), parallelized data waterfalls, and migrated E2E tests to Page Object Model (POM). `✓`
 - [x] [Feature] Authenticated Dashboard (Mission Control): Streamlined access to recent activity and creation tools for logged-in users (#96) `✓`

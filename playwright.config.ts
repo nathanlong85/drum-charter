@@ -18,7 +18,7 @@ export default defineConfig({
   expect: {
     timeout: 10 * 1000,
   },
-  reporter: 'list',
+  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'http://localhost:3001',
     trace: 'on-first-retry',

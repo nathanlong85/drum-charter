@@ -6,10 +6,8 @@ test.describe('Song Chart Editor', () => {
 
   test.beforeEach(async ({ page }) => {
     songEditorPage = new SongEditorPage(page);
-    // Start as a guest
-    await page.goto('/login');
-    await page.click('text=Continue as Guest');
-    await expect(page).toHaveURL('/library');
+    // Navigate to library
+    await page.goto('/library');
 
     // Create new song
     await songEditorPage.createNewSongFromLibrary();

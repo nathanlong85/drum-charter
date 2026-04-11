@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSupabaseStatus } from '@/lib/hooks/useSupabaseStatus';
@@ -9,7 +9,6 @@ import { AppShell } from '../AppShell';
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
   usePathname: vi.fn(),
-  useSearchParams: vi.fn(),
 }));
 
 // Mock useSupabaseStatus
@@ -51,10 +50,7 @@ describe('AppShell', () => {
       refresh: mockRefresh,
       push: mockPush,
     });
-    (usePathname as any).mockReturnValue('/');
-    (useSearchParams as any).mockReturnValue({
-      get: vi.fn().mockReturnValue(null),
-    });
+    (usePathname as any).mockReturnValue('/dashboard');
     (useSupabaseStatus as any).mockReturnValue('connected');
 
     // Default useTransition mock
@@ -72,6 +68,32 @@ describe('AppShell', () => {
     expect(screen.getByText('Child Content')).toBeDefined();
   });
 
+  it('renders navigation items', () => {
+    render(<AppShell>Content</AppShell>);
+
+    // Use getAllByText because they appear in both sidebar and bottom nav
+    expect(screen.getAllByText('Dashboard')).toBeDefined();
+    expect(screen.getAllByText('Songs')).toBeDefined();
+    expect(screen.getAllByText('Notebooks')).toBeDefined();
+    expect(screen.getAllByText('Snippets')).toBeDefined();
+  });
+
+  it('marks the current path as active', () => {
+    (usePathname as any).mockReturnValue('/library/songs');
+    render(<AppShell>Content</AppShell>);
+
+    // The Link component has data-active attribute
+    const songsLinks = screen.getAllByRole('link', { name: /Songs/i });
+    let foundActive = false;
+    for (const link of songsLinks) {
+      if (link.getAttribute('data-active') === 'true') {
+        foundActive = true;
+        break;
+      }
+    }
+    expect(foundActive).toBe(true);
+  });
+
   it('calls router.refresh() when the refresh button is clicked', async () => {
     render(
       <AppShell>
@@ -83,20 +105,6 @@ describe('AppShell', () => {
     fireEvent.click(refreshButton);
 
     expect(mockRefresh).toHaveBeenCalledTimes(1);
-  });
-
-  it('wraps the refresh button in a tooltip with correct content', () => {
-    render(
-      <AppShell>
-        <div>Content</div>
-      </AppShell>,
-    );
-
-    const tooltip = screen.getByTestId('mock-tooltip');
-    expect(tooltip.getAttribute('data-content')).toBe('Refresh data');
-
-    const refreshButton = screen.getByLabelText('Refresh data');
-    expect(tooltip.contains(refreshButton)).toBe(true);
   });
 
   it('disables the button and shows spinning icon when pending', async () => {

@@ -2,14 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Setlist Editor', () => {
   test.beforeEach(async ({ page }) => {
-    // Start in guest mode
-    await page.goto('/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
-
-    // Switch to Setlists tab
-    await page.getByTestId('tab-setlist').click();
-    await expect(page.getByTestId('tab-setlist')).toHaveAttribute('aria-selected', 'true');
+    // Navigate directly to Setlists tab
+    await page.goto('/library/setlists');
   });
 
   test('should create and edit a setlist', async ({ page }) => {

@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { waitForSave } from './test-utils';
 
-test.use({ storageState: { cookies: [], origins: [] } });
-
 test.describe('Public Sharing Workflows', () => {
   test('Should handle private or missing songs with 404', async ({ page }) => {
     // Navigate to a likely non-existent or private ID
@@ -12,13 +10,11 @@ test.describe('Public Sharing Workflows', () => {
   });
 
   test('Should allow viewing a public song', async ({ page }) => {
-    // 1. Sign in as guest
-    await page.goto('http://localhost:3001/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+    // 1. Setup - Create a new song while authenticated
+    await page.goto('/library');
 
     // 2. Create a new song
-    await page.getByTestId('tab-song').first().click();
+    await page.getByTestId('tab-songs').first().click();
     await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
@@ -31,23 +27,29 @@ test.describe('Public Sharing Workflows', () => {
     await page.getByTestId('toggle-public-button').click();
     await waitForSave(page);
 
-    // 4. View public page
-    await page.goto(`http://localhost:3001/public/songs/${songId!}`);
+    // 4. View public page in a separate unauthenticated context
+    const unauthContext = await page
+      .context()
+      .browser()!
+      .newContext({ storageState: { cookies: [], origins: [] } });
+    const unauthPage = await unauthContext.newPage();
+
+    await unauthPage.goto(`http://localhost:3001/public/songs/${songId!}`);
     // Wait for content that confirms public view is loaded
-    await expect(page.getByText(/Untitled Song/i)).toBeVisible({
+    await expect(unauthPage.getByText(/Untitled Song/i)).toBeVisible({
       timeout: 20000,
     });
+
+    await unauthContext.close();
   });
 
   test('Should allow viewing a public notebook', async ({ page }) => {
-    // 1. Sign in as guest
-    await page.goto('http://localhost:3001/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+    // 1. Setup - Create a new song while authenticated
+    await page.goto('/library');
 
     // 2. Create a new notebook
-    await page.getByTestId('tab-notebook').first().click();
-    await page.waitForURL(/tab=notebook/);
+    await page.getByTestId('tab-notebooks').first().click();
+    await page.waitForURL(/\/library\/notebooks/);
     await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
@@ -60,13 +62,21 @@ test.describe('Public Sharing Workflows', () => {
     await page.getByTestId('toggle-public-button').click();
     await waitForSave(page);
 
-    // 4. View public page
-    await page.goto(`http://localhost:3001/public/notebooks/${notebookId!}`);
+    // 4. View public page in a separate unauthenticated context
+    const unauthContext = await page
+      .context()
+      .browser()!
+      .newContext({ storageState: { cookies: [], origins: [] } });
+    const unauthPage = await unauthContext.newPage();
+
+    await unauthPage.goto(`http://localhost:3001/public/notebooks/${notebookId!}`);
     // Wait for the specific heading that confirms the public view is loaded
-    await expect(page.getByText(/Public Notebook View/i).first()).toBeVisible({
+    await expect(unauthPage.getByText(/Public Notebook View/i).first()).toBeVisible({
       timeout: 20000,
     });
-    await expect(page.getByText(/Untitled Notebook/i)).toBeVisible();
+    await expect(unauthPage.getByText(/Untitled Notebook/i)).toBeVisible();
+
+    await unauthContext.close();
   });
 
   test('Should handle private or missing notebooks with 404', async ({ page }) => {
@@ -75,14 +85,12 @@ test.describe('Public Sharing Workflows', () => {
   });
 
   test('Should allow viewing a public snippet', async ({ page }) => {
-    // 1. Sign in as guest
-    await page.goto('http://localhost:3001/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+    // 1. Setup - Create a new song while authenticated
+    await page.goto('/library');
 
     // 2. Create a new snippet
-    await page.getByTestId('tab-snippet').first().click();
-    await page.waitForURL(/tab=snippet/);
+    await page.getByTestId('tab-snippets').first().click();
+    await page.waitForURL(/\/library\/snippets/);
     await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
@@ -95,13 +103,21 @@ test.describe('Public Sharing Workflows', () => {
     await page.getByTestId('toggle-public-button').click();
     await waitForSave(page);
 
-    // 4. View public page
-    await page.goto(`http://localhost:3001/public/snippets/${snippetId!}`);
+    // 4. View public page in a separate unauthenticated context
+    const unauthContext = await page
+      .context()
+      .browser()!
+      .newContext({ storageState: { cookies: [], origins: [] } });
+    const unauthPage = await unauthContext.newPage();
+
+    await unauthPage.goto(`http://localhost:3001/public/snippets/${snippetId!}`);
     // Wait for the specific heading that confirms the public view is loaded
-    await expect(page.getByText(/Atomic Snippet View/i).first()).toBeVisible({
+    await expect(unauthPage.getByText(/Atomic Snippet View/i).first()).toBeVisible({
       timeout: 20000,
     });
-    await expect(page.getByText(/Untitled Snippet/i)).toBeVisible();
+    await expect(unauthPage.getByText(/Untitled Snippet/i)).toBeVisible();
+
+    await unauthContext.close();
   });
 
   test('Should handle private or missing snippets with 404', async ({ page }) => {
@@ -110,14 +126,12 @@ test.describe('Public Sharing Workflows', () => {
   });
 
   test('Should allow viewing a public setlist', async ({ page }) => {
-    // 1. Sign in as guest
-    await page.goto('http://localhost:3001/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+    // 1. Setup - Create a new song while authenticated
+    await page.goto('/library');
 
     // 2. Create a new setlist
-    await page.getByTestId('tab-setlist').first().click();
-    await page.waitForURL(/tab=setlist/);
+    await page.getByTestId('tab-setlists').first().click();
+    await page.waitForURL(/\/library\/setlists/);
     await expect(page.getByTestId('create-new-button')).toBeVisible({
       timeout: 15000,
     });
@@ -130,11 +144,19 @@ test.describe('Public Sharing Workflows', () => {
     await page.getByTestId('toggle-public-button').click();
     await waitForSave(page);
 
-    // 4. View public page
-    await page.goto(`http://localhost:3001/public/setlists/${setlistId!}`);
-    await expect(page.getByText(/Untitled Setlist/i)).toBeVisible({
+    // 4. View public page in a separate unauthenticated context
+    const unauthContext = await page
+      .context()
+      .browser()!
+      .newContext({ storageState: { cookies: [], origins: [] } });
+    const unauthPage = await unauthContext.newPage();
+
+    await unauthPage.goto(`http://localhost:3001/public/setlists/${setlistId!}`);
+    await expect(unauthPage.getByText(/Untitled Setlist/i)).toBeVisible({
       timeout: 20000,
     });
+
+    await unauthContext.close();
   });
 
   test('Should handle private or missing setlists with 404', async ({ page }) => {

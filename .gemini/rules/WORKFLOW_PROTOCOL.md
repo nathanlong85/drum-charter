@@ -9,12 +9,13 @@ This document outlines the mandatory process for initialization, implementation,
 3. **Project Status**: Mark corresponding issue as "In Progress" on the project board.
 4. **Skill Activation**: Activate and read ALL relevant skills for the task (e.g., `vitest`, `accessibility`).
 
-## 2. Implementation Standards
+## 2. Implementation Standards (MANDATORY)
 
-- **Think Before Coding**: Surface tradeoffs and ambiguities before starting.
+- **Test-Driven First**: No code changes are allowed without an accompanying test plan. If it's a bug fix, **you MUST reproduce it with a test first**. If it's a feature, **you MUST define the success criteria in code (tests) before or during implementation**.
+- **No Test = Incomplete**: Any directive that results in code changes without tests is a failure to meet the Senior Engineer standard.
 - **Surgical Changes**: Touch only what you must. Match existing style.
 - **Simplicity**: Minimum code to solve the problem. No speculative abstractions.
-- **Goal-Driven**: Define success criteria. Write a test that reproduces a bug before fixing it.
+- **Goal-Driven**: Define success criteria. Verify behavioral correctness via automated tests before considering a sub-task done.
 
 ## 3. Verification & Definition of Done
 

@@ -5,7 +5,9 @@ import type { User } from '@supabase/supabase-js';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { signOutAction } from '@/app/auth/actions';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/client';
 import type { UserProfile } from '@/lib/types/user';
@@ -20,6 +22,7 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
   const [profile, setProfile] = useState<UserProfile | null>(initialProfile);
   const [loading, setLoading] = useState(!initialUser && !initialProfile);
   const supabase = useMemo(() => createClient(), []);
+  const _router = useRouter();
 
   useEffect(() => {
     let mounted = true;
@@ -88,13 +91,9 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
     };
   }, [supabase, initialProfile, initialUser]);
 
-  const handleLogout = useCallback(() => {
-    supabase.auth.signOut().catch((err) => {
-      console.error('Sign out error:', err);
-    });
-  }, [supabase.auth]);
-
-  const isGuest = user?.is_anonymous;
+  const handleLogout = useCallback(async () => {
+    await signOutAction();
+  }, []);
 
   if (loading)
     return (
@@ -116,29 +115,6 @@ export function AuthStatus({ initialUser = null, initialProfile = null }: AuthSt
         >
           Sign In
         </a>
-      </div>
-    );
-  }
-
-  if (isGuest) {
-    return (
-      <div className="flex flex-col gap-3" data-testid="auth-status-guest">
-        <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-xl border border-primary/20">
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--color-primary)]"></div>
-          <span
-            className="text-[10px] font-headline font-black text-primary uppercase tracking-widest"
-            data-testid="guest-mode-indicator"
-          >
-            Guest Mode
-          </span>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 text-[10px] font-headline font-bold text-on-surface-variant hover:text-error transition-colors px-1"
-        >
-          <LogOut size={12} />
-          End Session
-        </button>
       </div>
     );
   }

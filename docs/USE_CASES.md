@@ -65,19 +65,4 @@ Optimizing the app for real-time performance.
 
 - **Scenario**: A drummer playing a 3-hour wedding gig using an iPad for charts.
 - **Workflow**: The drummer creates a "Wedding Set 1" Setlist. They enter "Live Mode," which provides a high-contrast, distraction-free view. They use a Bluetooth foot switch to "turn the page" (scroll or advance sections) without taking their hands off the sticks.
-- **Benefit**: No more fumbling with paper or small buttons on stage.
-
-### Use Case: Rehearsal Efficiency
-
-- **Scenario**: A band is running through their set and needs to quickly jump between songs.
-- **Workflow**: The drummer opens the Setlist. As they finish one song, they click "Next" (or it auto-advances), and the next chart is immediately ready with the correct BPM and metronome settings.
-
-## 6. Guest Access: Low-Friction Entry
-
-Allowing users to try the app and save data without an upfront commitment.
-
-### Use Case: Instant Trial
-
-- **Scenario**: A drummer finds the app and wants to quickly sketch a groove they just thought of.
-- **Workflow**: Clicks "Continue as Guest" on the login page. Immediately redirected to the home page with full access to the Library and Notebook Editor. They create a "Morning Idea" notebook and save it.
-- **Persistence**: The data is saved to Supabase under an anonymous user ID. If the drummer returns on the same browser, their "Morning Idea" is still there.
+- **Benefit**: As they finish one song, they click "Next" (or it auto-advances), and the next chart is immediately ready with the correct BPM and metronome settings.

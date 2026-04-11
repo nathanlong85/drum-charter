@@ -1,26 +1,25 @@
 import { expect, test } from '@playwright/test';
 import { waitForSave } from './test-utils';
 
-test.use({ storageState: { cookies: [], origins: [] } });
-
 test.describe('Snippet Integration', () => {
-  test.beforeEach(async ({ page }) => {
-    // 1. Sign in as guest
-    await page.goto('/login');
-    await page.getByRole('button', { name: /Continue as Guest/i }).click();
-    await page.waitForURL(/\/library/);
+  let snippetTitle: string;
 
-    // 2. Create a snippet to use for integration
+  test.beforeEach(async ({ page }) => {
+    // 1. Create a snippet to use for integration
     // Use direct navigation to be sure
-    await page.goto('/library?tab=snippet');
-    await page.waitForURL(/tab=snippet/);
+    await page.goto('/library/snippets');
+    await page.waitForURL(/\/library\/snippets/);
 
     await page.getByTestId('create-new-button').click();
 
     await page.waitForURL(/\/snippets\/.+/);
 
-    await page.getByPlaceholder(/Snippet Title/i).fill('Integration Test Snippet');
+    const uniqueTitle = `Integration Snippet ${Date.now()}`;
+    await page.getByPlaceholder(/Snippet Title/i).fill(uniqueTitle);
     await waitForSave(page);
+
+    // Store title for use in tests
+    snippetTitle = uniqueTitle;
 
     // Go back to library
     await page.goto('/library');
@@ -28,8 +27,8 @@ test.describe('Snippet Integration', () => {
 
   test('should insert a snippet into a song chart', async ({ page }) => {
     // 1. Create a new song
-    await page.goto('/library?tab=song');
-    await page.waitForURL(/tab=song/);
+    await page.goto('/library/songs');
+    await page.waitForURL(/\/library\/songs/);
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/songs\/.+/);
 
@@ -43,7 +42,7 @@ test.describe('Snippet Integration', () => {
 
     // 4. Select the snippet
     const snippetItem = page.getByRole('button', {
-      name: /Select snippet: Integration Test Snippet/i,
+      name: new RegExp(`Select snippet: ${snippetTitle}`, 'i'),
     });
     await expect(snippetItem).toBeVisible({ timeout: 15000 });
     await snippetItem.click();
@@ -59,8 +58,8 @@ test.describe('Snippet Integration', () => {
 
   test('should insert a snippet into a notebook', async ({ page }) => {
     // 1. Create a new notebook
-    await page.goto('/library?tab=notebook');
-    await page.waitForURL(/tab=notebook/);
+    await page.goto('/library/notebooks');
+    await page.waitForURL(/\/library\/notebooks/);
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/notebooks\/.+/);
 
@@ -74,7 +73,7 @@ test.describe('Snippet Integration', () => {
 
     // 4. Select the snippet
     const snippetItem = page.getByRole('button', {
-      name: /Select snippet: Integration Test Snippet/i,
+      name: new RegExp(`Select snippet: ${snippetTitle}`, 'i'),
     });
     await expect(snippetItem).toBeVisible({ timeout: 15000 });
     await snippetItem.click();

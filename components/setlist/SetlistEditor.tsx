@@ -139,7 +139,7 @@ export function SetlistEditor({ initialSetlist }: SetlistEditorProps) {
                 cancelAutosave();
                 await settleAutosave();
                 await deleteItemAction(setlist.id, 'setlist');
-                router.push('/library');
+                router.push('/library/setlists');
               } catch (error) {
                 console.error('Failed to delete setlist:', error);
                 alert('Failed to delete setlist.');

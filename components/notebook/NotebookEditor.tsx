@@ -159,7 +159,7 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
               try {
                 await settleAutosave();
                 await deleteItemAction(state.id, 'notebook');
-                router.push('/library');
+                router.push('/library/notebooks');
               } catch (error) {
                 console.error('Failed to delete notebook:', error);
                 alert('Failed to delete notebook.');

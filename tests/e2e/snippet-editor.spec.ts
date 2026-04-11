@@ -3,13 +3,11 @@ import { waitForSave } from './test-utils';
 
 test.describe('Groove Snippet Editor', () => {
   test.beforeEach(async ({ page }) => {
-    // Start as a guest
-    await page.goto('/login');
-    await page.click('text=Continue as Guest');
-    await expect(page).toHaveURL('/library');
+    // Navigate to library
+    await page.goto('/library');
 
     // Navigate to Snippets tab and create new snippet
-    await page.getByTestId('tab-snippet').click();
+    await page.getByTestId('tab-snippets').click();
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
       timeout: 15000,
     });

@@ -9,11 +9,11 @@ test.describe('Universal Home Logo Linking', () => {
   test('sidebar logo links to home and has hover effects', async ({ page }) => {
     const sidebarLogo = page
       .locator('aside')
-      .getByRole('link', { name: 'DrumCharter Home' })
+      .getByRole('link', { name: 'DrumCharter Dashboard' })
       .first();
 
     // Check link destination
-    await expect(sidebarLogo).toHaveAttribute('href', '/');
+    await expect(sidebarLogo).toHaveAttribute('href', '/dashboard');
 
     // Check for interactive classes (group, hover:opacity-80)
     const className = await sidebarLogo.getAttribute('class');
@@ -22,14 +22,14 @@ test.describe('Universal Home Logo Linking', () => {
 
     // Click and verify navigation
     await sidebarLogo.click();
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL(/\/dashboard/);
   });
 
   test('top bar logo links to home and has hover effects', async ({ page }) => {
-    const topBarLogo = page.locator('header').getByRole('link', { name: 'DrumCharter Home' });
+    const topBarLogo = page.locator('header').getByRole('link', { name: 'DrumCharter Dashboard' });
 
     // Check link destination
-    await expect(topBarLogo).toHaveAttribute('href', '/');
+    await expect(topBarLogo).toHaveAttribute('href', '/dashboard');
 
     // Check for interactive classes
     const className = await topBarLogo.getAttribute('class');
@@ -37,6 +37,6 @@ test.describe('Universal Home Logo Linking', () => {
 
     // Click and verify navigation
     await topBarLogo.click();
-    await expect(page).toHaveURL('/');
+    await expect(page).toHaveURL(/\/dashboard/);
   });
 });

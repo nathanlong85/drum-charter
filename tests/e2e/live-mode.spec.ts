@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitForGoLiveAndClick } from './test-utils';
+import { waitForGoLiveAndClick, waitForSave } from './test-utils';
 
 test.use({ storageState: 'playwright/.auth/user.json' });
 
@@ -9,7 +9,7 @@ test.describe('Live Mode', () => {
     await page.goto('/library');
 
     // Switch to Songs tab
-    await page.getByTestId('tab-song').click();
+    await page.getByTestId('tab-songs').click();
     await page.waitForTimeout(500);
 
     // Click New song
@@ -37,6 +37,9 @@ test.describe('Live Mode', () => {
       .getByPlaceholder(/Section Name/i)
       .nth(1)
       .fill('Section 2');
+
+    // Wait for auto-save to ensure names are in DB
+    await waitForSave(page);
 
     // Ensure GO LIVE is ready
     await expect(page.getByTestId('go-live-button')).toBeVisible({ timeout: 20000 });

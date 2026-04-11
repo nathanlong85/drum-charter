@@ -1,7 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
-import type { SongChart } from '@/lib/types/groove';
 import { LiveModeViewContainer } from './LiveModeViewContainer';
 
 interface LiveSongPageProps {
@@ -9,21 +8,19 @@ interface LiveSongPageProps {
 }
 
 export default async function LiveSongPage({ params }: LiveSongPageProps) {
-  const { id } = await params;
-  const supabase = await createClient();
+  const [{ id }, supabase] = await Promise.all([params, createClient()]);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [authResult, rawChartResult] = await Promise.allSettled([
+    supabase.auth.getUser(),
+    supabaseService.getSongChart(id, supabase),
+  ]);
 
-  if (!user) {
+  if (authResult.status === 'rejected' || !authResult.value.data.user) {
     redirect('/login');
   }
 
-  let rawChart: SongChart;
-  try {
-    rawChart = await supabaseService.getSongChart(id, supabase);
-  } catch (error: unknown) {
+  if (rawChartResult.status === 'rejected') {
+    const error = rawChartResult.reason;
     if (
       error &&
       typeof error === 'object' &&
@@ -34,6 +31,8 @@ export default async function LiveSongPage({ params }: LiveSongPageProps) {
     }
     throw error;
   }
+
+  const rawChart = rawChartResult.value;
 
   return <LiveModeViewContainer chart={rawChart} />;
 }

@@ -2,13 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Playback & Metronome', () => {
   test.beforeEach(async ({ page }) => {
-    // Start as a guest
-    await page.goto('/login');
-    await page.click('text=Continue as Guest');
-    await expect(page).toHaveURL('/library');
-
     // Create new snippet for a clean grid
-    await page.getByTestId('tab-snippet').click();
+    await page.goto('/library/snippets');
     await expect(page.getByTestId('create-new-button')).toHaveText(/New snippet/i, {
       timeout: 15000,
     });

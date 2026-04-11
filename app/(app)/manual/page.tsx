@@ -267,7 +267,6 @@ export default function ManualPage() {
               <ul className="list-disc list-inside space-y-2 text-sm">
                 <li>We do not sell your musical data or personal identity.</li>
                 <li>Public charts are only visible to those with the unique architect URL.</li>
-                <li>Guest sessions utilize anonymous identifiers and local persistence.</li>
               </ul>
             </div>
           </section>

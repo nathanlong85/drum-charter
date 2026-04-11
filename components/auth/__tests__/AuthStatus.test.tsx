@@ -4,10 +4,24 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthStatus } from '../AuthStatus';
 
 const mockGetUser = vi.fn();
-const mockSignOut = vi.fn(() => Promise.resolve({ error: null }));
 const mockOnAuthStateChange = vi.fn(() => ({
   data: { subscription: { unsubscribe: vi.fn() } },
 }));
+const mockPush = vi.fn();
+const mockRefresh = vi.fn();
+const mockSignOutAction = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    refresh: mockRefresh,
+  }),
+}));
+
+vi.mock('@/app/auth/actions', () => ({
+  signOutAction: (...args: any[]) => mockSignOutAction(...args),
+}));
+
 const mockFrom = vi.fn().mockReturnValue({
   select: vi.fn().mockReturnThis(),
   eq: vi.fn().mockReturnThis(),
@@ -18,7 +32,7 @@ vi.mock('@/lib/supabase/client', () => ({
   createClient: () => ({
     auth: {
       getUser: mockGetUser,
-      signOut: mockSignOut,
+      signOut: vi.fn(),
       onAuthStateChange: mockOnAuthStateChange,
     },
     from: mockFrom,
@@ -44,34 +58,6 @@ describe('AuthStatus', () => {
       expect(screen.getByText('Sign In')).toBeInTheDocument();
     });
     expect(screen.getByText('Sign In').closest('a')).toHaveAttribute('href', '/login');
-  });
-
-  it('renders guest mode indicator for anonymous users', async () => {
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: 'guest-1', is_anonymous: true } },
-    });
-    render(<AuthStatus />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('auth-status-guest')).toBeInTheDocument();
-    });
-    expect(screen.getByText('Guest Mode')).toBeInTheDocument();
-    expect(screen.getByText('End Session')).toBeInTheDocument();
-  });
-
-  it('calls signOut when guest ends session', async () => {
-    mockGetUser.mockResolvedValue({
-      data: { user: { id: 'guest-1', is_anonymous: true } },
-    });
-    render(<AuthStatus />);
-
-    await waitFor(() => {
-      expect(screen.getByText('End Session')).toBeInTheDocument();
-    });
-
-    const user = userEvent.setup();
-    await user.click(screen.getByText('End Session'));
-    expect(mockSignOut).toHaveBeenCalled();
   });
 
   it('renders dropdown trigger and items for authenticated users', async () => {
@@ -106,7 +92,7 @@ describe('AuthStatus', () => {
     expect(screen.getByText('Sign Out')).toBeInTheDocument();
   });
 
-  it('calls signOut when Sign Out is selected from dropdown', async () => {
+  it('calls signOutAction when Sign Out is selected from dropdown', async () => {
     mockGetUser.mockResolvedValue({
       data: { user: { id: 'user-1', email: 'test@example.com' } },
     });
@@ -124,6 +110,6 @@ describe('AuthStatus', () => {
     });
 
     await user.click(screen.getByText('Sign Out'));
-    expect(mockSignOut).toHaveBeenCalled();
+    expect(mockSignOutAction).toHaveBeenCalled();
   });
 });
