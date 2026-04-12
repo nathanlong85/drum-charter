@@ -11,9 +11,16 @@ import { NoteCell } from './NoteCell';
 interface InstrumentRowProps {
   instrument: DrumInstrument;
   instIdx: number;
+  startNoteIdx: number;
+  endNoteIdx: number;
 }
 
-export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instIdx }) => {
+export const InstrumentRow: React.FC<InstrumentRowProps> = ({
+  instrument,
+  instIdx,
+  startNoteIdx,
+  endNoteIdx,
+}) => {
   const {
     state,
     dispatch,
@@ -207,7 +214,8 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
 
       {/* Notes Grid */}
       <div className="flex bg-surface-container-high/10">
-        {instrument.notes.map((note, idx) => {
+        {instrument.notes.slice(startNoteIdx, endNoteIdx).map((note, relativeIdx) => {
+          const idx = startNoteIdx + relativeIdx;
           const isBeatStart = idx % notesPerBeat === 0;
           const _beatIndex = Math.floor(idx / notesPerBeat);
           const isMeasureEnd = idx % (totalNotesPerMeasure || 1) === totalNotesPerMeasure - 1;

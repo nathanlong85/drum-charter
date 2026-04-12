@@ -99,7 +99,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
             alt={symbol}
             data-testid="note-cell-icon"
             style={{ opacity }}
-            className="w-7 h-7 select-none pointer-events-none filter drop-shadow-sm"
+            className="w-[70%] h-[70%] select-none pointer-events-none filter drop-shadow-sm"
           />
         </div>
       )}
@@ -120,13 +120,18 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   );
 
   const containerClasses = `
-    note-cell w-10 h-10 flex items-center justify-center border-r border-outline-variant/10 
+    note-cell flex items-center justify-center border-r border-outline-variant/10 
     transition-all relative select-none
     ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-primary/5'}
     ${isBeat ? 'bg-surface-container-high/40' : 'bg-surface-container-low/20'}
     ${isMeasureBoundary ? 'border-r-2 border-r-outline-variant/30' : ''}
     ${isSelected && !readOnly ? 'bg-primary/20 ring-1 ring-primary ring-inset z-10' : ''}
   `;
+
+  const sizeStyle = {
+    width: 'var(--note-cell-size, 40px)',
+    height: 'var(--note-cell-size, 40px)',
+  };
 
   if (readOnly || symbol === 'none') {
     return (
@@ -143,6 +148,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         data-active={symbol === 'none' ? 'false' : 'true'}
         data-selected={isSelected ? 'true' : 'false'}
         className={containerClasses}
+        style={sizeStyle}
       >
         {content}
       </div>
@@ -165,6 +171,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         data-active="true"
         data-selected={isSelected ? 'true' : 'false'}
         className={`${containerClasses} appearance-none bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm`}
+        style={sizeStyle}
         aria-label={symbolLabels[symbol]}
       >
         {content}

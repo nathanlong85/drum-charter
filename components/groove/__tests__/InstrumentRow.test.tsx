@@ -33,7 +33,9 @@ const renderWithProvider = (ui: React.ReactElement, grid: GrooveGrid = initialGr
 
 describe('InstrumentRow', () => {
   it('renders instrument name and notes', () => {
-    renderWithProvider(<InstrumentRow instrument={mockInstrument} instIdx={0} />);
+    renderWithProvider(
+      <InstrumentRow instrument={mockInstrument} instIdx={0} startNoteIdx={0} endNoteIdx={4} />,
+    );
 
     expect(screen.getByText('Main Snare')).toBeInTheDocument();
     // 4 notes rendered
@@ -45,7 +47,7 @@ describe('InstrumentRow', () => {
     render(
       <Tooltip.Provider>
         <GrooveGridProvider initialGrid={initialGrid} bpm={120} onChange={onChange}>
-          <InstrumentRow instrument={mockInstrument} instIdx={0} />
+          <InstrumentRow instrument={mockInstrument} instIdx={0} startNoteIdx={0} endNoteIdx={4} />
         </GrooveGridProvider>
       </Tooltip.Provider>,
     );
