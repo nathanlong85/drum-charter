@@ -76,7 +76,10 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
       data-testid={instrumentRowTestId}
     >
       {/* Instrument Info Panel */}
-      <div className="w-32 h-10 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0">
+      <div
+        className="w-32 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0"
+        style={{ height: 'var(--note-cell-size, 40px)' }}
+      >
         {!readOnly && isEditing && (
           <div className="flex flex-col mr-1">
             <button

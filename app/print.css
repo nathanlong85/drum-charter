@@ -67,7 +67,7 @@
 
     /* Ensure NoteCells are visible */
     [data-testid="note-cell"] {
-      border-color: #ddd !important;
+      border-color: black !important;
     }
 
     [data-testid="note-cell-icon"] {

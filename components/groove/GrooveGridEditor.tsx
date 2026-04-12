@@ -123,7 +123,7 @@ function GridBody() {
                   onClick={() =>
                     dispatch({
                       type: 'ADD_INSTRUMENT',
-                      id: `inst-${Date.now()}`,
+                      id: `inst-${crypto.randomUUID()}`,
                       category: 'misc',
                       presetVariety: 'Misc',
                       customName: 'misc',
@@ -189,10 +189,13 @@ function GridColumnLabels({
             <div
               key={`label-${globalIdx}`}
               data-testid={isBeatStart ? `beat-label-${label}` : undefined}
-              className={`h-6 flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/5 ${
+              className={`flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/5 ${
                 isBeatStart ? 'text-primary' : 'text-on-surface-variant/30'
               }`}
-              style={{ width: 'var(--note-cell-size, 24px)' }}
+              style={{
+                width: 'var(--note-cell-size, 40px)',
+                height: 'var(--note-cell-size, 40px)',
+              }}
             >
               {label}
             </div>
