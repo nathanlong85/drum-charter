@@ -102,7 +102,7 @@ jobs:
           name: Run Playwright E2E Tests
           command: |
             source $BASH_ENV
-            pnpm test:e2e
+            pnpm test:e2e || (docker ps && docker logs supabase_db_drum-charter && exit 1)
           environment:
             CI: "true"
       - store_artifacts:
