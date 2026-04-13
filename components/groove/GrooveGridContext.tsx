@@ -1,5 +1,6 @@
 'use client';
 
+import { isEqual } from 'lodash';
 import {
   createContext,
   type ReactNode,
@@ -168,15 +169,22 @@ export function GrooveGridProvider({
     }
   }, [isPlaying]);
 
-  const hasInitialized = useRef(false);
-
+  // Sync initialGrid to internal state without triggering onChange
   useEffect(() => {
-    if (!hasInitialized.current) {
-      hasInitialized.current = true;
-      return;
+    if (!isEqual(initialGrid, state)) {
+      dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
     }
-    onChange?.(state);
-  }, [state, onChange]);
+  }, [initialGrid, state]);
+
+  const wrappedDispatch = useCallback(
+    (action: GrooveAction) => {
+      if (readOnly) return;
+      const nextState = grooveReducer(latestStateRef.current, action);
+      dispatch(action);
+      onChange?.(nextState);
+    },
+    [onChange, readOnly],
+  );
 
   const handleNoteRightClick = useCallback(
     (id: string, noteIndex: number, e: React.MouseEvent) => {
@@ -201,39 +209,39 @@ export function GrooveGridProvider({
         return;
       }
       if (e.shiftKey) {
-        dispatch({ type: 'TOGGLE_OPTIONAL', id, noteIndex });
+        wrappedDispatch({ type: 'TOGGLE_OPTIONAL', id, noteIndex });
         return;
       }
       setSelectionRange(null);
-      dispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
+      wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
     },
-    [readOnly, handleNoteRightClick],
+    [readOnly, handleNoteRightClick, wrappedDispatch],
   );
 
   const handleSymbolSelect = useCallback(
     (symbol: DrumSymbol | null) => {
       if (!pickerPos || readOnly) return;
-      dispatch({
+      wrappedDispatch({
         type: 'SET_SYMBOL',
         id: pickerPos.id,
         noteIndex: pickerPos.noteIndex,
         symbol: symbol || 'none',
       });
     },
-    [pickerPos, readOnly],
+    [pickerPos, readOnly, wrappedDispatch],
   );
 
   const handleVelocitySelect = useCallback(
     (velocity: number) => {
       if (!pickerPos || readOnly) return;
-      dispatch({
+      wrappedDispatch({
         type: 'SET_VELOCITY',
         id: pickerPos.id,
         noteIndex: pickerPos.noteIndex,
         velocity,
       });
     },
-    [pickerPos, readOnly],
+    [pickerPos, readOnly, wrappedDispatch],
   );
 
   // Keyboard Shortcuts logic
@@ -250,14 +258,14 @@ export function GrooveGridProvider({
       // Delete key - clear selection or picker note
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectionRange) {
-          dispatch({
+          wrappedDispatch({
             type: 'SET_SELECTION_SYMBOLS',
             selection: selectionRange,
             symbol: 'none',
           });
           setSelectionRange(null);
         } else if (pickerPos) {
-          dispatch({
+          wrappedDispatch({
             type: 'SET_SYMBOL',
             id: pickerPos.id,
             noteIndex: pickerPos.noteIndex,
@@ -305,7 +313,7 @@ export function GrooveGridProvider({
       try {
         const pasteData = JSON.parse(text);
         if (Array.isArray(pasteData)) {
-          dispatch({
+          wrappedDispatch({
             type: 'PASTE_DATA',
             id: state.instruments[selectionRange.start.instIdx].id,
             noteIndex: selectionRange.start.noteIdx,
@@ -323,11 +331,11 @@ export function GrooveGridProvider({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('paste', handlePaste);
     };
-  }, [readOnly, selectionRange, pickerPos, state.instruments]);
+  }, [readOnly, selectionRange, pickerPos, state.instruments, wrappedDispatch]);
 
   const value = {
     state,
-    dispatch,
+    dispatch: wrappedDispatch,
     isPlaying,
     isSamplesLoaded,
     togglePlayback,
@@ -354,21 +362,21 @@ export function GrooveGridProvider({
     handleSymbolSelect,
     handleVelocitySelect,
     updateMeasures: (delta: number) =>
-      dispatch({
+      wrappedDispatch({
         type: 'SET_MEASURES',
         measures: Math.max(1, state.measures + delta),
       }),
     updateResolution: (res: BeatResolution) =>
-      dispatch({ type: 'SET_RESOLUTION', resolution: res as 4 | 8 | 16 }),
+      wrappedDispatch({ type: 'SET_RESOLUTION', resolution: res as 4 | 8 | 16 }),
     updateTimeSignature: (ts: TimeSignature) =>
-      dispatch({
+      wrappedDispatch({
         type: 'SET_TIME_SIGNATURE',
         beatsPerMeasure: ts.beatsPerMeasure,
         beatValue: ts.beatValue,
       }),
     onToggleOptionalHits: (enabled: boolean) =>
-      dispatch({ type: 'SET_GRID_SETTINGS', settings: { playbackOptionalHits: enabled } }),
-    onClearGrid: () => dispatch({ type: 'CLEAR_GRID' }),
+      wrappedDispatch({ type: 'SET_GRID_SETTINGS', settings: { playbackOptionalHits: enabled } }),
+    onClearGrid: () => wrappedDispatch({ type: 'CLEAR_GRID' }),
   };
 
   return <GrooveGridContext.Provider value={value}>{children}</GrooveGridContext.Provider>;
