@@ -90,21 +90,16 @@ jobs:
       - run:
           name: Install pnpm
           command: |
-            sudo npm install -g pnpm
-            # On some machine images, the global bin might not be in the path immediately
-            PNPM_PATH=$(npm config get prefix)/bin/pnpm
-            if [ ! -f "$PNPM_PATH" ]; then
-              # Try alternative location
-              PNPM_PATH=$(which pnpm || echo "/usr/local/bin/pnpm")
-            fi
-            echo "Final PNPM_PATH: $PNPM_PATH"
-            echo "export PNPM_PATH=$PNPM_PATH" >> $BASH_ENV
+            npm install -g pnpm
+            # Add the global bin to PATH for the rest of the job
+            echo "export PATH=$(npm config get prefix)/bin:$PATH" >> $BASH_ENV
+            source $BASH_ENV
       - run:
           name: Install dependencies
-          command: $PNPM_PATH install
+          command: pnpm install
       - run:
           name: Install Playwright Browsers
-          command: $PNPM_PATH exec playwright install --with-deps chromium
+          command: pnpm exec playwright install --with-deps chromium
       - run:
           name: Install Supabase CLI
           command: |
@@ -123,7 +118,7 @@ jobs:
             echo "export SUPABASE_SERVICE_ROLE_KEY=$(echo $SUPABASE_STATUS | jq -r '.SERVICE_ROLE_KEY')" >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
-          command: $PNPM_PATH test:e2e
+          command: pnpm test:e2e
           environment:
             CI: "true"
       - when:
@@ -131,7 +126,7 @@ jobs:
           steps:
             - run:
                 name: Run PWA Offline Tests
-                command: $PNPM_PATH test:e2e tests/e2e/offline-support.spec.ts
+                command: pnpm test:e2e tests/e2e/offline-support.spec.ts
                 environment:
                   RUN_OFFLINE_E2E: "true"
                   CI: "true"
