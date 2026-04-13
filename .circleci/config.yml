@@ -4,7 +4,6 @@ version: 2.1
 # DrumCharter CI/CD Configuration (CircleCI)
 # -------------------------------------------------------------------------------------
 
-# Reusable executor definitions
 executors:
   node-executor:
     docker:
@@ -17,9 +16,6 @@ executors:
     working_directory: ~/repo
 
 jobs:
-  # -----------------------------------------------------------------------------------
-  # 1. LINTING
-  # -----------------------------------------------------------------------------------
   lint:
     executor: node-executor
     steps:
@@ -36,9 +32,6 @@ jobs:
           name: Run Markdown lint
           command: pnpm lint:md
 
-  # -----------------------------------------------------------------------------------
-  # 2. UNIT TESTS
-  # -----------------------------------------------------------------------------------
   test-unit:
     executor: node-executor
     steps:
@@ -52,9 +45,6 @@ jobs:
           name: Run Vitest
           command: pnpm test run
 
-  # -----------------------------------------------------------------------------------
-  # 3. E2E & PWA TESTS (Supabase + Playwright)
-  # -----------------------------------------------------------------------------------
   test-e2e:
     executor: machine-executor
     steps:
@@ -97,8 +87,9 @@ jobs:
             supabase start
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
-            # Use python3 to parse the JSON and export the keys
-            python3 -c 'import sys, json; data=json.loads(sys.stdin.read()); print(f"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY={data[\"ANON_KEY\"]}\nexport SUPABASE_SERVICE_ROLE_KEY={data[\"SERVICE_ROLE_KEY\"]}")' <<< "$SUPABASE_STATUS" >> $BASH_ENV
+            # Use jq if available or simple grep/sed for keys
+            echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
+            echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
           command: |
@@ -110,9 +101,6 @@ jobs:
           path: test-results
           destination: playwright-results
 
-  # -----------------------------------------------------------------------------------
-  # 4. DATABASE SYNC (Supabase Migrations)
-  # -----------------------------------------------------------------------------------
   deploy-migrations:
     executor: node-executor
     steps:
@@ -142,9 +130,6 @@ jobs:
           environment:
             SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
 
-# -------------------------------------------------------------------------------------
-# WORKFLOW DEFINITIONS
-# -------------------------------------------------------------------------------------
 workflows:
   version: 2
   build-test-deploy:
