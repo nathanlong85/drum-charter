@@ -34,7 +34,6 @@ jobs:
 
   test-unit:
     executor: node-executor
-    resource_class: large
     steps:
       - checkout
       - run:
