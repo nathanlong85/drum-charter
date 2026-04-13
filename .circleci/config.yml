@@ -110,7 +110,21 @@ jobs:
       - run:
           name: Start Supabase (local)
           command: |
-            supabase start
+            # Try to start with retries
+            for i in {1..3}; do
+              if supabase start; then
+                echo "Supabase started successfully"
+                break
+              else
+                echo "Supabase start failed, retrying in 10s... (Attempt $i/3)"
+                supabase stop || true
+                sleep 10
+              fi
+              if [ $i -eq 3 ]; then
+                echo "Supabase failed to start after 3 attempts"
+                exit 1
+              fi
+            done
             # Extract keys for test environment using python for robust JSON parsing
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
