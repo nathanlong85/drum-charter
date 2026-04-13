@@ -69,11 +69,14 @@ describe('SnippetEditor', () => {
       await wait(2500);
     });
 
-    await waitFor(() => {
-      expect(saveGrooveSnippetAction).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'New Title' }),
-      );
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(saveGrooveSnippetAction).toHaveBeenCalledWith(
+          expect.objectContaining({ title: 'New Title' }),
+        );
+      },
+      { timeout: 2000 },
+    );
   }, 10000);
 
   it('adds a tag on Enter', async () => {
@@ -87,11 +90,14 @@ describe('SnippetEditor', () => {
       await wait(2500);
     });
 
-    await waitFor(() => {
-      expect(saveGrooveSnippetAction).toHaveBeenCalledWith(
-        expect.objectContaining({ tags: ['funk'] }),
-      );
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(saveGrooveSnippetAction).toHaveBeenCalledWith(
+          expect.objectContaining({ tags: ['funk'] }),
+        );
+      },
+      { timeout: 2000 },
+    );
   }, 10000);
 
   it('duplicates the snippet', async () => {
@@ -104,9 +110,12 @@ describe('SnippetEditor', () => {
       await wait(2500);
     });
 
-    await waitFor(() => {
-      expect(duplicateItemAction).toHaveBeenCalledWith('sn1', 'snippet');
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(duplicateItemAction).toHaveBeenCalledWith('sn1', 'snippet');
+      },
+      { timeout: 2000 },
+    );
   }, 10000);
 
   it('handles public state toggle', async () => {
@@ -119,11 +128,14 @@ describe('SnippetEditor', () => {
       await wait(2500);
     });
 
-    await waitFor(() => {
-      expect(saveGrooveSnippetAction).toHaveBeenCalledWith(
-        expect.objectContaining({ isPublic: true }),
-      );
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(saveGrooveSnippetAction).toHaveBeenCalledWith(
+          expect.objectContaining({ isPublic: true }),
+        );
+      },
+      { timeout: 2000 },
+    );
   }, 10000);
 
   it('handles public link for snippets', async () => {
@@ -150,9 +162,12 @@ describe('SnippetEditor', () => {
       await wait(2500);
     });
 
-    await waitFor(() => {
-      expect(screen.getAllByText(/Save failed/i).length).toBeGreaterThan(0);
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(screen.getAllByText(/Save failed/i).length).toBeGreaterThan(0);
+      },
+      { timeout: 2000 },
+    );
   }, 10000);
 
   it('does not attempt to update state if unmounted during save', async () => {
@@ -172,9 +187,12 @@ describe('SnippetEditor', () => {
     });
 
     // cleanup flushes
-    await waitFor(() => {
-      expect(saveSpy).toHaveBeenCalled();
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(saveSpy).toHaveBeenCalled();
+      },
+      { timeout: 2000 },
+    );
   }, 10000);
 
   it('deletes the snippet', async () => {
@@ -188,8 +206,11 @@ describe('SnippetEditor', () => {
       await wait(2500);
     });
 
-    await waitFor(() => {
-      expect(deleteItemAction).toHaveBeenCalledWith('sn1', 'snippet');
-    }, { timeout: 2000 });
+    await waitFor(
+      () => {
+        expect(deleteItemAction).toHaveBeenCalledWith('sn1', 'snippet');
+      },
+      { timeout: 2000 },
+    );
   }, 10000);
 });
