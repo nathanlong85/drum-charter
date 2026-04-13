@@ -33,8 +33,8 @@ Before final verification, you MUST complete the iterative feedback loop as defi
    gh auth switch --user nathanlong85 && gh pr edit <number> --add-reviewer "@copilot" && gh auth switch --user nathanlong85-ai
    ```
 
-4. **Poll & Address**: Wait for Copilot and CI. Address ALL relevant comments or flag for discussion.
-5. **Repeat**: Repeat until the review is clean and CI passes.
+4. **Poll & Address**: Wait for Copilot and CircleCI. Address ALL relevant comments or flag for discussion.
+5. **Repeat**: Repeat until the review is clean and CircleCI passes.
 
 ### 3. Run Linting
 
@@ -75,7 +75,7 @@ Once all checks pass, you MUST report completion using this exact checklist form
 - [ ] **Copilot Loop**: Remote iterative loop completed and addressed.
 - [ ] **Unit Tests**: 100% pass rate.
 - [ ] **E2E Tests**: 100% pass rate.
-- [ ] **Green CI**: All remote GitHub Action checks passing.
+- [ ] **Green CircleCI**: All remote CircleCI workflow jobs passing.
 - [ ] **Manual Checks**: Plan updated, no logs, types verified.
 ```
 

@@ -19,21 +19,21 @@ Follow these steps for every code change:
       ```
 
     * **Notification**: If the command fails for any reason, you MUST notify the user immediately so they can request it manually. **Do not start polling until the review has been successfully requested.**
-5. **Monitoring**: Poll for the completion of all CI check results and the Copilot review.
-6. **CI Remediation**: Address any CI failures immediately.
+5. **Monitoring**: Poll for the completion of all CircleCI jobs and the Copilot review.
+6. **CI Remediation**: Address any CircleCI failures immediately.
 7. **Address Findings**: Address **ALL** relevant Copilot review comments.
     * **Agreement**: Apply fixes for all valid suggestions.
     * **Disagreement**: If a suggestion is unnecessary or conflicts with project plans/standards, notify the user and leave a detailed comment on the original Copilot review comment explaining the rationale.
 8. **Repeat**: Repeat steps 1–7 until:
     * Copilot reviews come back clean (no new relevant findings).
-    * **ALL CI checks are green/passing.** Even if no new Copilot comments exist, you MUST poll until the remote CI confirms success.
+    * **ALL CircleCI jobs are green/passing.** Even if no new Copilot comments exist, you MUST poll until the remote CI confirms success.
 
-### 2. The "Green CI" Mandate
+### 2. The "Green CircleCI" Mandate
 
-Verification is not complete until the remote CI environment (GitHub Actions) returns a success state.
+Verification is not complete until the CircleCI workflow returns a success state.
 * Do not signal task completion or sign off based solely on local tests.
-* If CI fails, you MUST investigate the logs (using `gh run view` or similar), fix the issue locally, and push again.
-* Continue the loop until both Copilot and CI are satisfied.
+* If CircleCI fails, you MUST investigate the logs (using the CircleCI dashboard), fix the issue locally, and push again.
+* Continue the loop until both Copilot and CircleCI are satisfied.
 
 ### 3. Disagreement & Flagging Protocol
 

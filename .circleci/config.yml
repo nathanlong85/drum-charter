@@ -1,0 +1,182 @@
+version: 2.1
+
+# -------------------------------------------------------------------------------------
+# DrumCharter CI/CD Configuration (CircleCI)
+# -------------------------------------------------------------------------------------
+
+# Parameters to use for conditional execution
+parameters:
+  run-pwa-e2e:
+    type: boolean
+    default: true
+
+# Reusable executor definitions
+executors:
+  node-executor:
+    docker:
+      - image: cimg/node:22.14.0 # Using Node 22 (LTS) as a stable base
+    working_directory: ~/repo
+
+  # For jobs that require Docker (like Supabase CLI)
+  machine-executor:
+    machine:
+      image: ubuntu-2404:current
+    working_directory: ~/repo
+
+jobs:
+  # -----------------------------------------------------------------------------------
+  # 1. LINTING
+  # -----------------------------------------------------------------------------------
+  lint:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Install pnpm
+          command: corepack enable && corepack prepare pnpm@latest --activate
+      - restore_cache:
+          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - save_cache:
+          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - node_modules
+      - run:
+          name: Run Biome lint
+          command: pnpm lint
+      - run:
+          name: Run Markdown lint
+          command: pnpm lint:md
+
+  # -----------------------------------------------------------------------------------
+  # 2. UNIT TESTS
+  # -----------------------------------------------------------------------------------
+  test-unit:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Install pnpm
+          command: corepack enable && corepack prepare pnpm@latest --activate
+      - restore_cache:
+          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - run:
+          name: Run Vitest
+          command: pnpm test run
+
+  # -----------------------------------------------------------------------------------
+  # 3. E2E & PWA TESTS (Supabase + Playwright)
+  # -----------------------------------------------------------------------------------
+  test-e2e:
+    executor: machine-executor
+    steps:
+      - checkout
+      - run:
+          name: Setup Node.js (v22)
+          command: |
+            curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "./.fnm"
+            ./.fnm/fnm install 22
+            ./.fnm/fnm use 22
+            echo 'export PATH="./.fnm:$PATH"' >> $BASH_ENV
+            echo 'eval "$(fnm env --use-on-cd)"' >> $BASH_ENV
+      - run:
+          name: Install pnpm
+          command: corepack enable && corepack prepare pnpm@latest --activate
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - run:
+          name: Install Playwright Browsers
+          command: pnpm exec playwright install --with-deps chromium
+      - run:
+          name: Install Supabase CLI
+          command: |
+            # Using the official installation script for CircleCI
+            curl -L https://github.com/supabase/cli/releases/download/v2.81.2/supabase_2.81.2_linux_amd64.tar.gz -o supabase.tar.gz
+            tar -xzf supabase.tar.gz
+            sudo mv supabase /usr/local/bin/
+      - run:
+          name: Start Supabase (local)
+          command: |
+            supabase start --exclude studio,mailpit,realtime,edge-runtime
+            # Extract keys for test environment
+            SUPABASE_STATUS=$(supabase status -o json)
+            echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
+            echo "export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$(echo $SUPABASE_STATUS | jq -r '.ANON_KEY')" >> $BASH_ENV
+            echo "export SUPABASE_SERVICE_ROLE_KEY=$(echo $SUPABASE_STATUS | jq -r '.SERVICE_ROLE_KEY')" >> $BASH_ENV
+      - run:
+          name: Run Playwright E2E Tests
+          command: pnpm test:e2e
+          environment:
+            CI: "true"
+      - when:
+          condition: << pipeline.parameters.run-pwa-e2e >>
+          steps:
+            - run:
+                name: Run PWA Offline Tests
+                command: pnpm test:e2e tests/e2e/offline-support.spec.ts
+                environment:
+                  RUN_OFFLINE_E2E: "true"
+                  CI: "true"
+      - store_artifacts:
+          path: test-results
+          destination: playwright-results
+
+  # -----------------------------------------------------------------------------------
+  # 4. DATABASE SYNC (Supabase Migrations)
+  # -----------------------------------------------------------------------------------
+  deploy-migrations:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Install Supabase CLI
+          command: |
+            curl -L https://github.com/supabase/cli/releases/download/v2.81.2/supabase_2.81.2_linux_amd64.tar.gz -o supabase.tar.gz
+            tar -xzf supabase.tar.gz
+            sudo mv supabase /usr/local/bin/
+      - run:
+          name: Push Migrations to Staging
+          command: |
+            if [ "$CIRCLE_BRANCH" = "staging" ]; then
+              supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
+              supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
+            fi
+          environment:
+            SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
+      - run:
+          name: Push Migrations to Production
+          command: |
+            if [ "$CIRCLE_BRANCH" = "main" ]; then
+              supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
+              supabase db push --password $SUPABASE_DB_PASSWORD_PROD
+            fi
+          environment:
+            SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
+
+# -------------------------------------------------------------------------------------
+# WORKFLOW DEFINITIONS
+# -------------------------------------------------------------------------------------
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - lint
+      - test-unit
+      - test-e2e:
+          requires:
+            - lint
+            - test-unit
+      - deploy-migrations:
+          requires:
+            - test-e2e
+          filters:
+            branches:
+              only:
+                - main
+                - staging

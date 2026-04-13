@@ -19,12 +19,15 @@ This document outlines the mandatory process for initialization, implementation,
 
 ## 3. Verification & Definition of Done
 
+> [!IMPORTANT]
+> **CIRCLECI MIGRATION**: We have migrated our CI/CD from GitHub Actions to CircleCI to utilize its more generous free tier. All automated checks now run on CircleCI.
+
 Work is ONLY "Done" when the following are met:
 
 1. **Clean Lint**: `pnpm lint` and `pnpm lint:md` must return ZERO errors AND ZERO warnings.
 2. **Full Suite Pass**: `verify_done.sh` must return a total pass.
 3. **Automated Verification**: `pnpm test:run` (Unit) and `pnpm test:e2e` (E2E) must pass.
-4. **Remote CI Pass**: All GitHub Action checks on the PR must be PASSING.
+4. **CircleCI Pass**: All CircleCI workflow jobs must be PASSING.
 5. **Copilot Loop**: The PR review from `@copilot` must be clean (all findings addressed).
 6. **Checklist Reporting**: Provide a "Definition of Done Checklist" before final sign-off.
 

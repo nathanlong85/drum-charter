@@ -16,13 +16,13 @@ Follow these steps for every PR:
    gh auth switch --user nathanlong85 && gh pr edit <number> --add-reviewer "@copilot" && gh auth switch --user nathanlong85-ai
    ```
 
-4. **Monitoring**: Poll for completion of CI checks and Copilot comments.
+4. **Monitoring**: Poll for completion of CircleCI jobs and Copilot comments.
 5. **Address Findings**: Fix all valid suggestions. If you disagree, flag it for the human.
-6. **Repeat**: Until CI is green and Copilot finds no new relevant issues.
+6. **Repeat**: Until CircleCI is green and Copilot finds no new relevant issues.
 
-## 3. The "Green CI" Mandate
-- **Verification is not complete until remote CI (GitHub Actions) returns success.**
-- Investigate failures using `gh run view` and address them immediately.
+## 3. The "Green CircleCI" Mandate
+- **Verification is not complete until all jobs in the CircleCI workflow return success.**
+- Investigate failures using the CircleCI dashboard or local replication.
 
 ## 4. Reporting Requirements
 At the start of every iteration, state:
