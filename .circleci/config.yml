@@ -93,10 +93,13 @@ jobs:
             source $BASH_ENV
             pnpm install
       - run:
-          name: Install Playwright Browsers
+          name: Setup Docker Permissions
           command: |
-            source $BASH_ENV
-            pnpm exec playwright install --with-deps chromium
+            sudo usermod -aG docker circleci
+            # Note: newgrp doesn't work well in CI, so we just use sudo for docker if needed
+            # but usually circleci user is already in docker group on machine executor.
+            # If supabase start fails, it might be due to a missing docker daemon connection.
+            docker ps
       - run:
           name: Install Supabase CLI
           command: |
