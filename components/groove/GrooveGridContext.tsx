@@ -98,11 +98,39 @@ export function GrooveGridProvider({
   children,
 }: GrooveGridProviderProps) {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
-  const latestStateRef = useRef(state);
+  
+  // Track internal vs external changes to prevent infinite loops and state regressions
+  const isInternalChange = useRef(false);
+  const lastInternalState = useRef(state);
 
   useEffect(() => {
-    latestStateRef.current = state;
+    lastInternalState.current = state;
   }, [state]);
+
+  // Sync initialGrid to internal state ONLY if it's an external update (e.g. Undo)
+  useEffect(() => {
+    if (!isEqual(initialGrid, lastInternalState.current)) {
+      // Don't set isInternalChange to true here, as we don't want to echo back to parent
+      dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
+    }
+  }, [initialGrid]);
+
+  // Report internal changes to parent
+  useEffect(() => {
+    if (isInternalChange.current) {
+      isInternalChange.current = false;
+      onChange?.(state);
+    }
+  }, [state, onChange]);
+
+  const wrappedDispatch = useCallback(
+    (action: GrooveAction) => {
+      if (readOnly) return;
+      isInternalChange.current = true;
+      dispatch(action);
+    },
+    [readOnly],
+  );
 
   const [pickerPos, setPickerPos] = useState<{
     top: number;
@@ -168,23 +196,6 @@ export function GrooveGridProvider({
       setActiveStep(null);
     }
   }, [isPlaying]);
-
-  // Sync initialGrid to internal state without triggering onChange
-  useEffect(() => {
-    if (!isEqual(initialGrid, state)) {
-      dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
-    }
-  }, [initialGrid, state]);
-
-  const wrappedDispatch = useCallback(
-    (action: GrooveAction) => {
-      if (readOnly) return;
-      const nextState = grooveReducer(latestStateRef.current, action);
-      dispatch(action);
-      onChange?.(nextState);
-    },
-    [onChange, readOnly],
-  );
 
   const handleNoteRightClick = useCallback(
     (id: string, noteIndex: number, e: React.MouseEvent) => {

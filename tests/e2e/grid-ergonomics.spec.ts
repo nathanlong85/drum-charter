@@ -89,7 +89,6 @@ test.describe('Grid Ergonomics', () => {
     // Add a note first
     await firstCell.click();
     await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 15000 });
-    await page.waitForTimeout(500);
 
     // Shift + Click to toggle optional
     await firstCell.click({ modifiers: ['Shift'] });
@@ -98,8 +97,6 @@ test.describe('Grid Ergonomics', () => {
     await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute('alt', 'standard_opt', {
       timeout: 15000,
     });
-
-    await page.waitForTimeout(500);
 
     // Shift + Click again to toggle back
     await firstCell.click({ modifiers: ['Shift'] });
@@ -114,8 +111,7 @@ test.describe('Grid Ergonomics', () => {
     const firstCell = snareRow.getByTestId('note-cell').first();
 
     // Alt + Click
-    await page.waitForTimeout(500);
-    await firstCell.click({ modifiers: ['Alt'], force: true });
+    await firstCell.click({ modifiers: ['Alt'] });
 
     // Verify Symbol Picker is visible
     await expect(page.getByTestId('symbol-picker')).toBeVisible({ timeout: 15000 });
