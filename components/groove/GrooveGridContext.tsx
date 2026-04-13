@@ -49,6 +49,8 @@ interface GrooveGridContextType {
       end: { instIdx: number; noteIdx: number };
     } | null,
   ) => void;
+  isDragging: boolean;
+  setIsDragging: (isDragging: boolean) => void;
   bpm: number;
   setBpm: (bpm: number) => void;
   metronomeEnabled: boolean;
@@ -114,6 +116,7 @@ export function GrooveGridProvider({
     start: { instIdx: number; noteIdx: number };
     end: { instIdx: number; noteIdx: number };
   } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const {
     isPlaying,
@@ -361,6 +364,8 @@ export function GrooveGridProvider({
     setEditingInstrumentId,
     selectionRange,
     setSelectionRange,
+    isDragging,
+    setIsDragging,
     bpm: parentBpm,
     setBpm: onBpmChange || (() => {}),
     metronomeEnabled,

@@ -18,7 +18,7 @@ export const SongChartHeader: React.FC<SongChartHeaderProps> = ({
   sections,
   manualOrder,
 }) => {
-  const orderList = manualOrder || sections.map((s) => s.name).join(', ');
+  const orderList = (manualOrder ?? sections.map((s) => s.name).join(', ')).trim();
 
   return (
     <div className="mb-12 print:mb-8 border-b-2 border-on-surface pb-6">

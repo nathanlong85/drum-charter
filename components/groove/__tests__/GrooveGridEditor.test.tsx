@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -60,6 +60,7 @@ vi.mock('@radix-ui/react-dialog', () => ({
   Overlay: () => <div>Overlay</div>,
   Content: ({ children }: any) => (
     <div role="dialog" data-testid="dialog-content">
+      <p>Description</p>
       {children}
     </div>
   ),
@@ -211,13 +212,17 @@ describe('GrooveGridEditor', () => {
     renderWithProvider(<TestEditor grid={initialGrid} />);
     const cells = screen.getAllByTestId('note-cell');
 
-    fireEvent.mouseDown(cells[0], { button: 0 });
-    fireEvent.mouseEnter(cells[1]);
-    fireEvent.mouseUp(window);
-    expect(cells[0]).toHaveClass('ring-primary');
+    await act(async () => {
+      fireEvent.mouseDown(cells[0], { button: 0 });
+      fireEvent.mouseEnter(cells[1]);
+      fireEvent.mouseUp(document);
+    });
+    expect(cells[0]).toHaveAttribute('data-selected', 'true');
 
-    fireEvent.click(cells[2]);
-    expect(cells[0]).not.toHaveClass('ring-primary');
+    await act(async () => {
+      fireEvent.click(cells[2]);
+    });
+    expect(cells[0]).toHaveAttribute('data-selected', 'false');
   });
 
   it('handles paste with no text', async () => {
@@ -225,14 +230,20 @@ describe('GrooveGridEditor', () => {
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
     const cells = screen.getAllByTestId('note-cell');
 
-    fireEvent.mouseDown(cells[0], { button: 0 });
-    fireEvent.mouseUp(window);
+      await act(async () => {
+        fireEvent.mouseDown(cells[0], { button: 0 });
+        fireEvent.mouseUp(document);
+      });
+
+    onChange.mockClear();
 
     const pasteEventEmpty = new Event('paste') as any;
     pasteEventEmpty.clipboardData = {
       getData: () => '',
     };
-    fireEvent(window, pasteEventEmpty);
+    await act(async () => {
+      fireEvent(window, pasteEventEmpty);
+    });
 
     expect(onChange).not.toHaveBeenCalled();
   });
@@ -274,10 +285,14 @@ describe('GrooveGridEditor', () => {
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
     const cells = screen.getAllByTestId('note-cell');
 
-    fireEvent.contextMenu(cells[1]);
+    await act(async () => {
+      fireEvent.contextMenu(cells[1]);
+    });
     expect(screen.getByTestId('symbol-picker')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Accented'));
+    await act(async () => {
+      fireEvent.click(screen.getByText('Accented'));
+    });
 
     await waitFor(() => {
       expect(onChange).toHaveBeenCalled();
@@ -418,40 +433,59 @@ describe('GrooveGridEditor', () => {
   });
 
   describe('Multi-cell selection', () => {
-    it('selects multiple cells via drag', () => {
+    it('selects multiple cells via drag', async () => {
       renderWithProvider(<TestEditor grid={initialGrid} />);
-      const cells = screen.getAllByTestId('note-cell');
+      // Get cells from the first instrument row specifically to avoid cross-row confusion in wrapped blocks
+      const firstRow = screen.getAllByTestId('instrument-row-kick')[0];
+      const cells = within(firstRow).getAllByTestId('note-cell');
 
-      fireEvent.mouseDown(cells[0], { button: 0 });
-      fireEvent.mouseEnter(cells[1]);
-      fireEvent.mouseUp(window);
+      await act(async () => {
+        fireEvent.mouseDown(cells[0], { button: 0 });
+      });
+      await act(async () => {
+        fireEvent.mouseEnter(cells[1]);
+      });
 
-      expect(cells[0]).toHaveClass('ring-primary');
-      expect(cells[1]).toHaveClass('ring-primary');
+      await waitFor(() => {
+        expect(cells[0]).toHaveAttribute('data-selected', 'true');
+        expect(cells[1]).toHaveAttribute('data-selected', 'true');
+      });
+
+      await act(async () => {
+        fireEvent.mouseUp(document);
+      });
     });
 
-    it('clears selected cells when clicking outside range', () => {
+    it('clears selected cells when clicking outside range', async () => {
       renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
 
-      fireEvent.mouseDown(cells[0], { button: 0 });
-      fireEvent.mouseEnter(cells[1]);
-      fireEvent.mouseUp(window);
+      await act(async () => {
+        fireEvent.mouseDown(cells[0], { button: 0 });
+        fireEvent.mouseEnter(cells[1]);
+        fireEvent.mouseUp(document);
+      });
 
-      fireEvent.click(cells[3]);
-      expect(cells[0]).not.toHaveClass('ring-primary');
+      await act(async () => {
+        fireEvent.click(cells[3]);
+      });
+      expect(cells[0]).toHaveAttribute('data-selected', 'false');
     });
 
-    it('clears selection when opening context menu outside range', () => {
+    it('clears selection when opening context menu outside range', async () => {
       renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
 
-      fireEvent.mouseDown(cells[0], { button: 0 });
-      fireEvent.mouseEnter(cells[1]);
-      fireEvent.mouseUp(window);
+      await act(async () => {
+        fireEvent.mouseDown(cells[0], { button: 0 });
+        fireEvent.mouseEnter(cells[1]);
+        fireEvent.mouseUp(document);
+      });
 
-      fireEvent.contextMenu(cells[3]);
-      expect(cells[0]).not.toHaveClass('ring-primary');
+      await act(async () => {
+        fireEvent.contextMenu(cells[3]);
+      });
+      expect(cells[0]).toHaveAttribute('data-selected', 'false');
     });
 
     it('applies symbol to all selected cells', async () => {
@@ -459,12 +493,18 @@ describe('GrooveGridEditor', () => {
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
-      fireEvent.mouseDown(cells[0], { button: 0 });
-      fireEvent.mouseEnter(cells[1]);
-      fireEvent.mouseUp(window);
+      await act(async () => {
+        fireEvent.mouseDown(cells[0], { button: 0 });
+        fireEvent.mouseEnter(cells[1]);
+        fireEvent.mouseUp(document);
+      });
 
-      fireEvent.contextMenu(cells[0]);
-      fireEvent.click(screen.getByText('Accented'));
+      await act(async () => {
+        fireEvent.contextMenu(cells[0]);
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByText('Accented'));
+      });
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled();
@@ -476,12 +516,18 @@ describe('GrooveGridEditor', () => {
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
-      fireEvent.mouseDown(cells[0], { button: 0 });
-      fireEvent.mouseEnter(cells[1]);
-      fireEvent.mouseUp(window);
+      await act(async () => {
+        fireEvent.mouseDown(cells[0], { button: 0 });
+        fireEvent.mouseEnter(cells[1]);
+        fireEvent.mouseUp(document);
+      });
 
-      fireEvent.contextMenu(cells[0]);
-      fireEvent.click(screen.getByText('GHOST'));
+      await act(async () => {
+        fireEvent.contextMenu(cells[0]);
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByText('GHOST'));
+      });
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled();
@@ -504,24 +550,32 @@ describe('GrooveGridEditor', () => {
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
-      fireEvent.mouseDown(cells[0], { button: 0 });
-      fireEvent.mouseUp(window);
+      await act(async () => {
+        fireEvent.mouseDown(cells[0], { button: 0 });
+        fireEvent.mouseUp(document);
+      });
 
-      fireEvent.keyDown(window, { key: 'Delete' });
+      await act(async () => {
+        fireEvent.keyDown(window, { key: 'Delete' });
+      });
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled();
       });
     });
 
-    it('copies selected data to clipboard', () => {
+    it('copies selected data to clipboard', async () => {
       renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
 
-      fireEvent.mouseDown(cells[0], { button: 0 });
-      fireEvent.mouseUp(window);
+      await act(async () => {
+        fireEvent.mouseDown(cells[0], { button: 0 });
+        fireEvent.mouseUp(document);
+      });
 
-      fireEvent.keyDown(window, { key: 'c', ctrlKey: true });
+      await act(async () => {
+        fireEvent.keyDown(window, { key: 'c', ctrlKey: true });
+      });
 
       expect(navigator.clipboard.writeText).toHaveBeenCalled();
     });
@@ -531,17 +585,21 @@ describe('GrooveGridEditor', () => {
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
       const cells = screen.getAllByTestId('note-cell');
 
-      fireEvent.mouseDown(cells[2], { button: 0 });
-      fireEvent.mouseUp(window);
+      await act(async () => {
+        fireEvent.mouseDown(cells[2], { button: 0 });
+        fireEvent.mouseUp(window);
+      });
 
-      const pasteData = JSON.stringify([{ notes: ['accent'], velocities: [1.0] }]);
+      const pasteData = JSON.stringify([{ notes: ['accented'], velocities: [1.0] }]);
       const pasteEvent = new Event('paste') as any;
       pasteEvent.clipboardData = {
         getData: () => pasteData,
       };
       navigator.clipboard.readText = vi.fn().mockResolvedValue(pasteData);
 
-      fireEvent(window, pasteEvent);
+      await act(async () => {
+        fireEvent(window, pasteEvent);
+      });
 
       await waitFor(() => {
         expect(onChange).toHaveBeenCalled();
@@ -560,16 +618,22 @@ describe('GrooveGridEditor', () => {
 
       renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
-      fireEvent.mouseDown(cells[0], { button: 0 });
-      fireEvent.mouseUp(window);
+      
+      await act(async () => {
+        fireEvent.mouseDown(cells[0], { button: 0 });
+        fireEvent.mouseUp(document);
+      });
 
-      fireEvent.keyDown(window, { key: 'c', ctrlKey: true });
+      await act(async () => {
+        fireEvent.keyDown(window, { key: 'c', ctrlKey: true });
+      });
+      
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalled();
       });
     });
 
-    it('handles paste with invalid JSON or wrong format', () => {
+    it('handles paste with invalid JSON or wrong format', async () => {
       const onChange = vi.fn();
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
@@ -577,7 +641,9 @@ describe('GrooveGridEditor', () => {
       pasteEvent.clipboardData = {
         getData: () => 'invalid-json',
       };
-      fireEvent(window, pasteEvent);
+      await act(async () => {
+        fireEvent(window, pasteEvent);
+      });
       expect(onChange).not.toHaveBeenCalled();
     });
   });

@@ -40,7 +40,7 @@
     }
 
     /* Grid Specific Formatting */
-    .grid-editor-container {
+    [data-testid="groove-grid"] {
       break-inside: avoid;
       margin-bottom: 2rem !important;
       border: 1px solid black !important;
@@ -55,7 +55,10 @@
 
     .bg-surface-container-low,
     .bg-surface-container-lowest,
-    .bg-surface-container-high {
+    .bg-surface-container-high,
+    .bg-surface-container-low\/20,
+    .bg-surface-container-low\/50,
+    .bg-surface-container-high\/10 {
       background: transparent !important;
     }
 

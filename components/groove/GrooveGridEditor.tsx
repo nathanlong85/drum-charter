@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus } from 'lucide-react';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback } from 'react';
 import type { GrooveGrid } from '@/lib/types/groove';
 import { GrooveGridProvider, useGrooveGrid } from './GrooveGridContext';
 import { GrooveGridToolbar } from './GrooveGridToolbar';
@@ -51,20 +51,26 @@ function GridHeader() {
 const MEASURES_PER_ROW = 2;
 
 function GridBody() {
-  const { state, dispatch, selectionRange, setSelectionRange, readOnly, isEditingInstruments } =
-    useGrooveGrid();
+  const {
+    state,
+    dispatch,
+    selectionRange,
+    setSelectionRange,
+    isDragging,
+    setIsDragging,
+    readOnly,
+    isEditingInstruments,
+  } = useGrooveGrid();
   const { measures, timeSignature, resolution } = state;
   const notesPerBeat = resolution / timeSignature.beatValue;
   const totalNotesPerMeasure = timeSignature.beatsPerMeasure * notesPerBeat;
 
-  const isDraggingRef = useRef(false);
-
   const handleDragEnd = useCallback(() => {
-    if (!isDraggingRef.current || !selectionRange) {
-      isDraggingRef.current = false;
+    if (!isDragging || !selectionRange) {
+      setIsDragging(false);
       return;
     }
-    isDraggingRef.current = false;
+    setIsDragging(false);
 
     const { start, end } = selectionRange;
     const isClearing = state.instruments[start.instIdx].notes[start.noteIdx] !== 'none';
@@ -84,66 +90,65 @@ function GridBody() {
     }
 
     setSelectionRange(null);
-  }, [selectionRange, state.instruments, dispatch, setSelectionRange]);
+  }, [isDragging, selectionRange, state.instruments, dispatch, setSelectionRange, setIsDragging]);
 
   React.useEffect(() => {
-    window.addEventListener('mouseup', handleDragEnd);
-    return () => window.removeEventListener('mouseup', handleDragEnd);
+    document.addEventListener('mouseup', handleDragEnd);
+    return () => document.removeEventListener('mouseup', handleDragEnd);
   }, [handleDragEnd]);
 
   const rowCount = Math.ceil(measures / MEASURES_PER_ROW);
 
   return (
-    <div className="flex flex-col gap-10">
-      {Array.from({ length: rowCount }).map((_, rowIndex) => {
-        const startMeasure = rowIndex * MEASURES_PER_ROW;
-        const endMeasure = Math.min(startMeasure + MEASURES_PER_ROW, measures);
-        const startNoteIdx = startMeasure * totalNotesPerMeasure;
-        const endNoteIdx = endMeasure * totalNotesPerMeasure;
+    <div className="relative overflow-x-auto pb-4 custom-scrollbar">
+      <div className="flex flex-col gap-10 min-w-max">
+        {Array.from({ length: rowCount }).map((_, rowIndex) => {
+          const startMeasure = rowIndex * MEASURES_PER_ROW;
+          const endMeasure = Math.min(startMeasure + MEASURES_PER_ROW, measures);
+          const startNoteIdx = startMeasure * totalNotesPerMeasure;
+          const endNoteIdx = endMeasure * totalNotesPerMeasure;
 
-        return (
-          <div
-            key={`grid-block-${rowIndex}`}
-            className="relative overflow-x-auto pb-4 custom-scrollbar"
-          >
-            <div className="flex flex-col min-w-max border border-outline-variant/10 rounded-2xl overflow-hidden bg-surface-container-low shadow-sm">
-              <GridColumnLabels startMeasure={startMeasure} endMeasure={endMeasure} />
-              {state.instruments.map((instrument, instIdx) => (
-                <InstrumentRow
-                  key={`${instrument.id}-${rowIndex}`}
-                  instrument={instrument}
-                  instIdx={instIdx}
-                  startNoteIdx={startNoteIdx}
-                  endNoteIdx={endNoteIdx}
-                />
-              ))}
+          return (
+            <div key={`grid-block-${rowIndex}`} className="flex flex-col">
+              <div className="flex flex-col border border-outline-variant/10 rounded-2xl overflow-hidden bg-surface-container-low shadow-sm">
+                <GridColumnLabels startMeasure={startMeasure} endMeasure={endMeasure} />
+                {state.instruments.map((instrument, instIdx) => (
+                  <InstrumentRow
+                    key={`${instrument.id}-${rowIndex}`}
+                    instrument={instrument}
+                    instIdx={instIdx}
+                    startNoteIdx={startNoteIdx}
+                    endNoteIdx={endNoteIdx}
+                  />
+                ))}
 
-              {!readOnly && isEditingInstruments && rowIndex === rowCount - 1 && (
-                <button
-                  onClick={() =>
-                    dispatch({
-                      type: 'ADD_INSTRUMENT',
-                      id: `inst-${crypto.randomUUID()}`,
-                      category: 'misc',
-                      presetVariety: 'Misc',
-                      customName: 'misc',
-                    })
-                  }
-                  data-testid="add-instrument-button"
-                  className="flex items-center gap-3 px-6 py-4 hover:bg-primary/5 text-on-surface-variant/40 hover:text-primary transition-all group border-t border-outline-variant/10"
-                >
-                  <div className="w-8 h-8 rounded-lg border-2 border-dashed border-outline-variant/20 flex items-center justify-center group-hover:border-primary/40 group-hover:bg-primary/5 transition-all">
-                    <Plus size={16} />
-                  </div>
-                  <span className="text-[10px] font-headline font-black uppercase tracking-[0.2em]">
-                    Add Instrument
-                  </span>
-                </button>
-              )}
+                {!readOnly && isEditingInstruments && rowIndex === rowCount - 1 && (
+                  <button
+                    onClick={() =>
+                      dispatch({
+                        type: 'ADD_INSTRUMENT',
+                        id: `inst-${crypto.randomUUID()}`,
+                        category: 'misc',
+                        presetVariety: 'Misc',
+                        customName: 'misc',
+                      })
+                    }
+                    data-testid="add-instrument-button"
+                    className="flex items-center gap-3 px-6 py-4 hover:bg-primary/5 text-on-surface-variant/40 hover:text-primary transition-all group border-t border-outline-variant/10"
+                  >
+                    <div className="w-8 h-8 rounded-lg border-2 border-dashed border-outline-variant/20 flex items-center justify-center group-hover:border-primary/40 group-hover:bg-primary/5 transition-all">
+                      <Plus size={16} />
+                    </div>
+                    <span className="text-[10px] font-headline font-black uppercase tracking-[0.2em]">
+                      Add Instrument
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }

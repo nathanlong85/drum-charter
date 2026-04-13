@@ -29,6 +29,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
     setEditingInstrumentId,
     selectionRange,
     setSelectionRange,
+    setIsDragging,
     readOnly,
     handleNoteClick,
     handleNoteRightClick,
@@ -52,6 +53,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
 
   const handleDragStart = (noteIdx: number) => {
     if (readOnly) return;
+    setIsDragging(true);
     setSelectionRange({ start: { instIdx, noteIdx }, end: { instIdx, noteIdx } });
   };
 
