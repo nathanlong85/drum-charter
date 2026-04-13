@@ -1,6 +1,6 @@
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import * as Tooltip from '@radix-ui/react-tooltip';
 import {
   deleteItemAction,
   duplicateItemAction,

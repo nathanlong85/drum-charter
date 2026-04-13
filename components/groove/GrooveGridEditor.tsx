@@ -2,8 +2,8 @@
 
 import { Plus } from 'lucide-react';
 import React, { useCallback } from 'react';
-import { generateId } from '@/lib/utils/id';
 import type { GrooveGrid } from '@/lib/types/groove';
+import { generateId } from '@/lib/utils/id';
 import { GrooveGridProvider, useGrooveGrid } from './GrooveGridContext';
 import { GrooveGridToolbar } from './GrooveGridToolbar';
 import { InstrumentRow } from './InstrumentRow';
