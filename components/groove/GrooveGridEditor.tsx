@@ -19,6 +19,8 @@ export interface GrooveGridEditorProps {
   metronomeVolume?: number;
   onMetronomeVolumeChange?: (volume: number) => void;
   readOnly?: boolean;
+  cellSize?: number;
+  measuresPerRow?: number;
 }
 
 /**
@@ -29,15 +31,22 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = (props) => {
   const bpm = props.bpm !== undefined ? props.bpm : localBpm;
   const onBpmChange = props.onBpmChange || setLocalBpm;
 
+  const { cellSize = 40, measuresPerRow = 2 } = props;
+
   return (
     <GrooveGridProvider {...props} bpm={bpm} onBpmChange={onBpmChange}>
       <div
         className="flex flex-col gap-6"
         data-testid="groove-grid"
-        style={{ '--note-cell-size': '24px' } as React.CSSProperties}
+        style={
+          {
+            '--note-cell-size': `${cellSize}px`,
+            '--measures-per-row': measuresPerRow,
+          } as React.CSSProperties
+        }
       >
         <GridHeader />
-        <GridBody />
+        <GridBody measuresPerRow={measuresPerRow} />
         <GridOverlays />
       </div>
     </GrooveGridProvider>
@@ -48,9 +57,7 @@ function GridHeader() {
   return <GrooveGridToolbar />;
 }
 
-const MEASURES_PER_ROW = 2;
-
-function GridBody() {
+function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
   const {
     state,
     dispatch,
@@ -97,14 +104,14 @@ function GridBody() {
     return () => document.removeEventListener('mouseup', handleDragEnd);
   }, [handleDragEnd]);
 
-  const rowCount = Math.ceil(measures / MEASURES_PER_ROW);
+  const rowCount = Math.ceil(measures / measuresPerRow);
 
   return (
     <div className="relative overflow-x-auto pb-4 custom-scrollbar">
       <div className="flex flex-col gap-10 min-w-max">
         {Array.from({ length: rowCount }).map((_, rowIndex) => {
-          const startMeasure = rowIndex * MEASURES_PER_ROW;
-          const endMeasure = Math.min(startMeasure + MEASURES_PER_ROW, measures);
+          const startMeasure = rowIndex * measuresPerRow;
+          const endMeasure = Math.min(startMeasure + measuresPerRow, measures);
           const startNoteIdx = startMeasure * totalNotesPerMeasure;
           const endNoteIdx = endMeasure * totalNotesPerMeasure;
 
@@ -127,7 +134,11 @@ function GridBody() {
                     onClick={() =>
                       dispatch({
                         type: 'ADD_INSTRUMENT',
-                        id: `inst-${crypto.randomUUID()}`,
+                        id: `inst-${
+                          typeof crypto !== 'undefined' && crypto.randomUUID
+                            ? crypto.randomUUID()
+                            : Date.now()
+                        }`,
                         category: 'misc',
                         presetVariety: 'Misc',
                         customName: 'misc',

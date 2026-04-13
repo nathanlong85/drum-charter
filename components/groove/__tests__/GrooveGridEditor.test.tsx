@@ -666,4 +666,31 @@ describe('GrooveGridEditor', () => {
       expect(screen.getAllByText('a').length).toBeGreaterThan(0);
     });
   });
+
+  describe('Grid Wrapping', () => {
+    it('wraps measures after every 2 measures', () => {
+      const threeMeasureGrid: GrooveGrid = {
+        ...initialGrid,
+        measures: 3,
+        instruments: initialGrid.instruments.map((inst) => ({
+          ...inst,
+          notes: Array(12).fill('none'), // 3 measures * 4 notes
+        })),
+      };
+
+      renderWithProvider(<GrooveGridEditor initialGrid={threeMeasureGrid} measuresPerRow={2} />);
+
+      // Should have 2 blocks for 'kick' instrument (one in each wrapped row)
+      const kickRows = screen.getAllByTestId('instrument-row-kick');
+      expect(kickRows).toHaveLength(2);
+
+      // First block should have 2 measures worth of cells (2 * 4 = 8)
+      const firstRowCells = within(kickRows[0]).getAllByTestId('note-cell');
+      expect(firstRowCells).toHaveLength(8);
+
+      // Second block should have 1 measure worth of cells (1 * 4 = 4)
+      const secondRowCells = within(kickRows[1]).getAllByTestId('note-cell');
+      expect(secondRowCells).toHaveLength(4);
+    });
+  });
 });

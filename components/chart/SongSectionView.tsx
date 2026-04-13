@@ -33,7 +33,7 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({ section }) => 
 
         {section.grid && (
           <div className="overflow-visible">
-            <GrooveGridEditor initialGrid={section.grid} readOnly={true} />
+            <GrooveGridEditor initialGrid={section.grid} readOnly={true} cellSize={24} />
           </div>
         )}
 
@@ -63,7 +63,7 @@ export const SongSectionView: React.FC<SongSectionViewProps> = ({ section }) => 
 
                   {sub.grid && (
                     <div className="overflow-visible">
-                      <GrooveGridEditor initialGrid={sub.grid} readOnly={true} />
+                      <GrooveGridEditor initialGrid={sub.grid} readOnly={true} cellSize={24} />
                     </div>
                   )}
                 </div>
