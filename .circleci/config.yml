@@ -32,7 +32,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm install -g pnpm && pnpm install
+          command: sudo npm install -g pnpm && pnpm install
       - run:
           name: Run Biome lint
           command: pnpm lint
@@ -51,7 +51,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm install -g pnpm && pnpm install
+          command: sudo npm install -g pnpm && pnpm install
       - run:
           name: Run Vitest
           command: pnpm test run
