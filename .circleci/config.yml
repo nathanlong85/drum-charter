@@ -63,18 +63,40 @@ jobs:
   # 3. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
-    executor: node-executor
+    executor: machine-executor
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.14
-          docker_layer_caching: true
+      - run:
+          name: Setup Node.js (v22)
+          command: |
+            # Use the pre-installed nvm on CircleCI machine images
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
+            nvm alias default 22
+            # Make it available to subsequent steps
+            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Install pnpm
+          command: |
+            # Use a more reliable way to install pnpm if it's not there
+            if ! command -v pnpm &> /dev/null; then
+              curl -fsSL https://get.pnpm.io/install.sh | sh -
+              echo 'export PNPM_HOME="$HOME/.local/share/pnpm"' >> $BASH_ENV
+              echo 'export PATH="$PNPM_HOME:$PATH"' >> $BASH_ENV
+            fi
       - run:
           name: Install dependencies
-          command: pnpm install
+          command: |
+            source $BASH_ENV
+            pnpm install
       - run:
           name: Install Playwright Browsers
-          command: pnpm exec playwright install --with-deps chromium
+          command: |
+            source $BASH_ENV
+            pnpm exec playwright install --with-deps chromium
       - run:
           name: Install Supabase CLI
           command: |
@@ -85,7 +107,6 @@ jobs:
       - run:
           name: Start Supabase (local)
           command: |
-            # Note: Remote Docker requires host mapping or using the bridge IP
             supabase start --exclude studio,mailpit,realtime,edge-runtime
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
@@ -93,7 +114,9 @@ jobs:
             echo "export SUPABASE_SERVICE_ROLE_KEY=$(echo $SUPABASE_STATUS | jq -r '.SERVICE_ROLE_KEY')" >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
-          command: pnpm test:e2e
+          command: |
+            source $BASH_ENV
+            pnpm test:e2e
           environment:
             CI: "true"
       - when:
@@ -101,7 +124,9 @@ jobs:
           steps:
             - run:
                 name: Run PWA Offline Tests
-                command: pnpm test:e2e tests/e2e/offline-support.spec.ts
+                command: |
+                  source $BASH_ENV
+                  pnpm test:e2e tests/e2e/offline-support.spec.ts
                 environment:
                   RUN_OFFLINE_E2E: "true"
                   CI: "true"
