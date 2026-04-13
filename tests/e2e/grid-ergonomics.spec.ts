@@ -111,9 +111,7 @@ test.describe('Grid Ergonomics', () => {
     const firstCell = snareRow.getByTestId('note-cell').first();
 
     // Alt + Click
-    await page.keyboard.down('Alt');
-    await firstCell.click();
-    await page.keyboard.up('Alt');
+    await firstCell.click({ modifiers: ['Alt'] });
 
     // Verify Symbol Picker is visible
     await expect(page.getByTestId('symbol-picker')).toBeVisible({ timeout: 15000 });
