@@ -4,6 +4,9 @@ version: 2.1
 # DrumCharter CI/CD Configuration (CircleCI)
 # -------------------------------------------------------------------------------------
 
+orbs:
+  node: circleci/node@7.0.0
+
 # Parameters to use for conditional execution
 parameters:
   run-pwa-e2e:
@@ -12,12 +15,6 @@ parameters:
 
 # Reusable executor definitions
 executors:
-  node-executor:
-    docker:
-      - image: cimg/node:22.14.0 # Using Node 22 (LTS) as a stable base
-    working_directory: ~/repo
-
-  # For jobs that require Docker (like Supabase CLI)
   machine-executor:
     machine:
       image: ubuntu-2404:current
@@ -28,16 +25,14 @@ jobs:
   # 1. LINTING
   # -----------------------------------------------------------------------------------
   lint:
-    executor: node-executor
+    executor:
+      name: node/default
+      tag: '22.14'
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: pnpm install
-      - save_cache:
-          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
-          paths:
-            - node_modules
+          command: npm install -g pnpm && pnpm install
       - run:
           name: Run Biome lint
           command: pnpm lint
@@ -49,12 +44,14 @@ jobs:
   # 2. UNIT TESTS
   # -----------------------------------------------------------------------------------
   test-unit:
-    executor: node-executor
+    executor:
+      name: node/default
+      tag: '22.14'
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: pnpm install
+          command: npm install -g pnpm && pnpm install
       - run:
           name: Run Vitest
           command: pnpm test run
@@ -66,40 +63,17 @@ jobs:
     executor: machine-executor
     steps:
       - checkout
-      - run:
-          name: Setup Node.js (v22)
-          command: |
-            # Use the pre-installed nvm on CircleCI machine images
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install 22
-            nvm use 22
-            nvm alias default 22
-            # Make it available to subsequent steps
-            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
-            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - node/install:
+          node-version: '22.14'
       - run:
           name: Install pnpm
-          command: |
-            # Use a more reliable way to install pnpm if it's not there
-            if ! command -v pnpm &> /dev/null; then
-              curl -fsSL https://get.pnpm.io/install.sh | sh -
-              echo 'export PNPM_HOME="$HOME/.local/share/pnpm"' >> $BASH_ENV
-              echo 'export PATH="$PNPM_HOME:$PATH"' >> $BASH_ENV
-            fi
+          command: npm install -g pnpm
       - run:
           name: Install dependencies
-          command: |
-            source $BASH_ENV
-            pnpm install
+          command: pnpm install
       - run:
-          name: Setup Docker and Diagnostics
-          command: |
-            sudo systemctl start docker || true
-            sudo usermod -aG docker circleci
-            docker info
-            free -m
-            df -h
+          name: Install Playwright Browsers
+          command: pnpm exec playwright install --with-deps chromium
       - run:
           name: Install Supabase CLI
           command: |
@@ -110,22 +84,9 @@ jobs:
       - run:
           name: Start Supabase (local)
           command: |
-            # Try to start with retries
-            for i in {1..3}; do
-              if supabase start; then
-                echo "Supabase started successfully"
-                break
-              else
-                echo "Supabase start failed, retrying in 10s... (Attempt $i/3)"
-                supabase stop || true
-                sleep 10
-              fi
-              if [ $i -eq 3 ]; then
-                echo "Supabase failed to start after 3 attempts"
-                exit 1
-              fi
-            done
-            # Extract keys for test environment using python for robust JSON parsing
+            # Simple start, machine executor should have docker ready
+            supabase start
+            # Extract keys for test environment
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
             echo $SUPABASE_STATUS | python3 -c "import sys, json; data=json.load(sys.stdin); print(f'export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY={data[\"ANON_KEY\"]}')" >> $BASH_ENV
@@ -156,7 +117,9 @@ jobs:
   # 4. DATABASE SYNC (Supabase Migrations)
   # -----------------------------------------------------------------------------------
   deploy-migrations:
-    executor: node-executor
+    executor:
+      name: node/default
+      tag: '22.14'
     steps:
       - checkout
       - run:
