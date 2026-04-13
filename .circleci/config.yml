@@ -79,11 +79,15 @@ jobs:
       - run:
           name: Setup Node.js (v22)
           command: |
-            curl -fsSL https://fnm.vercel.app/install | bash -s -- --install-dir "./.fnm"
-            ./.fnm/fnm install 22
-            ./.fnm/fnm use 22
-            echo 'export PATH="./.fnm:$PATH"' >> $BASH_ENV
-            echo 'eval "$(fnm env --use-on-cd)"' >> $BASH_ENV
+            # Use the pre-installed nvm on CircleCI machine images
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
+            nvm alias default 22
+            # Make it available to subsequent steps
+            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
       - run:
           name: Install pnpm
           command: corepack enable && corepack prepare pnpm@latest --activate
