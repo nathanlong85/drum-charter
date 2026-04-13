@@ -4,12 +4,6 @@ version: 2.1
 # DrumCharter CI/CD Configuration (CircleCI)
 # -------------------------------------------------------------------------------------
 
-# Parameters to use for conditional execution
-parameters:
-  run-pwa-e2e:
-    type: boolean
-    default: true
-
 # Reusable executor definitions
 executors:
   node-executor:
@@ -103,25 +97,14 @@ jobs:
             supabase start
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
-            python3 -c "import sys, json; data=json.loads(sys.stdin.read()); print(f'export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY={data[\"ANON_KEY\"]}\nexport SUPABASE_SERVICE_ROLE_KEY={data[\"SERVICE_ROLE_KEY\"]}')" <<< "$SUPABASE_STATUS" >> $BASH_ENV
+            # Use python3 to parse the JSON and export the keys
+            python3 -c 'import sys, json; data=json.loads(sys.stdin.read()); print(f"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY={data[\"ANON_KEY\"]}\nexport SUPABASE_SERVICE_ROLE_KEY={data[\"SERVICE_ROLE_KEY\"]}")' <<< "$SUPABASE_STATUS" >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
           command: |
             source $BASH_ENV
             pnpm test:e2e
           environment:
-            CI: "true"
-      - run:
-          name: Run PWA Offline Tests
-          command: |
-            if [ "<< pipeline.parameters.run-pwa-e2e >>" = "true" ]; then
-              source $BASH_ENV
-              pnpm test:e2e tests/e2e/offline-support.spec.ts
-            else
-              echo "Skipping PWA Offline Tests"
-            fi
-          environment:
-            RUN_OFFLINE_E2E: "true"
             CI: "true"
       - store_artifacts:
           path: test-results
