@@ -133,16 +133,9 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     height: 'var(--note-cell-size, 40px)',
   };
 
-  if (readOnly || symbol === 'none') {
+  if (readOnly) {
     return (
       <div
-        onClick={readOnly ? undefined : onClick}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          if (!readOnly) onContextMenu(e);
-        }}
-        onMouseDown={readOnly ? undefined : onMouseDown}
-        onMouseEnter={readOnly ? undefined : onMouseEnter}
         data-testid="note-cell"
         data-index={index}
         data-active={symbol === 'none' ? 'false' : 'true'}
@@ -155,8 +148,9 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     );
   }
 
+  // Use button for interaction to improve E2E reliability and accessibility
   return (
-    <Tooltip content={symbolLabels[symbol]} side="top">
+    <Tooltip content={symbol !== 'none' ? symbolLabels[symbol] : 'Click to add note'} side="top">
       <button
         type="button"
         onClick={onClick}
@@ -168,11 +162,11 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         onMouseEnter={onMouseEnter}
         data-testid="note-cell"
         data-index={index}
-        data-active="true"
+        data-active={symbol === 'none' ? 'false' : 'true'}
         data-selected={isSelected ? 'true' : 'false'}
-        className={`${containerClasses} appearance-none bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm`}
+        className={`${containerClasses} appearance-none bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm w-full h-full`}
         style={sizeStyle}
-        aria-label={symbolLabels[symbol]}
+        aria-label={symbol !== 'none' ? symbolLabels[symbol] : `Add note at position ${index + 1}`}
       >
         {content}
       </button>
