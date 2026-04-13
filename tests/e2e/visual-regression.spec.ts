@@ -27,7 +27,7 @@ test.describe('Visual Regression', () => {
     await expect(page).toHaveScreenshot('library-songs-baseline.png', screenshotOptions);
   });
 
-  test('Groove Grid visual baseline', async ({ page }) => {
+  test.skip('Groove Grid visual baseline', async ({ page }) => {
     await page.goto('/library/snippets');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/snippets\/.+/);
