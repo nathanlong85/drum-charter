@@ -63,37 +63,12 @@ jobs:
   # 3. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
-    executor: machine-executor
+    executor: node-executor
     steps:
       - checkout
-      - run:
-          name: Setup Node.js (v22)
-          command: |
-            # Use the pre-installed nvm on CircleCI machine images
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install 22
-            nvm use 22
-            nvm alias default 22
-            # Make it available to subsequent steps
-            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
-            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
-      - run:
-          name: Debug Environment
-          command: |
-            echo "Current User: $(whoami)"
-            echo "Node version: $(node -v)"
-            echo "npm version: $(npm -v)"
-            echo "NVM_DIR: $NVM_DIR"
-            npm config get prefix
-            ls -la $(npm config get prefix)/bin || true
-      - run:
-          name: Install pnpm
-          command: |
-            npm install -g pnpm
-            # Add the global bin to PATH for the rest of the job
-            echo "export PATH=$(npm config get prefix)/bin:$PATH" >> $BASH_ENV
-            source $BASH_ENV
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
       - run:
           name: Install dependencies
           command: pnpm install
@@ -110,8 +85,8 @@ jobs:
       - run:
           name: Start Supabase (local)
           command: |
+            # Note: Remote Docker requires host mapping or using the bridge IP
             supabase start --exclude studio,mailpit,realtime,edge-runtime
-            # Extract keys for test environment
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
             echo "export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$(echo $SUPABASE_STATUS | jq -r '.ANON_KEY')" >> $BASH_ENV
