@@ -79,14 +79,26 @@ jobs:
             echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
             echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
       - run:
+          name: Debug Environment
+          command: |
+            echo "Current User: $(whoami)"
+            echo "Node version: $(node -v)"
+            echo "npm version: $(npm -v)"
+            echo "NVM_DIR: $NVM_DIR"
+            npm config get prefix
+            ls -la $(npm config get prefix)/bin || true
+      - run:
           name: Install pnpm
           command: |
             sudo npm install -g pnpm
             # On some machine images, the global bin might not be in the path immediately
             PNPM_PATH=$(npm config get prefix)/bin/pnpm
+            if [ ! -f "$PNPM_PATH" ]; then
+              # Try alternative location
+              PNPM_PATH=$(which pnpm || echo "/usr/local/bin/pnpm")
+            fi
+            echo "Final PNPM_PATH: $PNPM_PATH"
             echo "export PNPM_PATH=$PNPM_PATH" >> $BASH_ENV
-            # Alias it for the current step just in case
-            alias pnpm=$PNPM_PATH
       - run:
           name: Install dependencies
           command: $PNPM_PATH install
