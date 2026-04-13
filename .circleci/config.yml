@@ -111,17 +111,18 @@ jobs:
             pnpm test:e2e
           environment:
             CI: "true"
-      - when:
-          condition: << pipeline.parameters.run-pwa-e2e >>
-          steps:
-            - run:
-                name: Run PWA Offline Tests
-                command: |
-                  source $BASH_ENV
-                  pnpm test:e2e tests/e2e/offline-support.spec.ts
-                environment:
-                  RUN_OFFLINE_E2E: "true"
-                  CI: "true"
+      - run:
+          name: Run PWA Offline Tests
+          command: |
+            if [ "<< pipeline.parameters.run-pwa-e2e >>" = "true" ]; then
+              source $BASH_ENV
+              pnpm test:e2e tests/e2e/offline-support.spec.ts
+            else
+              echo "Skipping PWA Offline Tests"
+            fi
+          environment:
+            RUN_OFFLINE_E2E: "true"
+            CI: "true"
       - store_artifacts:
           path: test-results
           destination: playwright-results
