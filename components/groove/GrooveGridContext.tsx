@@ -98,7 +98,7 @@ export function GrooveGridProvider({
   children,
 }: GrooveGridProviderProps) {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
-  
+
   // Track internal vs external changes to prevent infinite loops and state regressions
   const isInternalChange = useRef(false);
   const lastInternalState = useRef(state);
