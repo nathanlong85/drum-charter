@@ -80,13 +80,19 @@ jobs:
             echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
       - run:
           name: Install pnpm
-          command: sudo npm install -g pnpm
+          command: |
+            sudo npm install -g pnpm
+            # On some machine images, the global bin might not be in the path immediately
+            PNPM_PATH=$(npm config get prefix)/bin/pnpm
+            echo "export PNPM_PATH=$PNPM_PATH" >> $BASH_ENV
+            # Alias it for the current step just in case
+            alias pnpm=$PNPM_PATH
       - run:
           name: Install dependencies
-          command: pnpm install
+          command: $PNPM_PATH install
       - run:
           name: Install Playwright Browsers
-          command: pnpm exec playwright install --with-deps chromium
+          command: $PNPM_PATH exec playwright install --with-deps chromium
       - run:
           name: Install Supabase CLI
           command: |
@@ -105,7 +111,7 @@ jobs:
             echo "export SUPABASE_SERVICE_ROLE_KEY=$(echo $SUPABASE_STATUS | jq -r '.SERVICE_ROLE_KEY')" >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
-          command: pnpm test:e2e
+          command: $PNPM_PATH test:e2e
           environment:
             CI: "true"
       - when:
@@ -113,7 +119,7 @@ jobs:
           steps:
             - run:
                 name: Run PWA Offline Tests
-                command: pnpm test:e2e tests/e2e/offline-support.spec.ts
+                command: $PNPM_PATH test:e2e tests/e2e/offline-support.spec.ts
                 environment:
                   RUN_OFFLINE_E2E: "true"
                   CI: "true"
