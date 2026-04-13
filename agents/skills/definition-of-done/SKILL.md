@@ -25,6 +25,9 @@ This skill automates the verification process for DrumCharter, ensuring that all
 
 Before final verification, you MUST complete the iterative feedback loop as defined in `CODE_REVIEW_PROTOCOL.md`.
 
+> [!IMPORTANT]
+> **CIRCLECI MIGRATION**: We have migrated our CI/CD from GitHub Actions to CircleCI. All automated checks now run on CircleCI. Exhaustive local verification via `verify_done.sh` remains a mandatory safeguard.
+
 1. **Verification**: Ensure changes are fully linted and tested (aim for 100% coverage).
 2. **Push & PR**: Push changes and open/update a Pull Request.
 3. **Request Review**: Request a review from **Copilot** on the PR using the verified CLI command:
@@ -33,8 +36,8 @@ Before final verification, you MUST complete the iterative feedback loop as defi
    gh auth switch --user nathanlong85 && gh pr edit <number> --add-reviewer "@copilot" && gh auth switch --user nathanlong85-ai
    ```
 
-4. **Poll & Address**: Wait for Copilot and CI. Address ALL relevant comments or flag for discussion.
-5. **Repeat**: Repeat until the review is clean and CI passes.
+4. **Poll & Address**: Wait for Copilot and CircleCI. Address ALL relevant comments or flag for discussion.
+5. **Repeat**: Repeat until the review is clean and CircleCI passes.
 
 ### 3. Run Linting
 
@@ -75,7 +78,8 @@ Once all checks pass, you MUST report completion using this exact checklist form
 - [ ] **Copilot Loop**: Remote iterative loop completed and addressed.
 - [ ] **Unit Tests**: 100% pass rate.
 - [ ] **E2E Tests**: 100% pass rate.
-- [ ] **Green CI**: All remote GitHub Action checks passing.
+- [ ] **Green CircleCI**: All remote CircleCI workflow jobs passing.
+- [ ] **Local Verification**: `verify_done.sh` passed with 100% success.
 - [ ] **Manual Checks**: Plan updated, no logs, types verified.
 ```
 
