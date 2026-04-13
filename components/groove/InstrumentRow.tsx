@@ -13,6 +13,7 @@ interface InstrumentRowProps {
   instIdx: number;
   startNoteIdx: number;
   endNoteIdx: number;
+  rowIndex?: number;
 }
 
 export const InstrumentRow: React.FC<InstrumentRowProps> = ({
@@ -20,6 +21,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   instIdx,
   startNoteIdx,
   endNoteIdx,
+  rowIndex,
 }) => {
   const {
     state,
@@ -76,6 +78,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
         instrument.muted ? 'opacity-40' : ''
       }`}
       data-testid={instrumentRowTestId}
+      data-row-index={rowIndex}
     >
       {/* Instrument Info Panel */}
       <div

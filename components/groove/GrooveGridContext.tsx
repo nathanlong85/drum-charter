@@ -175,32 +175,8 @@ export function GrooveGridProvider({
       hasInitialized.current = true;
       return;
     }
-
-    if (initialGrid) {
-      const isDifferent =
-        JSON.stringify(initialGrid.instruments) !== JSON.stringify(state.instruments) ||
-        initialGrid.measures !== state.measures ||
-        initialGrid.resolution !== state.resolution ||
-        initialGrid.timeSignature.beatsPerMeasure !== state.timeSignature.beatsPerMeasure ||
-        initialGrid.timeSignature.beatValue !== state.timeSignature.beatValue ||
-        initialGrid.playbackOptionalHits !== state.playbackOptionalHits;
-
-      if (isDifferent) {
-        dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
-      }
-    }
-  }, [initialGrid, state]);
-
-  const wrappedDispatch = useCallback(
-    (action: GrooveAction) => {
-      if (readOnly) return;
-      const nextState = grooveReducer(latestStateRef.current, action);
-      dispatch(action);
-      onChange?.(nextState);
-      latestStateRef.current = nextState;
-    },
-    [onChange, readOnly],
-  );
+    onChange?.(state);
+  }, [state, onChange]);
 
   const handleNoteRightClick = useCallback(
     (id: string, noteIndex: number, e: React.MouseEvent) => {
@@ -225,39 +201,39 @@ export function GrooveGridProvider({
         return;
       }
       if (e.shiftKey) {
-        wrappedDispatch({ type: 'TOGGLE_OPTIONAL', id, noteIndex });
+        dispatch({ type: 'TOGGLE_OPTIONAL', id, noteIndex });
         return;
       }
       setSelectionRange(null);
-      wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
+      dispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
     },
-    [readOnly, wrappedDispatch, handleNoteRightClick],
+    [readOnly, handleNoteRightClick],
   );
 
   const handleSymbolSelect = useCallback(
     (symbol: DrumSymbol | null) => {
       if (!pickerPos || readOnly) return;
-      wrappedDispatch({
+      dispatch({
         type: 'SET_SYMBOL',
         id: pickerPos.id,
         noteIndex: pickerPos.noteIndex,
         symbol: symbol || 'none',
       });
     },
-    [pickerPos, readOnly, wrappedDispatch],
+    [pickerPos, readOnly],
   );
 
   const handleVelocitySelect = useCallback(
     (velocity: number) => {
       if (!pickerPos || readOnly) return;
-      wrappedDispatch({
+      dispatch({
         type: 'SET_VELOCITY',
         id: pickerPos.id,
         noteIndex: pickerPos.noteIndex,
         velocity,
       });
     },
-    [pickerPos, readOnly, wrappedDispatch],
+    [pickerPos, readOnly],
   );
 
   // Keyboard Shortcuts logic
@@ -274,14 +250,14 @@ export function GrooveGridProvider({
       // Delete key - clear selection or picker note
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectionRange) {
-          wrappedDispatch({
+          dispatch({
             type: 'SET_SELECTION_SYMBOLS',
             selection: selectionRange,
             symbol: 'none',
           });
           setSelectionRange(null);
         } else if (pickerPos) {
-          wrappedDispatch({
+          dispatch({
             type: 'SET_SYMBOL',
             id: pickerPos.id,
             noteIndex: pickerPos.noteIndex,
@@ -329,7 +305,7 @@ export function GrooveGridProvider({
       try {
         const pasteData = JSON.parse(text);
         if (Array.isArray(pasteData)) {
-          wrappedDispatch({
+          dispatch({
             type: 'PASTE_DATA',
             id: state.instruments[selectionRange.start.instIdx].id,
             noteIndex: selectionRange.start.noteIdx,
@@ -347,11 +323,11 @@ export function GrooveGridProvider({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('paste', handlePaste);
     };
-  }, [readOnly, selectionRange, pickerPos, state.instruments, wrappedDispatch]);
+  }, [readOnly, selectionRange, pickerPos, state.instruments]);
 
   const value = {
     state,
-    dispatch: wrappedDispatch,
+    dispatch,
     isPlaying,
     isSamplesLoaded,
     togglePlayback,
@@ -378,21 +354,21 @@ export function GrooveGridProvider({
     handleSymbolSelect,
     handleVelocitySelect,
     updateMeasures: (delta: number) =>
-      wrappedDispatch({
+      dispatch({
         type: 'SET_MEASURES',
         measures: Math.max(1, state.measures + delta),
       }),
     updateResolution: (res: BeatResolution) =>
-      wrappedDispatch({ type: 'SET_RESOLUTION', resolution: res as 4 | 8 | 16 }),
+      dispatch({ type: 'SET_RESOLUTION', resolution: res as 4 | 8 | 16 }),
     updateTimeSignature: (ts: TimeSignature) =>
-      wrappedDispatch({
+      dispatch({
         type: 'SET_TIME_SIGNATURE',
         beatsPerMeasure: ts.beatsPerMeasure,
         beatValue: ts.beatValue,
       }),
     onToggleOptionalHits: (enabled: boolean) =>
-      wrappedDispatch({ type: 'SET_GRID_SETTINGS', settings: { playbackOptionalHits: enabled } }),
-    onClearGrid: () => wrappedDispatch({ type: 'CLEAR_GRID' }),
+      dispatch({ type: 'SET_GRID_SETTINGS', settings: { playbackOptionalHits: enabled } }),
+    onClearGrid: () => dispatch({ type: 'CLEAR_GRID' }),
   };
 
   return <GrooveGridContext.Provider value={value}>{children}</GrooveGridContext.Provider>;

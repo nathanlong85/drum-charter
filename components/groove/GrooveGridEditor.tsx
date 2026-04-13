@@ -126,6 +126,7 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
                     instIdx={instIdx}
                     startNoteIdx={startNoteIdx}
                     endNoteIdx={endNoteIdx}
+                    rowIndex={rowIndex}
                   />
                 ))}
 

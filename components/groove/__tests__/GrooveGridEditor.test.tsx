@@ -230,10 +230,10 @@ describe('GrooveGridEditor', () => {
     renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
     const cells = screen.getAllByTestId('note-cell');
 
-      await act(async () => {
-        fireEvent.mouseDown(cells[0], { button: 0 });
-        fireEvent.mouseUp(document);
-      });
+    await act(async () => {
+      fireEvent.mouseDown(cells[0], { button: 0 });
+      fireEvent.mouseUp(document);
+    });
 
     onChange.mockClear();
 
@@ -618,7 +618,7 @@ describe('GrooveGridEditor', () => {
 
       renderWithProvider(<TestEditor grid={initialGrid} />);
       const cells = screen.getAllByTestId('note-cell');
-      
+
       await act(async () => {
         fireEvent.mouseDown(cells[0], { button: 0 });
         fireEvent.mouseUp(document);
@@ -627,7 +627,7 @@ describe('GrooveGridEditor', () => {
       await act(async () => {
         fireEvent.keyDown(window, { key: 'c', ctrlKey: true });
       });
-      
+
       await waitFor(() => {
         expect(consoleSpy).toHaveBeenCalled();
       });

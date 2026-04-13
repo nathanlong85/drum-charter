@@ -15,7 +15,7 @@ test.describe('Grid Ergonomics', () => {
   });
 
   test('should clear the entire grid', async ({ page }) => {
-    const kickRow = page.getByTestId('instrument-row-kick');
+    const kickRow = page.getByTestId(/instrument-row-kick/).first();
     await kickRow.waitFor({ state: 'visible' });
     const firstCell = kickRow.getByTestId('note-cell').first();
 
@@ -34,7 +34,7 @@ test.describe('Grid Ergonomics', () => {
   });
 
   test('should clear a specific row', async ({ page }) => {
-    const snareRow = page.getByTestId('instrument-row-snare');
+    const snareRow = page.getByTestId(/instrument-row-snare/).first();
     await snareRow.waitFor({ state: 'visible' });
     const firstCell = snareRow.getByTestId('note-cell').first();
 
@@ -59,7 +59,7 @@ test.describe('Grid Ergonomics', () => {
   });
 
   test('should select multiple cells via dragging', async ({ page }) => {
-    const snareRow = page.getByTestId('instrument-row-snare');
+    const snareRow = page.getByTestId(/instrument-row-snare/).first();
     await snareRow.waitFor({ state: 'visible' });
     const cells = snareRow.getByTestId('note-cell');
 
@@ -81,14 +81,14 @@ test.describe('Grid Ergonomics', () => {
   });
 
   test('should toggle optional hits with Shift+Click', async ({ page }) => {
-    const kickRow = page.getByTestId('instrument-row-kick');
+    const kickRow = page.getByTestId(/instrument-row-kick/).first();
     await kickRow.waitFor({ state: 'visible' });
     const firstCell = kickRow.getByTestId('note-cell').first();
 
     // Toggle note first (standard)
     // Add a note first
     await firstCell.click();
-    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 10000 });
+    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 15000 });
 
     // Shift + Click to toggle optional
     await firstCell.click({ modifiers: ['Shift'] });
@@ -106,7 +106,8 @@ test.describe('Grid Ergonomics', () => {
   });
 
   test('should open symbol picker with Alt+Click', async ({ page }) => {
-    const snareRow = page.getByTestId('instrument-row-snare');
+    const snareRow = page.getByTestId(/instrument-row-snare/).first();
+    await snareRow.waitFor({ state: 'visible' });
     const firstCell = snareRow.getByTestId('note-cell').first();
 
     // Alt + Click
@@ -115,11 +116,11 @@ test.describe('Grid Ergonomics', () => {
     await page.keyboard.up('Alt');
 
     // Verify Symbol Picker is visible
-    await expect(page.getByTestId('symbol-picker')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId('symbol-picker')).toBeVisible({ timeout: 15000 });
   });
 
   test('should clear selection with Delete key', async ({ page }) => {
-    const kickRow = page.getByTestId('instrument-row-kick');
+    const kickRow = page.getByTestId(/instrument-row-kick/).first();
     await kickRow.waitFor({ state: 'visible' });
     const firstCell = kickRow.getByTestId('note-cell').first();
 

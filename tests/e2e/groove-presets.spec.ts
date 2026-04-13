@@ -13,7 +13,7 @@ test.describe('Groove Grid Quick Presets', () => {
   });
 
   test('should show quick presets menu when clicking instrument name', async ({ page }) => {
-    const row = page.getByTestId('instrument-row-hi-hat');
+    const row = page.getByTestId(/instrument-row-hi-hat/).first();
     await row.scrollIntoViewIfNeeded();
 
     // Click the instrument name area (the button with the title)
@@ -40,7 +40,7 @@ test.describe('Groove Grid Quick Presets', () => {
 
     // Verify some notes are now active
     // With 4/4 and 16th notes, on-beats are 1, 5, 9, 13 (0-indexed: 0, 4, 8, 12)
-    const row = page.getByTestId('instrument-row-hi-hat');
+    const row = page.getByTestId(/instrument-row-hi-hat/).first();
     const firstNote = row.getByTestId('note-cell').nth(0);
     await expect(firstNote.getByTestId('note-cell-icon')).toBeVisible();
 
@@ -52,7 +52,7 @@ test.describe('Groove Grid Quick Presets', () => {
   });
 
   test('should toggle mute state', async ({ page }) => {
-    const row = page.getByTestId('instrument-row-hi-hat');
+    const row = page.getByTestId(/instrument-row-hi-hat/).first();
 
     // Open menu
     await row.locator('button[title="Edit Settings"]').click();

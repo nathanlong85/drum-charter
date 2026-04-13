@@ -18,9 +18,9 @@ test.describe('Instrument Customization', () => {
     await expect(grid).toBeVisible();
 
     // Initial instruments (default: Hi-Hat, Snare, Kick)
-    await expect(page.getByTestId('instrument-row-hi-hat')).toBeVisible();
-    await expect(page.getByTestId('instrument-row-snare')).toBeVisible();
-    await expect(page.getByTestId('instrument-row-kick')).toBeVisible();
+    await expect(page.getByTestId(/instrument-row-hi-hat/).first()).toBeVisible();
+    await expect(page.getByTestId(/instrument-row-snare/).first()).toBeVisible();
+    await expect(page.getByTestId(/instrument-row-kick/).first()).toBeVisible();
 
     // Enter Edit Mode
     await page.getByTitle('Edit Instruments').click();
@@ -28,10 +28,10 @@ test.describe('Instrument Customization', () => {
 
     // Add a new instrument
     await page.getByTestId('add-instrument-button').click();
-    await expect(page.getByTestId('instrument-row-misc')).toBeVisible();
+    await expect(page.getByTestId(/instrument-row-misc/).first()).toBeVisible();
 
-    // Open settings for the new instrument
-    const newRow = page.getByTestId('instrument-row-misc');
+    // Edit the new instrument
+    const newRow = page.getByTestId(/instrument-row-misc/).first();
     await newRow.getByTitle('Edit Settings').click();
 
     // Click "Settings" in the menu to open the modal
@@ -48,28 +48,36 @@ test.describe('Instrument Customization', () => {
     await modal.getByRole('button', { name: /Save Changes/i }).click();
 
     // Verify update
+    // Verify update
     await expect(modal).not.toBeVisible();
-    await expect(page.getByTestId('instrument-row-custom-tom')).toBeVisible();
+    await expect(page.getByTestId(/instrument-row-custom-tom/).first()).toBeVisible();
 
     // Reorder: Move Custom Tom up (it should be at the bottom currently)
     // Rows: Hi-Hat, Snare, Kick, Custom Tom
-    await page.getByTestId('instrument-row-custom-tom').getByTitle('Move Up').click();
+    await page
+      .getByTestId(/instrument-row-custom-tom/)
+      .first()
+      .getByTitle('Move Up')
+      .click();
 
     // Verify order (Kick should now be below Custom Tom)
     const rows = page.locator('[data-testid^="instrument-row-"]');
-    await expect(rows.nth(2)).toHaveAttribute('data-testid', 'instrument-row-custom-tom');
-    await expect(rows.nth(3)).toHaveAttribute('data-testid', 'instrument-row-kick');
+    await expect(rows.nth(2)).toHaveAttribute('data-testid', /instrument-row-custom-tom/);
+    await expect(rows.nth(3)).toHaveAttribute('data-testid', /instrument-row-kick/);
 
     // Remove an instrument
-    await page.getByTestId('instrument-row-snare').getByTitle('Edit Settings').click();
+    await page
+      .getByTestId(/instrument-row-snare/)
+      .first()
+      .getByTitle('Edit Settings')
+      .click();
     await page.getByRole('menuitem', { name: /^Settings$/i }).click();
 
     // Setup dialog handler for confirm
     page.once('dialog', (dialog) => dialog.accept());
     await page.getByRole('button', { name: /Remove/i }).click();
 
-    // Verify removal
-    await expect(page.getByTestId('instrument-row-snare')).not.toBeVisible();
+    await expect(page.getByTestId(/instrument-row-snare/).first()).not.toBeVisible();
 
     // Finish Editing
     await page.getByTitle('Finish Editing').click();
