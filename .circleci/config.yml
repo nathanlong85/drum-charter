@@ -32,11 +32,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install pnpm
-          command: corepack enable && corepack prepare pnpm@latest --activate
-      - restore_cache:
-          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
-      - run:
           name: Install dependencies
           command: pnpm install
       - save_cache:
@@ -57,11 +52,6 @@ jobs:
     executor: node-executor
     steps:
       - checkout
-      - run:
-          name: Install pnpm
-          command: corepack enable && corepack prepare pnpm@latest --activate
-      - restore_cache:
-          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
       - run:
           name: Install dependencies
           command: pnpm install
@@ -90,7 +80,7 @@ jobs:
             echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
       - run:
           name: Install pnpm
-          command: corepack enable && corepack prepare pnpm@latest --activate
+          command: npm install -g pnpm
       - run:
           name: Install dependencies
           command: pnpm install
