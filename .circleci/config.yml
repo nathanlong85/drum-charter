@@ -110,11 +110,12 @@ jobs:
       - run:
           name: Start Supabase (local)
           command: |
-            supabase start --exclude studio,mailpit,realtime,edge-runtime
+            supabase start
+            # Extract keys for test environment using python for robust JSON parsing
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
-            echo "export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$(echo $SUPABASE_STATUS | jq -r '.ANON_KEY')" >> $BASH_ENV
-            echo "export SUPABASE_SERVICE_ROLE_KEY=$(echo $SUPABASE_STATUS | jq -r '.SERVICE_ROLE_KEY')" >> $BASH_ENV
+            echo $SUPABASE_STATUS | python3 -c "import sys, json; data=json.load(sys.stdin); print(f'export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY={data[\"ANON_KEY\"]}')" >> $BASH_ENV
+            echo $SUPABASE_STATUS | python3 -c "import sys, json; data=json.load(sys.stdin); print(f'export SUPABASE_SERVICE_ROLE_KEY={data[\"SERVICE_ROLE_KEY\"]}')" >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
           command: |
