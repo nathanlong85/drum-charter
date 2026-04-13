@@ -87,8 +87,9 @@ jobs:
             pnpm supabase start
             SUPABASE_STATUS=$(pnpm supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
-            # Robust key extraction using Python
-            python3 -c 'import sys, json; data=json.loads(sys.stdin.read()); print(f"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY={data[\"ANON_KEY\"]}\nexport SUPABASE_SERVICE_ROLE_KEY={data[\"SERVICE_ROLE_KEY\"]}")' <<< "$SUPABASE_STATUS" >> $BASH_ENV
+            # Robust key extraction
+            echo "export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$(echo $SUPABASE_STATUS | jq -r '.ANON_KEY')" >> $BASH_ENV
+            echo "export SUPABASE_SERVICE_ROLE_KEY=$(echo $SUPABASE_STATUS | jq -r '.SERVICE_ROLE_KEY')" >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
           command: |
