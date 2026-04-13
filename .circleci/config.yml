@@ -95,6 +95,15 @@ jobs:
               echo "Waiting for database... ($i/20)"
               sleep 5
             done
+            # Diagnostic: check all containers
+            docker ps -a
+            # Diagnostic: check logs if unhealthy
+            for container in $(docker ps -a --format "{{.Names}}"); do
+              if [[ $(docker inspect -f '{{.State.Status}}' $container) != "running" ]]; then
+                echo "Logs for failed container $container:"
+                docker logs $container || true
+              fi
+            done
             SUPABASE_STATUS=$(pnpm supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
