@@ -436,7 +436,7 @@ describe('GrooveGridEditor', () => {
     it('selects multiple cells via drag', async () => {
       renderWithProvider(<TestEditor grid={initialGrid} />);
       // Get cells from the first instrument row specifically to avoid cross-row confusion in wrapped blocks
-      const firstRow = screen.getAllByTestId('instrument-row-kick')[0];
+      const firstRow = screen.getAllByTestId('instrument-row-kick-row-0')[0];
       const cells = within(firstRow).getAllByTestId('note-cell');
 
       await act(async () => {
@@ -681,7 +681,7 @@ describe('GrooveGridEditor', () => {
       renderWithProvider(<GrooveGridEditor initialGrid={threeMeasureGrid} measuresPerRow={2} />);
 
       // Should have 2 blocks for 'kick' instrument (one in each wrapped row)
-      const kickRows = screen.getAllByTestId('instrument-row-kick');
+      const kickRows = screen.getAllByTestId(/instrument-row-kick-row-/);
       expect(kickRows).toHaveLength(2);
 
       // First block should have 2 measures worth of cells (2 * 4 = 8)

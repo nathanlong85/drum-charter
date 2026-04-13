@@ -70,7 +70,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
     'instrument'
   )
     .toLowerCase()
-    .replace(/\s+/g, '-')}`;
+    .replace(/\s+/g, '-')}-row-${rowIndex}`;
 
   return (
     <div

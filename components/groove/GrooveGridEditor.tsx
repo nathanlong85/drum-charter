@@ -2,8 +2,8 @@
 
 import { Plus } from 'lucide-react';
 import React, { useCallback } from 'react';
-import type { GrooveGrid } from '@/lib/types/groove';
 import { generateId } from '@/lib/utils/id';
+import type { GrooveGrid } from '@/lib/types/groove';
 import { GrooveGridProvider, useGrooveGrid } from './GrooveGridContext';
 import { GrooveGridToolbar } from './GrooveGridToolbar';
 import { InstrumentRow } from './InstrumentRow';
@@ -205,12 +205,11 @@ function GridColumnLabels({
             <div
               key={`label-${globalIdx}`}
               data-testid={isBeatStart ? `beat-label-${label}` : undefined}
-              className={`flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/5 ${
+              className={`flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/5 h-6 ${
                 isBeatStart ? 'text-primary' : 'text-on-surface-variant/30'
               }`}
               style={{
                 width: 'var(--note-cell-size, 40px)',
-                height: 'var(--note-cell-size, 40px)',
               }}
             >
               {label}

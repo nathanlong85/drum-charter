@@ -56,9 +56,9 @@
     .bg-surface-container-low,
     .bg-surface-container-lowest,
     .bg-surface-container-high,
-    .bg-surface-container-low\/20,
-    .bg-surface-container-low\/50,
-    .bg-surface-container-high\/10 {
+    .bg-surface-container-low/20,
+    .bg-surface-container-low/50,
+    .bg-surface-container-high/10 {
       background: transparent !important;
     }
 
@@ -67,18 +67,23 @@
       break-inside: avoid;
       page-break-inside: avoid;
     }
+/* Ensure NoteCells are visible with high contrast borders */
+[data-testid="note-cell"] {
+  border-color: black !important;
+}
 
-    /* Ensure NoteCells are visible */
-    [data-testid="note-cell"] {
-      border-color: black !important;
-    }
-
+/* Keep groove-grid instrument labels visible in read-only print views */
+button[data-testid^="instrument-settings-trigger-"] {
+  display: flex !important;
+}
+}
+}
     [data-testid="note-cell-icon"] {
       filter: grayscale(1) brightness(0) !important; /* Force icons to be black */
     }
 
     /* Beat highlights should be subtle but visible */
-    .bg-surface-container-high\/40 {
+    .bg-surface-container-high/40 {
       background-color: #f0f0f0 !important;
     }
   }

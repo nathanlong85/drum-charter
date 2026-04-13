@@ -164,7 +164,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         data-index={index}
         data-active={symbol === 'none' ? 'false' : 'true'}
         data-selected={isSelected ? 'true' : 'false'}
-        className={`${containerClasses} appearance-none bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm w-full h-full`}
+        className={`appearance-none bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm w-full h-full ${containerClasses}`}
         style={sizeStyle}
         aria-label={symbol !== 'none' ? symbolLabels[symbol] : `Add note at position ${index + 1}`}
       >
