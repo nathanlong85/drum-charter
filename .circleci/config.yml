@@ -67,30 +67,39 @@ jobs:
           node-version: '22.14'
       - run:
           name: Install pnpm
-          command: npm install -g pnpm
+          command: |
+            # Official pnpm installation is more reliable
+            wget -qO- https://get.pnpm.io/install.sh | ENV="$BASH_ENV" SHELL="$(which bash)" bash -
+            echo 'export PATH="$HOME/.local/share/pnpm:$PATH"' >> $BASH_ENV
       - run:
           name: Install dependencies
-          command: pnpm install
+          command: |
+            source $BASH_ENV
+            pnpm install
       - run:
           name: Install Playwright Browsers
-          command: pnpm exec playwright install --with-deps chromium
+          command: |
+            source $BASH_ENV
+            pnpm exec playwright install --with-deps chromium
       - run:
           name: Install Supabase CLI
           command: |
-            # Using the official installation script for CircleCI
             curl -L https://github.com/supabase/cli/releases/download/v2.81.2/supabase_2.81.2_linux_amd64.tar.gz -o supabase.tar.gz
             tar -xzf supabase.tar.gz
             sudo mv supabase /usr/local/bin/
       - run:
           name: Start Supabase (local)
           command: |
-            # Simple start, machine executor should have docker ready
+            source $BASH_ENV
+            # Ensure Docker is ready
+            docker info
+            # Start Supabase and wait for it to be ready
             supabase start
             # Extract keys for test environment
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
-            echo $SUPABASE_STATUS | python3 -c "import sys, json; data=json.load(sys.stdin); print(f'export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY={data[\"ANON_KEY\"]}')" >> $BASH_ENV
-            echo $SUPABASE_STATUS | python3 -c "import sys, json; data=json.load(sys.stdin); print(f'export SUPABASE_SERVICE_ROLE_KEY={data[\"SERVICE_ROLE_KEY\"]}')" >> $BASH_ENV
+            # Use python3 to parse the JSON and export the keys
+            python3 -c "import sys, json; data=json.loads(sys.stdin.read()); print(f'export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY={data[\"ANON_KEY\"]}\nexport SUPABASE_SERVICE_ROLE_KEY={data[\"SERVICE_ROLE_KEY\"]}')" <<< "$SUPABASE_STATUS" >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
           command: |
