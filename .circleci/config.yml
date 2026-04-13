@@ -4,9 +4,6 @@ version: 2.1
 # DrumCharter CI/CD Configuration (CircleCI)
 # -------------------------------------------------------------------------------------
 
-orbs:
-  node: circleci/node@7.0.0
-
 # Parameters to use for conditional execution
 parameters:
   run-pwa-e2e:
@@ -15,6 +12,11 @@ parameters:
 
 # Reusable executor definitions
 executors:
+  node-executor:
+    docker:
+      - image: cimg/node:22.14.0
+    working_directory: ~/repo
+
   machine-executor:
     machine:
       image: ubuntu-2404:current
@@ -25,14 +27,14 @@ jobs:
   # 1. LINTING
   # -----------------------------------------------------------------------------------
   lint:
-    executor:
-      name: node/default
-      tag: '22.14'
+    executor: node-executor
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: sudo npm install -g pnpm && pnpm install
+          command: |
+            sudo npm install -g pnpm
+            pnpm install
       - run:
           name: Run Biome lint
           command: pnpm lint
@@ -44,14 +46,14 @@ jobs:
   # 2. UNIT TESTS
   # -----------------------------------------------------------------------------------
   test-unit:
-    executor:
-      name: node/default
-      tag: '22.14'
+    executor: node-executor
     steps:
       - checkout
       - run:
           name: Install dependencies
-          command: sudo npm install -g pnpm && pnpm install
+          command: |
+            sudo npm install -g pnpm
+            pnpm install
       - run:
           name: Run Vitest
           command: pnpm test run
@@ -63,12 +65,19 @@ jobs:
     executor: machine-executor
     steps:
       - checkout
-      - node/install:
-          node-version: '22.14'
+      - run:
+          name: Setup Node.js (v22)
+          command: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
+            nvm alias default 22
+            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
       - run:
           name: Install pnpm
           command: |
-            # Official pnpm installation is more reliable
             wget -qO- https://get.pnpm.io/install.sh | ENV="$BASH_ENV" SHELL="$(which bash)" bash -
             echo 'export PATH="$HOME/.local/share/pnpm:$PATH"' >> $BASH_ENV
       - run:
@@ -91,14 +100,9 @@ jobs:
           name: Start Supabase (local)
           command: |
             source $BASH_ENV
-            # Ensure Docker is ready
-            docker info
-            # Start Supabase and wait for it to be ready
             supabase start
-            # Extract keys for test environment
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
-            # Use python3 to parse the JSON and export the keys
             python3 -c "import sys, json; data=json.loads(sys.stdin.read()); print(f'export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY={data[\"ANON_KEY\"]}\nexport SUPABASE_SERVICE_ROLE_KEY={data[\"SERVICE_ROLE_KEY\"]}')" <<< "$SUPABASE_STATUS" >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
@@ -126,9 +130,7 @@ jobs:
   # 4. DATABASE SYNC (Supabase Migrations)
   # -----------------------------------------------------------------------------------
   deploy-migrations:
-    executor:
-      name: node/default
-      tag: '22.14'
+    executor: node-executor
     steps:
       - checkout
       - run:
