@@ -47,35 +47,63 @@ jobs:
           command: pnpm test run
 
   test-e2e:
-    executor: node-executor
+    machine:
+      image: ubuntu-2404:current
     resource_class: large
+    working_directory: ~/repo
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.14
+      - run:
+          name: Setup Node.js
+          command: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
+            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Install pnpm
+          command: |
+            curl -fsSL https://get.pnpm.io/install.sh | sh -
+            echo 'export PATH="$HOME/.local/share/pnpm:$PATH"' >> $BASH_ENV
       - run:
           name: Install dependencies
           command: |
-            sudo npm install -g pnpm
+            source $BASH_ENV
             pnpm install
       - run:
           name: Install Playwright Browsers
-          command: pnpm exec playwright install --with-deps chromium
+          command: |
+            source $BASH_ENV
+            pnpm exec playwright install --with-deps chromium
+      - run:
+          name: Setup Docker Permissions
+          command: sudo chmod 666 /var/run/docker.sock
       - run:
           name: Start Supabase (local)
           command: |
-            # Use npx/pnpm dlx to run supabase without global install
-            # Note: Remote Docker might require host mapping
+            source $BASH_ENV
+            # Start Supabase
             pnpm supabase start
+            # Wait for healthy
+            for i in {1..20}; do
+              if docker exec supabase_db_drum-charter pg_isready -U postgres &> /dev/null; then
+                echo "Database is ready"
+                break
+              fi
+              echo "Waiting for database... ($i/20)"
+              sleep 5
+            done
             SUPABASE_STATUS=$(pnpm supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
-            echo "export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$(echo $SUPABASE_STATUS | jq -r '.ANON_KEY')" >> $BASH_ENV
-            echo "export SUPABASE_SERVICE_ROLE_KEY=$(echo $SUPABASE_STATUS | jq -r '.SERVICE_ROLE_KEY')" >> $BASH_ENV
+            echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
+            echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
       - run:
           name: Run Playwright E2E Tests
           command: |
             source $BASH_ENV
-            pnpm test:e2e -- --trace on || (docker ps && exit 1)
+            pnpm test:e2e -- --trace on
           environment:
             CI: "true"
       - store_artifacts:
