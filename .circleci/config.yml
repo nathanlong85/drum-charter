@@ -85,14 +85,20 @@ jobs:
             source $BASH_ENV
             # Start Supabase and wait for health
             pnpm supabase start
-            # Wait for postgres to be ready
-            for i in {1..10}; do
+            # Wait for postgres to be ready (longer wait)
+            for i in {1..20}; do
               if docker exec supabase_db_drum-charter pg_isready -U postgres &> /dev/null; then
                 echo "Database is ready"
                 break
               fi
-              echo "Waiting for database... ($i/10)"
+              echo "Waiting for database... ($i/20)"
               sleep 5
+            done
+            # Log all containers for diagnosis
+            docker ps -a
+            for container in $(docker ps -a --format "{{.Names}}"); do
+              echo "Logs for $container:"
+              docker logs $container --tail 100 || true
             done
             SUPABASE_STATUS=$(pnpm supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
@@ -102,7 +108,7 @@ jobs:
           name: Run Playwright E2E Tests
           command: |
             source $BASH_ENV
-            pnpm test:e2e || (docker ps && docker logs supabase_db_drum-charter && exit 1)
+            pnpm test:e2e -- --trace on || (docker ps && exit 1)
           environment:
             CI: "true"
       - store_artifacts:
