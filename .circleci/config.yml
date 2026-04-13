@@ -93,13 +93,13 @@ jobs:
             source $BASH_ENV
             pnpm install
       - run:
-          name: Setup Docker Permissions
+          name: Setup Docker and Diagnostics
           command: |
+            sudo systemctl start docker || true
             sudo usermod -aG docker circleci
-            # Note: newgrp doesn't work well in CI, so we just use sudo for docker if needed
-            # but usually circleci user is already in docker group on machine executor.
-            # If supabase start fails, it might be due to a missing docker daemon connection.
-            docker ps
+            docker info
+            free -m
+            df -h
       - run:
           name: Install Supabase CLI
           command: |
