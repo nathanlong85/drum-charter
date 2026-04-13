@@ -46,17 +46,33 @@ jobs:
           command: pnpm test run
 
   test-e2e:
-    executor: node-executor
+    executor: machine-executor
     steps:
       - checkout
       - run:
-          name: Install pnpm and dependencies
+          name: Setup Node.js
           command: |
-            sudo npm install -g pnpm
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
+            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+      - run:
+          name: Install pnpm
+          command: |
+            curl -fsSL https://get.pnpm.io/install.sh | sh -
+            echo 'export PATH="$HOME/.local/share/pnpm:$PATH"' >> $BASH_ENV
+      - run:
+          name: Install dependencies
+          command: |
+            source $BASH_ENV
             pnpm install
       - run:
           name: Install Playwright Browsers
-          command: pnpm exec playwright install --with-deps chromium
+          command: |
+            source $BASH_ENV
+            pnpm exec playwright install --with-deps chromium
       - run:
           name: Install Supabase CLI
           command: |
@@ -66,9 +82,9 @@ jobs:
       - run:
           name: Start Supabase (local)
           command: |
-            # In node-executor (Docker), we might need a different approach for supabase
-            # but let's try the simplest one first.
-            supabase start
+            source $BASH_ENV
+            # Direct start with full debug output
+            supabase start --debug
             SUPABASE_STATUS=$(supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
