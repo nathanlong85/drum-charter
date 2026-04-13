@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import {
   deleteItemAction,
   duplicateItemAction,
@@ -34,6 +35,10 @@ vi.mock('@/lib/services/supabase-service', () => ({
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(<Tooltip.Provider>{ui}</Tooltip.Provider>);
+};
+
 describe('SnippetEditor', () => {
   const mockSnippet: GrooveSnippet = {
     id: 'sn1',
@@ -55,12 +60,12 @@ describe('SnippetEditor', () => {
   });
 
   it('renders the snippet title', () => {
-    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    renderWithProviders(<SnippetEditor initialSnippet={mockSnippet} />);
     expect(screen.getByDisplayValue('Test Snippet')).toBeDefined();
   });
 
   it('updates the title and triggers auto-save', async () => {
-    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    renderWithProviders(<SnippetEditor initialSnippet={mockSnippet} />);
     const titleInput = screen.getByDisplayValue('Test Snippet');
 
     fireEvent.change(titleInput, { target: { value: 'New Title' } });
@@ -80,7 +85,7 @@ describe('SnippetEditor', () => {
   }, 10000);
 
   it('adds a tag on Enter', async () => {
-    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    renderWithProviders(<SnippetEditor initialSnippet={mockSnippet} />);
     const tagInput = screen.getByPlaceholderText(/\+ ADD TAG/i);
 
     fireEvent.change(tagInput, { target: { value: 'Funk' } });
@@ -101,7 +106,7 @@ describe('SnippetEditor', () => {
   }, 10000);
 
   it('duplicates the snippet', async () => {
-    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    renderWithProviders(<SnippetEditor initialSnippet={mockSnippet} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
 
     fireEvent.click(duplicateBtn);
@@ -119,7 +124,7 @@ describe('SnippetEditor', () => {
   }, 10000);
 
   it('handles public state toggle', async () => {
-    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    renderWithProviders(<SnippetEditor initialSnippet={mockSnippet} />);
     const toggle = screen.getByTestId('toggle-public-button');
 
     fireEvent.click(toggle);
@@ -143,7 +148,7 @@ describe('SnippetEditor', () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText: writeTextSpy } });
 
-    render(<SnippetEditor initialSnippet={snippet} />);
+    renderWithProviders(<SnippetEditor initialSnippet={snippet} />);
     const linkBtn = screen.getByRole('button', { name: /Copy Public Link/i });
     fireEvent.click(linkBtn);
 
@@ -152,7 +157,7 @@ describe('SnippetEditor', () => {
 
   it('handles auto-save error gracefully', async () => {
     vi.mocked(saveGrooveSnippetAction).mockRejectedValueOnce(new Error('Save failed'));
-    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    renderWithProviders(<SnippetEditor initialSnippet={mockSnippet} />);
 
     const titleInput = screen.getByDisplayValue('Test Snippet');
 
@@ -174,7 +179,7 @@ describe('SnippetEditor', () => {
     const saveSpy = vi.fn().mockResolvedValue({ success: true });
     vi.mocked(saveGrooveSnippetAction).mockImplementation(saveSpy);
 
-    const { unmount } = render(<SnippetEditor initialSnippet={mockSnippet} />);
+    const { unmount } = renderWithProviders(<SnippetEditor initialSnippet={mockSnippet} />);
 
     fireEvent.change(screen.getByDisplayValue('Test Snippet'), {
       target: { value: 'Unmounted Update' },
@@ -197,7 +202,7 @@ describe('SnippetEditor', () => {
 
   it('deletes the snippet', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
-    render(<SnippetEditor initialSnippet={mockSnippet} />);
+    renderWithProviders(<SnippetEditor initialSnippet={mockSnippet} />);
     const deleteBtn = screen.getByRole('button', { name: /Delete This Item/i });
 
     fireEvent.click(deleteBtn);

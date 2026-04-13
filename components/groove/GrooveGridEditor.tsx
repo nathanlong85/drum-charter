@@ -2,6 +2,7 @@
 
 import { Plus } from 'lucide-react';
 import React, { useCallback } from 'react';
+import { generateId } from '@/lib/utils/id';
 import type { GrooveGrid } from '@/lib/types/groove';
 import { GrooveGridProvider, useGrooveGrid } from './GrooveGridContext';
 import { GrooveGridToolbar } from './GrooveGridToolbar';
@@ -31,7 +32,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = (props) => {
   const bpm = props.bpm !== undefined ? props.bpm : localBpm;
   const onBpmChange = props.onBpmChange || setLocalBpm;
 
-  const { cellSize = 40, measuresPerRow = 2 } = props;
+  const { cellSize = 40, measuresPerRow: propMeasuresPerRow = 2 } = props;
+  const measuresPerRow = Math.max(1, propMeasuresPerRow);
 
   return (
     <GrooveGridProvider {...props} bpm={bpm} onBpmChange={onBpmChange}>
@@ -104,14 +106,15 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
     return () => document.removeEventListener('mouseup', handleDragEnd);
   }, [handleDragEnd]);
 
-  const rowCount = Math.ceil(measures / measuresPerRow);
+  const effectiveMeasuresPerRow = Math.max(1, measuresPerRow);
+  const rowCount = Math.ceil(measures / effectiveMeasuresPerRow);
 
   return (
     <div className="relative overflow-x-auto pb-4 custom-scrollbar">
       <div className="flex flex-col gap-10 min-w-max">
         {Array.from({ length: rowCount }).map((_, rowIndex) => {
-          const startMeasure = rowIndex * measuresPerRow;
-          const endMeasure = Math.min(startMeasure + measuresPerRow, measures);
+          const startMeasure = rowIndex * effectiveMeasuresPerRow;
+          const endMeasure = Math.min(startMeasure + effectiveMeasuresPerRow, measures);
           const startNoteIdx = startMeasure * totalNotesPerMeasure;
           const endNoteIdx = endMeasure * totalNotesPerMeasure;
 
@@ -135,11 +138,7 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
                     onClick={() =>
                       dispatch({
                         type: 'ADD_INSTRUMENT',
-                        id: `inst-${
-                          typeof crypto !== 'undefined' && crypto.randomUUID
-                            ? crypto.randomUUID()
-                            : Date.now()
-                        }`,
+                        id: generateId(),
                         category: 'misc',
                         presetVariety: 'Misc',
                         customName: 'misc',
