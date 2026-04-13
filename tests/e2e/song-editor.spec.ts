@@ -28,6 +28,7 @@ test.describe('Song Chart Editor', () => {
 
     // Add Section
     await songEditorPage.addSection('Chorus', '8');
+    await page.waitForTimeout(1000);
 
     // Verify section persists
     await page.reload();

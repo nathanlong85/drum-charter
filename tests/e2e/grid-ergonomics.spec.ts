@@ -88,19 +88,20 @@ test.describe('Grid Ergonomics', () => {
     // Toggle note first (standard)
     // Add a note first
     await firstCell.click();
-    await expect(firstCell.getByTestId('note-cell-icon')).toBeVisible({ timeout: 15000 });
+    const icon = firstCell.getByTestId('note-cell-icon');
+    await expect(icon).toBeVisible({ timeout: 15000 });
 
     // Shift + Click to toggle optional
     await firstCell.click({ modifiers: ['Shift'] });
 
     // Verify it changed to standard_opt
-    await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute('alt', 'standard_opt', {
+    await expect(icon).toHaveAttribute('alt', 'standard_opt', {
       timeout: 15000,
     });
 
     // Shift + Click again to toggle back
     await firstCell.click({ modifiers: ['Shift'] });
-    await expect(firstCell.getByTestId('note-cell-icon')).toHaveAttribute('alt', 'standard', {
+    await expect(icon).toHaveAttribute('alt', 'standard', {
       timeout: 15000,
     });
   });
