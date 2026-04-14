@@ -70,6 +70,42 @@ jobs:
           command: pnpm test run
 
   # -----------------------------------------------------------------------------------
+  # 3. BUILD APP (Pre-build for E2E)
+  # -----------------------------------------------------------------------------------
+  build-app:
+    executor: node-executor
+    resource_class: large
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
+            - pnpm-v1-
+      - run:
+          name: Install pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - save_cache:
+          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - ~/.local/share/pnpm/store
+            - node_modules
+      - run:
+          name: Build Next.js app
+          command: pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
+          environment:
+            NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: placeholder
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .next
+            - public
+            - node_modules
+
+  # -----------------------------------------------------------------------------------
   # 4. E2E TESTS (Sharded Machine)
   # -----------------------------------------------------------------------------------
   test-e2e:
@@ -82,6 +118,8 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run:
           name: Setup and Run E2E Shard << parameters.shard >>
           no_output_timeout: 30m
@@ -105,9 +143,6 @@ jobs:
             nvm use 22
             npm install -g pnpm
             
-            echo "Installing dependencies..."
-            pnpm install
-            
             echo "Starting Supabase..."
             npx supabase start --no-backup
             
@@ -126,13 +161,11 @@ jobs:
             export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$(echo "$SUPABASE_STATUS" | jq -r .ANON_KEY)
             export SUPABASE_SERVICE_ROLE_KEY=$(echo "$SUPABASE_STATUS" | jq -r .SERVICE_ROLE_KEY)
             
-            echo "Building app..."
-            pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
-            
             echo "Installing Playwright browsers..."
             pnpm exec playwright install --with-deps chromium
             
             echo "Running test shard << parameters.shard >>..."
+            export SKIP_BUILD=true
             pnpm test:e2e -- --project=chromium --shard=<< parameters.shard >>/4
             
             kill $GLOBAL_HEARTBEAT_PID
@@ -184,30 +217,30 @@ workflows:
     jobs:
       - lint
       - test-unit
+      - build-app:
+          requires:
+            - lint
+            - test-unit
       - test-e2e:
           name: test-e2e-shard-1
           shard: "1"
           requires:
-            - lint
-            - test-unit
+            - build-app
       - test-e2e:
           name: test-e2e-shard-2
           shard: "2"
           requires:
-            - lint
-            - test-unit
+            - build-app
       - test-e2e:
           name: test-e2e-shard-3
           shard: "3"
           requires:
-            - lint
-            - test-unit
+            - build-app
       - test-e2e:
           name: test-e2e-shard-4
           shard: "4"
           requires:
-            - lint
-            - test-unit
+            - build-app
       - deploy-migrations:
           requires:
             - test-e2e-shard-1
