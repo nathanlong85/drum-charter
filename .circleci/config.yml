@@ -40,6 +40,12 @@ jobs:
           name: Run Biome lint
           command: pnpm lint
       - run:
+          name: Build types
+          command: pnpm build
+          environment:
+            NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: placeholder
+      - run:
           name: Run Type check
           command: pnpm tsc --noEmit
       - run:
