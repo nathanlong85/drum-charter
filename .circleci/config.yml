@@ -41,7 +41,7 @@ jobs:
           command: pnpm lint
       - run:
           name: Build types
-          command: pnpm build
+          command: pnpm run build
           environment:
             NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
             NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: placeholder
