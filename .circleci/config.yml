@@ -70,9 +70,12 @@ jobs:
           command: pnpm test run
 
   # -----------------------------------------------------------------------------------
-  # 3. E2E TESTS (All-in-one Machine)
+  # 4. E2E TESTS (Sharded Machine)
   # -----------------------------------------------------------------------------------
   test-e2e:
+    parameters:
+      shard:
+        type: string
     machine:
       image: ubuntu-2204:2024.01.1
     resource_class: large
@@ -80,13 +83,13 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Setup and Run E2E
+          name: Setup and Run E2E Shard << parameters.shard >>
           no_output_timeout: 30m
           command: |
             set -e -o pipefail
             
             # Start a global heartbeat
-            (while true; do echo "CI HEARTBEAT $(date)"; sleep 15; done) &
+            (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             GLOBAL_HEARTBEAT_PID=$!
             
             echo "Setting Docker permissions..."
@@ -129,17 +132,16 @@ jobs:
             echo "Installing Playwright browsers..."
             pnpm exec playwright install --with-deps chromium
             
-            echo "Running tests with xvfb..."
-            xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" -- \
-              pnpm test:e2e -- --project=chromium --trace on
+            echo "Running test shard << parameters.shard >>..."
+            pnpm test:e2e -- --project=chromium --shard=<< parameters.shard >>/4
             
             kill $GLOBAL_HEARTBEAT_PID
       - store_artifacts:
           path: test-results
-          destination: playwright-results
+          destination: playwright-results-shard-<< parameters.shard >>
       - store_artifacts:
           path: playwright-report
-          destination: playwright-report
+          destination: playwright-report-shard-<< parameters.shard >>
 
   # -----------------------------------------------------------------------------------
   # 5. DATABASE SYNC (Supabase Migrations)
@@ -183,12 +185,35 @@ workflows:
       - lint
       - test-unit
       - test-e2e:
+          name: test-e2e-shard-1
+          shard: "1"
+          requires:
+            - lint
+            - test-unit
+      - test-e2e:
+          name: test-e2e-shard-2
+          shard: "2"
+          requires:
+            - lint
+            - test-unit
+      - test-e2e:
+          name: test-e2e-shard-3
+          shard: "3"
+          requires:
+            - lint
+            - test-unit
+      - test-e2e:
+          name: test-e2e-shard-4
+          shard: "4"
           requires:
             - lint
             - test-unit
       - deploy-migrations:
           requires:
-            - test-e2e
+            - test-e2e-shard-1
+            - test-e2e-shard-2
+            - test-e2e-shard-3
+            - test-e2e-shard-4
           filters:
             branches:
               only:
