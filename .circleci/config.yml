@@ -55,30 +55,51 @@ jobs:
   # 3. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
-    executor: node-executor
+    machine:
+      image: ubuntu-2204:2024.01.1
     resource_class: large
+    working_directory: ~/repo
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.14
       - browser-tools/install-browser-tools
       - run:
           name: Install missing system dependencies
           command: sudo apt-get update && sudo apt-get install -y libgbm-dev
       - run:
-          name: Install pnpm
-          command: sudo npm install -g pnpm
+          name: Setup Node.js and pnpm
+          command: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
+            npm install -g pnpm
+            echo 'export PATH=$(npm config get prefix)/bin:$PATH' >> $BASH_ENV
       - run:
           name: Install dependencies
-          command: pnpm install
+          command: |
+            source $BASH_ENV
+            pnpm install
       - run:
           name: Install Playwright Browsers
-          command: pnpm exec playwright install --with-deps chromium
+          command: |
+            source $BASH_ENV
+            pnpm exec playwright install --with-deps chromium
       - run:
           name: Start Supabase (local)
           command: |
-            pnpm supabase start
-            SUPABASE_STATUS=$(pnpm supabase status -o json)
+            source $BASH_ENV
+            # Use npx for supabase to avoid any pnpm-specific issues with the binary
+            npx supabase start --no-backup
+            # Wait for postgres to be ready
+            for i in {1..30}; do
+              if docker exec supabase_db_drum-charter pg_isready -U postgres &> /dev/null; then
+                echo "Database is ready"
+                break
+              fi
+              echo "Waiting for database... ($i/30)"
+              sleep 5
+            done
+            SUPABASE_STATUS=$(npx supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
