@@ -70,43 +70,7 @@ jobs:
           command: pnpm test run
 
   # -----------------------------------------------------------------------------------
-  # 3. BUILD APP (Pre-build for E2E)
-  # -----------------------------------------------------------------------------------
-  build-app:
-    executor: node-executor
-    resource_class: large
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
-            - pnpm-v1-
-      - run:
-          name: Install pnpm
-          command: sudo npm install -g pnpm
-      - run:
-          name: Install dependencies
-          command: pnpm install
-      - save_cache:
-          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
-          paths:
-            - ~/.local/share/pnpm/store
-            - node_modules
-      - run:
-          name: Build Next.js app
-          command: pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
-          environment:
-            NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
-            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: placeholder
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .next
-            - public
-            - node_modules
-
-  # -----------------------------------------------------------------------------------
-  # 4. E2E TESTS (Sharded Machine)
+  # 3. E2E TESTS (Sharded Machine)
   # -----------------------------------------------------------------------------------
   test-e2e:
     parameters:
@@ -118,8 +82,6 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - attach_workspace:
-          at: .
       - run:
           name: Setup and Run E2E Shard << parameters.shard >>
           no_output_timeout: 30m
@@ -135,22 +97,18 @@ jobs:
               [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
             fi
             
-            if command -v nvm; then
-              nvm install 22
-              nvm use 22
-            else
-              echo "NVM not available, using system node"
-            fi
-            
-            node -v
+            nvm install 22
+            nvm use 22
             npm install -g pnpm
-            pnpm -v
             
             echo "--- STEP 2: Docker & jq ---"
             sudo chmod 666 /var/run/docker.sock
             sudo apt-get update && sudo apt-get install -y jq
             
-            echo "--- STEP 3: Supabase ---"
+            echo "--- STEP 3: Dependencies ---"
+            pnpm install
+            
+            echo "--- STEP 4: Supabase ---"
             # Start heartbeat
             (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
@@ -158,33 +116,28 @@ jobs:
             npx supabase start --no-backup
             
             echo "Waiting for Supabase..."
-            READY=false
             for i in {1..60}; do
               if curl -s http://localhost:54321/rest/v1/ > /dev/null; then
                 echo "Supabase ready"
-                READY=true
                 break
               fi
-              echo "Waiting... ($i/60) $(date)"
+              echo "Waiting... $i"
               sleep 5
             done
-            
-            if [ "$READY" = "false" ]; then
-              echo "Supabase timed out"
-              npx supabase status
-              exit 1
-            fi
             
             SUPABASE_STATUS=$(npx supabase status -o json)
             export NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
             export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$(echo "$SUPABASE_STATUS" | jq -r .ANON_KEY)
             export SUPABASE_SERVICE_ROLE_KEY=$(echo "$SUPABASE_STATUS" | jq -r .SERVICE_ROLE_KEY)
             
-            echo "--- STEP 4: Playwright ---"
+            echo "--- STEP 5: Build App ---"
+            # We build AFTER supabase is up so the keys are real
+            pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
+            
+            echo "--- STEP 6: Playwright ---"
             pnpm exec playwright install --with-deps chromium
             
-            echo "--- STEP 5: Run Shard << parameters.shard >> ---"
-            export SKIP_BUILD=true
+            echo "--- STEP 7: Run Shard << parameters.shard >> ---"
             pnpm test:e2e -- --project=chromium --shard=<< parameters.shard >>/4
             
             kill $HEARTBEAT_PID
@@ -196,7 +149,7 @@ jobs:
           destination: playwright-report-shard-<< parameters.shard >>
 
   # -----------------------------------------------------------------------------------
-  # 5. DATABASE SYNC (Supabase Migrations)
+  # 4. DATABASE SYNC (Supabase Migrations)
   # -----------------------------------------------------------------------------------
   deploy-migrations:
     executor: node-executor
@@ -236,30 +189,30 @@ workflows:
     jobs:
       - lint
       - test-unit
-      - build-app:
-          requires:
-            - lint
-            - test-unit
       - test-e2e:
           name: test-e2e-shard-1
           shard: "1"
           requires:
-            - build-app
+            - lint
+            - test-unit
       - test-e2e:
           name: test-e2e-shard-2
           shard: "2"
           requires:
-            - build-app
+            - lint
+            - test-unit
       - test-e2e:
           name: test-e2e-shard-3
           shard: "3"
           requires:
-            - build-app
+            - lint
+            - test-unit
       - test-e2e:
           name: test-e2e-shard-4
           shard: "4"
           requires:
-            - build-app
+            - lint
+            - test-unit
       - deploy-migrations:
           requires:
             - test-e2e-shard-1
