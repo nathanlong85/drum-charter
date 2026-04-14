@@ -37,10 +37,19 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Debug Info
+          command: |
+            node -v
+            npm -v
+            pnpm -v || true
+      - run:
           name: Install dependencies
           command: |
             sudo npm install -g pnpm
             pnpm install
+      - run:
+          name: List dependencies
+          command: pnpm list
       - run:
           name: Run Vitest
           command: pnpm test run
