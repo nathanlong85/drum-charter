@@ -10,12 +10,18 @@ executors:
       - image: cimg/node:22.14.0
     working_directory: ~/repo
 
+  # For jobs that require Docker (like Supabase CLI and E2E)
+  # Machine is recommended for heavy Docker usage to avoid remote docker networking issues.
   machine-executor:
     machine:
-      image: ubuntu-2404:current
+      image: ubuntu-2204:2024.01.1
+    resource_class: large
     working_directory: ~/repo
 
 jobs:
+  # -----------------------------------------------------------------------------------
+  # 1. LINTING
+  # -----------------------------------------------------------------------------------
   lint:
     executor: node-executor
     steps:
@@ -32,85 +38,63 @@ jobs:
           name: Run Markdown lint
           command: pnpm lint:md
 
+  # -----------------------------------------------------------------------------------
+  # 2. UNIT TESTS
+  # -----------------------------------------------------------------------------------
   test-unit:
     executor: node-executor
     steps:
       - checkout
-      - run:
-          name: Debug Info
-          command: |
-            node -v
-            npm -v
-            pnpm -v || true
       - run:
           name: Install dependencies
           command: |
             sudo npm install -g pnpm
             pnpm install
       - run:
-          name: List dependencies
-          command: pnpm list
-      - run:
           name: Run Vitest
           command: pnpm test run
 
+  # -----------------------------------------------------------------------------------
+  # 3. E2E & PWA TESTS (Supabase + Playwright)
+  # -----------------------------------------------------------------------------------
   test-e2e:
-    machine:
-      image: ubuntu-2404:current
-    resource_class: large
-    working_directory: ~/repo
+    executor: machine-executor
     steps:
       - checkout
       - run:
           name: Setup Node.js
           command: |
+            # Use nvm which is pre-installed on machine executor
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             nvm install 22
             nvm use 22
+            nvm alias default 22
             echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
             echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
       - run:
           name: Install pnpm
           command: |
-            curl -fsSL https://get.pnpm.io/install.sh | sh -
-            echo 'export PATH="$HOME/.local/share/pnpm:$PATH"' >> $BASH_ENV
+            sudo npm install -g pnpm
       - run:
           name: Install dependencies
-          command: |
-            source $BASH_ENV
-            pnpm install
+          command: pnpm install
       - run:
           name: Install Playwright Browsers
-          command: |
-            source $BASH_ENV
-            pnpm exec playwright install --with-deps chromium
-      - run:
-          name: Setup Docker Permissions
-          command: sudo chmod 666 /var/run/docker.sock
+          command: pnpm exec playwright install --with-deps chromium
       - run:
           name: Start Supabase (local)
           command: |
-            source $BASH_ENV
             # Start Supabase
             pnpm supabase start
             # Wait for healthy
-            for i in {1..20}; do
+            for i in {1..30}; do
               if docker exec supabase_db_drum-charter pg_isready -U postgres &> /dev/null; then
                 echo "Database is ready"
                 break
               fi
-              echo "Waiting for database... ($i/20)"
+              echo "Waiting for database... ($i/30)"
               sleep 5
-            done
-            # Diagnostic: check all containers
-            docker ps -a
-            # Diagnostic: check logs if unhealthy
-            for container in $(docker ps -a --format "{{.Names}}"); do
-              if [[ $(docker inspect -f '{{.State.Status}}' $container) != "running" ]]; then
-                echo "Logs for failed container $container:"
-                docker logs $container || true
-              fi
             done
             SUPABASE_STATUS=$(pnpm supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
@@ -120,29 +104,31 @@ jobs:
           name: Run Playwright E2E Tests
           command: |
             source $BASH_ENV
-            pnpm test:e2e -- --trace on
+            pnpm test:e2e
           environment:
             CI: "true"
       - store_artifacts:
           path: test-results
           destination: playwright-results
 
+  # -----------------------------------------------------------------------------------
+  # 4. DATABASE SYNC (Supabase Migrations)
+  # -----------------------------------------------------------------------------------
   deploy-migrations:
     executor: node-executor
     steps:
       - checkout
       - run:
-          name: Install Supabase CLI
+          name: Install dependencies
           command: |
-            curl -L https://github.com/supabase/cli/releases/download/v2.81.2/supabase_2.81.2_linux_amd64.tar.gz -o supabase.tar.gz
-            tar -xzf supabase.tar.gz
-            sudo mv supabase /usr/local/bin/
+            sudo npm install -g pnpm
+            pnpm install
       - run:
           name: Push Migrations to Staging
           command: |
             if [ "$CIRCLE_BRANCH" = "staging" ]; then
-              supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
-              supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
+              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
+              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
             fi
           environment:
             SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
@@ -150,12 +136,15 @@ jobs:
           name: Push Migrations to Production
           command: |
             if [ "$CIRCLE_BRANCH" = "main" ]; then
-              supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
-              supabase db push --password $SUPABASE_DB_PASSWORD_PROD
+              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
+              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
             fi
           environment:
             SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
 
+# -------------------------------------------------------------------------------------
+# WORKFLOW DEFINITIONS
+# -------------------------------------------------------------------------------------
 workflows:
   version: 2
   build-test-deploy:
