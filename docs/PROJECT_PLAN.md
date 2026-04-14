@@ -53,7 +53,7 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟡 In Progress
 
-- [ ] [Infra] Fix CircleCI E2E Test Failures: Stabilize machine executor setup, pre-build app, and improve Supabase health checks (#129)
+- [ ] [Infra] Fix CircleCI E2E Test Failures: Consolidated build/test on machine executor, improved caching, and increased Playwright workers for stability (#129)
 
 ### 🟢 Done (Recent)
 
