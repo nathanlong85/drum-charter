@@ -1,5 +1,4 @@
 import path from 'node:path';
-import type { NextConfig } from 'next';
 import withSerwistInit from '@serwist/next';
 
 const withSerwist = withSerwistInit({
