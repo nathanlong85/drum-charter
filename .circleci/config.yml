@@ -70,7 +70,43 @@ jobs:
           command: pnpm test run
 
   # -----------------------------------------------------------------------------------
-  # 3. E2E & PWA TESTS (Supabase + Build + Playwright)
+  # 3. BUILD APP (Pre-build for E2E)
+  # -----------------------------------------------------------------------------------
+  build-app:
+    executor: node-executor
+    resource_class: large
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
+            - pnpm-v1-
+      - run:
+          name: Install pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - save_cache:
+          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - ~/.local/share/pnpm/store
+            - node_modules
+      - run:
+          name: Build Next.js app
+          command: pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
+          environment:
+            NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: placeholder
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .next
+            - public
+            - node_modules
+
+  # -----------------------------------------------------------------------------------
+  # 4. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
     machine:
@@ -79,10 +115,8 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
-            - pnpm-v1-
+      - attach_workspace:
+          at: .
       - run:
           name: Setup Node.js and pnpm
           command: |
@@ -105,17 +139,6 @@ jobs:
             
             echo "export PATH=$(npm config get prefix)/bin:\$PATH" >> $BASH_ENV
             echo "Setup complete."
-      - run:
-          name: Install dependencies
-          command: |
-            set -e -o pipefail
-            source $BASH_ENV
-            pnpm install
-      - save_cache:
-          key: pnpm-v1-{{ checksum "pnpm-lock.yaml" }}
-          paths:
-            - ~/.local/share/pnpm/store
-            - node_modules
       - restore_cache:
           keys:
             - playwright-browsers-v1-{{ checksum "package.json" }}
@@ -172,25 +195,10 @@ jobs:
               exit 1
             fi
             
-            # Extract and export keys
             SUPABASE_STATUS=$(npx supabase status -o json)
-            echo "$SUPABASE_STATUS"
-            
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
-            echo "Keys exported."
-      - run:
-          name: Build Next.js app (with real keys)
-          no_output_timeout: 15m
-          command: |
-            set -e -o pipefail
-            source $BASH_ENV
-            (while true; do echo "Building app... $(date)"; sleep 30; done) &
-            HEARTBEAT_PID=$!
-            export NODE_OPTIONS="--max-old-space-size=4096"
-            pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
-            kill $HEARTBEAT_PID
       - run:
           name: Run Playwright E2E Tests
           no_output_timeout: 15m
@@ -249,10 +257,13 @@ workflows:
     jobs:
       - lint
       - test-unit
-      - test-e2e:
+      - build-app:
           requires:
             - lint
             - test-unit
+      - test-e2e:
+          requires:
+            - build-app
       - deploy-migrations:
           requires:
             - test-e2e
