@@ -78,16 +78,28 @@ jobs:
             echo "[ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"" >> $BASH_ENV
             echo "nvm use 22 > /dev/null" >> $BASH_ENV
             echo "export PATH=$(npm config get prefix)/bin:\$PATH" >> $BASH_ENV
+      - restore_cache:
+          key: dependency-cache-{{ checksum "pnpm-lock.yaml" }}
       - run:
           name: Install dependencies
           command: |
             source $BASH_ENV
             pnpm install
+      - save_cache:
+          key: dependency-cache-{{ checksum "pnpm-lock.yaml" }}
+          paths:
+            - node_modules
+      - restore_cache:
+          key: playwright-cache-{{ checksum "package.json" }}
       - run:
           name: Install Playwright Browsers
           command: |
             source $BASH_ENV
             pnpm exec playwright install --with-deps chromium
+      - save_cache:
+          key: playwright-cache-{{ checksum "package.json" }}
+          paths:
+            - ~/.cache/ms-playwright
       - run:
           name: Setup Docker Permissions
           command: |
@@ -102,13 +114,13 @@ jobs:
             # Wait for healthy - checking the REST API specifically
             echo "Waiting for Supabase services to be healthy..."
             HEALTHY=false
-            for i in {1..120}; do
+            for i in {1..60}; do
               if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
                 echo "Supabase is ready"
                 HEALTHY=true
                 break
               fi
-              echo "Waiting for services... ($i/120)"
+              echo "Waiting for services... ($i/60)"
               # Check container status
               docker ps --format '{{.Names}}: {{.Status}}' | grep supabase || true
               sleep 5
@@ -134,6 +146,7 @@ jobs:
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
       - run:
           name: Run Playwright E2E Tests
+          no_output_timeout: 10m
           command: |
             source $BASH_ENV
             # Skip build since we did it above
