@@ -101,19 +101,26 @@ jobs:
             npx supabase start --no-backup
             # Wait for healthy - checking the REST API specifically
             echo "Waiting for Supabase services to be healthy..."
-            for i in {1..60}; do
+            HEALTHY=false
+            for i in {1..120}; do
               if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
                 echo "Supabase is ready"
                 HEALTHY=true
                 break
               fi
-              echo "Waiting for services... ($i/60)"
+              echo "Waiting for services... ($i/120)"
+              # Check container status
+              docker ps --format '{{.Names}}: {{.Status}}' | grep supabase || true
               sleep 5
             done
             if [ "$HEALTHY" != "true" ]; then
               echo "Supabase failed to start in time"
               docker ps -a
-              docker logs supabase_db_drum-charter
+              # Log all supabase containers for debugging
+              for container in $(docker ps -a --format '{{.Names}}' | grep supabase); do
+                echo "--- Logs for $container ---"
+                docker logs $container | tail -n 50
+              done
               exit 1
             fi
             SUPABASE_STATUS=$(npx supabase status -o json)
