@@ -6,20 +6,14 @@ version: 2.1
 
 orbs:
   node: circleci/node@6.0.0
-  browser-tools: circleci/browser-tools@1.5.0
-
-executors:
-  node-executor:
-    docker:
-      - image: cimg/node:22.14.0
-    working_directory: ~/repo
 
 jobs:
   # -----------------------------------------------------------------------------------
   # 1. LINTING
   # -----------------------------------------------------------------------------------
   lint:
-    executor: node-executor
+    docker:
+      - image: cimg/node:22.14.0
     steps:
       - checkout
       - node/install-packages:
@@ -35,7 +29,8 @@ jobs:
   # 2. UNIT TESTS
   # -----------------------------------------------------------------------------------
   test-unit:
-    executor: node-executor
+    docker:
+      - image: cimg/node:22.14.0
     steps:
       - checkout
       - node/install-packages:
@@ -45,13 +40,14 @@ jobs:
           command: pnpm test run
 
   # -----------------------------------------------------------------------------------
-  # 3. E2E TESTS (Sharded Docker)
+  # 3. E2E TESTS (Playwright Docker)
   # -----------------------------------------------------------------------------------
   test-e2e:
     parameters:
       shard:
         type: string
-    executor: node-executor
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.50.0-jammy
     resource_class: large
     working_directory: ~/repo
     steps:
@@ -59,8 +55,14 @@ jobs:
       - setup_remote_docker:
           version: 20.10.24
           docker_layer_caching: true
-      - node/install-packages:
-          pkg-manager: pnpm
+      - run:
+          name: Install pnpm & jq
+          command: |
+            npm install -g pnpm
+            apt-get update && apt-get install -y jq
+      - run:
+          name: Install dependencies
+          command: pnpm install
       - run:
           name: Setup and Run E2E Shard << parameters.shard >>
           no_output_timeout: 30m
@@ -70,10 +72,6 @@ jobs:
             (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
             
-            # Install jq for key extraction
-            sudo apt-get update && sudo apt-get install -y jq
-            
-            # Start Supabase (remote docker via CLI)
             pnpm supabase start --no-backup
             
             echo "Waiting for Supabase..."
@@ -92,13 +90,9 @@ jobs:
             export SUPABASE_SERVICE_ROLE_KEY=$(echo "$SUPABASE_STATUS" | jq -r .SERVICE_ROLE_KEY)
             
             echo "--- STEP 2: Build App ---"
-            # Build AFTER supabase is up so the keys are real
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
             
-            echo "--- STEP 3: Playwright ---"
-            pnpm exec playwright install --with-deps chromium
-            
-            echo "--- STEP 4: Run Shard << parameters.shard >> ---"
+            echo "--- STEP 3: Run Tests ---"
             export SKIP_BUILD=true
             pnpm test:e2e -- --project=chromium --shard=<< parameters.shard >>/4
             
@@ -114,7 +108,8 @@ jobs:
   # 4. DATABASE SYNC (Supabase Migrations)
   # -----------------------------------------------------------------------------------
   deploy-migrations:
-    executor: node-executor
+    docker:
+      - image: cimg/node:22.14.0
     steps:
       - checkout
       - node/install-packages:
