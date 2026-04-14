@@ -6,7 +6,6 @@ version: 2.1
 
 orbs:
   browser-tools: circleci/browser-tools@1.5.0
-  pnpm: circleci/pnpm@1.0.3
 
 executors:
   node-executor:
@@ -22,8 +21,12 @@ jobs:
     executor: node-executor
     steps:
       - checkout
-      - pnpm/setup
-      - pnpm/install
+      - run:
+          name: Install pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
       - run:
           name: Run Biome lint
           command: pnpm lint
@@ -38,8 +41,12 @@ jobs:
     executor: node-executor
     steps:
       - checkout
-      - pnpm/setup
-      - pnpm/install
+      - run:
+          name: Install pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
       - run:
           name: Run Vitest
           command: pnpm test run
@@ -58,23 +65,20 @@ jobs:
       - run:
           name: Install missing system dependencies
           command: sudo apt-get update && sudo apt-get install -y libgbm-dev
-      - pnpm/setup
-      - pnpm/install
+      - run:
+          name: Install pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
       - run:
           name: Install Playwright Browsers
           command: pnpm exec playwright install --with-deps chromium
       - run:
           name: Start Supabase (local)
           command: |
-            # When using setup_remote_docker, localhost won't work.
-            # We need to map the port or use the bridge IP.
-            # But supabase start manages its own containers.
             pnpm supabase start
             SUPABASE_STATUS=$(pnpm supabase status -o json)
-            # Find the bridge IP
-            BRIDGE_IP=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
-            echo "Bridge IP detected: $BRIDGE_IP"
-            # Attempt to use bridge IP if 127.0.0.1 fails in Playwright
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
@@ -97,8 +101,12 @@ jobs:
     executor: node-executor
     steps:
       - checkout
-      - pnpm/setup
-      - pnpm/install
+      - run:
+          name: Install pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
       - run:
           name: Push Migrations to Staging
           command: |
