@@ -1,4 +1,5 @@
 import path from 'node:path';
+import type { NextConfig } from 'next';
 import withSerwistInit from '@serwist/next';
 
 const withSerwist = withSerwistInit({
@@ -10,7 +11,7 @@ const withSerwist = withSerwistInit({
   disable: process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_FORCE_SW !== 'true',
 });
 
-export default withSerwist({
+const nextConfig = {
   outputFileTracingRoot: path.resolve(process.cwd()),
   eslint: {
     ignoreDuringBuilds: true,
@@ -24,4 +25,6 @@ export default withSerwist({
   experimental: {
     viewTransition: true,
   },
-});
+} as any;
+
+export default withSerwist(nextConfig);
