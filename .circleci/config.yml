@@ -99,7 +99,9 @@ jobs:
                 break
               fi
               echo "Waiting for services... ($i/30)"
-              sleep 5
+              # Check container status for diagnostics
+              docker ps --format '{{.Names}}: {{.Status}}' | grep supabase || true
+              sleep 10
             done
             if [ "$HEALTHY" != "true" ]; then
               echo "Supabase failed to start"
@@ -117,7 +119,7 @@ jobs:
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
       - run:
           name: Run Playwright E2E Tests
-          no_output_timeout: 15m
+          no_output_timeout: 10m
           command: |
             source $BASH_ENV
             export SKIP_BUILD=true
