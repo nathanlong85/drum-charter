@@ -55,52 +55,85 @@ jobs:
   # 3. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
-    executor: node-executor
+    machine:
+      image: ubuntu-2204:2024.01.1
     resource_class: large
+    working_directory: ~/repo
     steps:
       - checkout
-      - browser-tools/install-chrome
-      - setup_remote_docker:
-          version: 20.10.14
       - run:
-          name: Install pnpm
-          command: sudo npm install -g pnpm
+          name: Setup Node.js and pnpm
+          command: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
+            nvm alias default 22
+            npm install -g pnpm
+            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+            echo 'nvm use 22 > /dev/null' >> $BASH_ENV
+            echo 'export PATH=$(npm config get prefix)/bin:$PATH' >> $BASH_ENV
       - run:
           name: Install dependencies
-          command: pnpm install
+          command: |
+            source $BASH_ENV
+            pnpm install
       - run:
           name: Install Playwright Browsers
-          command: pnpm exec playwright install chromium
+          command: |
+            source $BASH_ENV
+            pnpm exec playwright install --with-deps chromium
+      - run:
+          name: Setup Docker Permissions
+          command: sudo chmod 666 /var/run/docker.sock
       - run:
           name: Start Supabase (local)
           command: |
-            # Start Supabase on remote docker
+            source $BASH_ENV
             npx supabase start --no-backup
-            
-            # Find the bridge IP for remote docker access
-            BRIDGE_IP=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
-            echo "Bridge IP detected: $BRIDGE_IP"
-            
-            # Extract keys
+            echo "Waiting for Supabase..."
+            HEALTHY=false
+            for i in {1..60}; do
+              if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
+                echo "Supabase is ready"
+                HEALTHY=true
+                break
+              fi
+              echo "Waiting for services... ($i/60)"
+              sleep 5
+            done
+            if [ "$HEALTHY" != "true" ]; then
+              echo "Supabase failed to start"
+              docker ps -a
+              exit 1
+            fi
             SUPABASE_STATUS=$(npx supabase status -o json)
-            
-            # Export variables for the build and tests
-            echo "export NEXT_PUBLIC_SUPABASE_URL=http://$BRIDGE_IP:54321" >> $BASH_ENV
-            echo "$SUPABASE_STATUS" | jq -r --arg ip "$BRIDGE_IP" '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
+            echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
+            echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
       - run:
           name: Build Next.js app
+          no_output_timeout: 30m
           command: |
             source $BASH_ENV
+            (while true; do echo "Heartbeat: build in progress... $(date)"; sleep 10; done) &
+            HEARTBEAT_PID=$!
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
+            kill $HEARTBEAT_PID
       - run:
           name: Run Playwright E2E Tests
+          no_output_timeout: 30m
           command: |
             source $BASH_ENV
+            (while true; do echo "Heartbeat: tests in progress... $(date)"; sleep 10; done) &
+            HEARTBEAT_PID=$!
             export SKIP_BUILD=true
             pnpm test:e2e -- --project=chromium --trace on
+            kill $HEARTBEAT_PID
           environment:
             CI: "true"
+            NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
       - store_artifacts:
           path: test-results
           destination: playwright-results
