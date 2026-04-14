@@ -82,27 +82,21 @@ jobs:
   # 4. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
-    docker:
-      - image: mcr.microsoft.com/playwright:v1.49.1-noble
+    executor: node-executor
     resource_class: large
-    working_directory: ~/repo
     steps:
       - checkout
       - attach_workspace:
           at: .
       - setup_remote_docker:
           version: 20.10.14
-      - run:
-          name: Install Docker CLI
-          command: |
-            apt-get update && apt-get install -y ca-certificates curl gnupg lsb-release
-            mkdir -p /etc/apt/keyrings
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-            apt-get update && apt-get install -y docker-ce-cli
+      - browser-tools/install-chrome
       - run:
           name: Install pnpm
-          command: npm install -g pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install Playwright Browsers
+          command: pnpm exec playwright install chromium
       - run:
           name: Start Supabase (local)
           command: |
@@ -120,6 +114,10 @@ jobs:
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://$BRIDGE_IP:54321" >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r --arg ip "$BRIDGE_IP" '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
+            
+            # Wait for healthy
+            echo "Waiting for services on $BRIDGE_IP..."
+            sleep 30
       - run:
           name: Run Playwright E2E Tests
           command: |
