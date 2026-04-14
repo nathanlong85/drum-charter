@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Visual Regression', () => {
-  test.beforeEach(({}, testInfo) => {
+  test.beforeEach(() => {
     // Skip in CI unless explicitly requested
     if (process.env.CI) {
       test.skip();
