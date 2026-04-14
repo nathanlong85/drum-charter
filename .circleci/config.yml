@@ -142,11 +142,19 @@ jobs:
           command: |
             source $BASH_ENV
             pnpm install
+      - restore_cache:
+          keys:
+            - playwright-browsers-v1-{{ checksum "package.json" }}
+            - playwright-browsers-v1-
       - run:
           name: Install Playwright Browsers
           command: |
             source $BASH_ENV
             pnpm exec playwright install --with-deps chromium
+      - save_cache:
+          key: playwright-browsers-v1-{{ checksum "package.json" }}
+          paths:
+            - ~/.cache/ms-playwright
       - run:
           name: Setup Docker Permissions
           command: sudo chmod 666 /var/run/docker.sock
