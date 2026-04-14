@@ -40,6 +40,9 @@ jobs:
           name: Run Biome lint
           command: pnpm lint
       - run:
+          name: Run Type check
+          command: pnpm tsc --noEmit
+      - run:
           name: Run Markdown lint
           command: pnpm lint:md
 
@@ -182,6 +185,7 @@ jobs:
             echo "Keys exported."
       - run:
           name: Build Next.js app (with real keys)
+          no_output_timeout: 15m
           command: |
             set -e -o pipefail
             source $BASH_ENV

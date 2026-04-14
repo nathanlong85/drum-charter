@@ -12,6 +12,12 @@ const withSerwist = withSerwistInit({
 
 export default withSerwist({
   outputFileTracingRoot: path.resolve(process.cwd()),
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   logging: {
     browserToTerminal: true,
   },
