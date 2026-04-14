@@ -158,6 +158,7 @@ jobs:
             source $BASH_ENV
             (while true; do echo "Building app... $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
+            export NODE_OPTIONS="--max-old-space-size=4096"
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
             kill $HEARTBEAT_PID
       - run:
