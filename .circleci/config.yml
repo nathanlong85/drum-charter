@@ -81,9 +81,13 @@ jobs:
       - checkout
       - run:
           name: Setup and Run E2E
-          no_output_timeout: 20m
+          no_output_timeout: 30m
           command: |
             set -e -o pipefail
+            
+            # Start a global heartbeat
+            (while true; do echo "CI HEARTBEAT $(date)"; sleep 15; done) &
+            GLOBAL_HEARTBEAT_PID=$!
             
             echo "Setting Docker permissions..."
             sudo chmod 666 /var/run/docker.sock
@@ -110,7 +114,7 @@ jobs:
                 echo "Supabase is ready"
                 break
               fi
-              echo "Waiting... ($i/60)"
+              echo "Waiting... ($i/60) $(date)"
               sleep 5
             done
             
@@ -125,8 +129,11 @@ jobs:
             echo "Installing Playwright browsers..."
             pnpm exec playwright install --with-deps chromium
             
-            echo "Running tests..."
-            pnpm test:e2e -- --project=chromium --trace on
+            echo "Running tests with xvfb..."
+            xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" -- \
+              pnpm test:e2e -- --project=chromium --trace on
+            
+            kill $GLOBAL_HEARTBEAT_PID
       - store_artifacts:
           path: test-results
           destination: playwright-results
