@@ -110,9 +110,12 @@ jobs:
           name: Run Playwright E2E Tests
           command: |
             source $BASH_ENV
+            # Playwright config usually handles starting the server,
+            # but let's make sure it's accessible.
             pnpm test:e2e
           environment:
             CI: "true"
+            NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
       - store_artifacts:
           path: test-results
           destination: playwright-results
