@@ -6,24 +6,19 @@ version: 2.1
 
 orbs:
   browser-tools: circleci/browser-tools@1.5.0
-
-executors:
-  node-executor:
-    docker:
-      - image: cimg/node:22.14.0
-    working_directory: ~/repo
+  node: circleci/node@6.0.0
 
 jobs:
   # -----------------------------------------------------------------------------------
   # 1. LINTING
   # -----------------------------------------------------------------------------------
   lint:
-    executor: node-executor
+    executor:
+      name: node/default
+      tag: "22.14.0"
     steps:
       - checkout
-      - run:
-          name: Install pnpm
-          command: sudo npm install -g pnpm
+      - node/install-pnpm
       - run:
           name: Install dependencies
           command: pnpm install
@@ -38,12 +33,12 @@ jobs:
   # 2. UNIT TESTS
   # -----------------------------------------------------------------------------------
   test-unit:
-    executor: node-executor
+    executor:
+      name: node/default
+      tag: "22.14.0"
     steps:
       - checkout
-      - run:
-          name: Install pnpm
-          command: sudo npm install -g pnpm
+      - node/install-pnpm
       - run:
           name: Install dependencies
           command: pnpm install
@@ -62,44 +57,28 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Setup Node.js and pnpm
+          name: Install Node.js 22 and pnpm
           command: |
-            # Install jq
-            sudo apt-get update && sudo apt-get install -y jq
-            # Load nvm
+            # On machine executor, nvm is pre-installed
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            # Use stable node and install pnpm
             nvm install 22
             nvm use 22
             npm install -g pnpm
-            # Persist PATH for subsequent steps
-            echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
-            echo "[ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"" >> $BASH_ENV
-            echo "nvm use 22 > /dev/null" >> $BASH_ENV
-            echo "export PATH=$(npm config get prefix)/bin:\$PATH" >> $BASH_ENV
-      - restore_cache:
-          key: dependency-cache-{{ checksum "pnpm-lock.yaml" }}
+            echo 'export PATH=$(npm config get prefix)/bin:$PATH' >> $BASH_ENV
+            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
+            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
+            echo 'nvm use 22 > /dev/null' >> $BASH_ENV
       - run:
           name: Install dependencies
           command: |
             source $BASH_ENV
             pnpm install
-      - save_cache:
-          key: dependency-cache-{{ checksum "pnpm-lock.yaml" }}
-          paths:
-            - node_modules
-      - restore_cache:
-          key: playwright-cache-{{ checksum "package.json" }}
       - run:
           name: Install Playwright Browsers
           command: |
             source $BASH_ENV
             pnpm exec playwright install --with-deps chromium
-      - save_cache:
-          key: playwright-cache-{{ checksum "package.json" }}
-          paths:
-            - ~/.cache/ms-playwright
       - run:
           name: Setup Docker Permissions
           command: |
@@ -109,30 +88,22 @@ jobs:
           name: Start Supabase (local)
           command: |
             source $BASH_ENV
-            # Start Supabase
             npx supabase start --no-backup
             # Wait for healthy - checking the REST API specifically
             echo "Waiting for Supabase services to be healthy..."
             HEALTHY=false
-            for i in {1..60}; do
+            for i in {1..30}; do
               if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
                 echo "Supabase is ready"
                 HEALTHY=true
                 break
               fi
-              echo "Waiting for services... ($i/60)"
-              # Check container status
-              docker ps --format '{{.Names}}: {{.Status}}' | grep supabase || true
+              echo "Waiting for services... ($i/30)"
               sleep 5
             done
             if [ "$HEALTHY" != "true" ]; then
-              echo "Supabase failed to start in time"
+              echo "Supabase failed to start"
               docker ps -a
-              # Log all supabase containers for debugging
-              for container in $(docker ps -a --format '{{.Names}}' | grep supabase); do
-                echo "--- Logs for $container ---"
-                docker logs $container | tail -n 50
-              done
               exit 1
             fi
             SUPABASE_STATUS=$(npx supabase status -o json)
@@ -146,50 +117,16 @@ jobs:
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
       - run:
           name: Run Playwright E2E Tests
-          no_output_timeout: 10m
+          no_output_timeout: 15m
           command: |
             source $BASH_ENV
-            # Skip build since we did it above
             export SKIP_BUILD=true
             pnpm test:e2e -- --project=chromium --trace on
           environment:
             CI: "true"
-            NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
       - store_artifacts:
           path: test-results
           destination: playwright-results
-
-  # -----------------------------------------------------------------------------------
-  # 4. DATABASE SYNC (Supabase Migrations)
-  # -----------------------------------------------------------------------------------
-  deploy-migrations:
-    executor: node-executor
-    steps:
-      - checkout
-      - run:
-          name: Install pnpm
-          command: sudo npm install -g pnpm
-      - run:
-          name: Install dependencies
-          command: pnpm install
-      - run:
-          name: Push Migrations to Staging
-          command: |
-            if [ "$CIRCLE_BRANCH" = "staging" ]; then
-              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
-              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
-            fi
-          environment:
-            SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
-      - run:
-          name: Push Migrations to Production
-          command: |
-            if [ "$CIRCLE_BRANCH" = "main" ]; then
-              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
-              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
-            fi
-          environment:
-            SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
 
 # -------------------------------------------------------------------------------------
 # WORKFLOW DEFINITIONS
@@ -212,3 +149,33 @@ workflows:
               only:
                 - main
                 - staging
+
+# Separate job for migrations since it doesn't need machine executor
+deploy-migrations:
+  executor:
+    name: node/default
+    tag: "22.14.0"
+  steps:
+    - checkout
+    - node/install-pnpm
+    - run:
+        name: Install dependencies
+        command: pnpm install
+    - run:
+        name: Push Migrations to Staging
+        command: |
+          if [ "$CIRCLE_BRANCH" = "staging" ]; then
+            pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
+            pnpm supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
+          fi
+        environment:
+          SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
+    - run:
+        name: Push Migrations to Production
+        command: |
+          if [ "$CIRCLE_BRANCH" = "main" ]; then
+            pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
+            pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
+          fi
+        environment:
+          SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
