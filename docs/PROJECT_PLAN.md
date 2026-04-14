@@ -51,6 +51,10 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ## Status Board (Kanban)
 
+### 🟡 In Progress
+
+- [ ] [Infra] Fix CircleCI E2E Test Failures: Stabilize machine executor setup, pre-build app, and improve Supabase health checks (#129)
+
 ### 🟢 Done (Recent)
 
 - [x] [Arch/UX] Modernize Web App (Phase 4): Enhanced testing infrastructure with **Visual Regression Tests** for Dashboard, Library, and GrooveGrid. Expanded Vitest component coverage for \`AppShell\` and \`LibraryHeader\`. (#120) \`✓\`

@@ -64,12 +64,20 @@ jobs:
       - run:
           name: Setup Node.js and pnpm
           command: |
+            # Install jq
+            sudo apt-get update && sudo apt-get install -y jq
+            # Load nvm
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            # Use stable node and install pnpm
             nvm install 22
             nvm use 22
             npm install -g pnpm
-            echo 'export PATH=$(npm config get prefix)/bin:$PATH' >> $BASH_ENV
+            # Persist PATH for subsequent steps
+            echo "export NVM_DIR=\"$HOME/.nvm\"" >> $BASH_ENV
+            echo "[ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"" >> $BASH_ENV
+            echo "nvm use 22 > /dev/null" >> $BASH_ENV
+            echo "export PATH=$(npm config get prefix)/bin:\$PATH" >> $BASH_ENV
       - run:
           name: Install dependencies
           command: |
@@ -82,34 +90,47 @@ jobs:
             pnpm exec playwright install --with-deps chromium
       - run:
           name: Setup Docker Permissions
-          command: sudo chmod 666 /var/run/docker.sock
+          command: |
+            sudo chmod 666 /var/run/docker.sock
+            docker version
       - run:
           name: Start Supabase (local)
           command: |
             source $BASH_ENV
             # Start Supabase
             npx supabase start --no-backup
-            # Wait for healthy
-            for i in {1..30}; do
-              if docker exec supabase_db_drum-charter pg_isready -U postgres &> /dev/null; then
-                echo "Database is ready"
+            # Wait for healthy - checking the REST API specifically
+            echo "Waiting for Supabase services to be healthy..."
+            for i in {1..60}; do
+              if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
+                echo "Supabase is ready"
+                HEALTHY=true
                 break
               fi
-              echo "Waiting for database... ($i/30)"
+              echo "Waiting for services... ($i/60)"
               sleep 5
             done
-            # Diagnostic: logs on failure
-            if [ $? -ne 0 ]; then
+            if [ "$HEALTHY" != "true" ]; then
+              echo "Supabase failed to start in time"
+              docker ps -a
               docker logs supabase_db_drum-charter
+              exit 1
             fi
             SUPABASE_STATUS=$(npx supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
       - run:
+          name: Build Next.js app
+          command: |
+            source $BASH_ENV
+            pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
+      - run:
           name: Run Playwright E2E Tests
           command: |
             source $BASH_ENV
+            # Skip build since we did it above
+            export SKIP_BUILD=true
             pnpm test:e2e -- --project=chromium --trace on
           environment:
             CI: "true"
