@@ -128,6 +128,38 @@ jobs:
           path: test-results
           destination: playwright-results
 
+  # -----------------------------------------------------------------------------------
+  # 4. DATABASE SYNC (Supabase Migrations)
+  # -----------------------------------------------------------------------------------
+  deploy-migrations:
+    executor:
+      name: node/default
+      tag: "22.14.0"
+    steps:
+      - checkout
+      - node/install-pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - run:
+          name: Push Migrations to Staging
+          command: |
+            if [ "$CIRCLE_BRANCH" = "staging" ]; then
+              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
+              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
+            fi
+          environment:
+            SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
+      - run:
+          name: Push Migrations to Production
+          command: |
+            if [ "$CIRCLE_BRANCH" = "main" ]; then
+              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
+              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
+            fi
+          environment:
+            SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
+
 # -------------------------------------------------------------------------------------
 # WORKFLOW DEFINITIONS
 # -------------------------------------------------------------------------------------
@@ -149,33 +181,3 @@ workflows:
               only:
                 - main
                 - staging
-
-# Separate job for migrations since it doesn't need machine executor
-deploy-migrations:
-  executor:
-    name: node/default
-    tag: "22.14.0"
-  steps:
-    - checkout
-    - node/install-pnpm
-    - run:
-        name: Install dependencies
-        command: pnpm install
-    - run:
-        name: Push Migrations to Staging
-        command: |
-          if [ "$CIRCLE_BRANCH" = "staging" ]; then
-            pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
-            pnpm supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
-          fi
-        environment:
-          SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
-    - run:
-        name: Push Migrations to Production
-        command: |
-          if [ "$CIRCLE_BRANCH" = "main" ]; then
-            pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
-            pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
-          fi
-        environment:
-          SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
