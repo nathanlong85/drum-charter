@@ -83,32 +83,28 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Setup and Run E2E Shard << parameters.shard >>
+          name: E2E Shard << parameters.shard >>
           no_output_timeout: 30m
           command: |
             set -e
-            echo "--- STEP 1: Environment Setup ---"
-            # Use 'n' to install node 22 (usually available on CircleCI machine)
-            sudo npm install -g n
-            sudo n 22
-            sudo npm install -g pnpm
-            sudo npm install -g supabase
+            echo "--- STEP 1: Environment ---"
             sudo apt-get update && sudo apt-get install -y jq
             sudo chmod 666 /var/run/docker.sock
             
-            node -v
-            pnpm -v
-            supabase -v
+            # Use the pre-installed nvm/node to be safe
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
             
-            echo "--- STEP 2: Dependencies ---"
+            npm install -g pnpm
             pnpm install
             
-            echo "--- STEP 3: Supabase ---"
-            # Start heartbeat
-            (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
+            echo "--- STEP 2: Supabase ---"
+            (while true; do echo "HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
             
-            supabase start --no-backup
+            npx supabase start --no-backup
             
             echo "Waiting for Supabase..."
             for i in {1..60}; do
@@ -116,23 +112,20 @@ jobs:
                 echo "Supabase ready"
                 break
               fi
-              echo "Waiting... $i $(date)"
+              echo "Waiting... $i"
               sleep 5
             done
             
-            SUPABASE_STATUS=$(supabase status -o json)
+            SUPABASE_STATUS=$(npx supabase status -o json)
             export NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
             export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$(echo "$SUPABASE_STATUS" | jq -r .ANON_KEY)
             export SUPABASE_SERVICE_ROLE_KEY=$(echo "$SUPABASE_STATUS" | jq -r .SERVICE_ROLE_KEY)
             
-            echo "--- STEP 4: Build App ---"
+            echo "--- STEP 3: Build & Playwright ---"
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
-            
-            echo "--- STEP 5: Playwright ---"
             pnpm exec playwright install --with-deps chromium
             
-            echo "--- STEP 6: Run Shard << parameters.shard >> ---"
-            export SKIP_BUILD=true
+            echo "--- STEP 4: Run Tests ---"
             pnpm test:e2e -- --project=chromium --shard=<< parameters.shard >>/4
             
             kill $HEARTBEAT_PID
@@ -170,7 +163,7 @@ jobs:
           command: |
             if [ "$CIRCLE_BRANCH" = "main" ]; then
               pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
-              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
+              pnpm supabase_db_push --password $SUPABASE_DB_PASSWORD_PROD
             fi
           environment:
             SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
