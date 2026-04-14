@@ -55,52 +55,38 @@ jobs:
   # 3. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
-    machine:
-      image: ubuntu-2204:2024.01.1
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.49.1-noble
     resource_class: large
     working_directory: ~/repo
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 20.10.14
       - run:
-          name: Setup Node.js and pnpm
-          command: |
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install 22
-            nvm use 22
-            npm install -g pnpm
-            echo 'export PATH=$(npm config get prefix)/bin:$PATH' >> $BASH_ENV
+          name: Install pnpm
+          command: npm install -g pnpm
       - run:
           name: Install dependencies
-          command: |
-            source $BASH_ENV
-            pnpm install
-      - run:
-          name: Install Playwright Browsers
-          command: |
-            source $BASH_ENV
-            pnpm exec playwright install --with-deps chromium
-      - run:
-          name: Setup Docker Permissions
-          command: sudo chmod 666 /var/run/docker.sock
+          command: pnpm install
       - run:
           name: Start Supabase (local)
           command: |
-            source $BASH_ENV
-            # Start Supabase
+            # Start Supabase on remote docker
             npx supabase start --no-backup
-            # Wait for healthy
-            for i in {1..30}; do
-              if docker exec supabase_db_drum-charter pg_isready -U postgres &> /dev/null; then
-                echo "Database is ready"
-                break
-              fi
-              echo "Waiting for database... ($i/30)"
-              sleep 5
-            done
+            
+            # Find the bridge IP for remote docker access
+            # When using setup_remote_docker, the primary container can talk to the 
+            # remote docker host via the default bridge gateway (usually 172.17.0.1)
+            BRIDGE_IP=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
+            echo "Bridge IP detected: $BRIDGE_IP"
+            
+            # Extract keys
             SUPABASE_STATUS=$(npx supabase status -o json)
-            echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
-            echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
+            
+            # Export variables for the build and tests
+            echo "export NEXT_PUBLIC_SUPABASE_URL=http://$BRIDGE_IP:54321" >> $BASH_ENV
+            echo "$SUPABASE_STATUS" | jq -r --arg ip "$BRIDGE_IP" '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
       - run:
           name: Build Next.js app
@@ -111,10 +97,10 @@ jobs:
           name: Run Playwright E2E Tests
           command: |
             source $BASH_ENV
+            export SKIP_BUILD=true
             pnpm test:e2e -- --project=chromium --trace on
           environment:
             CI: "true"
-            NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
       - store_artifacts:
           path: test-results
           destination: playwright-results
