@@ -55,19 +55,30 @@ jobs:
   # 3. BUILD APP (Pre-build for E2E)
   # -----------------------------------------------------------------------------------
   build-app:
-    executor: node-executor
+    machine:
+      image: ubuntu-2204:2024.01.1
     resource_class: large
     steps:
       - checkout
       - run:
-          name: Install pnpm
-          command: sudo npm install -g pnpm
+          name: Setup Node.js and pnpm
+          command: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
+            npm install -g pnpm
+            echo 'export PATH=$(npm config get prefix)/bin:$PATH' >> $BASH_ENV
       - run:
           name: Install dependencies
-          command: pnpm install
+          command: |
+            source $BASH_ENV
+            pnpm install
       - run:
           name: Build Next.js app
-          command: pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
+          command: |
+            source $BASH_ENV
+            pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
           environment:
             NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
             NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: placeholder
@@ -100,6 +111,11 @@ jobs:
             npm install -g pnpm
             echo 'export PATH=$(npm config get prefix)/bin:$PATH' >> $BASH_ENV
       - run:
+          name: Verify and Install dependencies
+          command: |
+            source $BASH_ENV
+            pnpm install
+      - run:
           name: Install Playwright Browsers
           command: |
             source $BASH_ENV
@@ -114,7 +130,7 @@ jobs:
             # Increase output to prevent 10m timeout
             (while true; do echo "Supabase starting... $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
-            npx supabase start --no-backup
+            pnpm supabase start --no-backup
             kill $HEARTBEAT_PID
             
             # Wait for healthy
@@ -128,7 +144,7 @@ jobs:
               sleep 5
             done
             
-            SUPABASE_STATUS=$(npx supabase status -o json)
+            SUPABASE_STATUS=$(pnpm supabase status -o json)
             echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
