@@ -86,6 +86,7 @@ jobs:
       - run:
           name: Setup Node.js and pnpm
           command: |
+            set -e -o pipefail
             sudo apt-get update && sudo apt-get install -y jq
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -96,6 +97,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            set -e -o pipefail
             source $BASH_ENV
             pnpm install
       - save_cache:
@@ -110,6 +112,7 @@ jobs:
       - run:
           name: Install Playwright Browsers
           command: |
+            set -e -o pipefail
             source $BASH_ENV
             pnpm exec playwright install --with-deps chromium
       - save_cache:
@@ -122,6 +125,7 @@ jobs:
       - run:
           name: Debug Environment
           command: |
+            set -e -o pipefail
             source $BASH_ENV
             node -v
             pnpm -v
@@ -130,12 +134,16 @@ jobs:
       - run:
           name: Start Supabase (local)
           command: |
+            set -e -o pipefail
             source $BASH_ENV
             # Increase output to prevent 10m timeout
             (while true; do echo "Supabase starting... $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
             pnpm supabase start --no-backup
             kill $HEARTBEAT_PID
+            
+            # Debug status
+            pnpm supabase status -o json
             
             # Wait for healthy
             echo "Waiting for services..."
@@ -155,6 +163,7 @@ jobs:
       - run:
           name: Build Next.js app (with real keys)
           command: |
+            set -e -o pipefail
             source $BASH_ENV
             (while true; do echo "Building app... $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
@@ -165,6 +174,7 @@ jobs:
           name: Run Playwright E2E Tests
           no_output_timeout: 15m
           command: |
+            set -e -o pipefail
             source $BASH_ENV
             (while true; do echo "Tests running... $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
