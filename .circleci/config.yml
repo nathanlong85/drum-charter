@@ -40,29 +40,52 @@ jobs:
           command: pnpm test run
 
   # -----------------------------------------------------------------------------------
-  # 3. E2E TESTS (Playwright Docker)
+  # 3. BUILD APP (Pre-build with Placeholder)
+  # -----------------------------------------------------------------------------------
+  build-app:
+    docker:
+      - image: cimg/node:22.14.0
+    resource_class: large
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: pnpm
+      - run:
+          name: Build Next.js app with Placeholder
+          command: |
+            # We use a long unique string that won't be truncated or collisioned
+            export NEXT_PUBLIC_SUPABASE_URL="http://localhost:54321"
+            export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY="SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI"
+            pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .next
+            - public
+            - node_modules
+
+  # -----------------------------------------------------------------------------------
+  # 4. E2E TESTS (Sharded & Patched Machine)
   # -----------------------------------------------------------------------------------
   test-e2e:
     parameters:
       shard:
         type: string
-    docker:
-      - image: mcr.microsoft.com/playwright:v1.50.0-jammy
+    machine:
+      image: ubuntu-2204:2024.01.1
     resource_class: large
     working_directory: ~/repo
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.24
-          docker_layer_caching: true
+      - attach_workspace:
+          at: .
       - run:
-          name: Install pnpm & jq
+          name: Setup Environment
           command: |
-            npm install -g pnpm
-            apt-get update && apt-get install -y jq
-      - run:
-          name: Install dependencies
-          command: pnpm install
+            sudo apt-get update && sudo apt-get install -y jq
+            sudo chmod 666 /var/run/docker.sock
+      - node/install:
+          node-version: "22.14.0"
       - run:
           name: Setup and Run E2E Shard << parameters.shard >>
           no_output_timeout: 30m
@@ -72,7 +95,10 @@ jobs:
             (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
             
-            pnpm supabase start --no-backup
+            # Use pre-installed global npm to get pnpm if needed, but it should be in workspace
+            export PATH=$PATH:$(pwd)/node_modules/.bin
+            
+            npx supabase start --no-backup
             
             echo "Waiting for Supabase..."
             for i in {1..60}; do
@@ -84,15 +110,22 @@ jobs:
               sleep 5
             done
             
-            SUPABASE_STATUS=$(pnpm supabase status -o json)
+            SUPABASE_STATUS=$(npx supabase status -o json)
+            REAL_ANON_KEY=$(echo "$SUPABASE_STATUS" | jq -r .ANON_KEY)
             export NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
-            export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$(echo "$SUPABASE_STATUS" | jq -r .ANON_KEY)
+            export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$REAL_ANON_KEY
             export SUPABASE_SERVICE_ROLE_KEY=$(echo "$SUPABASE_STATUS" | jq -r .SERVICE_ROLE_KEY)
             
-            echo "--- STEP 2: Build App ---"
-            pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
+            echo "--- STEP 2: Patching App ---"
+            # Patch the built files with the real key
+            echo "Patching placeholder with real key..."
+            grep -rl "SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI" .next | xargs sed -i "s/SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI/$REAL_ANON_KEY/g"
+            echo "Patching complete."
             
-            echo "--- STEP 3: Run Tests ---"
+            echo "--- STEP 3: Playwright ---"
+            pnpm exec playwright install --with-deps chromium
+            
+            echo "--- STEP 4: Run Tests ---"
             export SKIP_BUILD=true
             pnpm test:e2e -- --project=chromium --shard=<< parameters.shard >>/4
             
@@ -105,7 +138,7 @@ jobs:
           destination: playwright-report-shard-<< parameters.shard >>
 
   # -----------------------------------------------------------------------------------
-  # 4. DATABASE SYNC (Supabase Migrations)
+  # 5. DATABASE SYNC (Supabase Migrations)
   # -----------------------------------------------------------------------------------
   deploy-migrations:
     docker:
@@ -142,30 +175,30 @@ workflows:
     jobs:
       - lint
       - test-unit
+      - build-app:
+          requires:
+            - lint
+            - test-unit
       - test-e2e:
           name: test-e2e-shard-1
           shard: "1"
           requires:
-            - lint
-            - test-unit
+            - build-app
       - test-e2e:
           name: test-e2e-shard-2
           shard: "2"
           requires:
-            - lint
-            - test-unit
+            - build-app
       - test-e2e:
           name: test-e2e-shard-3
           shard: "3"
           requires:
-            - lint
-            - test-unit
+            - build-app
       - test-e2e:
           name: test-e2e-shard-4
           shard: "4"
           requires:
-            - lint
-            - test-unit
+            - build-app
       - deploy-migrations:
           requires:
             - test-e2e-shard-1
