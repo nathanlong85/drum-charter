@@ -27,7 +27,7 @@ jobs:
             - pnpm-v1-
       - run:
           name: Install pnpm
-          command: npm install -g pnpm
+          command: sudo npm install -g pnpm
       - run:
           name: Install dependencies
           command: pnpm install
@@ -56,7 +56,7 @@ jobs:
             - pnpm-v1-
       - run:
           name: Install pnpm
-          command: npm install -g pnpm
+          command: sudo npm install -g pnpm
       - run:
           name: Install dependencies
           command: pnpm install
@@ -217,7 +217,7 @@ jobs:
       - checkout
       - run:
           name: Install pnpm
-          command: npm install -g pnpm
+          command: sudo npm install -g pnpm
       - run:
           name: Install dependencies
           command: pnpm install
