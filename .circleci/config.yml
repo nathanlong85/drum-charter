@@ -119,6 +119,14 @@ jobs:
           name: Setup Docker Permissions
           command: sudo chmod 666 /var/run/docker.sock
       - run:
+          name: Debug Environment
+          command: |
+            source $BASH_ENV
+            node -v
+            pnpm -v
+            docker --version
+            docker ps
+      - run:
           name: Start Supabase (local)
           command: |
             source $BASH_ENV
