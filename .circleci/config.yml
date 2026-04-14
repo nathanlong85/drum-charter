@@ -32,7 +32,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            npm install -g pnpm
+            sudo npm install -g pnpm
             pnpm install
       - run:
           name: Run Biome lint
@@ -51,7 +51,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            npm install -g pnpm
+            sudo npm install -g pnpm
             pnpm install
       - run:
           name: Run Vitest
@@ -128,7 +128,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            npm install -g pnpm
+            sudo npm install -g pnpm
             pnpm install
       - run:
           name: Push Migrations to Staging
