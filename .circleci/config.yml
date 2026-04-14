@@ -109,79 +109,37 @@ jobs:
   # 4. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
-    machine:
-      image: ubuntu-2204:2024.01.1
-    parallelism: 2
+    executor: node-executor
     resource_class: large
     working_directory: ~/repo
     steps:
       - checkout
       - attach_workspace:
           at: .
+      - setup_remote_docker:
+          version: 20.10.24
+          docker_layer_caching: true
       - run:
-          name: Setup Node.js and pnpm
-          command: |
-            echo "Starting Setup..."
-            # Try to install jq without full update first
-            sudo apt-get install -y jq || (sudo apt-get update && sudo apt-get install -y jq)
-            
-            export NVM_DIR="$HOME/.nvm"
-            if [ -s "$NVM_DIR/nvm.sh" ]; then
-              source "$NVM_DIR/nvm.sh"
-              nvm install 22
-              nvm use 22
-            else
-              echo "NVM not found, using system node"
-            fi
-            
-            node -v
-            npm install -g pnpm
-            pnpm -v
-            
-            echo "export PATH=$(npm config get prefix)/bin:\$PATH" >> $BASH_ENV
-            echo "Setup complete."
-      - restore_cache:
-          keys:
-            - playwright-browsers-v1-{{ checksum "package.json" }}
-            - playwright-browsers-v1-
+          name: Install pnpm
+          command: sudo npm install -g pnpm
       - run:
           name: Install Playwright Browsers
+          command: pnpm exec playwright install --with-deps chromium
+      - run:
+          name: Start Supabase (remote docker)
           command: |
             set -e -o pipefail
-            source $BASH_ENV
-            pnpm exec playwright install --with-deps chromium
-      - save_cache:
-          key: playwright-browsers-v1-{{ checksum "package.json" }}
-          paths:
-            - ~/.cache/ms-playwright
-      - run:
-          name: Setup Docker Permissions
-          command: sudo chmod 666 /var/run/docker.sock
-      - run:
-          name: Debug Environment
-          command: |
-            set -e -o pipefail
-            source $BASH_ENV
-            node -v
-            pnpm -v
-            docker --version
-            docker ps
-      - run:
-          name: Start Supabase (local)
-          command: |
-            set -e -o pipefail
-            source $BASH_ENV
-            # Increase output to prevent 10m timeout
-            (while true; do echo "Supabase starting... $(date)"; sleep 30; done) &
-            HEARTBEAT_PID=$!
-            npx supabase start --no-backup
-            kill $HEARTBEAT_PID
+            # Supabase start
+            pnpm supabase start --no-backup
             
-            # Wait for healthy
+            # Wait for healthy using bridge IP
+            BRIDGE_IP=$(docker network inspect bridge -f '{{ (index .IPAM.Config 0).Gateway }}')
+            echo "Detected Bridge IP: $BRIDGE_IP"
+            
             echo "Waiting for services..."
             READY=false
             for i in {1..60}; do
-              if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
+              if curl -s http://localhost:54321/rest/v1/ > /dev/null; then
                 echo "Supabase is ready"
                 READY=true
                 break
@@ -192,32 +150,28 @@ jobs:
             
             if [ "$READY" = "false" ]; then
               echo "Supabase timed out"
-              npx supabase status
+              pnpm supabase status
               exit 1
             fi
             
-            SUPABASE_STATUS=$(npx supabase status -o json)
-            echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
+            SUPABASE_STATUS=$(pnpm supabase status -o json)
+            echo "export NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321" >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
+            echo "export SUPABASE_BRIDGE_IP=$BRIDGE_IP" >> $BASH_ENV
       - run:
-          name: Run Playwright E2E Tests (Parallel)
+          name: Run Playwright E2E Tests
           no_output_timeout: 15m
           command: |
             set -e -o pipefail
             source $BASH_ENV
-            (while true; do echo "Tests running... $(date)"; sleep 30; done) &
-            HEARTBEAT_PID=$!
             export SKIP_BUILD=true
-            
-            # Split tests
-            TESTFILES=$(circleci tests glob "tests/e2e/*.spec.ts" | circleci tests split)
-            echo "Running tests: $TESTFILES"
-            
-            pnpm test:e2e -- --project=chromium --trace on $TESTFILES
-            kill $HEARTBEAT_PID
+            # Map localhost to bridge IP for the app to find Supabase
+            pnpm test:e2e -- --project=chromium --trace on
           environment:
             CI: "true"
+            # We will use localhost because Supabase CLI maps ports from remote docker to localhost in setup_remote_docker
+            NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
       - store_artifacts:
           path: test-results
           destination: playwright-results
