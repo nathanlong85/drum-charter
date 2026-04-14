@@ -52,15 +52,45 @@ jobs:
           command: pnpm test run
 
   # -----------------------------------------------------------------------------------
-  # 3. E2E & PWA TESTS (Supabase + Playwright)
+  # 3. BUILD APP (Pre-build for E2E)
+  # -----------------------------------------------------------------------------------
+  build-app:
+    executor: node-executor
+    resource_class: large
+    steps:
+      - checkout
+      - run:
+          name: Install pnpm
+          command: sudo npm install -g pnpm
+      - run:
+          name: Install dependencies
+          command: pnpm install
+      - run:
+          name: Build Next.js app
+          command: pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
+          environment:
+            # Placeholder values just for build time
+            NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: placeholder
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .next
+            - public
+            - node_modules
+
+  # -----------------------------------------------------------------------------------
+  # 4. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
     machine:
       image: ubuntu-2204:2024.01.1
-    resource_class: xlarge
+    resource_class: large
     working_directory: ~/repo
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run:
           name: Setup Node.js and pnpm
           command: |
@@ -74,17 +104,6 @@ jobs:
             echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
             echo 'nvm use 22 > /dev/null' >> $BASH_ENV
             echo 'export PATH=$(npm config get prefix)/bin:$PATH' >> $BASH_ENV
-      - restore_cache:
-          key: dependency-cache-{{ checksum "pnpm-lock.yaml" }}
-      - run:
-          name: Install dependencies
-          command: |
-            source $BASH_ENV
-            pnpm install
-      - save_cache:
-          key: dependency-cache-{{ checksum "pnpm-lock.yaml" }}
-          paths:
-            - node_modules
       - run:
           name: Install Playwright Browsers
           command: |
@@ -119,24 +138,12 @@ jobs:
             echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
       - run:
-          name: Build Next.js app
-          no_output_timeout: 30m
-          command: |
-            source $BASH_ENV
-            (while true; do echo "HEARTBEAT: build $(date)"; free -m; sleep 60; done) &
-            HEARTBEAT_PID=$!
-            pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
-            kill $HEARTBEAT_PID
-      - run:
           name: Run Playwright E2E Tests
-          no_output_timeout: 30m
+          no_output_timeout: 15m
           command: |
             source $BASH_ENV
-            (while true; do echo "HEARTBEAT: tests $(date)"; free -m; sleep 60; done) &
-            HEARTBEAT_PID=$!
             export SKIP_BUILD=true
             pnpm test:e2e -- --project=chromium --trace on
-            kill $HEARTBEAT_PID
           environment:
             CI: "true"
             NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
@@ -145,7 +152,7 @@ jobs:
           destination: playwright-results
 
   # -----------------------------------------------------------------------------------
-  # 4. DATABASE SYNC (Supabase Migrations)
+  # 5. DATABASE SYNC (Supabase Migrations)
   # -----------------------------------------------------------------------------------
   deploy-migrations:
     executor: node-executor
@@ -185,10 +192,13 @@ workflows:
     jobs:
       - lint
       - test-unit
-      - test-e2e:
+      - build-app:
           requires:
             - lint
             - test-unit
+      - test-e2e:
+          requires:
+            - build-app
       - deploy-migrations:
           requires:
             - test-e2e
