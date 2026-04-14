@@ -50,67 +50,36 @@ jobs:
   # 3. E2E & PWA TESTS (Supabase + Playwright)
   # -----------------------------------------------------------------------------------
   test-e2e:
-    machine:
-      image: ubuntu-2204:2024.01.1
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.49.1-noble
     resource_class: large
     working_directory: ~/repo
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 20.10.14
       - run:
-          name: Install Node.js 22 and pnpm
-          command: |
-            # On machine executor, nvm is pre-installed
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            nvm install 22
-            nvm use 22
-            npm install -g pnpm
-            echo 'export PATH=$(npm config get prefix)/bin:$PATH' >> $BASH_ENV
-            echo 'export NVM_DIR="$HOME/.nvm"' >> $BASH_ENV
-            echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> $BASH_ENV
-            echo 'nvm use 22 > /dev/null' >> $BASH_ENV
+          name: Install pnpm
+          command: npm install -g pnpm
       - run:
           name: Install dependencies
-          command: |
-            source $BASH_ENV
-            pnpm install
-      - run:
-          name: Install Playwright Browsers
-          command: |
-            source $BASH_ENV
-            pnpm exec playwright install --with-deps chromium
-      - run:
-          name: Setup Docker Permissions
-          command: |
-            sudo chmod 666 /var/run/docker.sock
-            docker version
+          command: pnpm install
       - run:
           name: Start Supabase (local)
           command: |
-            source $BASH_ENV
+            # Start Supabase on remote docker
             npx supabase start --no-backup
-            # Wait for healthy - checking the REST API specifically
-            echo "Waiting for Supabase services to be healthy..."
-            HEALTHY=false
-            for i in {1..30}; do
-              if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
-                echo "Supabase is ready"
-                HEALTHY=true
-                break
-              fi
-              echo "Waiting for services... ($i/30)"
-              # Check container status for diagnostics
-              docker ps --format '{{.Names}}: {{.Status}}' | grep supabase || true
-              sleep 10
-            done
-            if [ "$HEALTHY" != "true" ]; then
-              echo "Supabase failed to start"
-              docker ps -a
-              exit 1
-            fi
+            
+            # Find the bridge IP for remote docker access
+            BRIDGE_IP=$(docker network inspect bridge -f '{{range .IPAM.Config}}{{.Gateway}}{{end}}')
+            echo "Bridge IP detected: $BRIDGE_IP"
+            
+            # Extract keys
             SUPABASE_STATUS=$(npx supabase status -o json)
-            echo "export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321" >> $BASH_ENV
-            echo "$SUPABASE_STATUS" | jq -r '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
+            
+            # When using remote docker, the services are accessible via BRIDGE_IP
+            echo "export NEXT_PUBLIC_SUPABASE_URL=http://$BRIDGE_IP:54321" >> $BASH_ENV
+            echo "$SUPABASE_STATUS" | jq -r --arg ip "$BRIDGE_IP" '"export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=" + .ANON_KEY' >> $BASH_ENV
             echo "$SUPABASE_STATUS" | jq -r '"export SUPABASE_SERVICE_ROLE_KEY=" + .SERVICE_ROLE_KEY' >> $BASH_ENV
       - run:
           name: Build Next.js app
@@ -119,7 +88,6 @@ jobs:
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build
       - run:
           name: Run Playwright E2E Tests
-          no_output_timeout: 10m
           command: |
             source $BASH_ENV
             export SKIP_BUILD=true
