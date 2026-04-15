@@ -75,21 +75,13 @@ This document serves as the absolute source of truth for GitHub-related operatio
 
 ### 3. Review & Comments
 
-- **Trigger Copilot Review (MANDATORY for every PR)**:
+- **AI Agent Self-Review (MANDATORY for every PR)**:
 
-  - **Constraint**: The AI account (`nathanlong85-ai`) may lack permissions to trigger the GitHub Copilot App directly.
   - **Protocol**:
-    1. Temporarily switch to the user account.
-    2. Trigger the review.
-    3. Switch back to the AI account immediately.
+    1. Perform an automated self-review of the changes using the `code-reviewer` skill or Gemini Code Assist.
+    2. Ensure all changes meet the project's quality standards before finalizing the PR.
 
-  - **Command**:
-
-    ```bash
-    gh auth switch --user nathanlong85 && gh pr edit <number> --add-reviewer "@copilot" && gh auth switch --user nathanlong85-ai
-    ```
-
-  - **Verification**: Copilot typically does not appear in `reviewRequests` but will appear in `latestReviews` (visible via `gh pr view --json latestReviews`) once it begins its review.
+  - **Verification**: Gemini Code Assist review comments or automated feedback will appear in the PR history.
 
 - **Check Review Comments (General/Top-level)**:
 

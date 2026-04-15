@@ -10,12 +10,20 @@ const withSerwist = withSerwistInit({
   disable: process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_FORCE_SW !== 'true',
 });
 
-export default withSerwist({
+const nextConfig = {
   outputFileTracingRoot: path.resolve(process.cwd()),
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
   logging: {
     browserToTerminal: true,
   },
   experimental: {
     viewTransition: true,
   },
-});
+};
+
+export default withSerwist(nextConfig);
