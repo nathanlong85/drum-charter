@@ -4,12 +4,12 @@ This protocol defines the iterative review loop using Gemini Code Assist (the AI
 
 ## 1. Creating the PR
 - **Title/Body**: Informative, link to issues (e.g., "Closes #60").
-- **Self-Assign**: \`gh pr edit <number> --add-assignee nathanlong85-ai\`.
+- **Self-Assign**: gh pr edit number --add-assignee nathanlong85-ai
 
 ## 2. The Iterative Feedback Loop
 Follow these steps for every PR:
-1. **Verification**: Ensure changes are fully verified locally via \`verify_done.sh\`.
-2. **Push & PR**: Open the PR against \`staging\`.
+1. **Verification**: Ensure changes are fully verified locally via verify_done.sh.
+2. **Push & PR**: Open the PR against staging.
 3. **Gemini Self-Review (MANDATORY)**: Perform a final self-review using Gemini Code Assist (the current agent) to ensure adherence to all project standards and best practices.
 4. **Monitoring**: Poll for completion of CircleCI jobs.
 5. **Address Findings**: Fix all self-identified issues or any flagged by the user.
