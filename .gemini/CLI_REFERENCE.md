@@ -147,3 +147,17 @@ query($id:ID!) {
 - **Sync Main**: `git checkout main && git pull origin main`
 - **Create Feature Branch**: `git checkout -b <type>/<issue-number>-<description>`
 - **Check Status & Diff**: `git status && git diff HEAD`
+
+---
+
+## CircleCI (CI/CD)
+
+- **List Pipelines**: `circleci pipeline list <project-slug-or-id>` (Slug: `gh/nathanlong85/drum-charter`)
+- **Check Secrets**: `circleci project secret list <vcs-type> <org-name> <project-name>` (e.g., `circleci project secret list github nathanlong85 drum-charter`)
+- **Open Project**: `circleci open` (Opens dashboard in browser)
+- **Status via API (curl)**:
+  ```bash
+  curl --request GET \
+    --url "https://circleci.com/api/v2/pipeline?org-slug=gh/<org>" \
+    --header "Circle-Token: $CIRCLE_TOKEN"
+  ```

@@ -183,8 +183,6 @@ jobs:
               pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
               pnpm supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
             fi
-          environment:
-            SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
       - run:
           name: Push Migrations to Production
           command: |
@@ -192,8 +190,6 @@ jobs:
               pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
               pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
             fi
-          environment:
-            SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
 
 # -------------------------------------------------------------------------------------
 # WORKFLOW DEFINITIONS
