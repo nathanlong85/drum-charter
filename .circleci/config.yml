@@ -74,7 +74,6 @@ jobs:
     machine:
       image: ubuntu-2204:2024.01.1
     resource_class: large
-    working_directory: ~/repo
     steps:
       - checkout
       - attach_workspace:
@@ -96,8 +95,9 @@ jobs:
             (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
             
-            # Ensure pnpm is available in the path
-            export PATH=$PATH:$(pnpm bin -g)
+            # Use corepack to ensure pnpm is available and in the path
+            sudo corepack enable
+            pnpm --version
             
             npx supabase start --no-backup
             
@@ -121,7 +121,19 @@ jobs:
             # Patch the built files with the real key
             echo "Patching placeholder with real key..."
             # Use | as delimiter for sed to be safe with base64/JWT keys
-            grep -rl "SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI" .next public | xargs sed -i "s|SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI|$REAL_ANON_KEY|g"
+            # Use || true to avoid grep exit code 1 if no matches are found
+            FILES=$(grep -rl "SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI" .next public || true)
+            if [ -n "$FILES" ]; then
+              echo "Patching files: $FILES"
+              echo "$FILES" | xargs sed -i "s|SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI|$REAL_ANON_KEY|g"
+            else
+              echo "No files found containing the placeholder. Checking if patching is needed..."
+              if grep -rq "$REAL_ANON_KEY" .next; then
+                echo "Real key already present in .next. Patching may have already occurred or was not needed."
+              else
+                echo "WARNING: Placeholder not found and real key not found in .next. This might cause issues."
+              fi
+            fi
             echo "Patching complete."
             
             echo "--- STEP 3: Playwright ---"
