@@ -32,32 +32,39 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = (props) => {
   const bpm = props.bpm !== undefined ? props.bpm : localBpm;
   const onBpmChange = props.onBpmChange || setLocalBpm;
 
-  const { cellSize = 40, measuresPerRow: propMeasuresPerRow = 2 } = props;
-  const measuresPerRow = Math.max(1, propMeasuresPerRow);
-  const safeBeatValue = Math.max(1, props.initialGrid.timeSignature.beatValue);
-  const notesPerBeat = props.initialGrid.resolution / safeBeatValue;
-
   return (
     <GrooveGridProvider {...props} bpm={bpm} onBpmChange={onBpmChange}>
-      <div
-        className="flex flex-col gap-6"
-        data-testid="groove-grid"
-        style={
-          {
-            '--note-cell-size': `${cellSize}px`,
-            '--measures-per-row': measuresPerRow,
-            '--beats-per-measure': props.initialGrid.timeSignature.beatsPerMeasure,
-            '--notes-per-beat': notesPerBeat,
-          } as React.CSSProperties
-        }
-      >
-        <GridHeader />
-        <GridBody measuresPerRow={measuresPerRow} />
-        <GridOverlays />
-      </div>
+      <EditorLayout {...props} />
     </GrooveGridProvider>
   );
 };
+
+function EditorLayout(props: GrooveGridEditorProps) {
+  const { state } = useGrooveGrid();
+  const { cellSize = 40, measuresPerRow: propMeasuresPerRow = 2 } = props;
+  const measuresPerRow = Math.max(1, propMeasuresPerRow);
+  const safeBeatValue = Math.max(1, state.timeSignature.beatValue);
+  const notesPerBeat = state.resolution / safeBeatValue;
+
+  return (
+    <div
+      className="flex flex-col gap-6"
+      data-testid="groove-grid"
+      style={
+        {
+          '--note-cell-size': `${cellSize}px`,
+          '--measures-per-row': measuresPerRow,
+          '--beats-per-measure': state.timeSignature.beatsPerMeasure,
+          '--notes-per-beat': notesPerBeat,
+        } as React.CSSProperties
+      }
+    >
+      <GridHeader />
+      <GridBody measuresPerRow={measuresPerRow} />
+      <GridOverlays />
+    </div>
+  );
+}
 
 function GridHeader() {
   return <GrooveGridToolbar />;
@@ -218,11 +225,12 @@ function GridColumnLabels({
             <div
               key={`label-${globalIdx}`}
               data-testid={isBeatStart ? `beat-label-${label}` : undefined}
-              className={`flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/5 h-6 ${
+              className={`flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/5 ${
                 isBeatStart ? 'text-primary' : 'text-on-surface-variant/30'
               }`}
               style={{
                 width: 'var(--note-cell-size, 40px)',
+                height: 'var(--note-cell-size, 40px)',
               }}
             >
               {label}

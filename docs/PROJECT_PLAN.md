@@ -53,6 +53,8 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done (Recent)
 
+- [x] [UX] Formatting: Indented Print View & High-Contrast PDF Support: Optimized grid and section spacing for professional drum chart printing. (#128) `✓`
+
 - [x] [Infra] Fix CircleCI E2E Test Failures: Consolidated build/test on machine executor, improved caching, and increased Playwright workers for stability (#129) `✓`
 
 - [x] [Release] Production Deployment: Promoting \`staging\` to \`main\` with Modernization Phase 1-4, Header UX Refactor, and Auth refinements. (#122) \`✓\`
