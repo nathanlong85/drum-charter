@@ -88,8 +88,8 @@ jobs:
             nvm install 22
             nvm use 22
             
-            sudo corepack enable
-            sudo corepack prepare pnpm@latest --activate
+            corepack enable
+            corepack prepare pnpm@latest --activate
             
             sudo apt-get update || true
             sudo apt-get install -y jq || true
