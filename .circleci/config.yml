@@ -106,7 +106,7 @@ jobs:
             (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
             
-            npx supabase start --no-backup
+            npx supabase start
             
             echo "Waiting for Supabase..."
             for i in {1..60}; do
