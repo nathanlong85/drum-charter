@@ -135,11 +135,12 @@ jobs:
               echo "Patching files: $FILES"
               echo "$FILES" | xargs sed -i "s|SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI|$REAL_ANON_KEY|g"
             else
-              echo "No files found containing the placeholder. Checking if patching is needed..."
+              echo "Checking if patching is needed..."
               if grep -rq "$REAL_ANON_KEY" .next; then
                 echo "Real key already present in .next."
               else
-                echo "WARNING: Placeholder not found and real key not found in .next."
+                echo "ERROR: Placeholder not found and real key not found in .next. Patching failed."
+                exit 1
               fi
             fi
             echo "Patching complete."

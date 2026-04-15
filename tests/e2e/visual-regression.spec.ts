@@ -1,13 +1,6 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Visual Regression', () => {
-  test.beforeEach(() => {
-    // Skip in CI unless explicitly requested
-    if (process.env.CI) {
-      test.skip();
-    }
-  });
-
   // Use a slight threshold to account for rendering differences
   const screenshotOptions = {
     threshold: 0.2,

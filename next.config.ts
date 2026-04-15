@@ -13,10 +13,10 @@ const withSerwist = withSerwistInit({
 const nextConfig = {
   outputFileTracingRoot: path.resolve(process.cwd()),
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   logging: {
     browserToTerminal: true,
@@ -24,6 +24,6 @@ const nextConfig = {
   experimental: {
     viewTransition: true,
   },
-} as any;
+};
 
 export default withSerwist(nextConfig);
