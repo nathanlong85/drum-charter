@@ -91,6 +91,7 @@ jobs:
             corepack enable
             corepack prepare pnpm@latest --activate
             
+            export DEBIAN_FRONTEND=noninteractive
             sudo apt-get update || true
             sudo apt-get install -y jq || true
             sudo chmod 666 /var/run/docker.sock || true
