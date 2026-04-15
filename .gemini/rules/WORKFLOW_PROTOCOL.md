@@ -28,7 +28,7 @@ Work is ONLY "Done" when the following are met:
 2. **Full Suite Pass**: `verify_done.sh` must return a total pass.
 3. **Automated Verification**: `pnpm test:run` (Unit) and `pnpm test:e2e` (E2E) must pass.
 4. **CircleCI Pass**: All remote CircleCI workflow jobs must be PASSING.
-5. **Copilot Loop**: The PR review from `@copilot` must be clean (all findings addressed).
+5. **Gemini Review**: The self-review via Gemini Code Assist must be clean (all findings addressed).
 6. **Checklist Reporting**: Provide a "Definition of Done Checklist" before final sign-off.
 
 ## 4. Committing
