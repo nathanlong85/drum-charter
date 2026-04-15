@@ -86,6 +86,7 @@ jobs:
             sudo chmod 666 /var/run/docker.sock
       - node/install:
           node-version: "22.14.0"
+          install-pnpm: true
       - run:
           name: Setup and Run E2E Shard << parameters.shard >>
           no_output_timeout: 30m
@@ -95,8 +96,8 @@ jobs:
             (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
             
-            # Use pre-installed global npm to get pnpm if needed, but it should be in workspace
-            export PATH=$PATH:$(pwd)/node_modules/.bin
+            # Ensure pnpm is available in the path
+            export PATH=$PATH:$(pnpm bin -g)
             
             npx supabase start --no-backup
             
@@ -119,7 +120,8 @@ jobs:
             echo "--- STEP 2: Patching App ---"
             # Patch the built files with the real key
             echo "Patching placeholder with real key..."
-            grep -rl "SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI" .next | xargs sed -i "s/SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI/$REAL_ANON_KEY/g"
+            # Use | as delimiter for sed to be safe with base64/JWT keys
+            grep -rl "SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI" .next public | xargs sed -i "s|SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI|$REAL_ANON_KEY|g"
             echo "Patching complete."
             
             echo "--- STEP 3: Playwright ---"
@@ -161,7 +163,7 @@ jobs:
           command: |
             if [ "$CIRCLE_BRANCH" = "main" ]; then
               pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
-              pnpm supabase_db_push --password $SUPABASE_DB_PASSWORD_PROD
+              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
             fi
           environment:
             SUPABASE_ACCESS_TOKEN: $SUPABASE_ACCESS_TOKEN
