@@ -148,7 +148,13 @@ jobs:
             
             echo "--- STEP 4: Run Tests ---"
             export SKIP_BUILD=true
-            pnpm test:e2e -- --project=chromium --shard=<< parameters.shard >>/4
+            if ! pnpm test:e2e -- --project=chromium --shard=<< parameters.shard >>/4; then
+              echo "--- E2E FAILURES DETECTED IN SHARD << parameters.shard >> ---"
+              # Optional: print summary of failed tests if possible
+              # Playwright usually prints this at the end of the run with the 'list' reporter
+              kill $HEARTBEAT_PID
+              exit 1
+            fi
             
             kill $HEARTBEAT_PID
       - store_artifacts:
