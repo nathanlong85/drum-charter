@@ -31,7 +31,7 @@ test.describe('Groove Grid Quick Presets', () => {
   test('should apply On-Beats preset to Hi-Hat', async ({ page }) => {
     // Click instrument name to open menu
     await page
-      .getByTestId('instrument-row-hi-hat')
+      .getByTestId(/instrument-row-hi-hat/)
       .locator('button[title="Edit Settings"]')
       .click();
 
@@ -85,7 +85,7 @@ test.describe('Groove Grid Quick Presets', () => {
 
     // Open Hi-Hat presets
     await page
-      .getByTestId('instrument-row-hi-hat')
+      .getByTestId(/instrument-row-hi-hat/)
       .locator('button[title="Edit Settings"]')
       .click();
 

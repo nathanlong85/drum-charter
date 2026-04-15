@@ -27,9 +27,7 @@ test.describe('Visual Regression', () => {
     await expect(page).toHaveScreenshot('library-songs-baseline.png', screenshotOptions);
   });
 
-  // FIXME: This test is temporarily marked as fixme until Linux-based CI baselines can be updated
-  // to match the new multi-row wrapped grid layout (which increased from 218px to 282px height).
-  test.fixme('Groove Grid visual baseline', async ({ page }) => {
+  test('Groove Grid visual baseline', async ({ page }) => {
     await page.goto('/library/snippets');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/snippets\/.+/);

@@ -56,9 +56,8 @@
     .bg-surface-container-low,
     .bg-surface-container-lowest,
     .bg-surface-container-high,
-    .bg-surface-container-low/20,
-    .bg-surface-container-low/50,
-    .bg-surface-container-high/10 {
+    [class*="bg-surface-container-low/"],
+    [class*="bg-surface-container-high/"] {
       background: transparent !important;
     }
 
@@ -83,7 +82,7 @@
     }
 
     /* Beat highlights should be subtle but visible */
-    .bg-surface-container-high/40 {
+    [class*="bg-surface-container-high/40"] {
       background-color: #f0f0f0 !important;
     }
   }

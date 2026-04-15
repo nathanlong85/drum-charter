@@ -34,6 +34,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = (props) => {
 
   const { cellSize = 40, measuresPerRow: propMeasuresPerRow = 2 } = props;
   const measuresPerRow = Math.max(1, propMeasuresPerRow);
+  const safeBeatValue = Math.max(1, props.initialGrid.timeSignature.beatValue);
+  const notesPerBeat = props.initialGrid.resolution / safeBeatValue;
 
   return (
     <GrooveGridProvider {...props} bpm={bpm} onBpmChange={onBpmChange}>
@@ -44,6 +46,8 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = (props) => {
           {
             '--note-cell-size': `${cellSize}px`,
             '--measures-per-row': measuresPerRow,
+            '--beats-per-measure': props.initialGrid.timeSignature.beatsPerMeasure,
+            '--notes-per-beat': notesPerBeat,
           } as React.CSSProperties
         }
       >
@@ -71,7 +75,8 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
     isEditingInstruments,
   } = useGrooveGrid();
   const { measures, timeSignature, resolution } = state;
-  const notesPerBeat = resolution / timeSignature.beatValue;
+  const safeBeatValue = Math.max(1, timeSignature.beatValue);
+  const notesPerBeat = resolution / safeBeatValue;
   const totalNotesPerMeasure = timeSignature.beatsPerMeasure * notesPerBeat;
 
   const handleDragEnd = useCallback(() => {
@@ -181,7 +186,8 @@ function GridColumnLabels({
   const { state } = useGrooveGrid();
   const { timeSignature, resolution } = state;
 
-  const notesPerBeat = resolution / timeSignature.beatValue;
+  const safeBeatValue = Math.max(1, timeSignature.beatValue);
+  const notesPerBeat = resolution / safeBeatValue;
   const measuresInBlock = endMeasure - startMeasure;
   const totalNotesInBlock = measuresInBlock * timeSignature.beatsPerMeasure * notesPerBeat;
 

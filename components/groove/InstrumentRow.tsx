@@ -38,7 +38,8 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   } = useGrooveGrid();
 
   const { timeSignature, resolution } = state;
-  const notesPerBeat = resolution / timeSignature.beatValue;
+  const safeBeatValue = Math.max(1, timeSignature.beatValue);
+  const notesPerBeat = resolution / safeBeatValue;
   const totalNotesPerMeasure = timeSignature.beatsPerMeasure * notesPerBeat;
 
   const presets = getFilteredPresets(instrument.category, timeSignature);
