@@ -108,8 +108,7 @@ export function GrooveGridProvider({
   useEffect(() => {
     if (!isEqual(initialGrid, lastPropGrid.current)) {
       lastPropGrid.current = initialGrid;
-      // If the prop changed and it's different from our current state, sync it.
-      // We don't set isInternalChange here because we don't want to report this back to parent.
+      // Only dispatch if the new external grid is actually different from our current state
       if (!isEqual(initialGrid, state)) {
         dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
       }
@@ -118,10 +117,12 @@ export function GrooveGridProvider({
 
   // Report internal changes to parent
   useEffect(() => {
+    // We ALWAYS update lastPropGrid to the current state to ensure the next
+    // render cycle's initialGrid check (above) knows what we currently have.
+    lastPropGrid.current = state;
+
     if (isInternalChange.current) {
       isInternalChange.current = false;
-      // Update lastPropGrid so we don't sync this change back to ourselves in the other effect
-      lastPropGrid.current = state;
       onChange?.(state);
     }
   }, [state, onChange]);
