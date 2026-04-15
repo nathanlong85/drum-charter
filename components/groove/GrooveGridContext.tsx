@@ -99,33 +99,28 @@ export function GrooveGridProvider({
 }: GrooveGridProviderProps) {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
 
-  // Track internal vs external changes to prevent infinite loops and state regressions
+  // Track if the current state change was initiated locally (user action)
   const isInternalChange = useRef(false);
-  const lastInternalState = useRef(state);
+  // Track the last prop to detect external changes
   const lastPropGrid = useRef(initialGrid);
 
-  useEffect(() => {
-    lastInternalState.current = state;
-  }, [state]);
-
-  // Sync initialGrid to internal state ONLY if it's an external update (e.g. Undo)
+  // Sync initialGrid to internal state ONLY if it's an external update
   useEffect(() => {
     if (!isEqual(initialGrid, lastPropGrid.current)) {
       lastPropGrid.current = initialGrid;
-      // If the new prop is different from our current internal state, sync it.
-      // But don't sync if it's just what we just reported via onChange.
-      if (!isEqual(initialGrid, lastInternalState.current)) {
+      // If the prop changed and it's different from our current state, sync it.
+      // We don't set isInternalChange here because we don't want to report this back to parent.
+      if (!isEqual(initialGrid, state)) {
         dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
       }
     }
-  }, [initialGrid]);
+  }, [initialGrid, state]);
 
   // Report internal changes to parent
   useEffect(() => {
     if (isInternalChange.current) {
       isInternalChange.current = false;
-      // Update our "last seen prop" to match what we're sending up,
-      // so the prop-sync useEffect doesn't try to sync it back down.
+      // Update lastPropGrid so we don't sync this change back to ourselves in the other effect
       lastPropGrid.current = state;
       onChange?.(state);
     }

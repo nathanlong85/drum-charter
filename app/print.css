@@ -67,17 +67,17 @@
       break-inside: avoid;
       page-break-inside: avoid;
     }
-/* Ensure NoteCells are visible with high contrast borders */
-[data-testid="note-cell"] {
-  border-color: black !important;
-}
 
-/* Keep groove-grid instrument labels visible in read-only print views */
-button[data-testid^="instrument-settings-trigger-"] {
-  display: flex !important;
-}
-}
-}
+    /* Ensure NoteCells are visible with high contrast borders */
+    [data-testid="note-cell"] {
+      border-color: black !important;
+    }
+
+    /* Keep groove-grid instrument labels visible in read-only print views */
+    button[data-testid^="instrument-settings-trigger-"] {
+      display: flex !important;
+    }
+
     [data-testid="note-cell-icon"] {
       filter: grayscale(1) brightness(0) !important; /* Force icons to be black */
     }

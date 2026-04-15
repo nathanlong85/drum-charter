@@ -2,8 +2,8 @@
 
 import { Plus } from 'lucide-react';
 import React, { useCallback } from 'react';
-import { generateId } from '@/lib/utils/id';
 import type { GrooveGrid } from '@/lib/types/groove';
+import { generateId } from '@/lib/utils/id';
 import { GrooveGridProvider, useGrooveGrid } from './GrooveGridContext';
 import { GrooveGridToolbar } from './GrooveGridToolbar';
 import { InstrumentRow } from './InstrumentRow';
@@ -82,6 +82,13 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
     setIsDragging(false);
 
     const { start, end } = selectionRange;
+
+    // If it's a single cell, let the click handler deal with it to avoid double-toggles
+    if (start.instIdx === end.instIdx && start.noteIdx === end.noteIdx) {
+      setSelectionRange(null);
+      return;
+    }
+
     const isClearing = state.instruments[start.instIdx].notes[start.noteIdx] !== 'none';
 
     if (isClearing) {
