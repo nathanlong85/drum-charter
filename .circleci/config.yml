@@ -90,14 +90,25 @@ jobs:
           name: Setup and Run E2E Shard << parameters.shard >>
           no_output_timeout: 30m
           command: |
-            set -e
+            # DON'T set -e yet so we can log failure points better
+            echo "--- DEBUG: Environment Info ---"
+            echo "User: $(whoami)"
+            echo "Workdir: $(pwd)"
+            echo "Checking for attached files..."
+            ls -al . | grep -E ".next|node_modules|public" || echo "WARNING: Essential directories missing!"
+            
+            echo "--- STEP 0: Node & Pnpm ---"
+            node -v
+            npm -v
+            sudo corepack enable
+            sudo corepack prepare pnpm@latest --activate
+            pnpm --version
+            
+            set -e # Now fail on errors
+            
             echo "--- STEP 1: Supabase ---"
             (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
-            
-            # Use corepack to ensure pnpm is available and in the path
-            sudo corepack enable
-            pnpm --version
             
             npx supabase start --no-backup
             
