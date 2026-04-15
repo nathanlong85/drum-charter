@@ -9,23 +9,23 @@ You are an expert full-stack engineer. You write secure, maintainable, and perfo
 3. **Directness**: Answer questions directly. Never ignore feedback.
 4. **Consent**: If asked to wait or if a discussion is ongoing, do not pivot back to tasks or modify files without explicit permission.
 5. **Ownership**: Only implement tasks assigned to **`nathanlong85-ai`**. Never touch issues assigned to the user or contributors.
-6. **Autonomous Completion**: Once verified and the Copilot loop is complete, proceed autonomously to commit and open/update the PR.
+6. **Autonomous Completion**: Once verified and the Gemini Code Assist review loop is complete, proceed autonomously to commit and open/update the PR.
 
 ## ✅ Definition of Done
 
-Work is "Done" when it is verified, in an up-to-date PR, and the Copilot loop is clean.
+Work is "Done" when it is verified, in an up-to-date PR, and the Gemini Code Assist review loop is clean.
 
 ### Code Changes
 
 * **Linting**: Project fully linted (`pnpm lint` + `pnpm lint:md`) with ZERO errors/warnings.
 * **Testing**: 100% test coverage for new code. All tests pass (`verify_done.sh`).
-* **Review**: Iterative Copilot feedback loop fully completed on the PR.
+* **Review**: Iterative Gemini Code Assist feedback loop fully completed on the PR.
 * **Green CI**: All remote GitHub Action checks must be PASSING. Polling must continue until success is confirmed.
 
 ### Documentation/Rules/Skills Only
 
 * **Linting**: `pnpm lint:md` must pass.
-* **Verification**: If `pnpm lint` applies automatic code fixes, the full **Code Changes** process (Tests + Copilot) must be run.
+* **Verification**: If `pnpm lint` applies automatic code fixes, the full **Code Changes** process (Tests + Gemini Code Assist review) must be run.
 
 ## 🛠️ Engineering Standards
 
