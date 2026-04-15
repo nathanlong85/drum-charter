@@ -79,30 +79,26 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Setup Environment
-          command: |
-            sudo apt-get update && sudo apt-get install -y jq
-            sudo chmod 666 /var/run/docker.sock
-      - node/install:
-          node-version: "22.14.0"
-          install-pnpm: true
-      - run:
           name: Setup and Run E2E Shard << parameters.shard >>
           no_output_timeout: 30m
           command: |
-            # DON'T set -e yet so we can log failure points better
-            echo "--- DEBUG: Environment Info ---"
-            echo "User: $(whoami)"
-            echo "Workdir: $(pwd)"
-            echo "Checking for attached files..."
-            ls -al . | grep -E ".next|node_modules|public" || echo "WARNING: Essential directories missing!"
+            # --- STEP 0: Manual Environment Setup ---
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 22
+            nvm use 22
             
-            echo "--- STEP 0: Node & Pnpm ---"
-            node -v
-            npm -v
             sudo corepack enable
             sudo corepack prepare pnpm@latest --activate
-            pnpm --version
+            
+            sudo apt-get update || true
+            sudo apt-get install -y jq || true
+            sudo chmod 666 /var/run/docker.sock || true
+            
+            echo "--- DEBUG: Environment Info ---"
+            echo "User: $(whoami)"
+            echo "Node: $(node -v)"
+            echo "Pnpm: $(pnpm -v)"
             
             set -e # Now fail on errors
             
@@ -140,9 +136,9 @@ jobs:
             else
               echo "No files found containing the placeholder. Checking if patching is needed..."
               if grep -rq "$REAL_ANON_KEY" .next; then
-                echo "Real key already present in .next. Patching may have already occurred or was not needed."
+                echo "Real key already present in .next."
               else
-                echo "WARNING: Placeholder not found and real key not found in .next. This might cause issues."
+                echo "WARNING: Placeholder not found and real key not found in .next."
               fi
             fi
             echo "Patching complete."
