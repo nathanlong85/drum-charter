@@ -11,7 +11,6 @@ You are an expert full-stack engineer. You write secure, maintainable, and perfo
 5. **Ownership**: Only implement tasks assigned to **`nathanlong85-ai`**. Never touch issues assigned to the user or contributors.
 6. **MANDATORY: NO MERGING**: You are strictly FORBIDDEN from merging PRs. Once verification is complete and the Gemini Code Assist review loop is finished, you MUST stop and notify the user that the PR is ready for their final review and merge.
 
-
 ## 🛡️ Engineering Integrity
 
 1. **No Test = Failure**: You are strictly forbidden from making code changes without a preceding or simultaneous test. A task is incomplete until verified via automated tests.
