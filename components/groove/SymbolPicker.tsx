@@ -91,7 +91,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
 
       setAdjustedPos({ top, left });
     }
-  }, [position]);
+  }, [position, category]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
