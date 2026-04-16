@@ -29,9 +29,8 @@ test.describe('Song Chart Editor', () => {
     await songEditorPage.addSection('Intro', '4');
     await songEditorPage.addSection('Verse', '8');
 
-    // Verify auto-generated order in header (this is a bit tricky as header is separate)
-    // But we can check it in the SongEditor's header section if it's visible or just check the input
-    const orderOverrideInput = page.locator('input[placeholder*="Intro, Verse"]');
+    // Verify manual order override input exists
+    const orderOverrideInput = page.getByTestId('song-order-override-input');
     await expect(orderOverrideInput).toBeVisible();
 
     // Fill override
@@ -41,7 +40,7 @@ test.describe('Song Chart Editor', () => {
 
     // Reload and verify
     await page.reload();
-    await expect(page.locator('input[placeholder*="Intro, Verse"]')).toHaveValue(manualOrder);
+    await expect(page.getByTestId('song-order-override-input')).toHaveValue(manualOrder);
   });
 
   test('should manage song sections', async ({ page }) => {

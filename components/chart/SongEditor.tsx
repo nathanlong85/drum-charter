@@ -127,6 +127,7 @@ export function SongEditorHeader() {
             <input
               type="text"
               value={state.header.manualOrder || ''}
+              data-testid="song-order-override-input"
               onChange={(e) =>
                 dispatch({ type: 'UPDATE_MANUAL_ORDER', manualOrder: e.target.value })
               }

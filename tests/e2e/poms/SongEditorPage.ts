@@ -96,6 +96,7 @@ export class SongEditorPage {
   async openSymbolPicker(cell: Locator) {
     await cell.click({ button: 'right' });
     await expect(this.symbolPicker).toBeVisible({ timeout: 10000 });
+    await this.page.waitForTimeout(300); // Wait for position to settle
   }
 
   async selectSymbol(label: string) {
