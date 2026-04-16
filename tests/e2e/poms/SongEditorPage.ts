@@ -32,7 +32,7 @@ export class SongEditorPage {
 
     this.addGridButton = page.locator('text=+ ADD GRID');
     this.grid = page.getByTestId('groove-grid');
-    this.kickRow = page.getByTestId('instrument-row-kick');
+    this.kickRow = page.getByTestId(/instrument-row-kick/).first();
     this.symbolPicker = page.getByTestId('symbol-picker');
 
     this.playButton = page.locator('button', { hasText: /Play|Stop|Loading/i }).first();

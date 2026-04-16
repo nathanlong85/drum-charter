@@ -1,3 +1,4 @@
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -54,18 +55,22 @@ vi.mock('@/lib/services/supabase-service', () => ({
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(<Tooltip.Provider>{ui}</Tooltip.Provider>);
+};
+
 describe('NotebookEditor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('renders the notebook title', () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     expect(screen.getByDisplayValue('My Notebook')).toBeDefined();
   });
 
   it('updates the title and triggers auto-save ', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const titleInput = screen.getByPlaceholderText('Notebook Title');
 
     fireEvent.change(titleInput, { target: { value: 'New Name' } });
@@ -81,7 +86,7 @@ describe('NotebookEditor', () => {
   });
 
   it('adds a new section', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const addBtn = screen.getByText(/Add New Section/i);
 
     fireEvent.click(addBtn);
@@ -98,7 +103,7 @@ describe('NotebookEditor', () => {
   });
 
   it('removes a section', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const removeBtn = screen.getByLabelText(/Remove Section/i);
 
     fireEvent.click(removeBtn);
@@ -115,7 +120,7 @@ describe('NotebookEditor', () => {
   });
 
   it('updates section name ', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const nameInput = screen.getByPlaceholderText('Section Name');
 
     fireEvent.change(nameInput, { target: { value: 'Updated Section' } });
@@ -132,7 +137,7 @@ describe('NotebookEditor', () => {
   });
 
   it('updates section notes ', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const notesInput = screen.getByPlaceholderText(/Add notes/i);
 
     fireEvent.change(notesInput, { target: { value: 'New practice notes' } });
@@ -149,7 +154,7 @@ describe('NotebookEditor', () => {
   });
 
   it('updates tags ', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const tagInput = screen.getByPlaceholderText(/\+ ADD TAG/i);
 
     fireEvent.change(tagInput, { target: { value: 'technique' } });
@@ -167,7 +172,7 @@ describe('NotebookEditor', () => {
   });
 
   it('duplicates the notebook', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
 
     await act(async () => {
@@ -179,7 +184,7 @@ describe('NotebookEditor', () => {
   });
 
   it('adds and removes a grid in a section', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
 
     const addGridBtn = screen.getByText(/\+ ADD GRID/i);
 
@@ -205,7 +210,7 @@ describe('NotebookEditor', () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText: writeTextSpy } });
 
-    render(<NotebookEditor initialNotebook={notebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={notebook} />);
     const linkBtn = screen.getByRole('button', { name: /Copy Public Link/i });
     fireEvent.click(linkBtn);
 
@@ -213,7 +218,7 @@ describe('NotebookEditor', () => {
   });
 
   it('toggles public state ', async () => {
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const toggle = screen.getByTestId('toggle-public-button');
 
     fireEvent.click(toggle);
@@ -233,7 +238,7 @@ describe('NotebookEditor', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.mocked(saveNotebookAction).mockRejectedValueOnce(new Error('Save failed'));
 
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const titleInput = screen.getByPlaceholderText('Notebook Title');
 
     fireEvent.change(titleInput, { target: { value: 'Error Test' } });
@@ -249,7 +254,7 @@ describe('NotebookEditor', () => {
   });
 
   it('does not attempt to update state if unmounted during save', async () => {
-    const { unmount } = render(<NotebookEditor initialNotebook={mockNotebook} />);
+    const { unmount } = renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const titleInput = screen.getByPlaceholderText('Notebook Title');
 
     fireEvent.change(titleInput, { target: { value: 'Unmount Test' } });
@@ -268,7 +273,7 @@ describe('NotebookEditor', () => {
 
   it('deletes the notebook', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
     const deleteBtn = screen.getByRole('button', { name: /Delete This Item/i });
 
     await act(async () => {
@@ -295,7 +300,7 @@ describe('NotebookEditor', () => {
     };
     vi.mocked(listGrooveSnippetsAction).mockResolvedValue([mockSnippet]);
 
-    render(<NotebookEditor initialNotebook={mockNotebook} />);
+    renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
 
     // Open picker
     fireEvent.click(screen.getByText(/\+ Insert Snippet/i));

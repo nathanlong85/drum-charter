@@ -99,7 +99,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
             alt={symbol}
             data-testid="note-cell-icon"
             style={{ opacity }}
-            className="w-7 h-7 select-none pointer-events-none filter drop-shadow-sm"
+            className="w-[70%] h-[70%] select-none pointer-events-none filter drop-shadow-sm"
           />
         </div>
       )}
@@ -120,7 +120,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
   );
 
   const containerClasses = `
-    note-cell w-10 h-10 flex items-center justify-center border-r border-outline-variant/10 
+    note-cell flex items-center justify-center border-r border-outline-variant/10 
     transition-all relative select-none
     ${readOnly ? 'cursor-default' : 'cursor-pointer hover:bg-primary/5'}
     ${isBeat ? 'bg-surface-container-high/40' : 'bg-surface-container-low/20'}
@@ -128,29 +128,29 @@ export const NoteCell: React.FC<NoteCellProps> = ({
     ${isSelected && !readOnly ? 'bg-primary/20 ring-1 ring-primary ring-inset z-10' : ''}
   `;
 
-  if (readOnly || symbol === 'none') {
+  const sizeStyle = {
+    width: 'var(--note-cell-size, 40px)',
+    height: 'var(--note-cell-size, 40px)',
+  };
+
+  if (readOnly) {
     return (
       <div
-        onClick={readOnly ? undefined : onClick}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          if (!readOnly) onContextMenu(e);
-        }}
-        onMouseDown={readOnly ? undefined : onMouseDown}
-        onMouseEnter={readOnly ? undefined : onMouseEnter}
         data-testid="note-cell"
         data-index={index}
         data-active={symbol === 'none' ? 'false' : 'true'}
         data-selected={isSelected ? 'true' : 'false'}
         className={containerClasses}
+        style={sizeStyle}
       >
         {content}
       </div>
     );
   }
 
+  // Use button for interaction to improve E2E reliability and accessibility
   return (
-    <Tooltip content={symbolLabels[symbol]} side="top">
+    <Tooltip content={symbol !== 'none' ? symbolLabels[symbol] : 'Click to add note'} side="top">
       <button
         type="button"
         onClick={onClick}
@@ -162,10 +162,11 @@ export const NoteCell: React.FC<NoteCellProps> = ({
         onMouseEnter={onMouseEnter}
         data-testid="note-cell"
         data-index={index}
-        data-active="true"
+        data-active={symbol === 'none' ? 'false' : 'true'}
         data-selected={isSelected ? 'true' : 'false'}
-        className={`${containerClasses} appearance-none bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm`}
-        aria-label={symbolLabels[symbol]}
+        className={`appearance-none bg-transparent p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset rounded-sm w-full h-full ${containerClasses}`}
+        style={sizeStyle}
+        aria-label={symbol !== 'none' ? symbolLabels[symbol] : `Add note at position ${index + 1}`}
       >
         {content}
       </button>
