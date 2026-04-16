@@ -18,6 +18,7 @@ export const SongChartView: React.FC<SongChartViewProps> = ({ chart }) => {
         bpm={chart.header.bpm}
         timeSignature={chart.header.timeSignature}
         sections={chart.sections}
+        manualOrder={chart.header.manualOrder}
       />
 
       <div className="space-y-12 print:space-y-8">

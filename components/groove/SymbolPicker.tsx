@@ -2,7 +2,7 @@
 
 import { X } from 'lucide-react';
 import type React from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   type DrumCategory,
   type DrumSymbol,
@@ -67,7 +67,31 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
   category,
 }) => {
   const pickerRef = useRef<HTMLDivElement>(null);
+  const [adjustedPos, setAdjustedPos] = useState<{ top: number; left: number }>(position);
   const filteredSymbols = category ? getSymbolsForCategory(category) : allSymbols;
+
+  useLayoutEffect(() => {
+    if (pickerRef.current) {
+      const rect = pickerRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      let top = position.top;
+      let left = position.left;
+
+      // Adjust horizontal
+      if (left + rect.width > viewportWidth) {
+        left = Math.max(10, viewportWidth - rect.width - 20);
+      }
+
+      // Adjust vertical
+      if (top + rect.height > viewportHeight) {
+        top = Math.max(10, viewportHeight - rect.height - 20);
+      }
+
+      setAdjustedPos({ top, left });
+    }
+  }, [position]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -88,7 +112,7 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
       <div
         ref={pickerRef}
         className="fixed z-50 bg-surface-container-low border border-outline-variant/20 shadow-2xl rounded-2xl p-4 flex flex-col gap-4 min-w-[280px] animate-in zoom-in-95 duration-100"
-        style={{ top: position.top, left: position.left }}
+        style={{ top: adjustedPos.top, left: adjustedPos.left }}
         data-testid="symbol-picker"
       >
         <div className="flex justify-between items-center border-b border-outline-variant/10 pb-2">

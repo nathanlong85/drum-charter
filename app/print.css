@@ -82,7 +82,7 @@
     }
 
     /* Beat highlights should be subtle but visible */
-    [class*="bg-surface-container-high\/40"] {
+    [class*="bg-surface-container-high/40"] {
       background-color: #f0f0f0 !important;
     }
   }

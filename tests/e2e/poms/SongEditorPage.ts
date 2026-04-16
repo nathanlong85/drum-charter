@@ -64,9 +64,11 @@ export class SongEditorPage {
 
   async addSection(name: string, measures: string) {
     await this.addSectionButton.click();
-    await expect(this.sectionNameInput).toBeVisible();
-    await this.sectionNameInput.fill(name);
-    await this.measuresInput.fill(measures);
+    const nameInput = this.page.locator('input[placeholder="Section Name"]').last();
+    const measuresInput = this.page.getByTestId('song-editor-measures-input').last();
+    await expect(nameInput).toBeVisible();
+    await nameInput.fill(name);
+    await measuresInput.fill(measures);
     await this.waitForSave();
   }
 
@@ -94,6 +96,7 @@ export class SongEditorPage {
   async openSymbolPicker(cell: Locator) {
     await cell.click({ button: 'right' });
     await expect(this.symbolPicker).toBeVisible({ timeout: 10000 });
+    await this.page.waitForTimeout(200); // Wait for smart position adjustment
   }
 
   async selectSymbol(label: string) {
