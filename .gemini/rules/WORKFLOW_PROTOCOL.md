@@ -19,20 +19,18 @@ This document outlines the mandatory process for initialization, implementation,
 
 ## 3. Verification & Definition of Done
 
-> [!IMPORTANT]
-> **CIRCLECI MIGRATION**: We have migrated our CI/CD from GitHub Actions to CircleCI to conserve GitHub Actions minutes. All automated checks now run on CircleCI.
-
 Work is ONLY "Done" when the following are met:
 
 1. **Clean Lint**: `pnpm lint` and `pnpm lint:md` must return ZERO errors AND ZERO warnings.
 2. **Full Suite Pass**: `verify_done.sh` must return a total pass.
 3. **Automated Verification**: `pnpm test:run` (Unit) and `pnpm test:e2e` (E2E) must pass.
 4. **CircleCI Pass**: All remote CircleCI workflow jobs must be PASSING.
-5. **Gemini Review**: The self-review via Gemini Code Assist must be clean (all findings addressed).
-6. **Checklist Reporting**: Provide a "Definition of Done Checklist" before final sign-off.
+5. **Gemini Review**: All comments (AI and User) addressed and replied to.
+6. **MANDATORY**: STOP and notify the user when the PR is ready. **DO NOT MERGE.**
 
-## 4. Committing
+## 4. Post-Merge Cleanup
 
-- **Attribution**: Commits must be made exclusively on behalf of the configured git user.
-- **Message Style**: Clear, concise, focusing on "why" rather than "what". Matches existing project style.
-- **No Co-authoring**: Do not add co-author trailers.
+After the user merges the PR:
+1. **Switch**: `git checkout staging && git pull origin staging`.
+2. **Cleanup**: Delete the local feature branch.
+3. **Hurray!**: Rejoice! 🥳🎉
