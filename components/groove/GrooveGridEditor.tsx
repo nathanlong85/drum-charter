@@ -48,7 +48,7 @@ function EditorLayout(props: GrooveGridEditorProps) {
 
   return (
     <div
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-6 grid-editor-container"
       data-testid="groove-grid"
       style={
         {
@@ -225,12 +225,11 @@ function GridColumnLabels({
             <div
               key={`label-${globalIdx}`}
               data-testid={isBeatStart ? `beat-label-${label}` : undefined}
-              className={`flex items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/5 ${
+              className={`flex h-6 items-center justify-center text-[10px] font-headline font-black border-r border-outline-variant/5 ${
                 isBeatStart ? 'text-primary' : 'text-on-surface-variant/30'
               }`}
               style={{
                 width: 'var(--note-cell-size, 40px)',
-                height: 'var(--note-cell-size, 40px)',
               }}
             >
               {label}
