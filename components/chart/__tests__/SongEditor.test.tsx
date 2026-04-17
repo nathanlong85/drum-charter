@@ -100,7 +100,7 @@ describe('SongEditor', () => {
 
   it('updates manual order override and triggers save', async () => {
     renderWithProviders(<SongEditor initialSong={mockSong} />);
-    const orderInput = screen.getByPlaceholderText('Chorus');
+    const orderInput = screen.getByTestId('song-order-override-input');
 
     await act(async () => {
       fireEvent.change(orderInput, { target: { value: 'Chorus x2, Verse, Chorus' } });
