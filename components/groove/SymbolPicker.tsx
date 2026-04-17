@@ -78,10 +78,9 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
 
   const filteredSymbols = category ? getSymbolsForCategory(category) : allSymbols;
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: category affects height via filteredSymbols rendering
   useLayoutEffect(() => {
     if (pickerRef.current) {
-      // Accessing category here to satisfy Biome as its value changes the rendered height of the picker
-      const _contentMarker = category;
       const rect = pickerRef.current.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;

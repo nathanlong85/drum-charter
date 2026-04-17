@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import { GrooveGridEditor } from '@/components/groove/GrooveGridEditor';
 import { SnippetPickerModal } from '@/components/groove/SnippetPickerModal';
@@ -10,6 +10,7 @@ import {
   MIN_BEATS_PER_MEASURE,
   VALID_BEAT_VALUES,
 } from '@/lib/utils/constants';
+import { generateId } from '@/lib/utils/id';
 import { EditorToolbar } from '../layout/EditorToolbar';
 import { LiveModeView } from './LiveModeView';
 import { SongEditorProvider, useSongEditor } from './SongEditorContext';
@@ -86,6 +87,7 @@ export function SongEditorToolbar() {
  */
 export function SongEditorHeader() {
   const { state, dispatch, isSaving } = useSongEditor();
+  const manualOrderId = useMemo(() => `manual-order-${generateId()}`, []);
 
   return (
     <section className="p-8 pb-4 pt-16 md:pt-8">
@@ -117,22 +119,26 @@ export function SongEditorHeader() {
 
           <div className="mt-6 space-y-2">
             <div className="flex items-center gap-2">
-              <span className="font-label text-[10px] font-black uppercase text-on-surface-variant/50 tracking-[0.2em]">
+              <label
+                htmlFor={manualOrderId}
+                className="font-label text-[10px] font-black uppercase text-on-surface-variant/50 tracking-[0.2em] cursor-pointer hover:text-primary transition-colors"
+              >
                 Order Override
-              </span>
+              </label>
               <span className="text-[10px] text-on-surface-variant/30 font-bold italic">
                 (Leave blank for auto-generation)
               </span>
             </div>
             <input
+              id={manualOrderId}
               type="text"
               value={state.header.manualOrder || ''}
               data-testid="song-order-override-input"
               onChange={(e) =>
                 dispatch({ type: 'UPDATE_MANUAL_ORDER', manualOrder: e.target.value })
               }
-              className="w-full bg-surface-container-low/50 border border-outline-variant/10 rounded-xl px-4 py-2 text-sm font-body text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none focus:border-primary/50"
-              placeholder={state.sections.map((s) => s.name).join(', ')}
+              className="w-full bg-surface-container-low/50 border border-outline-variant/10 rounded-xl px-4 py-2 text-sm font-body text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none focus:border-primary/50 transition-all focus:ring-1 focus:ring-primary/20"
+              placeholder="e.g. Intro, Verse, Chorus"
             />
           </div>
         </div>
