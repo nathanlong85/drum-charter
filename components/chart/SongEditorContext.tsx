@@ -71,7 +71,7 @@ export function songReducer(state: SongChart, action: SongAction): SongChart {
     case 'UPDATE_MANUAL_ORDER':
       return {
         ...state,
-        header: { ...state.header, manualOrder: action.manualOrder },
+        header: { ...state.header, manualOrder: action.manualOrder.trim() || undefined },
         updatedAt: timestamp,
       };
     case 'UPDATE_TIME_SIGNATURE':
