@@ -44,6 +44,8 @@ pnpm lint
 pnpm lint:md
 ```
 
+- **CRITICAL**: If `pnpm lint` modifies any code files (automatic fixes), you MUST treat this as a code change and run the **Full Automated Verification** (Step 4) and **Gemini Loop** (Step 2).
+
 ### 4. Full Automated Verification (Code Changes Only)
 
 Execute the bundled verification script to ensure no regressions or formatting issues were introduced.
@@ -61,7 +63,7 @@ In addition to the automated checks, manually verify the following:
 - **No Residual Debugging**: Ensure no `console.log` or temporary debugging code remains.
 - **Type Safety**: Confirm that there are no new TypeScript errors.
 
-### 4. Reporting (MANDATORY)
+### 6. Reporting (MANDATORY)
 
 Once all checks pass, you MUST report completion using this exact checklist format:
 
