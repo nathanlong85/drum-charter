@@ -68,10 +68,20 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
 }) => {
   const pickerRef = useRef<HTMLDivElement>(null);
   const [adjustedPos, setAdjustedPos] = useState<{ top: number; left: number }>(position);
+  const [prevPosition, setPrevPosition] = useState(position);
+
+  // Sync state during render to avoid one-frame flicker when moving between cells
+  if (position.top !== prevPosition.top || position.left !== prevPosition.left) {
+    setAdjustedPos(position);
+    setPrevPosition(position);
+  }
+
   const filteredSymbols = category ? getSymbolsForCategory(category) : allSymbols;
 
   useLayoutEffect(() => {
     if (pickerRef.current) {
+      // Accessing category here to satisfy Biome as its value changes the rendered height of the picker
+      const _contentMarker = category;
       const rect = pickerRef.current.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
@@ -91,7 +101,8 @@ export const SymbolPicker: React.FC<SymbolPickerProps> = ({
 
       setAdjustedPos({ top, left });
     }
-  }, [position]);
+    // We include category because it affects the picker height, requiring repositioning
+  }, [position.top, position.left, category]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
