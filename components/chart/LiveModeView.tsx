@@ -15,9 +15,16 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
   const [activeSectionIdx, setActiveSectionIdx] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const transitionTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const transitionTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeSection = chart.sections[activeSectionIdx];
+
+  // Z-index scale for Live Mode
+  const Z_INDEX = {
+    BASE: 'z-[10000]',
+    TRANSITION: 'z-[10010]',
+    PROGRESS_FULLSCREEN: 'z-[10020]',
+  };
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -33,21 +40,16 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       clearTimeout(transitionTimeoutRef.current);
     }
     setIsTransitioning(true);
+    // Sync with CSS transition duration (300ms + padding)
     transitionTimeoutRef.current = setTimeout(() => setIsTransitioning(false), 500);
   }, []);
 
   const nextSection = useCallback(() => {
-    setActiveSectionIdx((prev) => {
-      const next = Math.min(prev + 1, chart.sections.length - 1);
-      return next;
-    });
+    setActiveSectionIdx((prev) => Math.min(prev + 1, chart.sections.length - 1));
   }, [chart.sections.length]);
 
   const prevSection = useCallback(() => {
-    setActiveSectionIdx((prev) => {
-      const next = Math.max(prev - 1, 0);
-      return next;
-    });
+    setActiveSectionIdx((prev) => Math.max(prev - 1, 0));
   }, []);
 
   // Trigger transition when activeSectionIdx changes (but not on initial mount)
@@ -57,8 +59,10 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       isFirstMount.current = false;
       return;
     }
-    triggerTransition();
-    // biome-ignore lint/correctness/useExhaustiveDependencies: activeSectionIdx is the trigger for the transition
+    // We use activeSectionIdx as a trigger for transition
+    if (activeSectionIdx !== undefined) {
+      triggerTransition();
+    }
   }, [activeSectionIdx, triggerTransition]);
 
   const toggleFullscreen = useCallback(() => {
@@ -145,7 +149,7 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
 
   return (
     <div
-      className="fixed inset-0 z-[10000] bg-surface-container-lowest text-on-surface flex flex-col font-body"
+      className={`fixed inset-0 ${Z_INDEX.BASE} bg-surface-container-lowest text-on-surface flex flex-col font-body`}
       data-testid="live-mode-view"
       id="live-mode-view-root"
     >
@@ -206,7 +210,9 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       >
         {/* Transition Overlay */}
         {isTransitioning && (
-          <div className="fixed inset-0 z-[10001] flex items-center justify-center pointer-events-none">
+          <div
+            className={`fixed inset-0 ${Z_INDEX.TRANSITION} flex items-center justify-center pointer-events-none`}
+          >
             <div className="text-9xl font-headline font-black text-primary animate-ping-slow uppercase tracking-tighter">
               {activeSection.name}
             </div>
@@ -216,7 +222,7 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
         {/* Fullscreen Progress Minimalist */}
         {isFullscreen && (
           <div
-            className="fixed top-6 right-10 z-[10002] flex gap-2"
+            className={`fixed top-6 right-10 ${Z_INDEX.PROGRESS_FULLSCREEN} flex gap-2`}
             data-testid="live-mode-progress-indicator-fullscreen"
           >
             {chart.sections.map((section, idx) => (

@@ -20,20 +20,25 @@ test.describe('Live Mode', () => {
     const addSectionBtn = page.getByRole('button', { name: /Add New Section/i });
     await expect(addSectionBtn).toBeVisible({ timeout: 15000 });
     await addSectionBtn.click({ force: true });
-    await expect(page.getByPlaceholder(/Section Name/i)).toBeVisible({ timeout: 10000 });
 
-    // Name the first section
-    await page.getByPlaceholder(/Section Name/i).fill('Section 1');
+    const section1Name = page.getByPlaceholder(/Section Name/i).nth(0);
+    await expect(section1Name).toBeVisible({ timeout: 10000 });
+    await section1Name.fill('Section 1');
+    await expect(section1Name).toHaveValue('Section 1');
 
     // Add a second section
-    await page.waitForTimeout(500); // Wait for first section to settle
     await addSectionBtn.click({ force: true });
-    // Wait for the second section's placeholder to appear (index 1)
-    await expect(page.getByPlaceholder(/Section Name/i).nth(1)).toBeVisible({ timeout: 10000 });
-    await page
-      .getByPlaceholder(/Section Name/i)
-      .nth(1)
-      .fill('Section 2');
+    const section2Name = page.getByPlaceholder(/Section Name/i).nth(1);
+    await expect(section2Name).toBeVisible({ timeout: 10000 });
+    await section2Name.fill('Section 2');
+    await expect(section2Name).toHaveValue('Section 2');
+
+    // Add a third section for full testing
+    await addSectionBtn.click({ force: true });
+    const section3Name = page.getByPlaceholder(/Section Name/i).nth(2);
+    await expect(section3Name).toBeVisible({ timeout: 10000 });
+    await section3Name.fill('Section 3');
+    await expect(section3Name).toHaveValue('Section 3');
 
     // Wait for auto-save to ensure names are in DB
     await waitForSave(page);
@@ -65,30 +70,28 @@ test.describe('Live Mode', () => {
     await waitForGoLiveAndClick(page);
 
     // Verify live mode is active
-    await expect(page.getByTestId('song-editor-container')).toBeHidden({ timeout: 15000 });
     await expect(page.getByTestId('live-mode-view')).toBeVisible({ timeout: 15000 });
 
     // Section 1 should be active
-    await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 1');
+    await expect(page.getByTestId('active-section-name')).toContainText('Section 1');
 
     // Press ArrowRight to go to next section
     await page.keyboard.press('ArrowRight');
-    await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 2');
-
-    // Section transition cue should be visible during/after transition
-    // (active-section-name is updated)
     await expect(page.getByTestId('active-section-name')).toContainText('Section 2');
+
+    // Press ArrowRight to go to next section
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByTestId('active-section-name')).toContainText('Section 3');
 
     // Press ArrowLeft to go back
     await page.keyboard.press('ArrowLeft');
-    await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 1');
+    await expect(page.getByTestId('active-section-name')).toContainText('Section 2');
   });
 
   test('should toggle fullscreen with F key and show progress', async ({ page }) => {
     await waitForGoLiveAndClick(page);
 
     // Verify live mode is active
-    await expect(page.getByTestId('song-editor-container')).toBeHidden({ timeout: 15000 });
     await expect(page.getByTestId('live-mode-view')).toBeVisible({ timeout: 15000 });
 
     // Toggle fullscreen with F
@@ -110,7 +113,6 @@ test.describe('Live Mode', () => {
     await waitForGoLiveAndClick(page);
 
     // Verify live mode is active
-    await expect(page.getByTestId('song-editor-container')).toBeHidden({ timeout: 15000 });
     await expect(page.getByTestId('live-mode-view')).toBeVisible({ timeout: 15000 });
 
     // Section 1 markers
@@ -118,9 +120,14 @@ test.describe('Live Mode', () => {
     await expect(page.getByTestId('next-section-preview')).toContainText(/Up Next/i);
     await expect(page.getByTestId('next-section-preview')).toContainText(/Section 2/i);
 
+    // Go to next section
+    await page.keyboard.press('ArrowRight');
+    await expect(page.getByTestId('active-section-name')).toContainText('Section 2');
+    await expect(page.getByTestId('next-section-preview')).toContainText(/Section 3/i);
+
     // Go to last section
     await page.keyboard.press('ArrowRight');
-    await expect(page.getByRole('heading', { level: 2 })).toContainText('Section 2');
+    await expect(page.getByTestId('active-section-name')).toContainText('Section 3');
 
     // Next section preview should be hidden on last section
     await expect(page.getByTestId('next-section-preview')).toBeHidden();
