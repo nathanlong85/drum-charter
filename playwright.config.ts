@@ -36,6 +36,10 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        // Hide Vercel preview toolbar
+        launchOptions: {
+          args: ['--disable-blink-features=AutomationControlled'],
+        },
         // Use prepared auth state.
         storageState: 'playwright/.auth/user.json',
       },

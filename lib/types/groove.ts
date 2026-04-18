@@ -299,6 +299,7 @@ export interface SongChart {
     timeSignature: TimeSignature;
     metronomeEnabled: boolean;
     metronomeVolume: number;
+    manualOrder?: string;
   };
   sections: SongSection[];
   tags: string[];

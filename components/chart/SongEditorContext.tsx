@@ -23,6 +23,7 @@ export type SongAction =
   | { type: 'SET_SONG'; song: SongChart }
   | { type: 'UPDATE_TITLE'; title: string }
   | { type: 'UPDATE_BPM'; bpm: number }
+  | { type: 'UPDATE_MANUAL_ORDER'; manualOrder: string }
   | {
       type: 'UPDATE_TIME_SIGNATURE';
       beatsPerMeasure: number;
@@ -65,6 +66,12 @@ export function songReducer(state: SongChart, action: SongAction): SongChart {
       return {
         ...state,
         header: { ...state.header, bpm: action.bpm },
+        updatedAt: timestamp,
+      };
+    case 'UPDATE_MANUAL_ORDER':
+      return {
+        ...state,
+        header: { ...state.header, manualOrder: action.manualOrder || undefined },
         updatedAt: timestamp,
       };
     case 'UPDATE_TIME_SIGNATURE':

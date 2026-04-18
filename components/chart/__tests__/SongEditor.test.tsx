@@ -98,6 +98,26 @@ describe('SongEditor', () => {
     );
   });
 
+  it('updates manual order override and triggers save', async () => {
+    renderWithProviders(<SongEditor initialSong={mockSong} />);
+    const orderInput = screen.getByTestId('song-order-override-input');
+
+    await act(async () => {
+      fireEvent.change(orderInput, { target: { value: 'Chorus x2, Verse, Chorus' } });
+      await wait(2100);
+    });
+
+    await waitFor(() => {
+      expect(saveSongChartAction).toHaveBeenCalled();
+    });
+
+    expect(saveSongChartAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        header: expect.objectContaining({ manualOrder: 'Chorus x2, Verse, Chorus' }),
+      }),
+    );
+  });
+
   it('adds a new section', async () => {
     renderWithProviders(<SongEditor initialSong={mockSong} />);
     const addSectionBtn = screen.getByRole('button', { name: /Add section/i });

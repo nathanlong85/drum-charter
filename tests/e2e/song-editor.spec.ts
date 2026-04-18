@@ -22,6 +22,27 @@ test.describe('Song Chart Editor', () => {
     await songEditorPage.verifyMetadata(songTitle, '145', '3', '4');
   });
 
+  test('should support manual order override', async ({ page }) => {
+    const songTitle = `Order Test ${Date.now()}`;
+    await songEditorPage.fillMetadata(songTitle, '120', '4', '4');
+
+    await songEditorPage.addSection('Intro', '4');
+    await songEditorPage.addSection('Verse', '8');
+
+    // Verify manual order override input exists
+    const orderOverrideInput = page.getByTestId('song-order-override-input');
+    await expect(orderOverrideInput).toBeVisible();
+
+    // Fill override
+    const manualOrder = 'Intro x2, Verse, Chorus';
+    await orderOverrideInput.fill(manualOrder);
+    await songEditorPage.waitForSave();
+
+    // Reload and verify
+    await page.reload();
+    await expect(page.getByTestId('song-order-override-input')).toHaveValue(manualOrder);
+  });
+
   test('should manage song sections', async ({ page }) => {
     // Default song should have 0 sections (verified in SongEditor.tsx initial state)
     await expect(songEditorPage.addSectionButton).toBeVisible();
@@ -45,6 +66,7 @@ test.describe('Song Chart Editor', () => {
 
     // Find a specific cell (e.g., Kick drum, first beat)
     const firstCell = await songEditorPage.getCell(songEditorPage.kickRow, 0);
+    await firstCell.scrollIntoViewIfNeeded({ block: 'center' });
 
     // Toggle a note
     await songEditorPage.toggleNote(firstCell);

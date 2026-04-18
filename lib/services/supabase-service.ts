@@ -200,6 +200,7 @@ export const supabaseService = {
         is_public: chart.isPublic,
         metronome_enabled: chart.header.metronomeEnabled,
         metronome_volume: chart.header.metronomeVolume,
+        manual_order: chart.header.manualOrder ?? null,
         updated_at: new Date().toISOString(),
         user_id: chart.userId,
       })
@@ -249,6 +250,7 @@ export const supabaseService = {
         timeSignature: fromJson<TimeSignature>(data.time_signature),
         metronomeEnabled: !!data.metronome_enabled,
         metronomeVolume: data.metronome_volume ?? 0.5,
+        manualOrder: data.manual_order || undefined,
       },
       sections,
       tags: data.tags || [],
