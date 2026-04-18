@@ -1,7 +1,6 @@
 'use client';
 
-import type React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { type RemoteAction, useRemoteControl } from '@/lib/hooks/useRemoteControl';
 import type { SongChart } from '@/lib/types/groove';
 import { GrooveGridEditor } from '../groove/GrooveGridEditor';
@@ -16,29 +15,51 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
   const [activeSectionIdx, setActiveSectionIdx] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const transitionTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const activeSection = chart.sections[activeSectionIdx];
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (transitionTimeoutRef.current) {
+        clearTimeout(transitionTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const triggerTransition = useCallback(() => {
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
     setIsTransitioning(true);
-    setTimeout(() => setIsTransitioning(false), 500);
+    transitionTimeoutRef.current = setTimeout(() => setIsTransitioning(false), 500);
   }, []);
 
   const nextSection = useCallback(() => {
     setActiveSectionIdx((prev) => {
       const next = Math.min(prev + 1, chart.sections.length - 1);
-      if (next !== prev) triggerTransition();
       return next;
     });
-  }, [chart.sections.length, triggerTransition]);
+  }, [chart.sections.length]);
 
   const prevSection = useCallback(() => {
     setActiveSectionIdx((prev) => {
       const next = Math.max(prev - 1, 0);
-      if (next !== prev) triggerTransition();
       return next;
     });
-  }, [triggerTransition]);
+  }, []);
+
+  // Trigger transition when activeSectionIdx changes (but not on initial mount)
+  const isFirstMount = React.useRef(true);
+  useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    triggerTransition();
+    // biome-ignore lint/correctness/useExhaustiveDependencies: activeSectionIdx is the trigger for the transition
+  }, [activeSectionIdx, triggerTransition]);
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -198,9 +219,9 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
             className="fixed top-6 right-10 z-[10002] flex gap-2"
             data-testid="live-mode-progress-indicator-fullscreen"
           >
-            {chart.sections.map((_, idx) => (
+            {chart.sections.map((section, idx) => (
               <div
-                key={idx}
+                key={section.id}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   idx === activeSectionIdx
                     ? 'w-10 bg-primary shadow-glow-sm'

@@ -26,6 +26,7 @@ test.describe('Live Mode', () => {
     await page.getByPlaceholder(/Section Name/i).fill('Section 1');
 
     // Add a second section
+    await page.waitForTimeout(500); // Wait for first section to settle
     await addSectionBtn.click({ force: true });
     // Wait for the second section's placeholder to appear (index 1)
     await expect(page.getByPlaceholder(/Section Name/i).nth(1)).toBeVisible({ timeout: 10000 });
