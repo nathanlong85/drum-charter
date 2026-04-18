@@ -11,6 +11,13 @@ interface LiveModeViewProps {
   onExit: () => void;
 }
 
+// Z-index scale for Live Mode
+const Z_INDEX = {
+  BASE: 'z-[10000]',
+  TRANSITION: 'z-[10010]',
+  PROGRESS_FULLSCREEN: 'z-[10020]',
+};
+
 export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => {
   const [activeSectionIdx, setActiveSectionIdx] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -18,13 +25,6 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
   const transitionTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const activeSection = chart.sections[activeSectionIdx];
-
-  // Z-index scale for Live Mode
-  const Z_INDEX = {
-    BASE: 'z-[10000]',
-    TRANSITION: 'z-[10010]',
-    PROGRESS_FULLSCREEN: 'z-[10020]',
-  };
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -59,10 +59,8 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       isFirstMount.current = false;
       return;
     }
-    // We use activeSectionIdx as a trigger for transition
-    if (activeSectionIdx !== undefined) {
-      triggerTransition();
-    }
+    triggerTransition();
+    // biome-ignore lint/correctness/useExhaustiveDependencies: activeSectionIdx is the trigger for the transition
   }, [activeSectionIdx, triggerTransition]);
 
   const toggleFullscreen = useCallback(() => {
@@ -204,21 +202,21 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
         </header>
       )}
 
+      {/* Transition Overlay - Outside main to avoid opacity-30 during transition */}
+      {isTransitioning && (
+        <div
+          className={`fixed inset-0 ${Z_INDEX.TRANSITION} flex items-center justify-center pointer-events-none`}
+        >
+          <div className="text-9xl font-headline font-black text-primary animate-ping-slow uppercase tracking-tighter">
+            {activeSection.name}
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main
         className={`flex-1 flex flex-col p-8 lg:p-12 overflow-y-auto bg-[radial-gradient(circle_at_top_right,var(--color-primary-dim)_0%,transparent_40%)] transition-opacity duration-300 ${isTransitioning ? 'opacity-30' : 'opacity-100'}`}
       >
-        {/* Transition Overlay */}
-        {isTransitioning && (
-          <div
-            className={`fixed inset-0 ${Z_INDEX.TRANSITION} flex items-center justify-center pointer-events-none`}
-          >
-            <div className="text-9xl font-headline font-black text-primary animate-ping-slow uppercase tracking-tighter">
-              {activeSection.name}
-            </div>
-          </div>
-        )}
-
         {/* Fullscreen Progress Minimalist */}
         {isFullscreen && (
           <div
