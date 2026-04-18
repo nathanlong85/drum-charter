@@ -59,8 +59,10 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       isFirstMount.current = false;
       return;
     }
-    triggerTransition();
-    // biome-ignore lint/correctness/useExhaustiveDependencies: activeSectionIdx is the trigger for the transition
+    // We use activeSectionIdx as a trigger for transition
+    if (typeof activeSectionIdx === 'number') {
+      triggerTransition();
+    }
   }, [activeSectionIdx, triggerTransition]);
 
   const toggleFullscreen = useCallback(() => {
@@ -213,29 +215,27 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
         </div>
       )}
 
+      {/* Fullscreen Progress Minimalist - Outside main to avoid dimming */}
+      {isFullscreen && (
+        <div
+          className={`fixed top-6 right-10 ${Z_INDEX.PROGRESS_FULLSCREEN} flex gap-2`}
+          data-testid="live-mode-progress-indicator-fullscreen"
+        >
+          {chart.sections.map((section, idx) => (
+            <div
+              key={section.id}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === activeSectionIdx ? 'w-10 bg-primary shadow-glow-sm' : 'w-4 bg-on-surface/10'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Main Content */}
       <main
         className={`flex-1 flex flex-col p-8 lg:p-12 overflow-y-auto bg-[radial-gradient(circle_at_top_right,var(--color-primary-dim)_0%,transparent_40%)] transition-opacity duration-300 ${isTransitioning ? 'opacity-30' : 'opacity-100'}`}
       >
-        {/* Fullscreen Progress Minimalist */}
-        {isFullscreen && (
-          <div
-            className={`fixed top-6 right-10 ${Z_INDEX.PROGRESS_FULLSCREEN} flex gap-2`}
-            data-testid="live-mode-progress-indicator-fullscreen"
-          >
-            {chart.sections.map((section, idx) => (
-              <div
-                key={section.id}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  idx === activeSectionIdx
-                    ? 'w-10 bg-primary shadow-glow-sm'
-                    : 'w-4 bg-on-surface/10'
-                }`}
-              />
-            ))}
-          </div>
-        )}
-
         <div className="max-w-6xl mx-auto w-full">
           <div className="flex justify-between items-end mb-12 border-b-4 border-primary pb-6">
             <div className="flex flex-col">
