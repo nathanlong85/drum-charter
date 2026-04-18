@@ -11,7 +11,8 @@ test.describe('Live Mode', () => {
     // Click New song
     const createBtn = page.getByTestId('create-new-button');
     await expect(createBtn).toBeVisible({ timeout: 15000 });
-    await createBtn.click({ force: true });
+    await expect(createBtn).toBeEnabled();
+    await createBtn.click();
 
     // Wait for redirect to a song ID
     await page.waitForURL(/\/songs\/[0-9a-f-]+/, { timeout: 30000 });
@@ -19,26 +20,32 @@ test.describe('Live Mode', () => {
     // Add first section
     const addSectionBtn = page.getByRole('button', { name: /Add New Section/i });
     await expect(addSectionBtn).toBeVisible({ timeout: 15000 });
-    await addSectionBtn.click({ force: true });
+    await expect(addSectionBtn).toBeEnabled();
+    await addSectionBtn.click();
 
     const section1Name = page.getByPlaceholder(/Section Name/i).nth(0);
     await expect(section1Name).toBeVisible({ timeout: 10000 });
     await section1Name.fill('Section 1');
     await expect(section1Name).toHaveValue('Section 1');
+    await page.waitForTimeout(300);
 
     // Add a second section
-    await addSectionBtn.click({ force: true });
+    await expect(addSectionBtn).toBeEnabled();
+    await addSectionBtn.click();
     const section2Name = page.getByPlaceholder(/Section Name/i).nth(1);
     await expect(section2Name).toBeVisible({ timeout: 10000 });
     await section2Name.fill('Section 2');
     await expect(section2Name).toHaveValue('Section 2');
+    await page.waitForTimeout(300);
 
     // Add a third section for full testing
-    await addSectionBtn.click({ force: true });
+    await expect(addSectionBtn).toBeEnabled();
+    await addSectionBtn.click();
     const section3Name = page.getByPlaceholder(/Section Name/i).nth(2);
     await expect(section3Name).toBeVisible({ timeout: 10000 });
     await section3Name.fill('Section 3');
     await expect(section3Name).toHaveValue('Section 3');
+    await page.waitForTimeout(300);
 
     // Wait for auto-save to ensure names are in DB
     await waitForSave(page);
@@ -46,7 +53,6 @@ test.describe('Live Mode', () => {
     // Ensure GO LIVE is ready
     await expect(page.getByTestId('go-live-button')).toBeVisible({ timeout: 20000 });
   });
-
   test('should enter and exit live mode from editor', async ({ page }) => {
     await waitForGoLiveAndClick(page);
 

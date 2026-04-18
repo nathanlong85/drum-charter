@@ -40,8 +40,8 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       clearTimeout(transitionTimeoutRef.current);
     }
     setIsTransitioning(true);
-    // Sync with CSS transition duration (300ms + padding)
-    transitionTimeoutRef.current = setTimeout(() => setIsTransitioning(false), 500);
+    // Sync with CSS transition duration (300ms)
+    transitionTimeoutRef.current = setTimeout(() => setIsTransitioning(false), 300);
   }, []);
 
   const nextSection = useCallback(() => {
