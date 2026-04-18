@@ -96,7 +96,7 @@ describe('LiveModeView', () => {
   it('renders the active section name and measure count', () => {
     render(<LiveModeView chart={mockChart} onExit={mockOnExit} />);
 
-    expect(screen.getByText('Verse')).toBeDefined();
+    expect(screen.getByTestId('active-section-name')).toHaveTextContent('Verse');
     expect(screen.getByTestId('section-measures-count')).toHaveTextContent('8 Measures');
   });
 
@@ -114,7 +114,7 @@ describe('LiveModeView', () => {
     const nextBtn = screen.getByTestId('live-mode-next-btn');
     fireEvent.click(nextBtn);
 
-    expect(screen.getByText('Chorus')).toBeDefined();
+    expect(screen.getByTestId('active-section-name')).toHaveTextContent('Chorus');
     expect(screen.queryByTestId('next-section-preview')).toBeNull();
   });
 

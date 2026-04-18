@@ -15,16 +15,30 @@ interface LiveModeViewProps {
 export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => {
   const [activeSectionIdx, setActiveSectionIdx] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const activeSection = chart.sections[activeSectionIdx];
 
+  const triggerTransition = useCallback(() => {
+    setIsTransitioning(true);
+    setTimeout(() => setIsTransitioning(false), 500);
+  }, []);
+
   const nextSection = useCallback(() => {
-    setActiveSectionIdx((prev) => Math.min(prev + 1, chart.sections.length - 1));
-  }, [chart.sections.length]);
+    setActiveSectionIdx((prev) => {
+      const next = Math.min(prev + 1, chart.sections.length - 1);
+      if (next !== prev) triggerTransition();
+      return next;
+    });
+  }, [chart.sections.length, triggerTransition]);
 
   const prevSection = useCallback(() => {
-    setActiveSectionIdx((prev) => Math.max(prev - 1, 0));
-  }, []);
+    setActiveSectionIdx((prev) => {
+      const next = Math.max(prev - 1, 0);
+      if (next !== prev) triggerTransition();
+      return next;
+    });
+  }, [triggerTransition]);
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {
@@ -166,7 +180,37 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
       )}
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col p-8 lg:p-12 overflow-y-auto bg-[radial-gradient(circle_at_top_right,var(--color-primary-dim)_0%,transparent_40%)]">
+      <main
+        className={`flex-1 flex flex-col p-8 lg:p-12 overflow-y-auto bg-[radial-gradient(circle_at_top_right,var(--color-primary-dim)_0%,transparent_40%)] transition-opacity duration-300 ${isTransitioning ? 'opacity-30' : 'opacity-100'}`}
+      >
+        {/* Transition Overlay */}
+        {isTransitioning && (
+          <div className="fixed inset-0 z-[10001] flex items-center justify-center pointer-events-none">
+            <div className="text-9xl font-headline font-black text-primary animate-ping-slow uppercase tracking-tighter">
+              {activeSection.name}
+            </div>
+          </div>
+        )}
+
+        {/* Fullscreen Progress Minimalist */}
+        {isFullscreen && (
+          <div
+            className="fixed top-6 right-10 z-[10002] flex gap-2"
+            data-testid="live-mode-progress-indicator-fullscreen"
+          >
+            {chart.sections.map((_, idx) => (
+              <div
+                key={idx}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  idx === activeSectionIdx
+                    ? 'w-10 bg-primary shadow-glow-sm'
+                    : 'w-4 bg-on-surface/10'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
         <div className="max-w-6xl mx-auto w-full">
           <div className="flex justify-between items-end mb-12 border-b-4 border-primary pb-6">
             <div className="flex flex-col">
@@ -174,7 +218,7 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
                 Current Section
               </div>
               <h2
-                className="text-7xl lg:text-8xl font-headline font-black uppercase text-on-surface leading-none tracking-tighter"
+                className="text-7xl lg:text-9xl font-headline font-black uppercase text-on-surface leading-none tracking-tighter"
                 data-testid="active-section-name"
               >
                 {activeSection.name}
@@ -206,30 +250,35 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-16">
+          <div className="grid grid-cols-1 gap-20">
             {activeSection.grid && (
-              <div className="bg-surface-container-low p-10 rounded-[32px] border border-outline-variant/10 shadow-2xl shadow-black/40">
-                <GrooveGridEditor initialGrid={activeSection.grid} readOnly />
+              <div className="bg-surface-container-low p-12 rounded-[48px] border border-outline-variant/10 shadow-3xl shadow-black/60 overflow-x-auto">
+                <GrooveGridEditor
+                  initialGrid={activeSection.grid}
+                  readOnly
+                  hideToolbar
+                  cellSize={52}
+                />
               </div>
             )}
 
             {activeSection.notes && activeSection.notes.length > 0 && (
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="h-px flex-1 bg-outline-variant/20"></div>
-                  <h3 className="text-xl font-headline font-bold text-primary uppercase tracking-[0.3em]">
+              <div className="space-y-10">
+                <div className="flex items-center gap-6">
+                  <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent to-outline-variant/20"></div>
+                  <h3 className="text-2xl font-headline font-bold text-primary uppercase tracking-[0.4em]">
                     Performance Cues
                   </h3>
-                  <div className="h-px flex-1 bg-outline-variant/20"></div>
+                  <div className="h-0.5 flex-1 bg-gradient-to-l from-transparent to-outline-variant/20"></div>
                 </div>
-                <ul className="space-y-4">
+                <ul className="space-y-8">
                   {activeSection.notes.map((note, idx) => (
                     <li
                       key={idx}
-                      className="text-4xl lg:text-5xl font-headline font-black text-on-surface flex gap-6 items-start leading-tight"
+                      className="text-5xl lg:text-7xl font-headline font-black text-on-surface flex gap-8 items-start leading-[1.1]"
                     >
-                      <span className="text-primary mt-1">»</span>
-                      <span className="bg-gradient-to-r from-on-surface to-on-surface-variant bg-clip-text text-transparent">
+                      <span className="text-primary mt-2">»</span>
+                      <span className="bg-gradient-to-br from-on-surface via-on-surface to-on-surface-variant/70 bg-clip-text text-transparent">
                         {note}
                       </span>
                     </li>
@@ -239,30 +288,39 @@ export const LiveModeView: React.FC<LiveModeViewProps> = ({ chart, onExit }) => 
             )}
 
             {activeSection.subSections && activeSection.subSections.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-12">
                 {activeSection.subSections.map((sub) => (
                   <div
                     key={sub.id}
-                    className="bg-surface-container-low/50 p-8 rounded-3xl border border-outline-variant/10 backdrop-blur-sm shadow-xl"
+                    className="bg-surface-container-low/40 p-10 rounded-[40px] border border-outline-variant/10 backdrop-blur-md shadow-2xl"
                   >
-                    <h4 className="text-2xl font-headline font-bold text-on-surface mb-6 uppercase flex justify-between items-center border-b border-outline-variant/10 pb-4">
+                    <h4 className="text-3xl font-headline font-bold text-on-surface mb-8 uppercase flex justify-between items-center border-b border-outline-variant/10 pb-6">
                       <span>{sub.name}</span>
                       {sub.measuresCount > 0 && (
                         <span
-                          className="text-lg text-primary font-black tracking-widest bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20"
+                          className="text-xl text-primary font-black tracking-widest bg-primary/10 px-5 py-2 rounded-2xl border border-primary/20 shadow-glow-sm"
                           data-testid={`subsection-measures-${sub.id}`}
                         >
                           {sub.measuresCount}M
                         </span>
                       )}
                     </h4>
-                    {sub.grid && <GrooveGridEditor initialGrid={sub.grid} readOnly />}
+                    {sub.grid && (
+                      <div className="overflow-x-auto">
+                        <GrooveGridEditor
+                          initialGrid={sub.grid}
+                          readOnly
+                          hideToolbar
+                          cellSize={44}
+                        />
+                      </div>
+                    )}
                     {sub.notes && sub.notes.length > 0 && (
-                      <ul className="mt-6 space-y-3">
+                      <ul className="mt-8 space-y-4">
                         {sub.notes.map((n, i) => (
                           <li
                             key={i}
-                            className="text-xl font-headline font-bold text-on-surface-variant flex gap-3"
+                            className="text-2xl font-headline font-bold text-on-surface-variant flex gap-4 leading-snug"
                           >
                             <span className="text-primary">•</span> {n}
                           </li>

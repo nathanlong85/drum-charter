@@ -12,9 +12,6 @@ const withSerwist = withSerwistInit({
 
 const nextConfig = {
   outputFileTracingRoot: path.resolve(process.cwd()),
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
   typescript: {
     ignoreBuildErrors: false,
   },

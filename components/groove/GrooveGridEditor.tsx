@@ -22,6 +22,7 @@ export interface GrooveGridEditorProps {
   readOnly?: boolean;
   cellSize?: number;
   measuresPerRow?: number;
+  hideToolbar?: boolean;
 }
 
 /**
@@ -41,7 +42,7 @@ export const GrooveGridEditor: React.FC<GrooveGridEditorProps> = (props) => {
 
 function EditorLayout(props: GrooveGridEditorProps) {
   const { state } = useGrooveGrid();
-  const { cellSize = 40, measuresPerRow: propMeasuresPerRow = 2 } = props;
+  const { cellSize = 40, measuresPerRow: propMeasuresPerRow = 2, hideToolbar } = props;
   const measuresPerRow = Math.max(1, propMeasuresPerRow);
   const safeBeatValue = Math.max(1, state.timeSignature.beatValue);
   const notesPerBeat = state.resolution / safeBeatValue;
@@ -59,7 +60,7 @@ function EditorLayout(props: GrooveGridEditorProps) {
         } as React.CSSProperties
       }
     >
-      <GridHeader />
+      {!hideToolbar && <GridHeader />}
       <GridBody measuresPerRow={measuresPerRow} />
       <GridOverlays />
     </div>

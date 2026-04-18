@@ -53,6 +53,8 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done (Recent)
 
+- [x] [UX] Live Mode Performance Optimization: Implemented high-visibility layout, fullscreen minimalist progress indicators, and prominent section transition cues for better stage usability. (#126) `✓`
+
 - [x] [UX] Song Chart Formatting & Metadata Refactor: Implemented indented print layout, high-contrast PDF support, grid wrapping, and manual 'Order' metadata override. (#124, #125, #127 via #128) `✓`
 
 - [x] [Infra] Fix CircleCI E2E Test Failures: Consolidated build/test on machine executor, improved caching, and increased Playwright workers for stability (#129) `✓`
