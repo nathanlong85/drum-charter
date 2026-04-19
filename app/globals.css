@@ -182,7 +182,11 @@
   --spacing-32: 8rem;
   
   --animate-spin-slow: spin 3s linear infinite;
+  --animate-ping-slow: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
   --animate-fade-in: fade-in 0.5s ease-out;
+
+  --shadow-glow-sm: 0 0 15px var(--color-primary);
+  --shadow-3xl: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
 
   @keyframes fade-in {
     from { opacity: 0; transform: translateY(10px); }
