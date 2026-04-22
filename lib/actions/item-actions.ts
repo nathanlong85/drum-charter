@@ -121,7 +121,10 @@ export async function createItemAction(
     }
   } catch (error) {
     // If it's already a NEXT_REDIRECT, let it bubble up
-    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+    if (
+      error instanceof Error &&
+      (error.message === 'NEXT_REDIRECT' || (error as any).digest?.startsWith('NEXT_REDIRECT'))
+    ) {
       throw error;
     }
     console.error('Error in createItemAction:', error);

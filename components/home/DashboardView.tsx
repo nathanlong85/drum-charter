@@ -41,7 +41,10 @@ export function DashboardView({ user, profile, recentItems }: DashboardViewProps
       setIsCreating(true);
       await createItemAction(type, defaultTimeSig);
     } catch (error) {
-      if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      if (
+        error instanceof Error &&
+        (error.message === 'NEXT_REDIRECT' || (error as any).digest?.startsWith('NEXT_REDIRECT'))
+      ) {
         throw error;
       }
       console.error('Failed to create item:', error);
