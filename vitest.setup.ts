@@ -64,4 +64,11 @@ global.fetch = vi.fn().mockResolvedValue({
 if (typeof window !== 'undefined') {
   window.alert = vi.fn();
   window.confirm = vi.fn(() => true);
+
+  // Mock crypto for JSDOM
+  if (!window.crypto) {
+    (window as any).crypto = {
+      randomUUID: () => 'test-uuid-' + Math.random().toString(36).substring(2, 9),
+    };
+  }
 }
