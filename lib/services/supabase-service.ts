@@ -18,6 +18,7 @@ import {
   type TimeSignature,
 } from '../types/groove';
 import { DEFAULT_PREFERENCES, type UserPreferences, type UserProfile } from '../types/user';
+import { generateId } from '../utils/id';
 
 type DbSongChart = Database['public']['Tables']['song_charts']['Row'];
 type DbNotebook = Database['public']['Tables']['notebooks']['Row'];
@@ -104,7 +105,7 @@ export function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
     }
 
     return {
-      id: inst.id || inst.instrumentId || crypto.randomUUID(),
+      id: inst.id || inst.instrumentId || generateId(),
       category,
       presetVariety,
       customName: label || presetVariety,
@@ -407,7 +408,7 @@ export const supabaseService = {
 
     const duplicate: SongChart = {
       ...rest,
-      id: crypto.randomUUID(),
+      id: generateId(),
       userId: userData.user.id,
       createdAt: null,
       updatedAt: null,
@@ -436,7 +437,7 @@ export const supabaseService = {
 
     const duplicate: Notebook = {
       ...rest,
-      id: crypto.randomUUID(),
+      id: generateId(),
       userId: userData.user.id,
       createdAt: null,
       updatedAt: null,
@@ -462,7 +463,7 @@ export const supabaseService = {
 
     const duplicate: GrooveSnippet = {
       ...rest,
-      id: crypto.randomUUID(),
+      id: generateId(),
       userId: userData.user.id,
       createdAt: null,
       updatedAt: null,
@@ -697,7 +698,7 @@ export const supabaseService = {
 
     const duplicate: Setlist = {
       ...rest,
-      id: crypto.randomUUID(),
+      id: generateId(),
       userId: user.id,
       createdAt: null,
       updatedAt: null,

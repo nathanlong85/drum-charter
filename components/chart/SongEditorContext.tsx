@@ -18,6 +18,7 @@ import {
 } from '@/lib/actions/item-actions';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import type { GrooveSnippet, SongChart, SongSection, SongSubSection } from '@/lib/types/groove';
+import { generateId } from '@/lib/utils/id';
 
 export type SongAction =
   | { type: 'SET_SONG'; song: SongChart }
@@ -102,7 +103,7 @@ export function songReducer(state: SongChart, action: SongAction): SongChart {
       };
     case 'ADD_SECTION': {
       const newSection: SongSection = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name: 'New Section',
         measuresCount: 4,
         notes: [],
@@ -134,7 +135,7 @@ export function songReducer(state: SongChart, action: SongAction): SongChart {
         sections: state.sections.map((s) => {
           if (s.id !== action.sectionId) return s;
           const newSub: SongSubSection = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             name: 'New Subsection',
             measuresCount: 4,
             notes: [],

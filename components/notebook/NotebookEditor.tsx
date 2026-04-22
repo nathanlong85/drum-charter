@@ -17,6 +17,7 @@ import {
   type Notebook,
   type NotebookSection,
 } from '@/lib/types/groove';
+import { generateId } from '@/lib/utils/id';
 import { EditorToolbar } from '../layout/EditorToolbar';
 
 type NotebookAction =
@@ -44,7 +45,7 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
       return { ...state, isPublic: action.isPublic, updatedAt: timestamp };
     case 'ADD_SECTION': {
       const newSection: NotebookSection = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name: 'New Section',
         notes: '',
       };

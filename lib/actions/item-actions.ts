@@ -1,6 +1,5 @@
 'use server';
 
-import crypto from 'node:crypto';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { supabaseService } from '@/lib/services/supabase-service';
@@ -12,6 +11,7 @@ import {
   type Setlist,
   type SongChart,
 } from '@/lib/types/groove';
+import { generateId } from '@/lib/utils/id';
 
 /**
  * Server Action for creating new items.
@@ -43,7 +43,7 @@ export async function createItemAction(
   try {
     if (type === 'song') {
       const newSong: SongChart = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         userId,
         header: {
           title: 'Untitled Song',
@@ -62,7 +62,7 @@ export async function createItemAction(
       routePrefix = 'songs';
     } else if (type === 'notebook') {
       const newNotebook: Notebook = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         userId,
         title: 'Untitled Notebook',
         sections: [],
@@ -78,7 +78,7 @@ export async function createItemAction(
       const resolution = 16;
       const measures = 1;
       const newSnippet: GrooveSnippet = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         userId,
         title: 'Untitled Snippet',
         bpm: 100,
@@ -100,7 +100,7 @@ export async function createItemAction(
       routePrefix = 'snippets';
     } else if (type === 'setlist') {
       const newSetlist: Setlist = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         userId,
         title: 'Untitled Setlist',
         songs: [],
