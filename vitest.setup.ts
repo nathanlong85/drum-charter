@@ -68,7 +68,7 @@ if (typeof window !== 'undefined') {
   // Mock crypto for JSDOM
   if (!window.crypto) {
     (window as any).crypto = {
-      randomUUID: () => `test-uuid-${Math.random().toString(36).substring(2, 9)}`,
+      randomUUID: () => `test-uuid-${Math.random().toString(36).slice(2, 9)}`,
     };
   }
 }

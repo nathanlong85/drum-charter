@@ -11,7 +11,7 @@ import {
   type Setlist,
   type SongChart,
 } from '@/lib/types/groove';
-import { generateId } from '@/lib/utils/id';
+import { generateId } from '../utils/id';
 
 /**
  * Server Action for creating new items.
