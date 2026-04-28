@@ -142,7 +142,10 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
       setIsCreating(true);
       await createItemAction(type);
     } catch (error) {
-      if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      if (
+        error instanceof Error &&
+        (error.message === 'NEXT_REDIRECT' || (error as any).digest?.startsWith('NEXT_REDIRECT'))
+      ) {
         throw error;
       }
       console.error('Failed to create item:', error);
