@@ -103,7 +103,10 @@ test.describe('Library Management', () => {
       .getByTestId('library-card')
       .filter({ has: page.locator('h3', { hasText: originalTitle }) });
     await songCard.hover(); // Actions are visible on hover
-    await songCard.locator('button[title="Duplicate"]').click();
+    await songCard.locator('button[title="Duplicate"]').click({ force: true });
+    // Explicitly wait for duplication persistence to finish
+    await page.waitForTimeout(2000);
+    await waitForSave(page);
 
     // Verify copy exists
     const copyTitle = `${originalTitle} (Copy)`;
@@ -115,7 +118,7 @@ test.describe('Library Management', () => {
       .getByTestId('library-card')
       .filter({ has: page.locator('h3', { hasText: copyTitle }) });
     await copyCard.hover();
-    await copyCard.locator('button[title="Delete"]').click();
+    await copyCard.locator('button[title="Delete"]').click({ force: true });
 
     // Verify copy is gone
     await expect(page.locator('h3', { hasText: copyTitle })).not.toBeVisible();

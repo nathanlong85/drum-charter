@@ -8,6 +8,7 @@ import {
   deleteItemAction,
   duplicateItemAction,
 } from '@/lib/actions/item-actions';
+import { generateId } from '@/lib/utils/id';
 import { LibraryCard } from './LibraryCard';
 
 type ItemType = 'song' | 'notebook' | 'snippet' | 'setlist';
@@ -96,7 +97,7 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
       // Create a temporary item for optimistic UI
       const itemToDuplicate = optimisticItems.find((i) => i.id === id);
       if (itemToDuplicate) {
-        const tempId = `temp-${Date.now()}`;
+        const tempId = generateId();
         addOptimisticAction({
           type: 'duplicate',
           payload: {
