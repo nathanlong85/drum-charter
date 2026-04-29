@@ -10,6 +10,7 @@ import {
   duplicateItemAction,
   saveNotebookAction,
 } from '@/lib/actions/item-actions';
+import { generateId } from '@/lib/utils/id';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import {
   createDefaultDrumInstruments,
@@ -17,7 +18,6 @@ import {
   type Notebook,
   type NotebookSection,
 } from '@/lib/types/groove';
-import { generateId } from '@/lib/utils/id';
 import { EditorToolbar } from '../layout/EditorToolbar';
 
 type NotebookAction =
