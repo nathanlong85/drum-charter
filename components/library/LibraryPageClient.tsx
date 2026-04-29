@@ -150,7 +150,8 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
         throw error;
       }
       console.error('Failed to create item:', error);
-      alert('Failed to create item. Please try again.');
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      alert(`${message}\n\nPlease check the console for more details.`);
       setIsCreating(false);
     }
   };
