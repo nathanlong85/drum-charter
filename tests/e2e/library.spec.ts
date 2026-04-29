@@ -102,22 +102,31 @@ test.describe('Library Management', () => {
     const songCard = page
       .getByTestId('library-card')
       .filter({ has: page.locator('h3', { hasText: originalTitle }) });
-    await songCard.hover(); // Actions are visible on hover
-    await songCard.locator('button[title="Duplicate"]').click({ force: true });
+    
+    // Ensure card is hovered and actions appear
+    await songCard.scrollIntoViewIfNeeded();
+    await songCard.hover();
+    const duplicateBtn = songCard.locator('button[title="Duplicate"]');
+    await expect(duplicateBtn).toBeVisible();
+    await duplicateBtn.click();
+    
     await waitForSave(page);
 
-    // Verify copy exists (wait for it to appear in the library)
+    // Verify copy exists
     const copyTitle = `${originalTitle} (Copy)`;
-    await page.reload(); // Force refresh to ensure data sync
+    await page.reload();
     await expect(page.locator('h3', { hasText: copyTitle })).toBeVisible({ timeout: 15000 });
 
     // Delete the copy
-    page.on('dialog', (dialog) => dialog.accept()); // Handle confirmation
+    page.on('dialog', (dialog) => dialog.accept());
     const copyCard = page
       .getByTestId('library-card')
       .filter({ has: page.locator('h3', { hasText: copyTitle }) });
+    
     await copyCard.hover();
-    await copyCard.locator('button[title="Delete"]').click({ force: true });
+    const deleteBtn = copyCard.locator('button[title="Delete"]');
+    await expect(deleteBtn).toBeVisible();
+    await deleteBtn.click();
 
     // Verify copy is gone
     await expect(page.locator('h3', { hasText: copyTitle })).not.toBeVisible();
