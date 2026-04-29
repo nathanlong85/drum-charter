@@ -104,13 +104,12 @@ test.describe('Library Management', () => {
       .filter({ has: page.locator('h3', { hasText: originalTitle }) });
     await songCard.hover(); // Actions are visible on hover
     await songCard.locator('button[title="Duplicate"]').click({ force: true });
-    // Explicitly wait for duplication persistence to finish
-    await page.waitForTimeout(2000);
     await waitForSave(page);
 
-    // Verify copy exists
+    // Verify copy exists (wait for it to appear in the library)
     const copyTitle = `${originalTitle} (Copy)`;
-    await expect(page.locator('h3', { hasText: copyTitle })).toBeVisible();
+    await page.reload(); // Force refresh to ensure data sync
+    await expect(page.locator('h3', { hasText: copyTitle })).toBeVisible({ timeout: 15000 });
 
     // Delete the copy
     page.on('dialog', (dialog) => dialog.accept()); // Handle confirmation

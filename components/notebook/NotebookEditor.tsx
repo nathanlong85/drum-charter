@@ -10,6 +10,7 @@ import {
   duplicateItemAction,
   saveNotebookAction,
 } from '@/lib/actions/item-actions';
+import { generateId } from '@/lib/utils/id';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import {
   createDefaultDrumInstruments,
@@ -44,7 +45,7 @@ function notebookReducer(state: Notebook, action: NotebookAction): Notebook {
       return { ...state, isPublic: action.isPublic, updatedAt: timestamp };
     case 'ADD_SECTION': {
       const newSection: NotebookSection = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name: 'New Section',
         notes: '',
       };
