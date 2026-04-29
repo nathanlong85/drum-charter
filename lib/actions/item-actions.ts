@@ -21,6 +21,7 @@ export async function createItemAction(
   type: 'song' | 'notebook' | 'snippet' | 'setlist',
   defaultTimeSig?: { numerator: number; denominator: number },
 ): Promise<{ success: boolean; id?: string; error?: string }> {
+  console.log('createItemAction entry:', { type });
   try {
     const supabase = await createClient();
     const {
