@@ -16,9 +16,9 @@ import {
   duplicateItemAction,
   saveSongChartAction,
 } from '@/lib/actions/item-actions';
-import { generateId } from '@/lib/utils/id';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import type { GrooveSnippet, SongChart, SongSection, SongSubSection } from '@/lib/types/groove';
+import { generateId } from '@/lib/utils/id';
 
 export type SongAction =
   | { type: 'SET_SONG'; song: SongChart }

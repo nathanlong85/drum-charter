@@ -118,11 +118,19 @@ export async function createItemAction(
       revalidatePath('/dashboard');
       revalidatePath('/');
     } else {
-      throw new Error('Failed to create item');
+      throw new Error(`Failed to create item: savedId=${savedId}, routePrefix=${routePrefix}`);
     }
   } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.message === 'NEXT_REDIRECT' || (error as any).digest?.startsWith('NEXT_REDIRECT'))
+    ) {
+      throw error;
+    }
     console.error('Error in createItemAction:', error);
-    throw new Error('Failed to create item');
+    throw new Error(
+      `Failed to create item: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
   }
 
   if (savedId && routePrefix) {
