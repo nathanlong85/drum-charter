@@ -102,14 +102,14 @@ test.describe('Library Management', () => {
     const songCard = page
       .getByTestId('library-card')
       .filter({ has: page.locator('h3', { hasText: originalTitle }) });
-    
+
     // Ensure card is hovered and actions appear
     await songCard.scrollIntoViewIfNeeded();
     await songCard.hover();
     const duplicateBtn = songCard.locator('button[title="Duplicate"]');
     await expect(duplicateBtn).toBeVisible();
     await duplicateBtn.click();
-    
+
     await waitForSave(page);
 
     // Verify copy exists
@@ -122,7 +122,7 @@ test.describe('Library Management', () => {
     const copyCard = page
       .getByTestId('library-card')
       .filter({ has: page.locator('h3', { hasText: copyTitle }) });
-    
+
     await copyCard.hover();
     const deleteBtn = copyCard.locator('button[title="Delete"]');
     await expect(deleteBtn).toBeVisible();
