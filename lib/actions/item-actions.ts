@@ -15,32 +15,32 @@ import { generateId } from '@/lib/utils/id';
 
 /**
  * Server Action for creating new items.
- * Throws errors on failure so callers can catch them (and NEXT_REDIRECT handled correctly by Next.js).
+ * Returns a result object to avoid Next.js production error masking.
  */
 export async function createItemAction(
   type: 'song' | 'notebook' | 'snippet' | 'setlist',
   defaultTimeSig?: { numerator: number; denominator: number },
-) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    throw new Error('Unauthorized');
-  }
-
-  const userId = user.id;
-  let savedId: string | undefined;
-  let routePrefix: string | undefined;
-
-  const timeSignature = {
-    beatsPerMeasure: defaultTimeSig?.numerator || 4,
-    beatValue: defaultTimeSig?.denominator || 4,
-  };
-
+): Promise<{ success: boolean; id?: string; error?: string }> {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const userId = user.id;
+    let savedId: string | undefined;
+    let routePrefix: string | undefined;
+
+    const timeSignature = {
+      beatsPerMeasure: defaultTimeSig?.numerator || 4,
+      beatValue: defaultTimeSig?.denominator || 4,
+    };
+
     if (type === 'song') {
       const newSong: SongChart = {
         id: generateId(),
@@ -117,24 +117,19 @@ export async function createItemAction(
       revalidatePath('/library', 'layout');
       revalidatePath('/dashboard');
       revalidatePath('/');
-    } else {
-      throw new Error(`Failed to create item: savedId=${savedId}, routePrefix=${routePrefix}`);
+      return { success: true, id: savedId, error: routePrefix };
     }
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      (error.message === 'NEXT_REDIRECT' || (error as any).digest?.startsWith('NEXT_REDIRECT'))
-    ) {
-      throw error;
-    }
-    console.error('Error in createItemAction:', error);
-    throw new Error(
-      `Failed to create item: ${error instanceof Error ? error.message : 'Unknown error'}`,
-    );
-  }
 
-  if (savedId && routePrefix) {
-    redirect(`/${routePrefix}/${savedId}`);
+    return {
+      success: false,
+      error: `Failed to create item: savedId=${savedId}, routePrefix=${routePrefix}`,
+    };
+  } catch (error) {
+    console.error('Error in createItemAction:', error);
+    return {
+      success: false,
+      error: `Server Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
   }
 }
 
