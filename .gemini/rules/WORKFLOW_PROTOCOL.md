@@ -28,9 +28,7 @@ Work is ONLY "Done" when the following are met:
 5. **Gemini Review**: All comments (AI and User) addressed and replied to.
 6. **MANDATORY**: STOP and notify the user when the PR is ready. **DO NOT MERGE.**
 
-## 4. Post-Merge Cleanup
+## 4. Database Management
 
-After the user merges the PR:
-1. **Switch**: `git checkout staging && git pull origin staging`.
-2. **Cleanup**: Delete the local feature branch.
-3. **Hurray!**: Rejoice! 🥳🎉
+- **CLI-First**: All Supabase migrations and schema management are performed locally using the `pnpm supabase` CLI. 
+- **No CI/CD Migrations**: GitHub workflows are NOT used for database migrations. This avoids CI/CD credit limits and ensures direct local control over schema updates.

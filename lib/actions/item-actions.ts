@@ -21,7 +21,6 @@ export async function createItemAction(
   type: 'song' | 'notebook' | 'snippet' | 'setlist',
   defaultTimeSig?: { numerator: number; denominator: number },
 ): Promise<{ success: boolean; id?: string; error?: string }> {
-  console.log('createItemAction entry:', { type });
   try {
     const supabase = await createClient();
     const {
@@ -43,7 +42,6 @@ export async function createItemAction(
     };
 
     if (type === 'song') {
-      console.log('Creating song chart object...');
       const newSong: SongChart = {
         id: generateId(),
         userId,
@@ -59,9 +57,7 @@ export async function createItemAction(
         createdAt: null,
         updatedAt: null,
       };
-      console.log('Saving song chart to Supabase...', newSong);
       const saved = await supabaseService.saveSongChart(newSong, supabase);
-      console.log('Song chart saved:', saved);
       savedId = saved?.id;
       routePrefix = 'songs';
     } else if (type === 'notebook') {
