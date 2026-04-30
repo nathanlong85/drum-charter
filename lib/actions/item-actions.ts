@@ -42,7 +42,6 @@ export async function createItemAction(
     };
 
     if (type === 'song') {
-      console.log('Creating song chart object...');
       const newSong: SongChart = {
         id: generateId(),
         userId,
@@ -58,9 +57,7 @@ export async function createItemAction(
         createdAt: null,
         updatedAt: null,
       };
-      console.log('Saving song chart to Supabase...', newSong);
       const saved = await supabaseService.saveSongChart(newSong, supabase);
-      console.log('Song chart saved:', saved);
       savedId = saved?.id;
       routePrefix = 'songs';
     } else if (type === 'notebook') {
