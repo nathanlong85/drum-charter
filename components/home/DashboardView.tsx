@@ -39,14 +39,16 @@ export function DashboardView({ user, profile, recentItems }: DashboardViewProps
 
     try {
       setIsCreating(true);
-      await createItemAction(type, defaultTimeSig);
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        (error.message === 'NEXT_REDIRECT' || (error as any).digest?.startsWith('NEXT_REDIRECT'))
-      ) {
-        throw error;
+      const result = await createItemAction(type, defaultTimeSig);
+      if (result.success && result.id && result.error) {
+        // In the success case, result.error contains the routePrefix
+        router.push(`/${result.error}/${result.id}`);
+      } else {
+        const message = result.error || 'Unknown error';
+        alert(`Failed to create item: ${message}`);
+        setIsCreating(false);
       }
+    } catch (error) {
       console.error('Failed to create item:', error);
       setIsCreating(false);
       alert('Failed to create item. Please try again.');
