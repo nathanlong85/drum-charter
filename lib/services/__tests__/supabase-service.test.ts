@@ -608,7 +608,7 @@ describe('supabaseService', () => {
 
     it('retries on 404 error', async () => {
       fetchFn.mockResolvedValue({ data: null, error: { status: 404 } });
-      const promise = fetchWithRetry(fetchFn, '1', 'Test', 2, 100);
+      const promise = fetchWithRetry(fetchFn, 2, 100);
       await vi.advanceTimersByTimeAsync(150);
       await vi.advanceTimersByTimeAsync(150);
       const result = await promise;
@@ -618,7 +618,7 @@ describe('supabaseService', () => {
 
     it('retries on specific error codes like PGRST116', async () => {
       fetchFn.mockResolvedValue({ data: null, error: { code: 'PGRST116' } });
-      const promise = fetchWithRetry(fetchFn, '1', 'Test', 2, 100);
+      const promise = fetchWithRetry(fetchFn, 2, 100);
       await vi.advanceTimersByTimeAsync(150);
       await vi.advanceTimersByTimeAsync(150);
       const result = await promise;
@@ -628,14 +628,14 @@ describe('supabaseService', () => {
 
     it('bails on 401/403 status', async () => {
       fetchFn.mockResolvedValue({ data: null, error: { status: 401 } });
-      const result = await fetchWithRetry(fetchFn, '1', 'Test');
+      const result = await fetchWithRetry(fetchFn);
       expect(result).toBeNull();
       expect(fetchFn).toHaveBeenCalledTimes(1);
     });
 
     it('retries if data is null and no error initially', async () => {
       fetchFn.mockResolvedValue({ data: null, error: null });
-      const promise = fetchWithRetry(fetchFn, '1', 'Test', 2, 100);
+      const promise = fetchWithRetry(fetchFn, 2, 100);
       await vi.advanceTimersByTimeAsync(150);
       await vi.advanceTimersByTimeAsync(150);
       const result = await promise;
@@ -648,7 +648,7 @@ describe('supabaseService', () => {
         .mockResolvedValueOnce({ data: null, error: { message: 'Timeout', code: '500' } })
         .mockResolvedValueOnce({ data: null, error: { status: 401 } });
 
-      const promise = fetchWithRetry(fetchFn, '1', 'Test', 3, 100);
+      const promise = fetchWithRetry(fetchFn, 3, 100);
       await vi.advanceTimersByTimeAsync(150);
 
       const result = await promise;
@@ -663,7 +663,7 @@ describe('supabaseService', () => {
         .mockResolvedValueOnce({ data: null, error: null })
         .mockResolvedValueOnce({ data: null, error: null });
 
-      const promise = fetchWithRetry(fetchFn, '1', 'Test', 3, 100);
+      const promise = fetchWithRetry(fetchFn, 3, 100);
       await vi.advanceTimersByTimeAsync(150);
       await vi.advanceTimersByTimeAsync(150);
       await vi.advanceTimersByTimeAsync(150);
@@ -678,7 +678,7 @@ describe('supabaseService', () => {
         .mockResolvedValueOnce({ data: null, error: { message: 'Network Timeout', code: '500' } })
         .mockResolvedValueOnce({ data: { id: '1' }, error: null });
 
-      const promise = fetchWithRetry(fetchFn, '1', 'Test', 3, 100);
+      const promise = fetchWithRetry(fetchFn, 3, 100);
       await vi.advanceTimersByTimeAsync(150);
 
       const result = await promise;
@@ -689,7 +689,7 @@ describe('supabaseService', () => {
     it('bails after max attempts', async () => {
       fetchFn.mockResolvedValue({ data: null, error: { message: 'Fail', code: '500' } });
 
-      const promise = fetchWithRetry(fetchFn, '1', 'Test', 2, 100);
+      const promise = fetchWithRetry(fetchFn, 2, 100);
       await vi.advanceTimersByTimeAsync(150);
       await vi.advanceTimersByTimeAsync(150);
 

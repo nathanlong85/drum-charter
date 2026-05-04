@@ -3,11 +3,6 @@ import { type NextRequest, NextResponse } from 'next/server';
 import type { Database } from './database.types';
 
 export async function updateSession(request: NextRequest) {
-  const cookieCount = request.cookies.getAll().length;
-  console.log(
-    `[Middleware] Updating session for: ${request.nextUrl.pathname} (Cookies: ${cookieCount})`,
-  );
-
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-pathname', request.nextUrl.pathname);
 

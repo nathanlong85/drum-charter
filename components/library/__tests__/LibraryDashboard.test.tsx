@@ -34,7 +34,18 @@ const { navState, mockRouter } = vi.hoisted(() => {
 
 // Mock item-actions
 vi.mock('@/lib/actions/item-actions', () => ({
-  createItemAction: vi.fn().mockResolvedValue({ success: true }),
+  createItemAction: vi.fn().mockImplementation(async (type) => ({
+    success: true,
+    id: `new-${type}-id`,
+    routePrefix:
+      type === 'song'
+        ? 'songs'
+        : type === 'notebook'
+          ? 'notebooks'
+          : type === 'snippet'
+            ? 'snippets'
+            : 'setlists',
+  })),
   duplicateItemAction: vi.fn().mockResolvedValue({
     success: true,
     data: { id: 'dup-1', title: 'Song 1 (Copy)', type: 'song' },

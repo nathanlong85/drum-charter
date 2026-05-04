@@ -1,6 +1,6 @@
 'use client';
 
-import { Filter, Plus, Search } from 'lucide-react';
+import { Filter, Loader2, Plus, Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import {
@@ -69,6 +69,7 @@ export default function LibraryDashboard({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isCreating, setIsCreating] = useState(false);
   const [songs, setSongs] = useState(initialSongs);
   const [notebooks, setNotebooks] = useState(initialNotebooks);
   const [snippets, setSnippets] = useState(initialSnippets);
@@ -191,16 +192,19 @@ export default function LibraryDashboard({
 
   const handleCreateNew = async () => {
     try {
-      await createItemAction(activeTab as ItemType);
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        (error.message === 'NEXT_REDIRECT' || (error as any).digest?.startsWith('NEXT_REDIRECT'))
-      ) {
-        throw error;
+      setIsCreating(true);
+      const result = await createItemAction(activeTab as ItemType);
+      if (result.success && result.id && result.routePrefix) {
+        router.push(`/${result.routePrefix}/${result.id}`);
+      } else {
+        const message = result.error || 'Unknown error';
+        alert(`Failed to create item: ${message}`);
       }
+    } catch (error) {
       console.error('Failed to create item:', error);
       alert('Failed to create item. Please try again.');
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -253,8 +257,9 @@ export default function LibraryDashboard({
           </div>
           <button
             onClick={handleCreateNew}
+            disabled={isCreating}
             data-testid="create-new-button"
-            className="bg-primary text-on-primary font-headline text-[11px] font-black tracking-[0.2em] uppercase px-8 py-3.5 rounded-full shadow-[0_8px_25px_var(--color-primary-dim)] hover:translate-y-[-2px] hover:shadow-[0_12px_30px_var(--color-primary-dim)] transition-all flex items-center gap-3 active:translate-y-[1px]"
+            className="bg-primary text-on-primary font-headline text-[11px] font-black tracking-[0.2em] uppercase px-8 py-3.5 rounded-full shadow-[0_8px_25px_var(--color-primary-dim)] hover:translate-y-[-2px] hover:shadow-[0_12px_30px_var(--color-primary-dim)] transition-all flex items-center gap-3 active:translate-y-[1px] disabled:opacity-50"
           >
             <Plus className="w-5 h-5 stroke-[3px]" />
             NEW {activeTab.toUpperCase()}
@@ -295,7 +300,12 @@ export default function LibraryDashboard({
       )}
 
       {/* Grid */}
-      <section className="space-y-8">
+      <section className="space-y-8 relative overflow-hidden">
+        {isCreating && (
+          <div className="absolute inset-0 bg-surface/50 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
+            <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          </div>
+        )}
         <div className="flex items-center gap-4">
           <div className="w-8 h-[2px] bg-primary/20" />
           <h3 className="font-headline font-black text-sm tracking-[0.3em] uppercase text-on-surface-variant/40">
@@ -307,7 +317,8 @@ export default function LibraryDashboard({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <button
             onClick={handleCreateNew}
-            className="aspect-[4/3] bg-surface-container-lowest flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-outline-variant/20 hover:border-primary/40 hover:bg-surface-container-low transition-all group shadow-sm active:scale-[0.98]"
+            disabled={isCreating}
+            className="aspect-[4/3] bg-surface-container-lowest flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed border-outline-variant/20 hover:border-primary/40 hover:bg-surface-container-low transition-all group shadow-sm active:scale-[0.98] disabled:opacity-50"
           >
             <div className="w-16 h-16 bg-surface-container-highest/50 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-500 text-on-surface-variant/30">
               <Plus className="w-8 h-8 stroke-[1.5px] group-hover:rotate-90 transition-transform duration-500" />
