@@ -196,8 +196,9 @@ export default function LibraryDashboard({
       const result = await createItemAction(activeTab as ItemType);
       if (result.success && result.id && result.routePrefix) {
         router.push(`/${result.routePrefix}/${result.id}`);
-      } else if (!result.success) {
-        alert(`Failed to create item: ${result.error || 'Unknown error'}`);
+      } else {
+        const message = result.error || 'Unknown error';
+        alert(`Failed to create item: ${message}`);
       }
     } catch (error) {
       console.error('Failed to create item:', error);

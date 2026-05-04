@@ -124,7 +124,8 @@ const _SNIPPET_RETRY_DELAY_MS = 3000;
 
 /**
  * Shared retry helper for fetching data from Supabase.
- * Bails early on 404/401/403 errors and only retries on transient network or server issues.
+ * Retries on transient network/server issues and 404/PGRST116 errors to handle potential replication lag.
+ * Bails early on 401/403 errors.
  */
 export async function fetchWithRetry<T>(
   fetchFn: () => PromiseLike<{ data: T | null; error: unknown }>,
