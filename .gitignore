@@ -64,3 +64,4 @@ tmp/
 
 /.agents/
 /.gemini/skills/
+graphify-out/

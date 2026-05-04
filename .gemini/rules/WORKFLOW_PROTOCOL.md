@@ -24,12 +24,11 @@ Work is ONLY "Done" when the following are met:
 1. **Clean Lint**: `pnpm lint` and `pnpm lint:md` must return ZERO errors AND ZERO warnings.
 2. **Full Suite Pass**: `verify_done.sh` must return a total pass.
 3. **Automated Verification**: `pnpm test:run` (Unit) and `pnpm test:e2e` (E2E) must pass.
-4. **Remote CI Pass**: All GitHub Action checks on the PR must be PASSING.
-5. **Copilot Loop**: The PR review from `@copilot` must be clean (all findings addressed).
-6. **Checklist Reporting**: Provide a "Definition of Done Checklist" before final sign-off.
+4. **CircleCI Pass**: All remote CircleCI workflow jobs must be PASSING.
+5. **Gemini Review**: All comments (AI and User) addressed and replied to.
+6. **MANDATORY**: STOP and notify the user when the PR is ready. **DO NOT MERGE.**
 
-## 4. Committing
+## 4. Database Management
 
-- **Attribution**: Commits must be made exclusively on behalf of the configured git user.
-- **Message Style**: Clear, concise, focusing on "why" rather than "what". Matches existing project style.
-- **No Co-authoring**: Do not add co-author trailers.
+- **CLI-First**: All Supabase migrations and schema management are performed locally using the `pnpm supabase` CLI.
+- **No CI/CD Migrations**: GitHub workflows are NOT used for database migrations. This avoids CI/CD credit limits and ensures direct local control over schema updates.

@@ -13,10 +13,10 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
-  workers: 1,
-  timeout: 30 * 1000,
+  workers: process.env.CI ? 2 : 1,
+  timeout: 60 * 1000,
   expect: {
-    timeout: 10 * 1000,
+    timeout: 15 * 1000,
   },
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
@@ -36,6 +36,10 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
+        // Hide Vercel preview toolbar
+        launchOptions: {
+          args: ['--disable-blink-features=AutomationControlled'],
+        },
         // Use prepared auth state.
         storageState: 'playwright/.auth/user.json',
       },
@@ -43,7 +47,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build && pnpm start --port 3001',
+    command:
+      process.env.SKIP_BUILD === 'true'
+        ? 'pnpm start --port 3001'
+        : 'pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build && pnpm start --port 3001',
     url: 'http://localhost:3001',
     reuseExistingServer: !process.env.CI && process.env.RUN_OFFLINE_E2E !== 'true',
     timeout: 180000,

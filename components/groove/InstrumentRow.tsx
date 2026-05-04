@@ -11,9 +11,18 @@ import { NoteCell } from './NoteCell';
 interface InstrumentRowProps {
   instrument: DrumInstrument;
   instIdx: number;
+  startNoteIdx: number;
+  endNoteIdx: number;
+  rowIndex?: number;
 }
 
-export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instIdx }) => {
+export const InstrumentRow: React.FC<InstrumentRowProps> = ({
+  instrument,
+  instIdx,
+  startNoteIdx,
+  endNoteIdx,
+  rowIndex,
+}) => {
   const {
     state,
     dispatch,
@@ -22,13 +31,15 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
     setEditingInstrumentId,
     selectionRange,
     setSelectionRange,
+    setIsDragging,
     readOnly,
     handleNoteClick,
     handleNoteRightClick,
   } = useGrooveGrid();
 
   const { timeSignature, resolution } = state;
-  const notesPerBeat = resolution / timeSignature.beatValue;
+  const safeBeatValue = Math.max(1, timeSignature.beatValue);
+  const notesPerBeat = resolution / safeBeatValue;
   const totalNotesPerMeasure = timeSignature.beatsPerMeasure * notesPerBeat;
 
   const presets = getFilteredPresets(instrument.category, timeSignature);
@@ -45,6 +56,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
 
   const handleDragStart = (noteIdx: number) => {
     if (readOnly) return;
+    setIsDragging(true);
     setSelectionRange({ start: { instIdx, noteIdx }, end: { instIdx, noteIdx } });
   };
 
@@ -59,7 +71,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
     'instrument'
   )
     .toLowerCase()
-    .replace(/\s+/g, '-')}`;
+    .replace(/\s+/g, '-')}-row-${rowIndex}`;
 
   return (
     <div
@@ -67,9 +79,13 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
         instrument.muted ? 'opacity-40' : ''
       }`}
       data-testid={instrumentRowTestId}
+      data-row-index={rowIndex}
     >
       {/* Instrument Info Panel */}
-      <div className="w-32 h-10 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0">
+      <div
+        className="w-32 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0"
+        style={{ height: 'var(--note-cell-size, 40px)' }}
+      >
         {!readOnly && isEditing && (
           <div className="flex flex-col mr-1">
             <button
@@ -207,7 +223,8 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({ instrument, instId
 
       {/* Notes Grid */}
       <div className="flex bg-surface-container-high/10">
-        {instrument.notes.map((note, idx) => {
+        {instrument.notes.slice(startNoteIdx, endNoteIdx).map((note, relativeIdx) => {
+          const idx = startNoteIdx + relativeIdx;
           const isBeatStart = idx % notesPerBeat === 0;
           const _beatIndex = Math.floor(idx / notesPerBeat);
           const isMeasureEnd = idx % (totalNotesPerMeasure || 1) === totalNotesPerMeasure - 1;

@@ -8,11 +8,14 @@
     .no-print,
     [role="button"],
     input[type="checkbox"],
-    select {
+    select,
+    [data-testid="editor-toolbar"] {
       display: none !important;
     }
 
-    /* Reset background and text colors for high contrast */
+    /* Reset background and text colors for absolute high contrast */
+    :root,
+    .dark,
     body {
       background: white !important;
       color: black !important;
@@ -20,7 +23,15 @@
       padding: 0 !important;
     }
 
-    /* Ensure chart elements are visible and properly spaced */
+    /* Ensure all text is black */
+    * {
+      color: black !important;
+      border-color: black !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Layout optimizations for drum charts */
     main {
       padding: 0 !important;
       margin: 0 !important;
@@ -28,44 +39,51 @@
       max-width: none !important;
     }
 
-    /* Force background colors for grid cells (most browsers need this) */
-    * {
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-
-    /* Layout optimizations for drum charts */
-    .grid-editor-container {
+    /* Grid Specific Formatting */
+    [data-testid="groove-grid"] {
       break-inside: avoid;
       margin-bottom: 2rem !important;
-      border: 1px solid #eee !important;
+      border: 1px solid black !important;
     }
 
-    /* Hide the "Saving..." status */
-    .save-status {
-      display: none !important;
-    }
-
-    /* Ensure title is prominent */
-    h1 {
-      font-size: 2.5rem !important;
-      margin-bottom: 1rem !important;
-      border-bottom: 2px solid black !important;
-      padding-bottom: 0.5rem !important;
-    }
-
-    /* Make tags look like plain text instead of badges */
-    .tag-badge {
-      background: none !important;
-      border: 1px solid #ccc !important;
+    /* Override tailwind colors for print */
+    .text-primary,
+    .text-on-surface,
+    .text-on-surface-variant {
       color: black !important;
-      padding: 2px 6px !important;
     }
 
-    /* Ensure sections don't break across pages if small */
-    section {
+    .bg-surface-container-low,
+    .bg-surface-container-lowest,
+    .bg-surface-container-high,
+    [class*="bg-surface-container-low/"],
+    [class*="bg-surface-container-high/"] {
+      background: transparent !important;
+    }
+
+    /* Section management */
+    .break-inside-avoid-page {
       break-inside: avoid;
-      margin-bottom: 3rem !important;
+      page-break-inside: avoid;
+    }
+
+    /* Ensure NoteCells are visible with high contrast borders */
+    [data-testid="note-cell"] {
+      border-color: black !important;
+    }
+
+    /* Keep groove-grid instrument labels visible in read-only print views */
+    button[data-testid^="instrument-settings-trigger-"] {
+      display: flex !important;
+    }
+
+    [data-testid="note-cell-icon"] {
+      filter: grayscale(1) brightness(0) !important; /* Force icons to be black */
+    }
+
+    /* Beat highlights should be subtle but visible */
+    [class*="bg-surface-container-high/40"] {
+      background-color: #f0f0f0 !important;
     }
   }
 }

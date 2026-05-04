@@ -26,10 +26,10 @@ I am strictly FORBIDDEN from considering a task "Done" unless the following cond
 
 1. **Clean Lint**: `pnpm lint` and `pnpm lint:md` must return ZERO errors AND ZERO warnings.
 2. **Full Suite Pass**: `verify_done.sh` must have been run and returned a total pass.
-3. **Iterative Copilot Loop**:
+3. **Iterative Gemini Code Assist Review Loop**:
     * A Pull Request must be opened against `staging`.
-    * A Copilot review must be requested and completed.
-    * **ALL** relevant Copilot comments must be addressed or flagged for discussion.
+    * A Gemini Code Assist review must be completed.
+    * **ALL** relevant Gemini Code Assist review comments must be addressed or flagged for discussion.
     * All remote CI checks must pass.
 4. **Checklist Reporting**: I must provide a "Definition of Done Checklist" in my response before final sign-off.
 

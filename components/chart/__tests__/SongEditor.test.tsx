@@ -1,3 +1,4 @@
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -62,19 +63,23 @@ vi.mock('@/lib/services/supabase-service', () => ({
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(<Tooltip.Provider>{ui}</Tooltip.Provider>);
+};
+
 describe('SongEditor', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('renders initial song data', () => {
-    render(<SongEditor initialSong={mockSong} />);
+    renderWithProviders(<SongEditor initialSong={mockSong} />);
     expect(screen.getByDisplayValue('Test Song')).toBeDefined();
     expect(screen.getByText('Chorus')).toBeDefined();
   });
 
   it('updates song title and triggers save', async () => {
-    render(<SongEditor initialSong={mockSong} />);
+    renderWithProviders(<SongEditor initialSong={mockSong} />);
     const titleInput = screen.getByPlaceholderText('Song Title');
 
     await act(async () => {
@@ -93,8 +98,28 @@ describe('SongEditor', () => {
     );
   });
 
+  it('updates manual order override and triggers save', async () => {
+    renderWithProviders(<SongEditor initialSong={mockSong} />);
+    const orderInput = screen.getByTestId('song-order-override-input');
+
+    await act(async () => {
+      fireEvent.change(orderInput, { target: { value: 'Chorus x2, Verse, Chorus' } });
+      await wait(2100);
+    });
+
+    await waitFor(() => {
+      expect(saveSongChartAction).toHaveBeenCalled();
+    });
+
+    expect(saveSongChartAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        header: expect.objectContaining({ manualOrder: 'Chorus x2, Verse, Chorus' }),
+      }),
+    );
+  });
+
   it('adds a new section', async () => {
-    render(<SongEditor initialSong={mockSong} />);
+    renderWithProviders(<SongEditor initialSong={mockSong} />);
     const addSectionBtn = screen.getByRole('button', { name: /Add section/i });
 
     await act(async () => {
@@ -111,7 +136,7 @@ describe('SongEditor', () => {
   });
 
   it('removes a section', async () => {
-    render(<SongEditor initialSong={mockSong} />);
+    renderWithProviders(<SongEditor initialSong={mockSong} />);
     const removeBtn = screen.getByTitle('Remove Section');
 
     await act(async () => {
@@ -128,7 +153,7 @@ describe('SongEditor', () => {
   });
 
   it('duplicates the song', async () => {
-    render(<SongEditor initialSong={mockSong} />);
+    renderWithProviders(<SongEditor initialSong={mockSong} />);
     const duplicateBtn = screen.getByRole('button', { name: /Duplicate This Item/i });
 
     await act(async () => {
@@ -141,7 +166,7 @@ describe('SongEditor', () => {
 
   it('deletes the song', async () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true);
-    render(<SongEditor initialSong={mockSong} />);
+    renderWithProviders(<SongEditor initialSong={mockSong} />);
     const deleteBtn = screen.getByRole('button', { name: /Delete This Item/i });
 
     await act(async () => {
@@ -168,7 +193,7 @@ describe('SongEditor', () => {
     };
     vi.mocked(listGrooveSnippetsAction).mockResolvedValue([mockSnippet]);
 
-    render(<SongEditor initialSong={mockSong} />);
+    renderWithProviders(<SongEditor initialSong={mockSong} />);
 
     // Open picker
     fireEvent.click(screen.getByText(/\+ Insert Snippet/i));
@@ -191,7 +216,7 @@ describe('SongEditor', () => {
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
     vi.stubGlobal('navigator', { clipboard: { writeText: writeTextSpy } });
 
-    render(<SongEditor initialSong={song} />);
+    renderWithProviders(<SongEditor initialSong={song} />);
     const linkBtn = screen.getByRole('button', { name: /Copy Public Link/i });
     fireEvent.click(linkBtn);
 

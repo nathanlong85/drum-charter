@@ -1,31 +1,32 @@
 # Pull Request & Review Protocol
 
-This protocol defines the iterative review loop between the agent and GitHub Copilot.
+This protocol defines the iterative review loop using Gemini Code Assist (the AI Agent).
 
 ## 1. Creating the PR
 - **Title/Body**: Informative, link to issues (e.g., "Closes #60").
-- **Self-Assign**: `gh pr edit <number> --add-assignee nathanlong85-ai`.
+- **Self-Assign**: gh pr edit number --add-assignee nathanlong85-ai
 
-## 2. The Iterative Feedback Loop
-Follow these steps for every PR:
-1. **Verification**: Ensure changes are fully verified locally via `verify_done.sh`.
-2. **Push & PR**: Open the PR against `staging`.
-3. **Request Copilot Review (MANDATORY)**: Initiate review immediately using:
+## 2. The PR & Review Lifecycle (Mandatory)
 
-   ```bash
-   gh auth switch --user nathanlong85 && gh pr edit <number> --add-reviewer "@copilot" && gh auth switch --user nathanlong85-ai
-   ```
+Follow this exact sequence for every PR:
 
-4. **Monitoring**: Poll for completion of CI checks and Copilot comments.
-5. **Address Findings**: Fix all valid suggestions. If you disagree, flag it for the human.
-6. **Repeat**: Until CI is green and Copilot finds no new relevant issues.
+1. **Preparation**: Commit, push, and open the PR when ready.
+2. **Initial Review**: Gemini Code Assist performs a review; the CI suite runs simultaneously.
+3. **Addressing Feedback**: Poll until review and CI are finished. Address all failures and **ALL** comments.
+   - Reply to **EVERY** comment: State what was done or why a fix was declined.
+4. **Verification**: Run `verify_done.sh` locally. If clean, push changes.
+5. **Re-request Review**: Post a PR comment: `/gemini review`.
+6. **Cycle Iteration**: While waiting for the re-review, the CI suite runs again.
+7. **Rinse & Repeat**: Repeat steps 3-6 until CI is clean and all comments are addressed and replied to.
+   - **Rule of Three**: Maximum of 3 Gemini review cycles (Initial + 2 re-requests) unless new code/requirements are added mid-cycle.
+8. **Handoff**: Stop polling. Notify the user that the PR is green, all comments are addressed, and it is ready for final review.
+9. **User Sovereignty**: **DO NOT MERGE.** Wait for the user to perform the final merge.
+10. **Finality**: The user will notify you when merged.
+11. **Cleanup**: Checkout `staging`, pull changes, and delete the local feature branch. Hurray! 🎉
 
-## 3. The "Green CI" Mandate
-- **Verification is not complete until remote CI (GitHub Actions) returns success.**
-- Investigate failures using `gh run view` and address them immediately.
+## 3. Production Release Flow (Staging -> Main)
 
-## 4. Reporting Requirements
-At the start of every iteration, state:
-- **Iteration Number** (e.g., "Starting Copilot Review Iteration 2").
-- **Finding Summary** (e.g., "3 suggestions regarding error handling").
-- **Resolution Plan** (which fixes will be applied vs flagged).
+1. **Trigger**: When instructed, use the `release-manager` skill to open a PR for merging `staging` into `main`.
+2. **No Polling**: Do not poll this PR. If issues arise, the user will notify you.
+3. **Merge**: The user merges to `main`.
+4. **Celebration**: Once the user confirms the merge, rejoice with party emojis! 🥳🎈✨

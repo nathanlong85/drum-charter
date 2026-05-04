@@ -2,5 +2,8 @@
   "experimental": {
     "enableAgents": true
   },
-  "mcpServers": {}
+  "mcpServers": {},
+  "hooks": {
+    "BeforeTool": []
+  }
 }

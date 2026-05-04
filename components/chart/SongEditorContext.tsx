@@ -18,11 +18,13 @@ import {
 } from '@/lib/actions/item-actions';
 import { useAutosave } from '@/lib/hooks/useAutosave';
 import type { GrooveSnippet, SongChart, SongSection, SongSubSection } from '@/lib/types/groove';
+import { generateId } from '@/lib/utils/id';
 
 export type SongAction =
   | { type: 'SET_SONG'; song: SongChart }
   | { type: 'UPDATE_TITLE'; title: string }
   | { type: 'UPDATE_BPM'; bpm: number }
+  | { type: 'UPDATE_MANUAL_ORDER'; manualOrder: string }
   | {
       type: 'UPDATE_TIME_SIGNATURE';
       beatsPerMeasure: number;
@@ -67,6 +69,12 @@ export function songReducer(state: SongChart, action: SongAction): SongChart {
         header: { ...state.header, bpm: action.bpm },
         updatedAt: timestamp,
       };
+    case 'UPDATE_MANUAL_ORDER':
+      return {
+        ...state,
+        header: { ...state.header, manualOrder: action.manualOrder || undefined },
+        updatedAt: timestamp,
+      };
     case 'UPDATE_TIME_SIGNATURE':
       return {
         ...state,
@@ -95,7 +103,7 @@ export function songReducer(state: SongChart, action: SongAction): SongChart {
       };
     case 'ADD_SECTION': {
       const newSection: SongSection = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name: 'New Section',
         measuresCount: 4,
         notes: [],
@@ -127,7 +135,7 @@ export function songReducer(state: SongChart, action: SongAction): SongChart {
         sections: state.sections.map((s) => {
           if (s.id !== action.sectionId) return s;
           const newSub: SongSubSection = {
-            id: crypto.randomUUID(),
+            id: generateId(),
             name: 'New Subsection',
             measuresCount: 4,
             notes: [],

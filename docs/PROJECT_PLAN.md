@@ -53,6 +53,13 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ### 🟢 Done (Recent)
 
+- [x] [UX] Live Mode Performance Optimization: Implemented high-visibility layout, fullscreen minimalist progress indicators, and prominent section transition cues for better stage usability. (#126) `✓`
+
+- [x] [UX] Song Chart Formatting & Metadata Refactor: Implemented indented print layout, high-contrast PDF support, grid wrapping, and manual 'Order' metadata override. (#124, #125, #127 via #128) `✓`
+
+- [x] [Infra] Fix CircleCI E2E Test Failures: Consolidated build/test on machine executor, improved caching, and increased Playwright workers for stability (#129) `✓`
+
+- [x] [Release] Production Deployment: Promoting \`staging\` to \`main\` with Modernization Phase 1-4, Header UX Refactor, and Auth refinements. (#122) \`✓\`
 - [x] [Arch/UX] Modernize Web App (Phase 4): Enhanced testing infrastructure with **Visual Regression Tests** for Dashboard, Library, and GrooveGrid. Expanded Vitest component coverage for \`AppShell\` and \`LibraryHeader\`. (#120) \`✓\`
 - [x] [Arch/UX] Modernize Web App (Phase 3): Implemented React 19 \`useOptimistic\` for instant library item mutations. Audited and improved WCAG accessibility (focus rings on cards and inputs). Eliminated data waterfalls in \`AppLayout\` and Live Mode views using \`Promise.all\`. (#120) \`✓\`
 - [x] [Arch/UX] Modernize Web App (Phase 2): Refactored Library into nested route segments (\`/library/songs\`, etc.) for better caching and RSC alignment. Implemented mobile-first bottom tab bar in \`AppShell\`. Updated all E2E tests for new routing structure. (#120) \`✓\`

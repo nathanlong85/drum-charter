@@ -32,7 +32,7 @@ export class SongEditorPage {
 
     this.addGridButton = page.locator('text=+ ADD GRID');
     this.grid = page.getByTestId('groove-grid');
-    this.kickRow = page.getByTestId('instrument-row-kick');
+    this.kickRow = page.getByTestId(/instrument-row-kick/).first();
     this.symbolPicker = page.getByTestId('symbol-picker');
 
     this.playButton = page.locator('button', { hasText: /Play|Stop|Loading/i }).first();
@@ -64,9 +64,11 @@ export class SongEditorPage {
 
   async addSection(name: string, measures: string) {
     await this.addSectionButton.click();
-    await expect(this.sectionNameInput).toBeVisible();
-    await this.sectionNameInput.fill(name);
-    await this.measuresInput.fill(measures);
+    const nameInput = this.page.locator('input[placeholder="Section Name"]').last();
+    const measuresInput = this.page.getByTestId('song-editor-measures-input').last();
+    await expect(nameInput).toBeVisible();
+    await nameInput.fill(name);
+    await measuresInput.fill(measures);
     await this.waitForSave();
   }
 

@@ -97,19 +97,25 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null;
+          display_name: string | null;
           id: string;
+          preferences: Json | null;
           updated_at: string | null;
           username: string | null;
         };
         Insert: {
           avatar_url?: string | null;
+          display_name?: string | null;
           id: string;
+          preferences?: Json | null;
           updated_at?: string | null;
           username?: string | null;
         };
         Update: {
           avatar_url?: string | null;
+          display_name?: string | null;
           id?: string;
+          preferences?: Json | null;
           updated_at?: string | null;
           username?: string | null;
         };
@@ -117,30 +123,30 @@ export type Database = {
       };
       setlists: {
         Row: {
-          created_at: string | null;
+          created_at: string;
           id: string;
-          is_public: boolean | null;
+          is_public: boolean;
           songs: Json;
           title: string;
-          updated_at: string | null;
+          updated_at: string;
           user_id: string;
         };
         Insert: {
-          created_at?: string | null;
+          created_at?: string;
           id?: string;
-          is_public?: boolean | null;
+          is_public?: boolean;
           songs?: Json;
           title: string;
-          updated_at?: string | null;
+          updated_at?: string;
           user_id: string;
         };
         Update: {
-          created_at?: string | null;
+          created_at?: string;
           id?: string;
-          is_public?: boolean | null;
+          is_public?: boolean;
           songs?: Json;
           title?: string;
-          updated_at?: string | null;
+          updated_at?: string;
           user_id?: string;
         };
         Relationships: [];
@@ -151,6 +157,7 @@ export type Database = {
           created_at: string | null;
           id: string;
           is_public: boolean | null;
+          manual_order: string | null;
           metronome_enabled: boolean | null;
           metronome_volume: number | null;
           sections: Json;
@@ -165,6 +172,7 @@ export type Database = {
           created_at?: string | null;
           id?: string;
           is_public?: boolean | null;
+          manual_order?: string | null;
           metronome_enabled?: boolean | null;
           metronome_volume?: number | null;
           sections: Json;
@@ -179,6 +187,7 @@ export type Database = {
           created_at?: string | null;
           id?: string;
           is_public?: boolean | null;
+          manual_order?: string | null;
           metronome_enabled?: boolean | null;
           metronome_volume?: number | null;
           sections?: Json;

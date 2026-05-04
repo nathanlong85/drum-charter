@@ -1,5 +1,6 @@
 'use client';
 
+import { isEqual } from 'lodash';
 import {
   createContext,
   type ReactNode,
@@ -49,6 +50,8 @@ interface GrooveGridContextType {
       end: { instIdx: number; noteIdx: number };
     } | null,
   ) => void;
+  isDragging: boolean;
+  setIsDragging: (isDragging: boolean) => void;
   bpm: number;
   setBpm: (bpm: number) => void;
   metronomeEnabled: boolean;
@@ -95,11 +98,43 @@ export function GrooveGridProvider({
   children,
 }: GrooveGridProviderProps) {
   const [state, dispatch] = useReducer(grooveReducer, initialGrid);
-  const latestStateRef = useRef(state);
 
+  // Track if the current state change was initiated locally (user action)
+  const isInternalChange = useRef(false);
+  // Track the last prop to detect external changes
+  const lastPropGrid = useRef(initialGrid);
+
+  // Sync initialGrid to internal state ONLY if it's an external update
   useEffect(() => {
-    latestStateRef.current = state;
-  }, [state]);
+    if (!isEqual(initialGrid, lastPropGrid.current)) {
+      lastPropGrid.current = initialGrid;
+      // Only dispatch if the new external grid is actually different from our current state
+      if (!isEqual(initialGrid, state)) {
+        dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
+      }
+    }
+  }, [initialGrid, state]);
+
+  // Report internal changes to parent
+  useEffect(() => {
+    // We ALWAYS update lastPropGrid to the current state to ensure the next
+    // render cycle's initialGrid check (above) knows what we currently have.
+    lastPropGrid.current = state;
+
+    if (isInternalChange.current) {
+      isInternalChange.current = false;
+      onChange?.(state);
+    }
+  }, [state, onChange]);
+
+  const wrappedDispatch = useCallback(
+    (action: GrooveAction) => {
+      if (readOnly) return;
+      isInternalChange.current = true;
+      dispatch(action);
+    },
+    [readOnly],
+  );
 
   const [pickerPos, setPickerPos] = useState<{
     top: number;
@@ -114,6 +149,7 @@ export function GrooveGridProvider({
     start: { instIdx: number; noteIdx: number };
     end: { instIdx: number; noteIdx: number };
   } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const {
     isPlaying,
@@ -165,40 +201,6 @@ export function GrooveGridProvider({
     }
   }, [isPlaying]);
 
-  const hasInitialized = useRef(false);
-
-  useEffect(() => {
-    if (!hasInitialized.current) {
-      hasInitialized.current = true;
-      return;
-    }
-
-    if (initialGrid) {
-      const isDifferent =
-        JSON.stringify(initialGrid.instruments) !== JSON.stringify(state.instruments) ||
-        initialGrid.measures !== state.measures ||
-        initialGrid.resolution !== state.resolution ||
-        initialGrid.timeSignature.beatsPerMeasure !== state.timeSignature.beatsPerMeasure ||
-        initialGrid.timeSignature.beatValue !== state.timeSignature.beatValue ||
-        initialGrid.playbackOptionalHits !== state.playbackOptionalHits;
-
-      if (isDifferent) {
-        dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
-      }
-    }
-  }, [initialGrid, state]);
-
-  const wrappedDispatch = useCallback(
-    (action: GrooveAction) => {
-      if (readOnly) return;
-      const nextState = grooveReducer(latestStateRef.current, action);
-      dispatch(action);
-      onChange?.(nextState);
-      latestStateRef.current = nextState;
-    },
-    [onChange, readOnly],
-  );
-
   const handleNoteRightClick = useCallback(
     (id: string, noteIndex: number, e: React.MouseEvent) => {
       e.preventDefault();
@@ -228,7 +230,7 @@ export function GrooveGridProvider({
       setSelectionRange(null);
       wrappedDispatch({ type: 'TOGGLE_NOTE', id, noteIndex });
     },
-    [readOnly, wrappedDispatch, handleNoteRightClick],
+    [readOnly, handleNoteRightClick, wrappedDispatch],
   );
 
   const handleSymbolSelect = useCallback(
@@ -361,6 +363,8 @@ export function GrooveGridProvider({
     setEditingInstrumentId,
     selectionRange,
     setSelectionRange,
+    isDragging,
+    setIsDragging,
     bpm: parentBpm,
     setBpm: onBpmChange || (() => {}),
     metronomeEnabled,

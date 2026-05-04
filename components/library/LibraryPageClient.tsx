@@ -8,6 +8,7 @@ import {
   deleteItemAction,
   duplicateItemAction,
 } from '@/lib/actions/item-actions';
+import { generateId } from '@/lib/utils/id';
 import { LibraryCard } from './LibraryCard';
 
 type ItemType = 'song' | 'notebook' | 'snippet' | 'setlist';
@@ -96,7 +97,7 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
       // Create a temporary item for optimistic UI
       const itemToDuplicate = optimisticItems.find((i) => i.id === id);
       if (itemToDuplicate) {
-        const tempId = `temp-${Date.now()}`;
+        const tempId = generateId();
         addOptimisticAction({
           type: 'duplicate',
           payload: {
@@ -140,13 +141,18 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
   const handleCreateNew = async () => {
     try {
       setIsCreating(true);
-      await createItemAction(type);
-    } catch (error) {
-      if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
-        throw error;
+      const result = await createItemAction(type);
+      if (result.success && result.id && result.routePrefix) {
+        router.push(`/${result.routePrefix}/${result.id}`);
+      } else {
+        const message = result.error || 'Unknown error';
+        alert(`Failed to create item: ${message}`);
       }
+    } catch (error) {
       console.error('Failed to create item:', error);
-      alert('Failed to create item. Please try again.');
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Client Error: ${message}`);
+    } finally {
       setIsCreating(false);
     }
   };

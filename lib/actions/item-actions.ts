@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -11,38 +10,39 @@ import {
   type Setlist,
   type SongChart,
 } from '@/lib/types/groove';
+import { generateId } from '@/lib/utils/id';
 
 /**
  * Server Action for creating new items.
- * Throws errors on failure so callers can catch them (and NEXT_REDIRECT handled correctly by Next.js).
+ * Returns a result object to avoid Next.js production error masking.
  */
 export async function createItemAction(
   type: 'song' | 'notebook' | 'snippet' | 'setlist',
   defaultTimeSig?: { numerator: number; denominator: number },
-) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    throw new Error('Unauthorized');
-  }
-
-  const userId = user.id;
-  let savedId: string | undefined;
-  let routePrefix: string | undefined;
-
-  const timeSignature = {
-    beatsPerMeasure: defaultTimeSig?.numerator || 4,
-    beatValue: defaultTimeSig?.denominator || 4,
-  };
-
+): Promise<{ success: boolean; id?: string; routePrefix?: string; error?: string }> {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const userId = user.id;
+    let savedId: string | undefined;
+    let routePrefix: string | undefined;
+
+    const timeSignature = {
+      beatsPerMeasure: defaultTimeSig?.numerator || 4,
+      beatValue: defaultTimeSig?.denominator || 4,
+    };
+
     if (type === 'song') {
       const newSong: SongChart = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         userId,
         header: {
           title: 'Untitled Song',
@@ -61,7 +61,7 @@ export async function createItemAction(
       routePrefix = 'songs';
     } else if (type === 'notebook') {
       const newNotebook: Notebook = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         userId,
         title: 'Untitled Notebook',
         sections: [],
@@ -77,7 +77,7 @@ export async function createItemAction(
       const resolution = 16;
       const measures = 1;
       const newSnippet: GrooveSnippet = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         userId,
         title: 'Untitled Snippet',
         bpm: 100,
@@ -99,7 +99,7 @@ export async function createItemAction(
       routePrefix = 'snippets';
     } else if (type === 'setlist') {
       const newSetlist: Setlist = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         userId,
         title: 'Untitled Setlist',
         songs: [],
@@ -116,20 +116,19 @@ export async function createItemAction(
       revalidatePath('/library', 'layout');
       revalidatePath('/dashboard');
       revalidatePath('/');
-    } else {
-      throw new Error('Failed to create item');
+      return { success: true, id: savedId, routePrefix };
     }
-  } catch (error) {
-    // If it's already a NEXT_REDIRECT, let it bubble up
-    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
-      throw error;
-    }
-    console.error('Error in createItemAction:', error);
-    throw new Error('Failed to create item');
-  }
 
-  if (savedId && routePrefix) {
-    redirect(`/${routePrefix}/${savedId}`);
+    return {
+      success: false,
+      error: 'Failed to create item',
+    };
+  } catch (error) {
+    console.error('Error in createItemAction:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown server error',
+    };
   }
 }
 
