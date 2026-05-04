@@ -45,12 +45,12 @@ export function DashboardView({ user, profile, recentItems }: DashboardViewProps
       } else {
         const message = result.error || 'Unknown error';
         alert(`Failed to create item: ${message}`);
-        setIsCreating(false);
       }
     } catch (error) {
       console.error('Failed to create item:', error);
-      setIsCreating(false);
       alert('Failed to create item. Please try again.');
+    } finally {
+      setIsCreating(false);
     }
   };
 

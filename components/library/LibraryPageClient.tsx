@@ -147,12 +147,12 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
       } else {
         const message = result.error || 'Unknown error';
         alert(`Failed to create item: ${message}`);
-        setIsCreating(false);
       }
     } catch (error) {
       console.error('Failed to create item:', error);
       const message = error instanceof Error ? error.message : 'Unknown error';
       alert(`Client Error: ${message}`);
+    } finally {
       setIsCreating(false);
     }
   };
