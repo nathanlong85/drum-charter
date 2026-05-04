@@ -28,7 +28,7 @@ interface DashboardViewProps {
 }
 
 export function DashboardView({ user, profile, recentItems }: DashboardViewProps) {
-  const _router = useRouter();
+  const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateNew = async (type: 'song' | 'notebook' | 'snippet') => {
@@ -40,9 +40,8 @@ export function DashboardView({ user, profile, recentItems }: DashboardViewProps
     try {
       setIsCreating(true);
       const result = await createItemAction(type, defaultTimeSig);
-      if (result.success && result.id && result.error) {
-        // In the success case, result.error contains the routePrefix
-        router.push(`/${result.error}/${result.id}`);
+      if (result.success && result.id && result.routePrefix) {
+        router.push(`/${result.routePrefix}/${result.id}`);
       } else {
         const message = result.error || 'Unknown error';
         alert(`Failed to create item: ${message}`);

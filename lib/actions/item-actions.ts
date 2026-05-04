@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { supabaseService } from '@/lib/services/supabase-service';
 import { createClient } from '@/lib/supabase/server';
 import {
@@ -20,7 +19,7 @@ import { generateId } from '@/lib/utils/id';
 export async function createItemAction(
   type: 'song' | 'notebook' | 'snippet' | 'setlist',
   defaultTimeSig?: { numerator: number; denominator: number },
-): Promise<{ success: boolean; id?: string; error?: string }> {
+): Promise<{ success: boolean; id?: string; routePrefix?: string; error?: string }> {
   try {
     const supabase = await createClient();
     const {
@@ -117,18 +116,18 @@ export async function createItemAction(
       revalidatePath('/library', 'layout');
       revalidatePath('/dashboard');
       revalidatePath('/');
-      return { success: true, id: savedId, error: routePrefix };
+      return { success: true, id: savedId, routePrefix };
     }
 
     return {
       success: false,
-      error: `Failed to create item: savedId=${savedId}, routePrefix=${routePrefix}`,
+      error: 'Failed to create item',
     };
   } catch (error) {
     console.error('Error in createItemAction:', error);
     return {
       success: false,
-      error: `Server Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      error: error instanceof Error ? error.message : 'Unknown server error',
     };
   }
 }

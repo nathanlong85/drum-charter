@@ -191,14 +191,13 @@ export default function LibraryDashboard({
 
   const handleCreateNew = async () => {
     try {
-      await createItemAction(activeTab as ItemType);
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        (error.message === 'NEXT_REDIRECT' || (error as any).digest?.startsWith('NEXT_REDIRECT'))
-      ) {
-        throw error;
+      const result = await createItemAction(activeTab as ItemType);
+      if (result.success && result.id && result.routePrefix) {
+        router.push(`/${result.routePrefix}/${result.id}`);
+      } else if (!result.success) {
+        alert(`Failed to create item: ${result.error || 'Unknown error'}`);
       }
+    } catch (error) {
       console.error('Failed to create item:', error);
       alert('Failed to create item. Please try again.');
     }

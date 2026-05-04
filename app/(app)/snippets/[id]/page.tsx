@@ -20,9 +20,6 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
     redirect('/login');
   }
 
-  const user = authResult.value.data.user;
-  console.log(`[SnippetPage] Loading snippet: ${id} (User: ${user?.id})`);
-
   if (snippetResult.status === 'rejected') {
     const error = snippetResult.reason;
     if (
@@ -38,10 +35,6 @@ export default async function SnippetPage({ params }: SnippetPageProps) {
   }
 
   const rawSnippet = snippetResult.value;
-
-  console.log(
-    `[SnippetPage] Snippet found: ${rawSnippet.title} (Owner: ${rawSnippet.userId}, Public: ${rawSnippet.isPublic})`,
-  );
 
   return (
     <div className="max-w-[1400px] mx-auto p-8 space-y-12">

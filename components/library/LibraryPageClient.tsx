@@ -142,18 +142,17 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
     try {
       setIsCreating(true);
       const result = await createItemAction(type);
-      if (result.success && result.id && result.error) {
-        // In the success case, result.error contains the routePrefix
-        router.push(`/${result.error}/${result.id}`);
+      if (result.success && result.id && result.routePrefix) {
+        router.push(`/${result.routePrefix}/${result.id}`);
       } else {
         const message = result.error || 'Unknown error';
-        alert(`Failed to create item: ${message}\n\nPlease check the console for more details.`);
+        alert(`Failed to create item: ${message}`);
         setIsCreating(false);
       }
     } catch (error) {
       console.error('Failed to create item:', error);
       const message = error instanceof Error ? error.message : 'Unknown error';
-      alert(`Client Error: ${message}\n\nPlease check the console for more details.`);
+      alert(`Client Error: ${message}`);
       setIsCreating(false);
     }
   };

@@ -128,8 +128,6 @@ const _SNIPPET_RETRY_DELAY_MS = 3000;
  */
 export async function fetchWithRetry<T>(
   fetchFn: () => PromiseLike<{ data: T | null; error: unknown }>,
-  id: string,
-  typeName: string,
   maxAttempts = 3,
   delayMs = _SNIPPET_RETRY_DELAY_MS,
 ): Promise<T | null> {
@@ -148,14 +146,10 @@ export async function fetchWithRetry<T>(
     if (isBailableError(error)) {
       return null;
     }
-    console.warn(`[supabaseService] Initial fetch error for ${typeName} ${id}:`, error);
   }
 
   while (!data && attempts < maxAttempts) {
     attempts++;
-    console.warn(
-      `[supabaseService] ${typeName} not found initially: ${id}. Retry attempt ${attempts}/${maxAttempts}...`,
-    );
     await new Promise((resolve) => setTimeout(resolve, delayMs));
 
     const retryResult = await fetchFn();
@@ -166,11 +160,9 @@ export async function fetchWithRetry<T>(
       if (isBailableError(error)) {
         return null;
       }
-      console.error(`[supabaseService] Retry error for ${typeName} ${id}:`, error);
     }
 
     if (data) {
-      console.log(`[supabaseService] ${typeName} found after retry: ${id}`);
       return data;
     }
   }
@@ -223,10 +215,8 @@ export const supabaseService = {
   async getSongChart(id: string, supabaseParam?: SupabaseClient<Database>): Promise<SongChart> {
     const supabase = supabaseParam || createBrowserClient();
 
-    const data = await fetchWithRetry<DbSongChart>(
-      () => supabase.from('song_charts').select('*').eq('id', id).maybeSingle(),
-      id,
-      'Song chart',
+    const data = await fetchWithRetry<DbSongChart>(() =>
+      supabase.from('song_charts').select('*').eq('id', id).single(),
     );
 
     if (!data) {
@@ -328,10 +318,8 @@ export const supabaseService = {
   async getNotebook(id: string, supabaseParam?: SupabaseClient<Database>): Promise<Notebook> {
     const supabase = supabaseParam || createBrowserClient();
 
-    const data = await fetchWithRetry<DbNotebook>(
-      () => supabase.from('notebooks').select('*').eq('id', id).maybeSingle(),
-      id,
-      'Notebook',
+    const data = await fetchWithRetry<DbNotebook>(() =>
+      supabase.from('notebooks').select('*').eq('id', id).single(),
     );
 
     if (!data) {
@@ -575,10 +563,8 @@ export const supabaseService = {
   ): Promise<GrooveSnippet> {
     const supabase = supabaseParam || createBrowserClient();
 
-    const data = await fetchWithRetry<DbGrooveSnippet>(
-      () => supabase.from('groove_snippets').select('*').eq('id', id).maybeSingle(),
-      id,
-      'Groove snippet',
+    const data = await fetchWithRetry<DbGrooveSnippet>(() =>
+      supabase.from('groove_snippets').select('*').eq('id', id).single(),
     );
 
     if (!data) {
@@ -641,10 +627,8 @@ export const supabaseService = {
   async getSetlist(id: string, supabaseParam?: SupabaseClient<Database>): Promise<Setlist> {
     const supabase = supabaseParam || createBrowserClient();
 
-    const data = await fetchWithRetry<DbSetlist>(
-      () => supabase.from('setlists').select('*').eq('id', id).maybeSingle(),
-      id,
-      'Setlist',
+    const data = await fetchWithRetry<DbSetlist>(() =>
+      supabase.from('setlists').select('*').eq('id', id).single(),
     );
 
     if (!data) {
