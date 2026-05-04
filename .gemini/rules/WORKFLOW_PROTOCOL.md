@@ -30,5 +30,5 @@ Work is ONLY "Done" when the following are met:
 
 ## 4. Database Management
 
-- **CLI-First**: All Supabase migrations and schema management are performed locally using the `pnpm supabase` CLI. 
+- **CLI-First**: All Supabase migrations and schema management are performed locally using the `pnpm supabase` CLI.
 - **No CI/CD Migrations**: GitHub workflows are NOT used for database migrations. This avoids CI/CD credit limits and ensures direct local control over schema updates.
