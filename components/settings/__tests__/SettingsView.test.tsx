@@ -51,7 +51,7 @@ describe('SettingsView', () => {
 
     expect(screen.getByDisplayValue('The Drummer')).toBeDefined();
     expect(screen.getByDisplayValue('groove_master')).toBeDefined();
-    expect(screen.getByText('Mission Control')).toBeDefined();
+    expect(screen.getByText('Settings')).toBeDefined();
   });
 
   it('handles display name change', () => {

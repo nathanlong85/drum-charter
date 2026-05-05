@@ -66,7 +66,7 @@ export function DashboardView({ user, profile, recentItems }: DashboardViewProps
       <div className="mb-12 flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
         <div>
           <h1 className="text-4xl md:text-5xl font-headline font-black text-on-surface uppercase tracking-tight">
-            Mission <span className="text-primary">Control</span>
+            Dashboard
           </h1>
           <p className="text-on-surface-variant font-body mt-2">
             Welcome back,{' '}

@@ -14,7 +14,7 @@ describe('LibraryHeader', () => {
     render(<LibraryHeader />);
 
     expect(screen.getByText('My Library')).toBeDefined();
-    expect(screen.getByText(/Orchestrating rhythm/i)).toBeDefined();
+    expect(screen.getByText(/Manage your songs/i)).toBeDefined();
   });
 
   it('renders all tabs', () => {

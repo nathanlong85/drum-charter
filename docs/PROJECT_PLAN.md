@@ -51,9 +51,19 @@ DrumCharter is a web application tailored for drummers to create, manage, and sh
 
 ## Status Board (Kanban)
 
+### 🟡 Next / Backlog
+
+- [ ] [Bug] Global Search Library input in AppShell is non-functional (#143)
+- [ ] [UX] Replace cheesy and "non-human" language with user-friendly wording (#144)
+- [ ] [Sample Matrix] Implement high-fidelity playback mapping. (#30)
+- [ ] [Backend] Supabase Realtime for Multi-User Live Control (#119)
+- [ ] [DevEx] Local PR Review Automation: Configure Gemini to auto-comment on PRs after CI pass. (#130)
+
 ### 🟢 Done (Recent)
 
-- [x] [UX] Live Mode Performance Optimization: Implemented high-visibility layout, fullscreen minimalist progress indicators, and prominent section transition cues for better stage usability. (#126) `✓`
+- [x] [Chore] Code Cleanup & Creation Flow Refactor: Removed diagnostic logs and unused mock code. Refactored \`createItemAction\` to use explicit \`routePrefix\` for client-side redirection, resolving UI locking bugs and improving type safety. (#138 via #141) \`✓\`
+
+- [x] [UX] Live Mode Performance Optimization: Implemented high-visibility layout, fullscreen minimalist progress indicators, and prominent section transition cues for better stage usability. (#126) \`✓\`
 
 - [x] [UX] Song Chart Formatting & Metadata Refactor: Implemented indented print layout, high-contrast PDF support, grid wrapping, and manual 'Order' metadata override. (#124, #125, #127 via #128) `✓`
 

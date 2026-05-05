@@ -1,7 +1,7 @@
 'use client';
 
 import { Filter, Plus, Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useOptimistic, useState, useTransition } from 'react';
 import {
   createItemAction,
@@ -30,7 +30,10 @@ interface LibraryPageClientProps {
 
 export default function LibraryPageClient({ initialItems, type }: LibraryPageClientProps) {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [_isPending, startTransition] = useTransition();

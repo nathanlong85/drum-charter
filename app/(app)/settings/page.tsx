@@ -16,7 +16,7 @@ export default async function SettingsPage() {
           Authentication Required
         </h2>
         <p className="text-on-surface-variant max-w-md mx-auto">
-          Please sign in to access your mission control and personalization settings.
+          Please sign in to access your settings and personalization options.
         </p>
       </div>
     );

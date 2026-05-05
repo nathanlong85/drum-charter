@@ -21,7 +21,7 @@ export default function LibraryHeader() {
             My Library
           </h2>
           <p className="text-on-surface-variant font-headline text-xs tracking-[0.3em] uppercase max-w-md">
-            Orchestrating rhythm through modular architectural design systems.
+            Manage your songs, notebooks, and snippets.
           </p>
         </div>
       </section>

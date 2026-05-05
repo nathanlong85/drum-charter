@@ -65,10 +65,10 @@ export default function SettingsView({ profile }: SettingsViewProps) {
     <div className="max-w-4xl mx-auto py-8 px-6">
       <div className="mb-8">
         <h1 className="text-3xl font-headline font-black text-on-surface uppercase tracking-tight mb-2">
-          Mission Control
+          Settings
         </h1>
         <p className="text-on-surface-variant font-headline text-xs tracking-widest uppercase opacity-60">
-          Personalize your sonic workstation
+          Personalize your workspace
         </p>
       </div>
 

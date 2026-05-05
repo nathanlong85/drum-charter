@@ -55,7 +55,7 @@ export default async function PublicNotebookPage({ params }: PublicNotebookPageP
       </div>
       <footer className="max-w-4xl mx-auto mt-12 text-center no-print space-y-4">
         <p className="text-[10px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.4em]">
-          Structured via Sonic Architect Console
+          Created via DrumCharter
         </p>
         <p className="text-xs font-headline font-bold text-on-surface-variant uppercase tracking-widest">
           Build your repertoire at{' '}
