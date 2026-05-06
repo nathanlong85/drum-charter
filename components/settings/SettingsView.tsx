@@ -226,7 +226,7 @@ export default function SettingsView({ profile }: SettingsViewProps) {
             {success && (
               <div className="flex items-center gap-2 text-green-500 text-[10px] font-headline font-black uppercase tracking-widest animate-fade-in">
                 <Check className="w-3 h-3" />
-                Configuration Updated Successfully
+                Settings Updated Successfully
               </div>
             )}
           </div>
@@ -242,7 +242,7 @@ export default function SettingsView({ profile }: SettingsViewProps) {
                 Syncing...
               </>
             ) : (
-              'Save Configuration'
+              'Save Settings'
             )}
           </button>
         </div>
