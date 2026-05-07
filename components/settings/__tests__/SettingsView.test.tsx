@@ -73,7 +73,7 @@ describe('SettingsView', () => {
       </ThemeProvider>,
     );
 
-    const saveButton = screen.getByText('Save Configuration');
+    const saveButton = screen.getByText('Save Settings');
     fireEvent.click(saveButton);
 
     await waitFor(() => {
@@ -87,7 +87,7 @@ describe('SettingsView', () => {
       );
     });
 
-    expect(screen.getByText('Configuration Updated Successfully')).toBeDefined();
+    expect(screen.getByText('Settings Updated Successfully')).toBeDefined();
   });
 
   it('displays error message on failure', async () => {
@@ -98,7 +98,7 @@ describe('SettingsView', () => {
       </ThemeProvider>,
     );
 
-    fireEvent.click(screen.getByText('Save Configuration'));
+    fireEvent.click(screen.getByText('Save Settings'));
 
     await waitFor(() => {
       expect(screen.getByText('Update failed')).toBeDefined();
