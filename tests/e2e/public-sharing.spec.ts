@@ -89,7 +89,7 @@ test.describe('Public Sharing Workflows', () => {
       intervals: [2000, 5000],
       timeout: 20000,
     });
-    
+
     await expect(unauthPage.getByText(/Untitled Notebook/i)).toBeVisible();
 
     await unauthContext.close();
@@ -137,7 +137,7 @@ test.describe('Public Sharing Workflows', () => {
       intervals: [2000, 5000],
       timeout: 20000,
     });
-    
+
     await expect(unauthPage.getByText(/Untitled Snippet/i)).toBeVisible();
 
     await unauthContext.close();

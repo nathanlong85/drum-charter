@@ -9,10 +9,10 @@ export const waitForSave = async (page: Page) => {
   const saveIndicator = page.getByTestId('floating-save-status');
   // First, wait long enough for the 2s debounce to trigger and the save to start
   await page.waitForTimeout(3000);
-  
+
   // Now wait for any active "Saving..." to be gone
   await expect(saveIndicator.locator('text=Saving...')).not.toBeVisible({ timeout: 20000 });
-  
+
   // Ensure we are in a "Saved" state or at least not "Saving..."
   // (Some editors show "Saved", some just hide the indicator)
   const isSaving = await saveIndicator.locator('text=Saving...').isVisible();
