@@ -27,11 +27,6 @@ export default async function SettingsPage() {
 
   return (
     <div className="flex flex-col h-full bg-surface">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-outline-variant/10">
-        <h1 className="text-xl font-headline font-black text-on-surface uppercase tracking-tight">
-          Settings
-        </h1>
-      </div>
       <div className="flex-1 overflow-y-auto">
         <Suspense fallback={<SettingsSkeleton />}>
           <SettingsView profile={profile} />

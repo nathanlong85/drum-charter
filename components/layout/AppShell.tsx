@@ -194,7 +194,10 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
         </main>
 
         {/* Bottom Navigation (Mobile Only) */}
-        <nav className="fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/10 flex items-center justify-around md:hidden z-50 no-print">
+        <nav
+          data-testid="bottom-nav"
+          className="fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/10 flex items-center justify-around md:hidden z-50 no-print"
+        >
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
             const Icon = item.icon;

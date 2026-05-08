@@ -47,7 +47,7 @@ test.describe('Visual Regression', () => {
     await page.goto('/dashboard');
     await page.waitForTimeout(2000);
 
-    const bottomNav = page.locator('nav').filter({ has: page.getByText(/Dashboard/i) });
+    const bottomNav = page.getByTestId('bottom-nav');
     await expect(bottomNav).toBeVisible();
 
     await expect(page).toHaveScreenshot('mobile-nav-baseline.png', screenshotOptions);

@@ -64,7 +64,10 @@ export default function SettingsView({ profile }: SettingsViewProps) {
   return (
     <div className="max-w-4xl mx-auto py-8 px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-headline font-black text-on-surface uppercase tracking-tight mb-2">
+        <h1
+          data-testid="settings-heading"
+          className="text-3xl font-headline font-black text-on-surface uppercase tracking-tight mb-2"
+        >
           Settings
         </h1>
         <p className="text-on-surface-variant font-headline text-xs tracking-widest uppercase opacity-60">

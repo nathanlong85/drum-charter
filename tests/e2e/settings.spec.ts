@@ -11,7 +11,7 @@ test.describe('User Identity & Preferences', () => {
   test('Update Display Name and reflect in Dashboard', async ({ page }) => {
     await test.step('Navigate to Settings', async () => {
       await page.goto('/settings');
-      await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+      await expect(page.getByTestId('settings-heading')).toBeVisible();
     });
 
     await test.step('Change Display Name', async () => {
