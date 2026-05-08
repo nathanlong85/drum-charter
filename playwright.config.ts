@@ -20,7 +20,7 @@ export default defineConfig({
   },
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
-    baseURL: 'http://localhost:3001',
+    baseURL: 'http://127.0.0.1:3001',
     trace: 'on-first-retry',
     actionTimeout: 10 * 1000,
     navigationTimeout: 90000,
@@ -51,7 +51,7 @@ export default defineConfig({
       process.env.SKIP_BUILD === 'true'
         ? 'pnpm start --port 3001'
         : 'pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm build && pnpm start --port 3001',
-    url: 'http://localhost:3001',
+    url: 'http://127.0.0.1:3001',
     reuseExistingServer: !process.env.CI && process.env.RUN_OFFLINE_E2E !== 'true',
     timeout: 180000,
   },

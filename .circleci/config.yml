@@ -54,7 +54,7 @@ jobs:
           name: Build Next.js app with Placeholder
           command: |
             # We use a long unique string that won't be truncated or collisioned
-            export NEXT_PUBLIC_SUPABASE_URL="http://localhost:54321"
+            export NEXT_PUBLIC_SUPABASE_URL="http://127.0.0.1:54321"
             export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY="SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI"
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
       - persist_to_workspace:
@@ -111,7 +111,7 @@ jobs:
             
             echo "Waiting for Supabase..."
             for i in {1..60}; do
-              if curl -s http://localhost:54321/rest/v1/ > /dev/null; then
+              if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
                 echo "Supabase ready"
                 break
               fi
@@ -121,7 +121,7 @@ jobs:
             
             SUPABASE_STATUS=$(npx supabase status -o json)
             REAL_ANON_KEY=$(echo "$SUPABASE_STATUS" | jq -r .ANON_KEY)
-            export NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+            export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
             export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$REAL_ANON_KEY
             export SUPABASE_SERVICE_ROLE_KEY=$(echo "$SUPABASE_STATUS" | jq -r .SERVICE_ROLE_KEY)
             

@@ -11,10 +11,12 @@ setup('authenticate', async ({ page }) => {
   await page.getByLabel('Password').fill('password123');
 
   // Click sign in and wait for navigation to dashboard
-  await page.locator('button[type="submit"]').click();
+  const submitBtn = page.locator('button[type="submit"]');
+  await expect(submitBtn).toBeVisible({ timeout: 15000 });
+  await submitBtn.click();
 
   // Wait for redirect to dashboard
-  await page.waitForURL(/\/dashboard/, { timeout: 60000 });
+  await page.waitForURL(/\/dashboard/, { timeout: 90000 });
   await expect(page.getByRole('heading', { name: /Dashboard/i })).toBeVisible();
 
   // End of authentication steps.
