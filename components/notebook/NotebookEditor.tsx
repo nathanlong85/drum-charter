@@ -380,7 +380,7 @@ export function NotebookEditor({ initialNotebook }: NotebookEditorProps) {
 
         <footer className="mt-24 pb-12 text-center">
           <p className="text-[10px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.3em]">
-            DrumCharter Notebook Console v1.0
+            DrumCharter Notebook Editor v1.0
           </p>
         </footer>
       </div>

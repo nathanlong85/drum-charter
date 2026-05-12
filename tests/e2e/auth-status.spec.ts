@@ -39,7 +39,7 @@ test.describe('Auth Status & User Menu', () => {
       await signOutBtn.click();
 
       // Verify redirect to landing page
-      await page.waitForURL('http://localhost:3001/', { timeout: 15000 });
+      await page.waitForURL('/', { timeout: 15000 });
       await expect(page.getByText(/Drum Charting for Professionals/i).first()).toBeVisible();
     });
   });

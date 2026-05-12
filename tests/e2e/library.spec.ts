@@ -37,6 +37,30 @@ test.describe('Library Management', () => {
     await expect(page.locator('h3', { hasText: songTitle })).not.toBeVisible({ timeout: 10000 });
   });
 
+  test('should use global search in AppShell', async ({ page }) => {
+    const songTitle = `Global Search Song ${Date.now()}`;
+
+    // Create a song first
+    await page.getByTestId('create-new-button').click();
+    await page.locator('input[placeholder="Song Title"]').fill(songTitle);
+    await waitForSave(page);
+
+    // Navigate somewhere else (e.g. Dashboard)
+    await page.goto('/dashboard');
+
+    // Use global search
+    const globalSearch = page.getByTestId('global-search-input');
+    await expect(globalSearch).toBeVisible();
+    await globalSearch.fill(songTitle);
+    await page.keyboard.press('Enter');
+
+    // Should redirect to library songs with search param
+    await expect(page).toHaveURL(/\/library\/songs\?search=/);
+
+    // Verify song is visible
+    await expect(page.locator('h3', { hasText: songTitle })).toBeVisible();
+  });
+
   test('should switch between library tabs', async ({ page }) => {
     // Default is Songs
     await expect(page.getByTestId('tab-songs')).toHaveClass(/bg-surface-container-highest/);

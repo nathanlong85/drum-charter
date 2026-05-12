@@ -161,6 +161,7 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
                 placeholder="SEARCH SONGS, SNIPPETS..."
                 type="text"
                 aria-label="Search library"
+                data-testid="global-search-input"
                 value={globalSearch}
                 onChange={(e) => setGlobalSearch(e.target.value)}
               />
