@@ -5,14 +5,5 @@
   "hooks": {
     "BeforeTool": []
   },
-  "mcpServers": {
-    "serena": {
-      "command": "serena",
-      "args": [
-        "start-mcp-server",
-        "--context",
-        "ide"
-      ]
-    }
-  }
+  "mcpServers": {}
 }

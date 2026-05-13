@@ -1,0 +1,17 @@
+# Exclude build artifacts and test coverage from knowledge graph
+playwright-report/
+coverage/
+
+# Exclude node_modules and package manager artifacts
+node_modules/
+.pnpm-store/
+.yarn/
+
+# Exclude local development artifacts
+.next/
+.supabase/
+tmp/stitch*/
+
+# Exclude sensitive files
+.env*
+*.local

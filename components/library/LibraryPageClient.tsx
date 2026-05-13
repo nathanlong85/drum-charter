@@ -2,7 +2,7 @@
 
 import { Filter, Plus, Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useOptimistic, useState, useTransition } from 'react';
+import { useEffect, useMemo, useOptimistic, useState, useTransition } from 'react';
 import {
   createItemAction,
   deleteItemAction,
@@ -37,6 +37,11 @@ export default function LibraryPageClient({ initialItems, type }: LibraryPageCli
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [_isPending, startTransition] = useTransition();
+
+  // Sync searchQuery with URL params (e.g. from Global Search)
+  useEffect(() => {
+    setSearchQuery(initialSearch);
+  }, [initialSearch]);
 
   const [optimisticItems, addOptimisticAction] = useOptimistic(
     initialItems,

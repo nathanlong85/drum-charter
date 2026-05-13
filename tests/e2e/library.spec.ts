@@ -57,8 +57,9 @@ test.describe('Library Management', () => {
     // Should redirect to library songs with search param
     await expect(page).toHaveURL(/\/library\/songs\?search=/);
 
-    // Verify song is visible
-    await expect(page.locator('h3', { hasText: songTitle })).toBeVisible();
+    // Verify song is visible in the list
+    // Use .first() to handle potential strict mode violations during view transitions
+    await expect(page.getByRole('heading', { name: songTitle }).first()).toBeVisible();
   });
 
   test('should switch between library tabs', async ({ page }) => {
