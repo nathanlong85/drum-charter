@@ -50,8 +50,8 @@ class MockAudioContext {
   destination = {};
 }
 
-(window as unknown as typeof window).AudioContext = MockAudioContext;
-(window as unknown as typeof window).webkitAudioContext = MockAudioContext;
+(window as any).AudioContext = MockAudioContext;
+(window as any).webkitAudioContext = MockAudioContext;
 
 // Mock fetch for all tests
 global.fetch = vi.fn().mockResolvedValue({
@@ -67,7 +67,7 @@ if (typeof window !== 'undefined') {
 
   // Mock crypto for JSDOM
   if (!window.crypto) {
-    (window as unknown as typeof window).crypto = {
+    (window as any).crypto = {
       randomUUID: () => `test-uuid-${Math.random().toString(36).slice(2, 9)}`,
     };
   }

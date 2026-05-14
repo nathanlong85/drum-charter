@@ -38,9 +38,9 @@ export function migrateGrooveGrid(grid: unknown): GrooveGrid | undefined {
   if (!grid || typeof grid !== 'object') return undefined;
 
   const gridObj = grid as Record<string, unknown>;
-  const targetLength = calculateTotalNotes(gridObj);
+  const targetLength = calculateTotalNotes(gridObj as any);
 
-  const instruments = ((gridObj.instruments as unknown[]) || []).map((inst: unknown) => {
+  const instruments = ((gridObj.instruments as unknown[]) || []).map((inst: any) => {
     // If already fully migrated, return as is
     if (
       inst.category &&
@@ -117,9 +117,9 @@ export function migrateGrooveGrid(grid: unknown): GrooveGrid | undefined {
   });
 
   return {
-    ...grid,
+    ...gridObj,
     instruments,
-  };
+  } as GrooveGrid;
 }
 
 const _SNIPPET_RETRY_DELAY_MS = 3000;

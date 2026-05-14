@@ -41,8 +41,14 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
     e.preventDefault();
     if (!globalSearch.trim()) return;
 
-    // Redirect to library with search param
-    router.push(`/library/songs?search=${encodeURIComponent(globalSearch.trim())}`);
+    // Determine target based on current pathname to make search context-aware
+    let target = '/library/songs';
+    if (pathname.includes('/library/notebooks')) target = '/library/notebooks';
+    else if (pathname.includes('/library/snippets')) target = '/library/snippets';
+    else if (pathname.includes('/library/setlists')) target = '/library/setlists';
+
+    // Redirect to determined library tab with search param
+    router.push(`${target}?search=${encodeURIComponent(globalSearch.trim())}`);
     setGlobalSearch('');
   };
 
