@@ -32,13 +32,15 @@ const fromJson = <T>(val: Json): T => val as unknown as T;
 
 /**
  * Migration helper to transition old InstrumentGrid data to DrumInstrument (#27).
+ * Accepts unknown data from legacy sources and transforms to current GrooveGrid format.
  */
-export function migrateGrooveGrid(grid: any): GrooveGrid | undefined {
-  if (!grid) return undefined;
+export function migrateGrooveGrid(grid: unknown): GrooveGrid | undefined {
+  if (!grid || typeof grid !== 'object') return undefined;
 
-  const targetLength = calculateTotalNotes(grid);
+  const gridObj = grid as Record<string, unknown>;
+  const targetLength = calculateTotalNotes(gridObj);
 
-  const instruments = (grid.instruments || []).map((inst: any) => {
+  const instruments = ((gridObj.instruments as unknown[]) || []).map((inst: unknown) => {
     // If already fully migrated, return as is
     if (
       inst.category &&
@@ -393,7 +395,7 @@ export const supabaseService = {
       throw new Error('Authenticated user required to duplicate a song chart');
     }
 
-    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original;
+    const { ...rest } = original;
 
     const duplicate: SongChart = {
       ...rest,
@@ -422,7 +424,7 @@ export const supabaseService = {
       throw new Error('Authenticated user required to duplicate a notebook');
     }
 
-    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original;
+    const { ...rest } = original;
 
     const duplicate: Notebook = {
       ...rest,
@@ -448,7 +450,7 @@ export const supabaseService = {
       throw new Error('Authenticated user required to duplicate a groove snippet');
     }
 
-    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original;
+    const { ...rest } = original;
 
     const duplicate: GrooveSnippet = {
       ...rest,
@@ -679,7 +681,7 @@ export const supabaseService = {
       throw new Error('Authenticated user required to duplicate a setlist');
     }
 
-    const { id: _, userId: __, createdAt: ___, updatedAt: ____, ...rest } = original;
+    const { ...rest } = original;
 
     const duplicate: Setlist = {
       ...rest,
@@ -719,7 +721,7 @@ export const supabaseService = {
       };
     }
 
-    const dbProfile = data as any; // Cast until types are updated
+    const dbProfile = data; // Type narrowed from query result
 
     return {
       id: dbProfile.id,
@@ -728,7 +730,7 @@ export const supabaseService = {
       avatar_url: dbProfile.avatar_url,
       preferences: {
         ...DEFAULT_PREFERENCES,
-        ...((dbProfile.preferences as UserPreferences | null) ?? {}),
+        ...((dbProfile.preferences as unknown as UserPreferences | null) ?? {}),
       },
       updated_at: dbProfile.updated_at,
     };
@@ -746,7 +748,7 @@ export const supabaseService = {
         username: updates.username,
         display_name: updates.display_name,
         avatar_url: updates.avatar_url,
-        preferences: updates.preferences as any,
+        preferences: updates.preferences as unknown as Json,
         updated_at: new Date().toISOString(),
       })
       .eq('id', userId)

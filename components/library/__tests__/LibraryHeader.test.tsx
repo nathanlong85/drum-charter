@@ -10,7 +10,7 @@ vi.mock('next/navigation', () => ({
 
 describe('LibraryHeader', () => {
   it('renders the title and description', () => {
-    (usePathname as any).mockReturnValue('/library/songs');
+    (usePathname as unknown).mockReturnValue('/library/songs');
     render(<LibraryHeader />);
 
     expect(screen.getByText('My Library')).toBeDefined();
@@ -18,7 +18,7 @@ describe('LibraryHeader', () => {
   });
 
   it('renders all tabs', () => {
-    (usePathname as any).mockReturnValue('/library/songs');
+    (usePathname as unknown).mockReturnValue('/library/songs');
     render(<LibraryHeader />);
 
     expect(screen.getByTestId('tab-songs')).toBeDefined();
@@ -28,7 +28,7 @@ describe('LibraryHeader', () => {
   });
 
   it('highlights the active tab', () => {
-    (usePathname as any).mockReturnValue('/library/notebooks');
+    (usePathname as unknown).mockReturnValue('/library/notebooks');
     render(<LibraryHeader />);
 
     const notebooksTab = screen.getByTestId('tab-notebooks');

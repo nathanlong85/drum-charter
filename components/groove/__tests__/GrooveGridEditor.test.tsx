@@ -17,7 +17,11 @@ const mockAudioState = {
 };
 
 vi.mock('@/lib/hooks/useAudioPlayback', () => ({
-  useAudioPlayback: ({ onStepChange, initialMetronomeEnabled, initialMetronomeVolume }: any) => {
+  useAudioPlayback: ({
+    onStepChange,
+    initialMetronomeEnabled,
+    initialMetronomeVolume,
+  }: Record<string, unknown>) => {
     useEffect(() => {
       mockAudioState.metronomeEnabled = initialMetronomeEnabled ?? false;
       mockAudioState.metronomeVolume = initialMetronomeVolume ?? 0.5;
@@ -25,7 +29,7 @@ vi.mock('@/lib/hooks/useAudioPlayback', () => ({
 
     // Expose a way to trigger step change for testing
     useEffect(() => {
-      (window as any).triggerStepChange = (step: number) => onStepChange?.(step);
+      (window as unknown).triggerStepChange = (step: number) => onStepChange?.(step);
     }, [onStepChange]);
 
     return mockAudioState;
@@ -34,7 +38,7 @@ vi.mock('@/lib/hooks/useAudioPlayback', () => ({
 
 // Mock SymbolPicker to avoid complex SVG/icon logic in unit tests
 vi.mock('../SymbolPicker', () => ({
-  SymbolPicker: ({ onSelect, onVelocityChange }: any) => (
+  SymbolPicker: ({ onSelect, onVelocityChange }: Record<string, unknown>) => (
     <div data-testid="symbol-picker">
       <button onClick={() => onSelect('standard')} aria-label="Standard Hit">
         Standard
@@ -49,41 +53,43 @@ vi.mock('../SymbolPicker', () => ({
 }));
 
 vi.mock('@/components/common/Tooltip', () => ({
-  Tooltip: ({ children }: any) => children,
+  Tooltip: ({ children }: Record<string, unknown>) => children,
 }));
 
 // Mock Radix UI components
 vi.mock('@radix-ui/react-dialog', () => ({
   Root: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Trigger: ({ children }: any) => <div>{children}</div>,
-  Portal: ({ children }: any) => <div>{children}</div>,
+  Trigger: ({ children }: Record<string, unknown>) => <div>{children}</div>,
+  Portal: ({ children }: Record<string, unknown>) => <div>{children}</div>,
   Overlay: () => <div>Overlay</div>,
-  Content: ({ children }: any) => (
+  Content: ({ children }: Record<string, unknown>) => (
     <div role="dialog" data-testid="dialog-content">
       <p>Description</p>
       {children}
     </div>
   ),
-  Title: ({ children }: any) => <h2>{children}</h2>,
-  Description: ({ children }: any) => <p>{children}</p>,
-  Close: ({ children, asChild }: any) => (asChild ? children : <button>{children}</button>),
+  Title: ({ children }: Record<string, unknown>) => <h2>{children}</h2>,
+  Description: ({ children }: Record<string, unknown>) => <p>{children}</p>,
+  Close: ({ children, asChild }: Record<string, unknown>) =>
+    asChild ? children : <button>{children}</button>,
 }));
 
 vi.mock('@radix-ui/react-dropdown-menu', () => ({
   Root: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Trigger: ({ children, asChild }: any) => (asChild ? children : <button>{children}</button>),
-  Portal: ({ children }: any) => <div>{children}</div>,
-  Content: ({ children }: any) => (
+  Trigger: ({ children, asChild }: Record<string, unknown>) =>
+    asChild ? children : <button>{children}</button>,
+  Portal: ({ children }: Record<string, unknown>) => <div>{children}</div>,
+  Content: ({ children }: Record<string, unknown>) => (
     <div data-testid="dropdown-content" role="menu">
       {children}
     </div>
   ),
-  Item: ({ children, onSelect }: any) => (
+  Item: ({ children, onSelect }: Record<string, unknown>) => (
     <button role="menuitem" onClick={() => onSelect?.()}>
       {children}
     </button>
   ),
-  Label: ({ children }: any) => <div>{children}</div>,
+  Label: ({ children }: Record<string, unknown>) => <div>{children}</div>,
   Separator: () => <hr />,
 }));
 
@@ -237,7 +243,7 @@ describe('GrooveGridEditor', () => {
 
     onChange.mockClear();
 
-    const pasteEventEmpty = new Event('paste') as any;
+    const pasteEventEmpty = new Event('paste') as unknown;
     pasteEventEmpty.clipboardData = {
       getData: () => '',
     };
@@ -361,7 +367,7 @@ describe('GrooveGridEditor', () => {
     renderWithProvider(<TestEditor grid={initialGrid} />);
 
     await act(async () => {
-      (window as any).triggerStepChange(2);
+      (window as unknown).triggerStepChange(2);
     });
 
     await waitFor(() => {
@@ -591,7 +597,7 @@ describe('GrooveGridEditor', () => {
       });
 
       const pasteData = JSON.stringify([{ notes: ['accented'], velocities: [1.0] }]);
-      const pasteEvent = new Event('paste') as any;
+      const pasteEvent = new Event('paste') as unknown;
       pasteEvent.clipboardData = {
         getData: () => pasteData,
       };
@@ -637,7 +643,7 @@ describe('GrooveGridEditor', () => {
       const onChange = vi.fn();
       renderWithProvider(<TestEditor grid={initialGrid} onChange={onChange} />);
 
-      const pasteEvent = new Event('paste') as any;
+      const pasteEvent = new Event('paste') as unknown;
       pasteEvent.clipboardData = {
         getData: () => 'invalid-json',
       };

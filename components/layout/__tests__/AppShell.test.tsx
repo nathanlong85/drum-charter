@@ -23,8 +23,10 @@ vi.mock('@/components/auth/AuthStatus', () => ({
 
 // Mock Tooltip and TooltipProvider
 vi.mock('@/components/common/Tooltip', () => ({
-  TooltipProvider: ({ children }: any) => <div data-testid="tooltip-provider">{children}</div>,
-  Tooltip: ({ children, content }: any) => (
+  TooltipProvider: ({ children }: Record<string, unknown>) => (
+    <div data-testid="tooltip-provider">{children}</div>
+  ),
+  Tooltip: ({ children, content }: Record<string, unknown>) => (
     <div data-testid="mock-tooltip" data-content={content}>
       {children}
     </div>
@@ -33,7 +35,7 @@ vi.mock('@/components/common/Tooltip', () => ({
 
 // Partially mock react to control useTransition
 vi.mock('react', async (importOriginal) => {
-  const actual: any = await importOriginal();
+  const actual: unknown = await importOriginal();
   return {
     ...actual,
     useTransition: vi.fn(),
@@ -46,15 +48,15 @@ describe('AppShell', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useRouter as any).mockReturnValue({
+    (useRouter as unknown).mockReturnValue({
       refresh: mockRefresh,
       push: mockPush,
     });
-    (usePathname as any).mockReturnValue('/dashboard');
-    (useSupabaseStatus as any).mockReturnValue('connected');
+    (usePathname as unknown).mockReturnValue('/dashboard');
+    (useSupabaseStatus as unknown).mockReturnValue('connected');
 
     // Default useTransition mock
-    (useTransition as any).mockReturnValue([false, (cb: () => void) => cb()]);
+    (useTransition as unknown).mockReturnValue([false, (cb: () => void) => cb()]);
   });
 
   it('renders children correctly', () => {
@@ -79,7 +81,7 @@ describe('AppShell', () => {
   });
 
   it('marks the current path as active', () => {
-    (usePathname as any).mockReturnValue('/library/songs');
+    (usePathname as unknown).mockReturnValue('/library/songs');
     render(<AppShell>Content</AppShell>);
 
     // The Link component has data-active attribute
@@ -109,7 +111,7 @@ describe('AppShell', () => {
 
   it('disables the button and shows spinning icon when pending', async () => {
     // Mock isPending as true
-    (useTransition as any).mockReturnValue([true, (cb: () => void) => cb()]);
+    (useTransition as unknown).mockReturnValue([true, (cb: () => void) => cb()]);
 
     render(
       <AppShell>
