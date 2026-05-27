@@ -65,7 +65,7 @@ export async function updateProfile(
   if (updates.avatar_url !== undefined) updatePayload.avatar_url = updates.avatar_url;
   if (updates.preferences !== undefined) {
     updatePayload.preferences =
-      updates.preferences as Database['public']['Tables']['profiles']['Update']['preferences'];
+      updates.preferences as unknown as Database['public']['Tables']['profiles']['Update']['preferences'];
   }
 
   const { error } = await supabase
