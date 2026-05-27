@@ -1,17 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(acli jira workitem view *)",
-      "Bash(acli jira workitem search *)",
       "Bash(openspec status *)",
-      "Bash(graphify *)",
-      "Bash(pnpm lint)",
-      "Bash(pnpm lint:md)",
-      "Bash(pnpm test:run)",
-      "Bash(pnpm build)",
+      "Bash(pnpm *)",
       "Bash(npx tsc *)",
-      "Bash(npx playwright show-report)",
-      "Bash(npx supabase gen types *)"
+      "Bash(npx playwright *)",
+      "Bash(npx supabase *)"
     ]
   },
   "hooks": {

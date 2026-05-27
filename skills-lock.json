@@ -72,6 +72,12 @@
       "sourceType": "github",
       "computedHash": "fcf4cb453f7108048631bf089ffcc426f2c00601fd97d7784b805de24eb4aa4d"
     },
+    "pwa-development": {
+      "source": "alinaqi/claude-bootstrap",
+      "sourceType": "github",
+      "skillPath": "skills/pwa-development/SKILL.md",
+      "computedHash": "356d9a26a8435778bb3bb906f5198814c48872ae87485ae97f4da3c10a0cfcc5"
+    },
     "review-duplication": {
       "source": "google-gemini/gemini-cli",
       "sourceType": "github",
@@ -85,7 +91,8 @@
     "supabase-postgres-best-practices": {
       "source": "supabase/agent-skills",
       "sourceType": "github",
-      "computedHash": "9c87c315aed143ee3b34bec8117100f5035e0df09e6b23e1ecc772cff434c9ad"
+      "skillPath": "skills/supabase-postgres-best-practices/SKILL.md",
+      "computedHash": "d606a1146be6d54fb9e73f718b5320b9acac5ff2ba2d7230a555df4b5a923b4a"
     },
     "ui-ux-pro-max": {
       "source": "nextlevelbuilder/ui-ux-pro-max-skill",
