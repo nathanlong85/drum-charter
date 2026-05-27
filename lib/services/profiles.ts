@@ -55,16 +55,22 @@ export async function updateProfile(
   supabaseParam?: SupabaseClient<Database>,
 ): Promise<UserProfile> {
   const supabase = getClient(supabaseParam);
+
+  const updatePayload: Database['public']['Tables']['profiles']['Update'] = {
+    updated_at: new Date().toISOString(),
+  };
+
+  if (updates.username !== undefined) updatePayload.username = updates.username;
+  if (updates.display_name !== undefined) updatePayload.display_name = updates.display_name;
+  if (updates.avatar_url !== undefined) updatePayload.avatar_url = updates.avatar_url;
+  if (updates.preferences !== undefined) {
+    updatePayload.preferences =
+      updates.preferences as Database['public']['Tables']['profiles']['Update']['preferences'];
+  }
+
   const { error } = await supabase
     .from('profiles')
-    .update({
-      username: updates.username,
-      display_name: updates.display_name,
-      avatar_url: updates.avatar_url,
-      preferences:
-        updates.preferences as Database['public']['Tables']['profiles']['Update']['preferences'],
-      updated_at: new Date().toISOString(),
-    })
+    .update(updatePayload)
     .eq('id', userId)
     .select()
     .single();

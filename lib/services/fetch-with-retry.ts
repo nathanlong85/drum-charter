@@ -8,8 +8,9 @@ export async function fetchWithRetry<T>(
   maxAttempts = 3,
   delayMs = _SNIPPET_RETRY_DELAY_MS,
 ): Promise<T | null> {
-  let attempts = 0;
-  let { data, error } = await fetchFn();
+  let attempts = 1;
+  let data: T | null = null;
+  let error: unknown = null;
 
   const isBailableError = (err: unknown): boolean => {
     if (!err || typeof err !== 'object') return false;
@@ -19,6 +20,14 @@ export async function fetchWithRetry<T>(
     return ['22P02', '401', '403'].includes(code) || status === 401 || status === 403;
   };
 
+  try {
+    const res = await fetchFn();
+    data = res.data;
+    error = res.error;
+  } catch (err) {
+    error = err;
+  }
+
   if (error && isBailableError(error)) {
     return null;
   }
@@ -27,17 +36,22 @@ export async function fetchWithRetry<T>(
     attempts++;
     await new Promise((resolve) => setTimeout(resolve, delayMs));
 
-    const retryResult = await fetchFn();
-    data = retryResult.data;
-    error = retryResult.error;
+    try {
+      const res = await fetchFn();
+      data = res.data;
+      error = res.error;
+    } catch (err) {
+      error = err;
+      data = null;
+    }
 
     if (error && isBailableError(error)) {
       return null;
     }
+  }
 
-    if (data) {
-      return data;
-    }
+  if (!data && error) {
+    console.error(`fetchWithRetry failed after ${attempts} attempts:`, error);
   }
 
   return data;

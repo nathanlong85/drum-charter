@@ -616,7 +616,7 @@ describe('supabaseService', () => {
       await vi.advanceTimersByTimeAsync(150);
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(3);
+      expect(fetchFn).toHaveBeenCalledTimes(2);
     });
 
     it('retries on specific error codes like PGRST116', async () => {
@@ -626,7 +626,7 @@ describe('supabaseService', () => {
       await vi.advanceTimersByTimeAsync(150);
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(3);
+      expect(fetchFn).toHaveBeenCalledTimes(2);
     });
 
     it('bails on 401/403 status', async () => {
@@ -643,7 +643,7 @@ describe('supabaseService', () => {
       await vi.advanceTimersByTimeAsync(150);
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(3);
+      expect(fetchFn).toHaveBeenCalledTimes(2);
     });
 
     it('retries on transient errors and bails if error becomes bailable during retry', async () => {
@@ -673,7 +673,7 @@ describe('supabaseService', () => {
 
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(4); // Initial + 3 retries
+      expect(fetchFn).toHaveBeenCalledTimes(3);
     });
 
     it('retries on transient errors and succeeds', async () => {
@@ -698,7 +698,20 @@ describe('supabaseService', () => {
 
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(3); // Initial + 2 retries
+      expect(fetchFn).toHaveBeenCalledTimes(2);
+    });
+
+    it('retries when fetchFn throws', async () => {
+      fetchFn
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce({ data: { id: '1' }, error: null });
+
+      const promise = fetchWithRetry(fetchFn, 3, 100);
+      await vi.advanceTimersByTimeAsync(150);
+
+      const result = await promise;
+      expect(result).toEqual({ id: '1' });
+      expect(fetchFn).toHaveBeenCalledTimes(2);
     });
   });
 });

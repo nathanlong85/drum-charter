@@ -8,6 +8,18 @@ describe('migrateGrooveGrid', () => {
     expect(migrateGrooveGrid(undefined)).toBeUndefined();
   });
 
+  it('returns undefined for malformed grid shape', () => {
+    expect(migrateGrooveGrid({ instruments: [] })).toBeUndefined();
+    expect(
+      migrateGrooveGrid({
+        timeSignature: {},
+        resolution: '16',
+        measures: 1,
+        instruments: [],
+      }),
+    ).toBeUndefined();
+  });
+
   it('migrates legacy instruments with basic instrumentId', () => {
     const legacyGrid = {
       timeSignature: { beatsPerMeasure: 4, beatValue: 4 },

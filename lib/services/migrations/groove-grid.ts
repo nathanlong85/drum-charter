@@ -15,6 +15,17 @@ export function migrateGrooveGrid(grid: unknown): GrooveGrid | undefined {
   if (!grid || typeof grid !== 'object') return undefined;
 
   const gridObj = grid as Record<string, unknown>;
+
+  if (
+    !gridObj.timeSignature ||
+    typeof gridObj.timeSignature !== 'object' ||
+    !('beatsPerMeasure' in (gridObj.timeSignature as object)) ||
+    typeof gridObj.resolution !== 'number' ||
+    typeof gridObj.measures !== 'number'
+  ) {
+    return undefined;
+  }
+
   const targetLength = calculateTotalNotes(gridObj as unknown as GrooveGrid);
 
   const instruments = ((gridObj.instruments as unknown[]) || []).map((instUnknown) => {

@@ -51,6 +51,7 @@ export function DocumentEditorHeader({
             onChange={(e) => onTitleChange(e.target.value)}
             className="text-5xl lg:text-6xl font-headline font-black tracking-tighter text-on-surface bg-transparent border-none focus:ring-0 w-full p-0 leading-tight"
             placeholder={titlePlaceholder}
+            aria-label={titlePlaceholder}
           />
           <div className="mt-6">
             <TagInput

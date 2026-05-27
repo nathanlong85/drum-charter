@@ -78,9 +78,11 @@ export function useGrooveGridKeyboard({
             velocities: (inst.velocities || []).slice(minNote, maxNote + 1),
           }));
 
-        navigator.clipboard
-          .writeText(JSON.stringify(copyData))
-          .catch((err) => console.error('Failed to copy to clipboard:', err));
+        if (navigator.clipboard) {
+          navigator.clipboard
+            .writeText(JSON.stringify(copyData))
+            .catch((err) => console.error('Failed to copy to clipboard:', err));
+        }
       }
     };
 

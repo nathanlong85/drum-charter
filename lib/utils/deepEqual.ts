@@ -7,6 +7,10 @@ export function deepEqual(a: unknown, b: unknown): boolean {
     return false;
   }
 
+  if (a instanceof Date && b instanceof Date) {
+    return a.getTime() === b.getTime();
+  }
+
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false;
     return a.every((item, i) => deepEqual(item, b[i]));
