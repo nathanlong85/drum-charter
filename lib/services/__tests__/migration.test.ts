@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { GrooveGrid } from '../../types/groove';
-import { migrateGrooveGrid } from '../supabase-service';
+import { migrateGrooveGrid } from '../migrations/groove-grid';
 
 describe('migrateGrooveGrid', () => {
   it('handles null or undefined grid', () => {

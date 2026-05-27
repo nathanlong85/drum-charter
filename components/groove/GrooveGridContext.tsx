@@ -1,6 +1,5 @@
 'use client';
 
-import { isEqual } from 'lodash';
 import {
   createContext,
   type ReactNode,
@@ -12,8 +11,10 @@ import {
   useState,
 } from 'react';
 import { useAudioPlayback } from '@/lib/hooks/useAudioPlayback';
+import { useGrooveGridKeyboard } from '@/lib/hooks/useGrooveGridKeyboard';
 import { type GrooveAction, grooveReducer } from '@/lib/state/groove-reducer';
 import type { BeatResolution, DrumSymbol, GrooveGrid, TimeSignature } from '@/lib/types/groove';
+import { deepEqual } from '@/lib/utils/deepEqual';
 
 interface GrooveGridContextType {
   state: GrooveGrid;
@@ -106,10 +107,10 @@ export function GrooveGridProvider({
 
   // Sync initialGrid to internal state ONLY if it's an external update
   useEffect(() => {
-    if (!isEqual(initialGrid, lastPropGrid.current)) {
+    if (!deepEqual(initialGrid, lastPropGrid.current)) {
       lastPropGrid.current = initialGrid;
       // Only dispatch if the new external grid is actually different from our current state
-      if (!isEqual(initialGrid, state)) {
+      if (!deepEqual(initialGrid, state)) {
         dispatch({ type: 'SET_FULL_GRID', grid: initialGrid });
       }
     }
@@ -259,94 +260,15 @@ export function GrooveGridProvider({
     [pickerPos, readOnly, wrappedDispatch],
   );
 
-  // Keyboard Shortcuts logic
-  useEffect(() => {
-    if (readOnly) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if typing in an input
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
-        return;
-      }
-
-      // Delete key - clear selection or picker note
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectionRange) {
-          wrappedDispatch({
-            type: 'SET_SELECTION_SYMBOLS',
-            selection: selectionRange,
-            symbol: 'none',
-          });
-          setSelectionRange(null);
-        } else if (pickerPos) {
-          wrappedDispatch({
-            type: 'SET_SYMBOL',
-            id: pickerPos.id,
-            noteIndex: pickerPos.noteIndex,
-            symbol: 'none',
-          });
-          setPickerPos(null);
-        }
-      }
-
-      // Copy/Paste logic
-      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectionRange) {
-        // Copy selection
-        const { start, end } = selectionRange;
-        const minInst = Math.min(start.instIdx, end.instIdx);
-        const maxInst = Math.max(start.instIdx, end.instIdx);
-        const minNote = Math.min(start.noteIdx, end.noteIdx);
-        const maxNote = Math.max(start.noteIdx, end.noteIdx);
-
-        const copyData = state.instruments.slice(minInst, maxInst + 1).map((inst) => ({
-          notes: inst.notes.slice(minNote, maxNote + 1),
-          velocities: (inst.velocities || []).slice(minNote, maxNote + 1),
-        }));
-
-        navigator.clipboard
-          .writeText(JSON.stringify(copyData))
-          .catch((err) => console.error('Failed to copy to clipboard:', err));
-      }
-
-      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && selectionRange) {
-        // keydown logic handled by paste listener
-      }
-    };
-
-    const handlePaste = (e: ClipboardEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
-        return;
-      }
-
-      if (!selectionRange) return;
-
-      const text = e.clipboardData?.getData('text');
-      if (!text) return;
-
-      try {
-        const pasteData = JSON.parse(text);
-        if (Array.isArray(pasteData)) {
-          wrappedDispatch({
-            type: 'PASTE_DATA',
-            id: state.instruments[selectionRange.start.instIdx].id,
-            noteIndex: selectionRange.start.noteIdx,
-            data: pasteData,
-          });
-        }
-      } catch (_err) {
-        // Ignore non-JSON
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('paste', handlePaste);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('paste', handlePaste);
-    };
-  }, [readOnly, selectionRange, pickerPos, state.instruments, wrappedDispatch]);
+  useGrooveGridKeyboard({
+    readOnly,
+    state,
+    selectionRange,
+    setSelectionRange,
+    pickerPos,
+    setPickerPos,
+    dispatch: wrappedDispatch,
+  });
 
   const value = {
     state,

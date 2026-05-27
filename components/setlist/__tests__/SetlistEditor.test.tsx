@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { debounce } from 'lodash';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   deleteItemAction,
@@ -7,6 +6,7 @@ import {
   saveSetlistAction,
 } from '@/lib/actions/item-actions';
 import { supabaseService } from '@/lib/services/supabase-service';
+import { debounce } from '@/lib/utils/debounce';
 import { SetlistEditor } from '../SetlistEditor';
 
 // Mock next/navigation
@@ -28,18 +28,14 @@ vi.mock('@/lib/actions/item-actions', () => ({
 }));
 
 // Mock debounce to be synchronous but expose cancel/flush
-vi.mock('lodash', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('lodash')>();
-  return {
-    ...actual,
-    debounce: vi.fn((fn: (...args: unknown[]) => void) => {
-      const debounced = (...args: unknown[]) => fn(...args);
-      debounced.cancel = vi.fn();
-      debounced.flush = vi.fn();
-      return debounced;
-    }),
-  };
-});
+vi.mock('@/lib/utils/debounce', () => ({
+  debounce: vi.fn((fn: (...args: unknown[]) => void) => {
+    const debounced = (...args: unknown[]) => fn(...args);
+    debounced.cancel = vi.fn();
+    debounced.flush = vi.fn();
+    return debounced;
+  }),
+}));
 
 vi.mock('@/lib/services/supabase-service', () => ({
   supabaseService: {
