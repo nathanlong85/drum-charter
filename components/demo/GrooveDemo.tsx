@@ -72,7 +72,7 @@ export function GrooveDemo() {
       <div className="flex items-center justify-between mb-8">
         <div className="flex flex-col">
           <h3 className="text-xl font-headline font-black text-on-surface uppercase tracking-tighter">
-            Sonic Architect Engine
+            Drum Sequencer
           </h3>
           <p className="text-[10px] font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.3em] mt-1">
             v1.0-alpha Live Preview
@@ -80,7 +80,7 @@ export function GrooveDemo() {
         </div>
         <div className="flex items-center gap-3">
           <div className="px-4 py-2 bg-primary/10 rounded-xl text-[9px] font-headline font-black text-primary uppercase tracking-widest border border-primary/20">
-            Interactive Console
+            Interactive Demo
           </div>
         </div>
       </div>

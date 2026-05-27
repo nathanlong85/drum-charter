@@ -18,7 +18,7 @@ class MockResizeObserver {
   disconnect = vi.fn();
 }
 
-(window as any).ResizeObserver = MockResizeObserver;
+(window as unknown as typeof window).ResizeObserver = MockResizeObserver;
 
 // Mock AudioContext for all tests
 class MockAudioContext {

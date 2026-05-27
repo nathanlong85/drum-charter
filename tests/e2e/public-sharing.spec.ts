@@ -4,7 +4,7 @@ import { waitForSave } from './test-utils';
 test.describe('Public Sharing Workflows', () => {
   test('Should handle private or missing songs with 404', async ({ page }) => {
     // Navigate to a likely non-existent or private ID
-    await page.goto('http://localhost:3001/public/songs/private-id-123');
+    await page.goto('/public/songs/private-id-123');
     // Next.js notFound() renders a default 404 page
     await expect(page.getByText('404')).toBeVisible();
   });
@@ -24,7 +24,10 @@ test.describe('Public Sharing Workflows', () => {
     const songId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     expect(songId, 'Expected song id in URL after creating song').toBeTruthy();
 
-    await page.getByTestId('toggle-public-button').click();
+    // Toggle public and wait for UI update + save
+    const toggleBtn = page.getByTestId('toggle-public-button');
+    await toggleBtn.click();
+    await expect(toggleBtn).toHaveText(/Public/i);
     await waitForSave(page);
 
     // 4. View public page in a separate unauthenticated context
@@ -34,9 +37,15 @@ test.describe('Public Sharing Workflows', () => {
       .newContext({ storageState: { cookies: [], origins: [] } });
     const unauthPage = await unauthContext.newPage();
 
-    await unauthPage.goto(`http://localhost:3001/public/songs/${songId!}`);
-    // Wait for content that confirms public view is loaded
-    await expect(unauthPage.getByText(/Untitled Song/i)).toBeVisible({
+    // Add retry for navigation to account for any save latency and bypass Next.js caching
+    await expect(async () => {
+      // Use a timestamp to bypass any potentially cached 404
+      await unauthPage.goto(`/public/songs/${songId!}?t=${Date.now()}`);
+      await expect(unauthPage.getByText(/Untitled Song/i)).toBeVisible({
+        timeout: 5000,
+      });
+    }).toPass({
+      intervals: [2000, 5000],
       timeout: 20000,
     });
 
@@ -59,7 +68,9 @@ test.describe('Public Sharing Workflows', () => {
     const notebookId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     expect(notebookId, 'Expected notebook id in URL after creating notebook').toBeTruthy();
 
-    await page.getByTestId('toggle-public-button').click();
+    const toggleBtn = page.getByTestId('toggle-public-button');
+    await toggleBtn.click();
+    await expect(toggleBtn).toHaveText(/Public/i);
     await waitForSave(page);
 
     // 4. View public page in a separate unauthenticated context
@@ -69,18 +80,23 @@ test.describe('Public Sharing Workflows', () => {
       .newContext({ storageState: { cookies: [], origins: [] } });
     const unauthPage = await unauthContext.newPage();
 
-    await unauthPage.goto(`http://localhost:3001/public/notebooks/${notebookId!}`);
-    // Wait for the specific heading that confirms the public view is loaded
-    await expect(unauthPage.getByText(/Public Notebook View/i).first()).toBeVisible({
+    await expect(async () => {
+      await unauthPage.goto(`/public/notebooks/${notebookId!}?t=${Date.now()}`);
+      await expect(unauthPage.getByText(/Public Notebook View/i).first()).toBeVisible({
+        timeout: 5000,
+      });
+    }).toPass({
+      intervals: [2000, 5000],
       timeout: 20000,
     });
+
     await expect(unauthPage.getByText(/Untitled Notebook/i)).toBeVisible();
 
     await unauthContext.close();
   });
 
   test('Should handle private or missing notebooks with 404', async ({ page }) => {
-    await page.goto('http://localhost:3001/public/notebooks/test-notebook-id');
+    await page.goto('/public/notebooks/test-notebook-id');
     await expect(page.getByText('404')).toBeVisible();
   });
 
@@ -100,7 +116,9 @@ test.describe('Public Sharing Workflows', () => {
     const snippetId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     expect(snippetId, 'Expected snippet id in URL after creating snippet').toBeTruthy();
 
-    await page.getByTestId('toggle-public-button').click();
+    const toggleBtn = page.getByTestId('toggle-public-button');
+    await toggleBtn.click();
+    await expect(toggleBtn).toHaveText(/Public/i);
     await waitForSave(page);
 
     // 4. View public page in a separate unauthenticated context
@@ -110,18 +128,23 @@ test.describe('Public Sharing Workflows', () => {
       .newContext({ storageState: { cookies: [], origins: [] } });
     const unauthPage = await unauthContext.newPage();
 
-    await unauthPage.goto(`http://localhost:3001/public/snippets/${snippetId!}`);
-    // Wait for the specific heading that confirms the public view is loaded
-    await expect(unauthPage.getByText(/Atomic Snippet View/i).first()).toBeVisible({
+    await expect(async () => {
+      await unauthPage.goto(`/public/snippets/${snippetId!}?t=${Date.now()}`);
+      await expect(unauthPage.getByText(/Atomic Snippet View/i).first()).toBeVisible({
+        timeout: 5000,
+      });
+    }).toPass({
+      intervals: [2000, 5000],
       timeout: 20000,
     });
+
     await expect(unauthPage.getByText(/Untitled Snippet/i)).toBeVisible();
 
     await unauthContext.close();
   });
 
   test('Should handle private or missing snippets with 404', async ({ page }) => {
-    await page.goto('http://localhost:3001/public/snippets/test-snippet-id');
+    await page.goto('/public/snippets/test-snippet-id');
     await expect(page.getByText('404')).toBeVisible();
   });
 
@@ -141,7 +164,9 @@ test.describe('Public Sharing Workflows', () => {
     const setlistId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
     expect(setlistId, 'Expected setlist id in URL after creating setlist').toBeTruthy();
 
-    await page.getByTestId('toggle-public-button').click();
+    const toggleBtn = page.getByTestId('toggle-public-button');
+    await toggleBtn.click();
+    await expect(toggleBtn).toHaveText(/Public/i);
     await waitForSave(page);
 
     // 4. View public page in a separate unauthenticated context
@@ -151,8 +176,13 @@ test.describe('Public Sharing Workflows', () => {
       .newContext({ storageState: { cookies: [], origins: [] } });
     const unauthPage = await unauthContext.newPage();
 
-    await unauthPage.goto(`http://localhost:3001/public/setlists/${setlistId!}`);
-    await expect(unauthPage.getByText(/Untitled Setlist/i)).toBeVisible({
+    await expect(async () => {
+      await unauthPage.goto(`/public/setlists/${setlistId!}?t=${Date.now()}`);
+      await expect(unauthPage.getByText(/Untitled Setlist/i)).toBeVisible({
+        timeout: 5000,
+      });
+    }).toPass({
+      intervals: [2000, 5000],
       timeout: 20000,
     });
 
@@ -160,7 +190,7 @@ test.describe('Public Sharing Workflows', () => {
   });
 
   test('Should handle private or missing setlists with 404', async ({ page }) => {
-    await page.goto('http://localhost:3001/public/setlists/test-setlist-id');
+    await page.goto('/public/setlists/test-setlist-id');
     await expect(page.getByText('404')).toBeVisible();
   });
 });

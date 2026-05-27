@@ -1,8 +1,8 @@
 'use client';
 
 import { Filter, Plus, Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useMemo, useOptimistic, useState, useTransition } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useOptimistic, useState, useTransition } from 'react';
 import {
   createItemAction,
   deleteItemAction,
@@ -30,10 +30,18 @@ interface LibraryPageClientProps {
 
 export default function LibraryPageClient({ initialItems, type }: LibraryPageClientProps) {
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [_isPending, startTransition] = useTransition();
+
+  // Sync searchQuery with URL params (e.g. from Global Search)
+  useEffect(() => {
+    setSearchQuery(initialSearch);
+  }, [initialSearch]);
 
   const [optimisticItems, addOptimisticAction] = useOptimistic(
     initialItems,

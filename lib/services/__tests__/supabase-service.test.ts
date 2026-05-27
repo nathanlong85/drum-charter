@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GrooveSnippet, Notebook, Setlist, SongChart } from '@/lib/types/groove';
 import { fetchWithRetry, supabaseService } from '../supabase-service';
 
-const mockSupabase: any = {
+const mockSupabase: Record<string, unknown> = {
   from: vi.fn(),
   auth: {
     getUser: vi.fn(),
@@ -20,7 +20,7 @@ const mockSupabase: any = {
 };
 
 // Helper to create a mock Supabase response that supports chaining
-const mockResponse = <TData = any, TError = any>(
+const mockResponse = <TData = unknown, TError = unknown>(
   data: TData | null = null,
   error: TError | null = null,
 ) => {
@@ -412,7 +412,10 @@ describe('supabaseService', () => {
       // Mock getProfile call (after update)
       mockSupabase.from.mockReturnValueOnce(mockResponse(refreshedProfile));
 
-      const result = await supabaseService.updateProfile(userId, updates as any);
+      const result = await supabaseService.updateProfile(
+        userId,
+        updates as Partial<typeof updates>,
+      );
       expect(result.display_name).toBe('New Name');
       expect(mockSupabase.from).toHaveBeenCalledWith('profiles');
       expect(mockSupabase.update).toHaveBeenCalled();

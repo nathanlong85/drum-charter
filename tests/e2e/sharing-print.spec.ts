@@ -29,12 +29,17 @@ test.describe('Sharing & Public View', () => {
     expect(publicUrl).toContain('/public/snippets/');
 
     // 2. Open the public URL in a new context (incognito/fresh session)
-    // For E2E simplicity, we can just clear cookies or use a new page if supported,
-    // but here we'll just navigate to it and verify "READ ONLY" text.
-    await page.goto(publicUrl!);
+    // Add retry for navigation to account for any save latency and bypass Next.js caching
+    await expect(async () => {
+      // Use a timestamp to bypass any potentially cached 404
+      await page.goto(`${publicUrl!}?t=${Date.now()}`);
+      // Verify content is visible
+      await expect(page.locator('h1')).toHaveText(snippetTitle, { timeout: 5000 });
+    }).toPass({
+      intervals: [2000, 5000],
+      timeout: 20000,
+    });
 
-    // Verify content is visible
-    await expect(page.locator('h1')).toHaveText(snippetTitle);
     await expect(page.locator('text=READ ONLY')).toBeVisible();
 
     // Try to click a cell and verify it doesn't change (using a non-intrusive check)

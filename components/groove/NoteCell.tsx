@@ -112,6 +112,7 @@ export const NoteCell: React.FC<NoteCellProps> = ({
       {/* Velocity indicator (mini bar if explicit velocity exists) */}
       {velocity !== undefined && velocity > 0 && (
         <div
+          data-testid="velocity-bar"
           className="absolute bottom-0 left-0 h-0.5 bg-primary/40 transition-all"
           style={{ width: `${Math.min(1, velocity) * 100}%` }}
         />

@@ -7,9 +7,9 @@ test.describe('Visual Regression', () => {
     maxDiffPixelRatio: 0.05,
   };
 
-  test('Dashboard (Mission Control) visual baseline', async ({ page }) => {
+  test('Dashboard visual baseline', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForSelector('h1:has-text("Mission Control")');
+    await page.waitForSelector('h1:has-text("Dashboard")');
     // Wait for any animations/streaming to settle
     await page.waitForTimeout(2000);
 
@@ -47,7 +47,7 @@ test.describe('Visual Regression', () => {
     await page.goto('/dashboard');
     await page.waitForTimeout(2000);
 
-    const bottomNav = page.locator('nav').filter({ has: page.getByText(/Home/i) });
+    const bottomNav = page.getByTestId('bottom-nav');
     await expect(bottomNav).toBeVisible();
 
     await expect(page).toHaveScreenshot('mobile-nav-baseline.png', screenshotOptions);

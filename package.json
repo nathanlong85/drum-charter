@@ -7,7 +7,7 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "biome check .",
-    "lint:md": "markdownlint --ignore node_modules --ignore playwright-report --ignore test-results --ignore tmp --ignore .agents --ignore .gemini/skills --ignore graphify-out . .gemini",
+    "lint:md": "markdownlint --ignore node_modules --ignore playwright-report --ignore test-results --ignore tmp --ignore .agents --ignore .gemini/skills . .gemini",
     "lint:fix": "biome check . --write --unsafe",
     "test": "vitest",
     "test:run": "vitest run",

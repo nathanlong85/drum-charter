@@ -80,7 +80,9 @@ test.describe('Song Chart Editor', () => {
 
     // Velocity adjustment buttons (GHOST/STD/ACCENT)
     await songEditorPage.setVelocity('GHOST');
-    await expect(firstCell.locator('div[style*="width: 30%"]')).toBeVisible({ timeout: 10000 });
+    const velocityBar = firstCell.getByTestId('velocity-bar');
+    await expect(velocityBar).toBeVisible({ timeout: 10000 });
+    await expect(velocityBar).toHaveAttribute('style', /width: 30%/);
 
     // Click Done
     await songEditorPage.closeSymbolPicker();

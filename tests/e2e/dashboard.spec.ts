@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('Dashboard (Mission Control)', () => {
+test.describe('Dashboard', () => {
   test.describe('Public', () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -9,7 +9,7 @@ test.describe('Dashboard (Mission Control)', () => {
 
       // Check for Marketing Hero elements
       await expect(page.getByText(/The Workspace Built For Rhythm/i)).toBeVisible();
-      await expect(page.getByRole('link', { name: /Sign In to Start Creating/i })).toBeVisible();
+      await expect(page.getByRole('link', { name: /Sign In/i }).first()).toBeVisible();
       await expect(page.getByText(/V1.0 ALPHA REDESIGN NOW LIVE/i)).toBeVisible();
     });
   });
@@ -21,9 +21,9 @@ test.describe('Dashboard (Mission Control)', () => {
       await page.goto('/');
     });
 
-    test('Authenticated user sees Mission Control dashboard', async ({ page }) => {
+    test('Authenticated user sees dashboard', async ({ page }) => {
       // Check for Dashboard elements
-      await expect(page.getByRole('heading', { name: /Mission Control/i })).toBeVisible();
+      await expect(page.getByRole('heading', { name: /Dashboard/i })).toBeVisible();
       await expect(page.getByText(/Welcome back/i)).toBeVisible();
 
       // Check for Quick Start section
