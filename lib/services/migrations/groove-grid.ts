@@ -26,9 +26,13 @@ export function migrateGrooveGrid(grid: unknown): GrooveGrid | undefined {
     return undefined;
   }
 
+  if (!Array.isArray(gridObj.instruments)) {
+    return undefined;
+  }
+
   const targetLength = calculateTotalNotes(gridObj as unknown as GrooveGrid);
 
-  const instruments = ((gridObj.instruments as unknown[]) || []).map((instUnknown) => {
+  const instruments = gridObj.instruments.map((instUnknown) => {
     const inst = instUnknown as Record<string, unknown>;
     if (
       inst.category &&

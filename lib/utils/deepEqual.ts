@@ -10,6 +10,7 @@ export function deepEqual(a: unknown, b: unknown): boolean {
   if (a instanceof Date && b instanceof Date) {
     return a.getTime() === b.getTime();
   }
+  if (a instanceof Date || b instanceof Date) return false;
 
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return false;
@@ -24,5 +25,5 @@ export function deepEqual(a: unknown, b: unknown): boolean {
   const bKeys = Object.keys(bObj);
   if (aKeys.length !== bKeys.length) return false;
 
-  return aKeys.every((key) => deepEqual(aObj[key], bObj[key]));
+  return aKeys.every((key) => Object.hasOwn(bObj, key) && deepEqual(aObj[key], bObj[key]));
 }

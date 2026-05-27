@@ -8,6 +8,17 @@ describe('migrateGrooveGrid', () => {
     expect(migrateGrooveGrid(undefined)).toBeUndefined();
   });
 
+  it('returns undefined when instruments is not an array', () => {
+    expect(
+      migrateGrooveGrid({
+        timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+        resolution: 16,
+        measures: 1,
+        instruments: { invalid: true },
+      }),
+    ).toBeUndefined();
+  });
+
   it('returns undefined for malformed grid shape', () => {
     expect(migrateGrooveGrid({ instruments: [] })).toBeUndefined();
     expect(

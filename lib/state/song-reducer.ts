@@ -1,6 +1,9 @@
 import type { GrooveSnippet, SongChart, SongSection, SongSubSection } from '../types/groove';
 import { generateId } from '../utils/id';
 
+type SongSectionUpdates = Partial<Omit<SongSection, 'id' | 'subSections'>>;
+type SongSubSectionUpdates = Partial<Omit<SongSubSection, 'id'>>;
+
 export type SongAction =
   | { type: 'SET_SONG'; song: SongChart }
   | { type: 'UPDATE_TITLE'; title: string }
@@ -15,14 +18,14 @@ export type SongAction =
   | { type: 'UPDATE_METRONOME'; enabled?: boolean; volume?: number }
   | { type: 'ADD_SECTION' }
   | { type: 'REMOVE_SECTION'; sectionId: string }
-  | { type: 'UPDATE_SECTION'; sectionId: string; updates: Partial<SongSection> }
+  | { type: 'UPDATE_SECTION'; sectionId: string; updates: SongSectionUpdates }
   | { type: 'ADD_SUBSECTION'; sectionId: string }
   | { type: 'REMOVE_SUBSECTION'; sectionId: string; subSectionId: string }
   | {
       type: 'UPDATE_SUBSECTION';
       sectionId: string;
       subSectionId: string;
-      updates: Partial<SongSubSection>;
+      updates: SongSubSectionUpdates;
     }
   | {
       type: 'INSERT_SNIPPET';

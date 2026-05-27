@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createItemAction } from '../item-actions';
+import { createItemAction } from '@/lib/actions/item-actions';
 
 const mockGetUser = vi.fn();
 const mockSaveSongChart = vi.fn();

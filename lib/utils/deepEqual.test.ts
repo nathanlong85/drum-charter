@@ -15,6 +15,17 @@ describe('deepEqual', () => {
     expect(deepEqual(a, c)).toBe(false);
   });
 
+  it('distinguishes Date from plain object', () => {
+    const date = new Date('2024-01-01T00:00:00Z');
+    expect(deepEqual(date, {})).toBe(false);
+    expect(deepEqual({}, date)).toBe(false);
+  });
+
+  it('differs when keys differ with undefined values', () => {
+    expect(deepEqual({ a: undefined }, { b: undefined })).toBe(false);
+    expect(deepEqual({ a: 1 }, { a: 1, b: undefined })).toBe(false);
+  });
+
   it('compares nested objects and arrays', () => {
     const a = { x: [1, { y: 'z' }] };
     const b = { x: [1, { y: 'z' }] };

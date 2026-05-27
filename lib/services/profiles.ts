@@ -44,6 +44,10 @@ export async function getProfile(
     preferences: {
       ...DEFAULT_PREFERENCES,
       ...(storedPreferences ?? {}),
+      defaultTimeSignature: {
+        ...DEFAULT_PREFERENCES.defaultTimeSignature,
+        ...(storedPreferences?.defaultTimeSignature ?? {}),
+      },
     },
     updated_at: dbProfile.updated_at,
   };
@@ -89,6 +93,10 @@ export async function updatePreferences(
   const newPreferences: UserPreferences = {
     ...currentProfile.preferences,
     ...updates,
+    defaultTimeSignature: {
+      ...currentProfile.preferences.defaultTimeSignature,
+      ...(updates.defaultTimeSignature ?? {}),
+    },
   };
 
   return updateProfile(userId, { preferences: newPreferences }, supabaseParam);

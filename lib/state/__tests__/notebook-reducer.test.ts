@@ -23,4 +23,23 @@ describe('notebookReducer', () => {
     const next = notebookReducer(baseNotebook, { type: 'ADD_SECTION' });
     expect(next.sections).toHaveLength(1);
   });
+
+  it('removes a section', () => {
+    const withSection = notebookReducer(baseNotebook, { type: 'ADD_SECTION' });
+    const sectionId = withSection.sections[0].id;
+    const next = notebookReducer(withSection, { type: 'REMOVE_SECTION', sectionId });
+    expect(next.sections).toHaveLength(0);
+  });
+
+  it('updates section fields', () => {
+    const withSection = notebookReducer(baseNotebook, { type: 'ADD_SECTION' });
+    const sectionId = withSection.sections[0].id;
+    const next = notebookReducer(withSection, {
+      type: 'UPDATE_SECTION',
+      sectionId,
+      updates: { name: 'Warm-up', notes: 'Start slow' },
+    });
+    expect(next.sections[0].name).toBe('Warm-up');
+    expect(next.sections[0].notes).toBe('Start slow');
+  });
 });

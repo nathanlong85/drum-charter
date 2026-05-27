@@ -86,7 +86,7 @@ export async function listNotebooks(supabaseParam?: SupabaseClient<Database>, li
     .select('id, title, created_at, updated_at')
     .order('updated_at', { ascending: false });
 
-  if (limit) {
+  if (limit !== undefined) {
     query = query.limit(limit);
   }
 

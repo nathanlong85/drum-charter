@@ -30,4 +30,19 @@ describe('snippetReducer', () => {
     const next = snippetReducer(baseSnippet, { type: 'UPDATE_PUBLIC', isPublic: true });
     expect(next.isPublic).toBe(true);
   });
+
+  it('updates BPM', () => {
+    const next = snippetReducer(baseSnippet, { type: 'UPDATE_BPM', bpm: 92 });
+    expect(next.bpm).toBe(92);
+  });
+
+  it('updates grid', () => {
+    const newGrid = {
+      ...gridShape,
+      measures: 2,
+      instruments: createDefaultDrumInstruments({ ...gridShape, measures: 2 }),
+    };
+    const next = snippetReducer(baseSnippet, { type: 'UPDATE_GRID', grid: newGrid });
+    expect(next.measures).toBe(2);
+  });
 });

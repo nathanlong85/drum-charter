@@ -35,4 +35,16 @@ describe('songReducer', () => {
     expect(next.sections).toHaveLength(1);
     expect(next.sections[0].name).toBe('New Section');
   });
+
+  it('removes a section', () => {
+    const withSection = songReducer(baseSong, { type: 'ADD_SECTION' });
+    const sectionId = withSection.sections[0].id;
+    const next = songReducer(withSection, { type: 'REMOVE_SECTION', sectionId });
+    expect(next.sections).toHaveLength(0);
+  });
+
+  it('updates BPM', () => {
+    const next = songReducer(baseSong, { type: 'UPDATE_BPM', bpm: 140 });
+    expect(next.header.bpm).toBe(140);
+  });
 });

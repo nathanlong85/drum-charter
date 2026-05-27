@@ -1,6 +1,8 @@
 import type { GrooveSnippet, Notebook, NotebookSection } from '../types/groove';
 import { generateId } from '../utils/id';
 
+type NotebookSectionUpdates = Partial<Omit<NotebookSection, 'id'>>;
+
 export type NotebookAction =
   | { type: 'SET_NOTEBOOK'; notebook: Notebook }
   | { type: 'UPDATE_TITLE'; title: string }
@@ -8,7 +10,7 @@ export type NotebookAction =
   | { type: 'UPDATE_PUBLIC'; isPublic: boolean }
   | { type: 'ADD_SECTION' }
   | { type: 'REMOVE_SECTION'; sectionId: string }
-  | { type: 'UPDATE_SECTION'; sectionId: string; updates: Partial<NotebookSection> }
+  | { type: 'UPDATE_SECTION'; sectionId: string; updates: NotebookSectionUpdates }
   | { type: 'UPDATE_SECTION_BPM'; sectionId: string; bpm: number }
   | { type: 'INSERT_SNIPPET'; sectionId: string; snippet: GrooveSnippet };
 

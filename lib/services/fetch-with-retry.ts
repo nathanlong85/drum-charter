@@ -32,7 +32,7 @@ export async function fetchWithRetry<T>(
     return null;
   }
 
-  while (!data && attempts < maxAttempts) {
+  while (data === null && attempts < maxAttempts) {
     attempts++;
     await new Promise((resolve) => setTimeout(resolve, delayMs));
 
@@ -50,7 +50,7 @@ export async function fetchWithRetry<T>(
     }
   }
 
-  if (!data && error) {
+  if (data === null && error) {
     console.error(`fetchWithRetry failed after ${attempts} attempts:`, error);
   }
 

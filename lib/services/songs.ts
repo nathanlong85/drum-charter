@@ -102,7 +102,7 @@ export async function listSongCharts(supabaseParam?: SupabaseClient<Database>, l
     .select('id, title, bpm, created_at, updated_at')
     .order('updated_at', { ascending: false });
 
-  if (limit) {
+  if (limit !== undefined) {
     query = query.limit(limit);
   }
 

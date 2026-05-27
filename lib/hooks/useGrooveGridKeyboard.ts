@@ -47,6 +47,7 @@ export function useGrooveGridKeyboard({
 
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectionRange) {
+          e.preventDefault();
           dispatch({
             type: 'SET_SELECTION_SYMBOLS',
             selection: selectionRange,
@@ -54,6 +55,7 @@ export function useGrooveGridKeyboard({
           });
           setSelectionRange(null);
         } else if (pickerPos) {
+          e.preventDefault();
           dispatch({
             type: 'SET_SYMBOL',
             id: pickerPos.id,
@@ -100,9 +102,12 @@ export function useGrooveGridKeyboard({
       try {
         const pasteData = JSON.parse(text);
         if (Array.isArray(pasteData)) {
+          const targetInstrument = state.instruments[selectionRange.start.instIdx];
+          if (!targetInstrument) return;
+          e.preventDefault();
           dispatch({
             type: 'PASTE_DATA',
-            id: state.instruments[selectionRange.start.instIdx].id,
+            id: targetInstrument.id,
             noteIndex: selectionRange.start.noteIdx,
             data: pasteData,
           });

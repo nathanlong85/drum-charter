@@ -1,13 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useId } from 'react';
 import { TagInput } from '@/components/common/TagInput';
 import {
   MAX_BEATS_PER_MEASURE,
   MIN_BEATS_PER_MEASURE,
   VALID_BEAT_VALUES,
 } from '@/lib/utils/constants';
-import { generateId } from '@/lib/utils/id';
 import { useSongEditor } from './SongEditorContext';
 
 /**
@@ -15,7 +14,7 @@ import { useSongEditor } from './SongEditorContext';
  */
 export function SongEditorHeader() {
   const { state, dispatch, isSaving } = useSongEditor();
-  const manualOrderId = useMemo(() => `manual-order-${generateId()}`, []);
+  const manualOrderId = useId();
 
   return (
     <section className="p-8 pb-4 pt-16 md:pt-8">
@@ -48,7 +47,7 @@ export function SongEditorHeader() {
           <div className="mt-6 space-y-2">
             <div className="flex items-center gap-2">
               <label
-                htmlFor={manualOrderId}
+                htmlFor={`manual-order-${manualOrderId}`}
                 className="font-label text-[10px] font-black uppercase text-on-surface-variant/50 tracking-[0.2em] cursor-pointer hover:text-primary transition-colors"
               >
                 Order Override
@@ -58,7 +57,7 @@ export function SongEditorHeader() {
               </span>
             </div>
             <input
-              id={manualOrderId}
+              id={`manual-order-${manualOrderId}`}
               type="text"
               value={state.header.manualOrder || ''}
               data-testid="song-order-override-input"

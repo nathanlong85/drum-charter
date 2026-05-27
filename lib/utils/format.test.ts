@@ -9,8 +9,11 @@ describe('formatTimestamp', () => {
 
   it('returns fallback for invalid dates', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    expect(formatTimestamp('not-a-date')).toBe('—');
-    warn.mockRestore();
+    try {
+      expect(formatTimestamp('not-a-date')).toBe('—');
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it('formats valid ISO strings', () => {
