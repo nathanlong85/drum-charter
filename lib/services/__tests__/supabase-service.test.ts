@@ -607,6 +607,7 @@ describe('supabaseService', () => {
 
     beforeEach(() => {
       fetchFn.mockReset();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
     it('retries on 404 error', async () => {

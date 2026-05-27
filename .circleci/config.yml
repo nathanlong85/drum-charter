@@ -37,7 +37,7 @@ jobs:
           pkg-manager: pnpm
       - run:
           name: Run Vitest
-          command: pnpm test run
+          command: pnpm test:run
 
   # -----------------------------------------------------------------------------------
   # 3. BUILD APP (Pre-build with Placeholder)
