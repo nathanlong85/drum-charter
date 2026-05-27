@@ -64,7 +64,7 @@ tmp/
 
 /.agents/
 /.gemini/skills/
-
+graphify-out/
 .claude/settings.local.json
 # Added by code-review-graph
 .code-review-graph/
