@@ -23,11 +23,6 @@
 # production
 /build
 
-# misc
-.junie/memory/
-.junie/mcp/
-!.junie/guidelines.md
-!.junie/CLI_REFERENCE.md
 .DS_Store
 *.pem
 .pnpm-store/
@@ -63,9 +58,14 @@ coderabbit_full_review.txt
 
 tmp/
 
-/.agents/
+/.agents/rules/
+/.agents/skills/*
+!.agents/skills/release-manager/
+
 /.gemini/skills/
-graphify-out/
+
+.claude/skills/
 .claude/settings.local.json
+
 # Added by code-review-graph
 .code-review-graph/
