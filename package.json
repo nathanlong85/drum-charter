@@ -60,9 +60,11 @@
     "prettier": "^3.8.1",
     "serwist": "^9.5.7",
     "sharp": "^0.34.5",
-    "supabase": "^2.97.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.18"
+  },
+  "optionalDependencies": {
+    "supabase": "^2.97.0"
   }
 }
