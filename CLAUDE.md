@@ -109,8 +109,15 @@ Server Actions (`lib/actions/item-actions.ts`) call `supabaseService` (`lib/serv
 ### Auth & routing
 `lib/supabase/middleware.ts` refreshes Supabase sessions on every request and injects `x-pathname` into headers. Public routes under `app/public/` are accessible without authentication; all `(app)/` routes expect a session (currently unenforced in middleware but protected via Server Actions).
 
-### Branching
+### Branching & Git Workflow
 Active development targets the `staging` branch. `main` is production-only. Feature branches: `feature/<issue-number>-description` → PR → `staging`. Merging to `staging` or `main` is a human action — never merge programmatically.
+
+**⚠️ CRITICAL: Minimize CircleCI Builds**
+Each push to `staging` triggers a full CircleCI run (lint, unit tests, build, 4x e2e shards). This has a quota limit. **Batch related commits into fewer pushes:**
+- ❌ BAD: Push after each fix, file change, or lock file update → 4+ builds wasted
+- ✅ GOOD: Stage multiple related changes, commit once, push once → 1 build
+
+Make multiple commits if needed (for clarity), but push only once or twice per logical change set.
 
 ### Path alias
 `@` resolves to the repository root (configured in `vitest.config.ts` and `tsconfig.json`).
