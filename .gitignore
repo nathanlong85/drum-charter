@@ -30,6 +30,7 @@
 !.junie/CLI_REFERENCE.md
 .DS_Store
 *.pem
+.pnpm-store/
 
 # debug
 npm-debug.log*
