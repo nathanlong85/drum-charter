@@ -33,7 +33,21 @@ export function migrateGrooveGrid(grid: unknown): GrooveGrid | undefined {
   const targetLength = calculateTotalNotes(gridObj as unknown as GrooveGrid);
 
   const instruments = gridObj.instruments.map((instUnknown) => {
-    if (!instUnknown || typeof instUnknown !== 'object') {
+    const inst = instUnknown as Record<string, unknown>;
+    if (
+      inst &&
+      typeof inst === 'object' &&
+      inst.category &&
+      inst.id &&
+      inst.presetVariety &&
+      (inst.notes as unknown[])?.length === targetLength &&
+      (inst.velocities as unknown[])?.length === targetLength
+    ) {
+      return inst as unknown as DrumInstrument;
+    }
+
+    // Fallback for invalid or missing instruments
+    if (!inst || typeof inst !== 'object') {
       return {
         id: generateId(),
         category: 'misc',
@@ -42,16 +56,6 @@ export function migrateGrooveGrid(grid: unknown): GrooveGrid | undefined {
         notes: Array(targetLength).fill('none'),
         velocities: Array(targetLength).fill(0),
       } as DrumInstrument;
-    }
-    const inst = instUnknown as Record<string, unknown>;
-    if (
-      inst.category &&
-      inst.id &&
-      inst.presetVariety &&
-      (inst.notes as unknown[])?.length === targetLength &&
-      (inst.velocities as unknown[])?.length === targetLength
-    ) {
-      return inst as unknown as DrumInstrument;
     }
 
     const instrumentId = String(inst.instrumentId || '').toLowerCase();
