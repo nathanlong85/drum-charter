@@ -30,6 +30,7 @@
 !.junie/CLI_REFERENCE.md
 .DS_Store
 *.pem
+.pnpm-store/
 
 # debug
 npm-debug.log*
@@ -64,7 +65,7 @@ tmp/
 
 /.agents/
 /.gemini/skills/
-
+graphify-out/
 .claude/settings.local.json
 # Added by code-review-graph
 .code-review-graph/

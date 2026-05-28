@@ -19,6 +19,13 @@ For agents (like Gemini CLI), the single source of truth for detailed implementa
 * **Database**: Supabase Local on Port `54321`.
 * **Verification**: `verify_done.sh` must be run before any PR.
 
+## Linting and CI
+
+* **Lint (canonical)**: `pnpm lint` (Biome) and `pnpm lint:md` (markdownlint). ESLint is not used in CI.
+* **Unit tests**: `pnpm test:run` and `pnpm test:coverage` (Vitest + v8 coverage).
+* **E2E**: `pnpm test:e2e` requires Docker Supabase (`npx supabase start`), Playwright (Chrome-only; specs under `tests/e2e/**/*.spec.ts` must use the Chromium project), and a healthy app on port `3001`. Offline PWA specs use `RUN_OFFLINE_E2E=true`.
+* **Primary CI**: CircleCI (see `.circleci/config.yml`). GitHub Actions workflows are manual/secondary.
+
 ## 🤝 Human Collaboration
 
 * **PR Review**: All code must pass automated CI and Copilot reviews before being presented to the human author for final sign-off.

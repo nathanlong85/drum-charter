@@ -1,7 +1,7 @@
 'use client';
 
-import { debounce } from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { debounce } from '@/lib/utils/debounce';
 
 /**
  * A generic hook for managing debounced autosave state with serialized writes.
