@@ -107,7 +107,7 @@ jobs:
             (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
             
-            npx supabase start
+            pnpm exec supabase start
             
             echo "Waiting for Supabase..."
             for i in {1..60}; do
@@ -119,7 +119,7 @@ jobs:
               sleep 5
             done
             
-            SUPABASE_STATUS=$(npx supabase status -o json)
+            SUPABASE_STATUS=$(pnpm exec supabase status -o json)
             REAL_ANON_KEY=$(echo "$SUPABASE_STATUS" | jq -r .ANON_KEY)
             export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
             export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$REAL_ANON_KEY
