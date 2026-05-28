@@ -2,6 +2,6 @@ packages:
   - '.'
 allowBuilds:
   esbuild: true
-  supabase: true
+  supabase: false
   sharp: false
   unrs-resolver: false
