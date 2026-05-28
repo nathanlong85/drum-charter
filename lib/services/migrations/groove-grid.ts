@@ -33,6 +33,16 @@ export function migrateGrooveGrid(grid: unknown): GrooveGrid | undefined {
   const targetLength = calculateTotalNotes(gridObj as unknown as GrooveGrid);
 
   const instruments = gridObj.instruments.map((instUnknown) => {
+    if (!instUnknown || typeof instUnknown !== 'object') {
+      return {
+        id: generateId(),
+        category: 'misc',
+        presetVariety: 'Misc',
+        customName: 'Misc',
+        notes: Array(targetLength).fill('none'),
+        velocities: Array(targetLength).fill(0),
+      } as DrumInstrument;
+    }
     const inst = instUnknown as Record<string, unknown>;
     if (
       inst.category &&

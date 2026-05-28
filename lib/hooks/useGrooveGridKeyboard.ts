@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { GrooveAction } from '@/lib/state/groove-reducer';
 import type { DrumInstrument, GrooveGrid } from '@/lib/types/groove';
 
@@ -36,6 +36,16 @@ export function useGrooveGridKeyboard({
   setPickerPos,
   dispatch,
 }: UseGrooveGridKeyboardOptions) {
+  const selectionRangeRef = useRef(selectionRange);
+  const pickerPosRef = useRef(pickerPos);
+  const instrumentsRef = useRef(state.instruments);
+
+  useEffect(() => {
+    selectionRangeRef.current = selectionRange;
+    pickerPosRef.current = pickerPos;
+    instrumentsRef.current = state.instruments;
+  });
+
   useEffect(() => {
     if (readOnly) return;
 
@@ -45,35 +55,39 @@ export function useGrooveGridKeyboard({
         return;
       }
 
+      const currentSelectionRange = selectionRangeRef.current;
+      const currentPickerPos = pickerPosRef.current;
+      const currentInstruments = instrumentsRef.current;
+
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        if (selectionRange) {
+        if (currentSelectionRange) {
           e.preventDefault();
           dispatch({
             type: 'SET_SELECTION_SYMBOLS',
-            selection: selectionRange,
+            selection: currentSelectionRange,
             symbol: 'none',
           });
           setSelectionRange(null);
-        } else if (pickerPos) {
+        } else if (currentPickerPos) {
           e.preventDefault();
           dispatch({
             type: 'SET_SYMBOL',
-            id: pickerPos.id,
-            noteIndex: pickerPos.noteIndex,
+            id: currentPickerPos.id,
+            noteIndex: currentPickerPos.noteIndex,
             symbol: 'none',
           });
           setPickerPos(null);
         }
       }
 
-      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectionRange) {
-        const { start, end } = selectionRange;
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c' && currentSelectionRange) {
+        const { start, end } = currentSelectionRange;
         const minInst = Math.min(start.instIdx, end.instIdx);
         const maxInst = Math.max(start.instIdx, end.instIdx);
         const minNote = Math.min(start.noteIdx, end.noteIdx);
         const maxNote = Math.max(start.noteIdx, end.noteIdx);
 
-        const copyData = state.instruments
+        const copyData = currentInstruments
           .slice(minInst, maxInst + 1)
           .map((inst: DrumInstrument) => ({
             notes: inst.notes.slice(minNote, maxNote + 1),
@@ -94,7 +108,10 @@ export function useGrooveGridKeyboard({
         return;
       }
 
-      if (!selectionRange) return;
+      const currentSelectionRange = selectionRangeRef.current;
+      const currentInstruments = instrumentsRef.current;
+
+      if (!currentSelectionRange) return;
 
       const text = e.clipboardData?.getData('text');
       if (!text) return;
@@ -102,13 +119,13 @@ export function useGrooveGridKeyboard({
       try {
         const pasteData = JSON.parse(text);
         if (Array.isArray(pasteData)) {
-          const targetInstrument = state.instruments[selectionRange.start.instIdx];
+          const targetInstrument = currentInstruments[currentSelectionRange.start.instIdx];
           if (!targetInstrument) return;
           e.preventDefault();
           dispatch({
             type: 'PASTE_DATA',
             id: targetInstrument.id,
-            noteIndex: selectionRange.start.noteIdx,
+            noteIndex: currentSelectionRange.start.noteIdx,
             data: pasteData,
           });
         }
@@ -123,13 +140,5 @@ export function useGrooveGridKeyboard({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('paste', handlePaste);
     };
-  }, [
-    readOnly,
-    selectionRange,
-    pickerPos,
-    state.instruments,
-    dispatch,
-    setSelectionRange,
-    setPickerPos,
-  ]);
+  }, [readOnly, dispatch, setSelectionRange, setPickerPos]);
 }
