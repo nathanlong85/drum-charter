@@ -16,10 +16,12 @@ export function migrateGrooveGrid(grid: unknown): GrooveGrid | undefined {
 
   const gridObj = grid as Record<string, unknown>;
 
+  const timeSignature = gridObj.timeSignature as Record<string, unknown> | undefined;
   if (
-    !gridObj.timeSignature ||
-    typeof gridObj.timeSignature !== 'object' ||
-    !('beatsPerMeasure' in (gridObj.timeSignature as object)) ||
+    !timeSignature ||
+    typeof timeSignature !== 'object' ||
+    !('beatsPerMeasure' in timeSignature) ||
+    !('beatValue' in timeSignature) ||
     typeof gridObj.resolution !== 'number' ||
     typeof gridObj.measures !== 'number'
   ) {
