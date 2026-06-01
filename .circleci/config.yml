@@ -180,15 +180,15 @@ jobs:
           name: Push Migrations to Staging
           command: |
             if [ "$CIRCLE_BRANCH" = "staging" ]; then
-              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
-              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
+              pnpm exec supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
+              pnpm exec supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
             fi
       - run:
           name: Push Migrations to Production
           command: |
             if [ "$CIRCLE_BRANCH" = "main" ]; then
-              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
-              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
+              pnpm exec supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
+              pnpm exec supabase db push --password $SUPABASE_DB_PASSWORD_PROD
             fi
 
 # -------------------------------------------------------------------------------------
