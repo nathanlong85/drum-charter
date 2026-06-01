@@ -12,6 +12,8 @@
       "!app/globals.css",
       "!.markdownlint-cli2.jsonc",
       "!.agents",
+      "!.wolf",
+      "!.claude",
       "!node_modules",
       "!.next",
       "!public/sw.js",

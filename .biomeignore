@@ -1,1 +1,4 @@
 pr_*.json
+.claude/skills/
+.wolf/
+.agents/
