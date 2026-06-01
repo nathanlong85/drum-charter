@@ -186,35 +186,30 @@ describe('NotebookEditor', () => {
   it('adds and removes a grid in a section', async () => {
     renderWithProviders(<NotebookEditor initialNotebook={mockNotebook} />);
 
-    const addGridBtn = screen.getByText(/\+ ADD GRID/i);
-
-    fireEvent.click(addGridBtn);
-    await act(async () => {
-      await wait(2100);
+    fireEvent.click(screen.getByText(/\+ ADD GRID/i));
+    await waitFor(() => {
+      expect(screen.getByTestId('groove-grid')).toBeDefined();
     });
 
-    expect(screen.getByTestId('groove-grid')).toBeDefined();
-
-    const removeGridBtn = screen.getByRole('button', { name: /Remove Grid/i });
-
-    fireEvent.click(removeGridBtn);
-    await act(async () => {
-      await wait(2100);
+    fireEvent.click(screen.getByRole('button', { name: /Remove Grid/i }));
+    await waitFor(() => {
+      expect(screen.queryByTestId('groove-grid')).toBeNull();
     });
-
-    expect(screen.queryByTestId('groove-grid')).toBeNull();
   });
 
   it('handles public link for notebooks', async () => {
     const notebook = { ...mockNotebook, isPublic: true };
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
-    vi.stubGlobal('navigator', { clipboard: { writeText: writeTextSpy } });
+    vi.stubGlobal('navigator', {
+      ...navigator,
+      clipboard: { writeText: writeTextSpy },
+    });
 
     renderWithProviders(<NotebookEditor initialNotebook={notebook} />);
-    const linkBtn = screen.getByRole('button', { name: /Copy Public Link/i });
-    fireEvent.click(linkBtn);
+    fireEvent.click(screen.getByRole('button', { name: /Copy Public Link/i }));
 
     expect(writeTextSpy).toHaveBeenCalled();
+    vi.unstubAllGlobals();
   });
 
   it('toggles public state ', async () => {

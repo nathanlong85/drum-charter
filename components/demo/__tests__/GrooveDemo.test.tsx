@@ -16,7 +16,7 @@ describe('GrooveDemo', () => {
   it('renders without crashing', () => {
     render(<GrooveDemo />);
 
-    expect(screen.getByText('Sonic Architect Engine')).toBeInTheDocument();
+    expect(screen.getByText('Drum Sequencer')).toBeInTheDocument();
     expect(screen.getByText('v1.0-alpha Live Preview')).toBeInTheDocument();
     expect(screen.getByTestId('mock-grid-editor')).toBeInTheDocument();
     expect(screen.getByText(/Mocked Editor with 3 instruments/)).toBeInTheDocument();

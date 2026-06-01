@@ -27,9 +27,9 @@ test.describe('Auth Status & User Menu', () => {
     test('Should allow user to sign out and redirect to landing page', async ({ page }) => {
       // Manual login first since we're using empty storageState
       await page.goto('/login');
-      await page.getByLabel(/Email Identity/i).fill('test@example.com');
-      await page.getByLabel(/Security Key/i).fill('password123');
-      await page.getByRole('button', { name: /Authenticate/i }).click();
+      await page.getByLabel(/Email/i).fill('test@example.com');
+      await page.getByLabel(/Password/i).fill('password123');
+      await page.getByRole('button', { name: /Log In/i }).click();
       await page.waitForURL('/dashboard');
 
       const avatar = page.getByTestId('auth-user-avatar');
@@ -39,8 +39,8 @@ test.describe('Auth Status & User Menu', () => {
       await signOutBtn.click();
 
       // Verify redirect to landing page
-      await page.waitForURL('http://localhost:3001/', { timeout: 15000 });
-      await expect(page.getByText(/Sonic Architect/i).first()).toBeVisible();
+      await page.waitForURL('/', { timeout: 15000 });
+      await expect(page.getByText(/Drum Charting for Professionals/i).first()).toBeVisible();
     });
   });
 

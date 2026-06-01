@@ -16,7 +16,7 @@ interface PortalProps {
 
 interface ContentProps {
   children?: React.ReactNode;
-  onOpenAutoFocus?: (e: any) => void;
+  onOpenAutoFocus?: (e: unknown) => void;
 }
 
 interface TitleProps {

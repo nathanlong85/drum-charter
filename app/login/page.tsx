@@ -74,10 +74,10 @@ export default function LoginPage() {
             </div>
           </Link>
           <h1 className="text-4xl font-headline font-black tracking-tighter text-on-surface uppercase mb-2">
-            Access Console
+            Log In
           </h1>
           <p className="text-on-surface-variant font-headline text-[10px] tracking-[0.3em] uppercase opacity-60">
-            Initialize your sonic architecture
+            Capture your rhythm
           </p>
         </div>
 
@@ -88,7 +88,7 @@ export default function LoginPage() {
                 className="text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant ml-1"
                 htmlFor="email"
               >
-                Email Identity
+                Email
               </label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
@@ -112,7 +112,7 @@ export default function LoginPage() {
                 className="text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant ml-1"
                 htmlFor="password"
               >
-                Security Key
+                Password
               </label>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant group-focus-within:text-primary transition-colors" />
@@ -133,8 +133,9 @@ export default function LoginPage() {
               <button
                 className="w-full bg-primary text-on-primary font-headline font-black text-xs uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all disabled:opacity-50"
                 disabled={loading}
+                type="submit"
               >
-                {loading ? 'Processing...' : 'Authenticate'}
+                {loading ? 'Processing...' : 'Log In'}
               </button>
               <button
                 onClick={handleSignup}

@@ -198,17 +198,17 @@ describe('SongEditor', () => {
     // Open picker
     fireEvent.click(screen.getByText(/\+ Insert Snippet/i));
 
-    // Wait for snippet to load
-    await screen.findByText('Test Snippet');
+    fireEvent.click(await screen.findByText('Test Snippet'));
 
-    await act(async () => {
-      fireEvent.click(screen.getByText('Test Snippet'));
-      await wait(2100);
-    });
-
-    const lastCall = vi.mocked(saveSongChartAction).mock.calls.at(-1)![0] as SongChart;
-    expect(lastCall.sections[0].grid).toBeDefined();
-    expect(lastCall.sections[0].grid?.timeSignature.beatsPerMeasure).toBe(4);
+    await waitFor(
+      () => {
+        expect(saveSongChartAction).toHaveBeenCalled();
+        const lastCall = vi.mocked(saveSongChartAction).mock.calls.at(-1)![0] as SongChart;
+        expect(lastCall.sections[0].grid).toBeDefined();
+        expect(lastCall.sections[0].grid?.timeSignature.beatsPerMeasure).toBe(4);
+      },
+      { timeout: 5000 },
+    );
   });
 
   it('copies public link to clipboard', async () => {

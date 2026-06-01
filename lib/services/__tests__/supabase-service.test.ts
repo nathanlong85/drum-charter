@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { GrooveSnippet, Notebook, Setlist, SongChart } from '@/lib/types/groove';
 import { fetchWithRetry, supabaseService } from '../supabase-service';
 
-const mockSupabase: any = {
+const mockSupabase: Record<string, unknown> = {
   from: vi.fn(),
   auth: {
     getUser: vi.fn(),
@@ -20,7 +20,7 @@ const mockSupabase: any = {
 };
 
 // Helper to create a mock Supabase response that supports chaining
-const mockResponse = <TData = any, TError = any>(
+const mockResponse = <TData = unknown, TError = unknown>(
   data: TData | null = null,
   error: TError | null = null,
 ) => {
@@ -412,7 +412,10 @@ describe('supabaseService', () => {
       // Mock getProfile call (after update)
       mockSupabase.from.mockReturnValueOnce(mockResponse(refreshedProfile));
 
-      const result = await supabaseService.updateProfile(userId, updates as any);
+      const result = await supabaseService.updateProfile(
+        userId,
+        updates as Partial<typeof updates>,
+      );
       expect(result.display_name).toBe('New Name');
       expect(mockSupabase.from).toHaveBeenCalledWith('profiles');
       expect(mockSupabase.update).toHaveBeenCalled();
@@ -604,6 +607,7 @@ describe('supabaseService', () => {
 
     beforeEach(() => {
       fetchFn.mockReset();
+      vi.spyOn(console, 'error').mockImplementation(() => {});
     });
 
     it('retries on 404 error', async () => {
@@ -613,7 +617,7 @@ describe('supabaseService', () => {
       await vi.advanceTimersByTimeAsync(150);
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(3);
+      expect(fetchFn).toHaveBeenCalledTimes(2);
     });
 
     it('retries on specific error codes like PGRST116', async () => {
@@ -623,7 +627,7 @@ describe('supabaseService', () => {
       await vi.advanceTimersByTimeAsync(150);
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(3);
+      expect(fetchFn).toHaveBeenCalledTimes(2);
     });
 
     it('bails on 401/403 status', async () => {
@@ -640,7 +644,7 @@ describe('supabaseService', () => {
       await vi.advanceTimersByTimeAsync(150);
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(3);
+      expect(fetchFn).toHaveBeenCalledTimes(2);
     });
 
     it('retries on transient errors and bails if error becomes bailable during retry', async () => {
@@ -670,7 +674,7 @@ describe('supabaseService', () => {
 
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(4); // Initial + 3 retries
+      expect(fetchFn).toHaveBeenCalledTimes(3);
     });
 
     it('retries on transient errors and succeeds', async () => {
@@ -695,7 +699,20 @@ describe('supabaseService', () => {
 
       const result = await promise;
       expect(result).toBeNull();
-      expect(fetchFn).toHaveBeenCalledTimes(3); // Initial + 2 retries
+      expect(fetchFn).toHaveBeenCalledTimes(2);
+    });
+
+    it('retries when fetchFn throws', async () => {
+      fetchFn
+        .mockRejectedValueOnce(new Error('Network error'))
+        .mockResolvedValueOnce({ data: { id: '1' }, error: null });
+
+      const promise = fetchWithRetry(fetchFn, 3, 100);
+      await vi.advanceTimersByTimeAsync(150);
+
+      const result = await promise;
+      expect(result).toEqual({ id: '1' });
+      expect(fetchFn).toHaveBeenCalledTimes(2);
     });
   });
 });

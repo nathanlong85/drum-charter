@@ -64,11 +64,14 @@ export default function SettingsView({ profile }: SettingsViewProps) {
   return (
     <div className="max-w-4xl mx-auto py-8 px-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-headline font-black text-on-surface uppercase tracking-tight mb-2">
-          Mission Control
+        <h1
+          data-testid="settings-heading"
+          className="text-3xl font-headline font-black text-on-surface uppercase tracking-tight mb-2"
+        >
+          Settings
         </h1>
         <p className="text-on-surface-variant font-headline text-xs tracking-widest uppercase opacity-60">
-          Personalize your sonic workstation
+          Personalize your workspace
         </p>
       </div>
 
@@ -226,7 +229,7 @@ export default function SettingsView({ profile }: SettingsViewProps) {
             {success && (
               <div className="flex items-center gap-2 text-green-500 text-[10px] font-headline font-black uppercase tracking-widest animate-fade-in">
                 <Check className="w-3 h-3" />
-                Configuration Updated Successfully
+                Settings Updated Successfully
               </div>
             )}
           </div>
@@ -242,7 +245,7 @@ export default function SettingsView({ profile }: SettingsViewProps) {
                 Syncing...
               </>
             ) : (
-              'Save Configuration'
+              'Save Settings'
             )}
           </button>
         </div>

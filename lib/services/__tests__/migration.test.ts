@@ -1,11 +1,34 @@
 import { describe, expect, it } from 'vitest';
 import type { GrooveGrid } from '../../types/groove';
-import { migrateGrooveGrid } from '../supabase-service';
+import { migrateGrooveGrid } from '../migrations/groove-grid';
 
 describe('migrateGrooveGrid', () => {
   it('handles null or undefined grid', () => {
     expect(migrateGrooveGrid(null)).toBeUndefined();
     expect(migrateGrooveGrid(undefined)).toBeUndefined();
+  });
+
+  it('returns undefined when instruments is not an array', () => {
+    expect(
+      migrateGrooveGrid({
+        timeSignature: { beatsPerMeasure: 4, beatValue: 4 },
+        resolution: 16,
+        measures: 1,
+        instruments: { invalid: true },
+      }),
+    ).toBeUndefined();
+  });
+
+  it('returns undefined for malformed grid shape', () => {
+    expect(migrateGrooveGrid({ instruments: [] })).toBeUndefined();
+    expect(
+      migrateGrooveGrid({
+        timeSignature: {},
+        resolution: '16',
+        measures: 1,
+        instruments: [],
+      }),
+    ).toBeUndefined();
   });
 
   it('migrates legacy instruments with basic instrumentId', () => {

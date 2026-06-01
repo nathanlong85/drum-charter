@@ -276,9 +276,7 @@ export default function ManualPage() {
               Terms of Service
             </h3>
             <div className="bg-surface-container p-8 rounded-[32px] border border-outline-variant/10 space-y-4 font-body text-on-surface-variant leading-relaxed">
-              <p>
-                By initializing the Sonic Architect Console, you agree to the following protocols:
-              </p>
+              <p>By signing up for DrumCharter, you agree to the following protocols:</p>
               <ul className="list-disc list-inside space-y-2 text-sm">
                 <li>Usage is intended for percussive notation and musical study.</li>
                 <li>We provide the architecture &quot;as-is&quot; during this alpha phase.</li>

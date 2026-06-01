@@ -1,0 +1,20 @@
+# Auto-generated types
+lib/supabase/database.types.ts
+
+# IDE & tool config
+.cursorrules
+.mcp.json
+.claude/
+.cursor/
+.gemini/
+
+# Metadata & documentation
+AGENTS.md
+MEMORY.md
+docs/
+
+# Build/debug artifacts
+graphify-out/
+
+# Backups
+*.bak

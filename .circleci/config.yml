@@ -37,7 +37,7 @@ jobs:
           pkg-manager: pnpm
       - run:
           name: Run Vitest
-          command: pnpm test run
+          command: pnpm test:run
 
   # -----------------------------------------------------------------------------------
   # 3. BUILD APP (Pre-build with Placeholder)
@@ -54,7 +54,7 @@ jobs:
           name: Build Next.js app with Placeholder
           command: |
             # We use a long unique string that won't be truncated or collisioned
-            export NEXT_PUBLIC_SUPABASE_URL="http://localhost:54321"
+            export NEXT_PUBLIC_SUPABASE_URL="http://127.0.0.1:54321"
             export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY="SUPABASE_ANON_KEY_PLACEHOLDER_FOR_PATCHING_IN_CI"
             pnpm cross-env NEXT_PUBLIC_FORCE_SW=true pnpm run build
       - persist_to_workspace:
@@ -107,11 +107,11 @@ jobs:
             (while true; do echo "CI HEARTBEAT $(date)"; sleep 30; done) &
             HEARTBEAT_PID=$!
             
-            npx supabase start
+            pnpm exec supabase start
             
             echo "Waiting for Supabase..."
             for i in {1..60}; do
-              if curl -s http://localhost:54321/rest/v1/ > /dev/null; then
+              if curl -s http://127.0.0.1:54321/rest/v1/ > /dev/null; then
                 echo "Supabase ready"
                 break
               fi
@@ -119,9 +119,9 @@ jobs:
               sleep 5
             done
             
-            SUPABASE_STATUS=$(npx supabase status -o json)
+            SUPABASE_STATUS=$(pnpm exec supabase status -o json)
             REAL_ANON_KEY=$(echo "$SUPABASE_STATUS" | jq -r .ANON_KEY)
-            export NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+            export NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
             export NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=$REAL_ANON_KEY
             export SUPABASE_SERVICE_ROLE_KEY=$(echo "$SUPABASE_STATUS" | jq -r .SERVICE_ROLE_KEY)
             
@@ -174,21 +174,27 @@ jobs:
       - image: cimg/node:22.14.0
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: pnpm
+      - run:
+          name: Install Supabase CLI
+          command: |
+            SUPABASE_VERSION="2.97.0"
+            curl -fsSL "https://github.com/supabase/cli/releases/download/v${SUPABASE_VERSION}/supabase_linux_amd64.tar.gz" -o /tmp/supabase.tar.gz
+            tar -xzf /tmp/supabase.tar.gz -C /tmp
+            sudo mv /tmp/supabase /usr/local/bin/supabase
+            supabase --version
       - run:
           name: Push Migrations to Staging
           command: |
             if [ "$CIRCLE_BRANCH" = "staging" ]; then
-              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
-              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
+              supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
+              supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
             fi
       - run:
           name: Push Migrations to Production
           command: |
             if [ "$CIRCLE_BRANCH" = "main" ]; then
-              pnpm supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
-              pnpm supabase db push --password $SUPABASE_DB_PASSWORD_PROD
+              supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
+              supabase db push --password $SUPABASE_DB_PASSWORD_PROD
             fi
 
 # -------------------------------------------------------------------------------------

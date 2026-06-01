@@ -50,10 +50,10 @@ export function MarketingHero() {
               href="/login"
               className="px-10 py-5 bg-surface-container-highest text-on-surface font-headline font-black text-xs uppercase tracking-widest rounded-2xl border border-outline-variant/20 hover:bg-surface-bright transition-all"
             >
-              Access Console
+              Sign In
             </Link>
           </div>
-          {/* Interactive Engine Preview */}
+          {/* Interactive Preview */}
           <div
             id="demo"
             className="relative group p-1 bg-gradient-to-br from-outline-variant/20 to-transparent rounded-[40px] scroll-mt-24"
@@ -69,7 +69,7 @@ export function MarketingHero() {
                   </div>
                   <div className="h-4 w-px bg-outline-variant/20 mx-2"></div>
                   <span className="text-[10px] font-headline font-black text-primary uppercase tracking-[0.3em]">
-                    Live Audio Engine
+                    Live Audio Demo
                   </span>
                 </div>
                 <div className="flex items-center gap-3 px-3 py-1 bg-surface-container-highest rounded-lg text-[9px] font-headline font-bold text-on-surface-variant">
@@ -94,8 +94,8 @@ export function MarketingHero() {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
             <div className="max-w-2xl">
               <h2 className="text-4xl md:text-5xl font-headline font-black text-on-surface uppercase tracking-tight mb-6">
-                Modular Architectural <br />
-                <span className="text-primary">Design Systems.</span>
+                Powerful <br />
+                <span className="text-primary">Organization.</span>
               </h2>
               <p className="text-lg text-on-surface-variant font-body">
                 DrumCharter isn&apos;t just a charting tool. It&apos;s a scalable infrastructure for
@@ -127,7 +127,7 @@ export function MarketingHero() {
                 accent: 'primary',
               },
               {
-                title: 'Drum-Aware Engine',
+                title: 'Drum Sequencer',
                 desc: 'A specialized sequencer that understands ghost notes, rimshots, and complex percussive articulations.',
                 icon: Music,
                 accent: 'tertiary',

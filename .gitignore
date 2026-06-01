@@ -23,13 +23,9 @@
 # production
 /build
 
-# misc
-.junie/memory/
-.junie/mcp/
-!.junie/guidelines.md
-!.junie/CLI_REFERENCE.md
 .DS_Store
 *.pem
+.pnpm-store/
 
 # debug
 npm-debug.log*
@@ -62,6 +58,55 @@ coderabbit_full_review.txt
 
 tmp/
 
-/.agents/
-/.gemini/skills/
-graphify-out/
+# Gemini
+.gemini/skills/
+.gemini/settings.json.bak
+
+# Agent local rules and skills overlays
+.agents/rules/local/**
+!.agents/rules/local/
+!.agents/rules/local/.keep
+
+.agents/skills/**
+!.agents/skills/
+!.agents/skills/.keep
+!.agents/skills/release-manager/
+
+# Cursor local rules and skills overlays
+.cursor/rules/local/**
+!.cursor/rules/local/
+!.cursor/rules/local/.keep
+
+.cursor/skills/**
+!.cursor/skills/
+!.cursor/skills/.keep
+
+# Cursor MCP config
+.cursor/mcp.json
+
+# Claude local rules and skills overlays
+CLAUDE.local.md
+.claude/CLAUDE.local.md
+
+.claude/rules/local/**
+!.claude/rules/local/
+!.claude/rules/local/.keep
+
+.claude/skills/**
+!.claude/skills/
+!.claude/skills/.keep
+!.claude/skills/release-manager
+
+# Claude local settings, projects, and misc files
+.claude/settings.local.json
+.claude/recall-context.md
+.claude/projects/
+
+# Claude MCP config
+.mcp.json
+
+# Skills lockfile (For `skills` tool. Local-only for now)
+skills-lock.json
+
+# Added by code-review-graph
+.code-review-graph/

@@ -82,7 +82,7 @@ export function useRemoteControl({ onAction, isActive }: UseRemoteControlProps) 
       if (stored) {
         const parsed = JSON.parse(stored);
 
-        const validateActions = (val: any): RemoteAction[] => {
+        const validateActions = (val: unknown): RemoteAction[] => {
           const arr = Array.isArray(val) ? val : [val];
           return arr.filter(
             (item): item is RemoteAction =>

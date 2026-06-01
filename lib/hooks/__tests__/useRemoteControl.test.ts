@@ -2,20 +2,6 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useRemoteControl } from '../useRemoteControl';
 
-// Mock lodash debounce to be synchronous
-vi.mock('lodash', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('lodash')>();
-  return {
-    ...actual,
-    debounce: vi.fn((fn: (...args: unknown[]) => void) => {
-      const debounced = (...args: unknown[]) => fn(...args);
-      debounced.cancel = vi.fn();
-      debounced.flush = vi.fn();
-      return debounced;
-    }),
-  };
-});
-
 // Mock localStorage
 const mockLocalStorage = (() => {
   let store: Record<string, string> = {};

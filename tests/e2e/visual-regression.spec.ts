@@ -7,9 +7,9 @@ test.describe('Visual Regression', () => {
     maxDiffPixelRatio: 0.05,
   };
 
-  test('Dashboard (Mission Control) visual baseline', async ({ page }) => {
+  test('Dashboard visual baseline', async ({ page }) => {
     await page.goto('/dashboard');
-    await page.waitForSelector('h1:has-text("Mission Control")');
+    await page.waitForSelector('h1:has-text("Dashboard")');
     // Wait for any animations/streaming to settle
     await page.waitForTimeout(2000);
 
@@ -27,9 +27,7 @@ test.describe('Visual Regression', () => {
     await expect(page).toHaveScreenshot('library-songs-baseline.png', screenshotOptions);
   });
 
-  // FIXME: This test is temporarily marked as fixme until Linux-based CI baselines can be updated
-  // to match the new multi-row wrapped grid layout (which increased from 218px to 266px height).
-  test.fixme('Groove Grid visual baseline', async ({ page }) => {
+  test('Groove Grid visual baseline', async ({ page }) => {
     await page.goto('/library/snippets');
     await page.getByTestId('create-new-button').click();
     await page.waitForURL(/\/snippets\/.+/);
@@ -47,7 +45,7 @@ test.describe('Visual Regression', () => {
     await page.goto('/dashboard');
     await page.waitForTimeout(2000);
 
-    const bottomNav = page.locator('nav').filter({ has: page.getByText(/Home/i) });
+    const bottomNav = page.getByTestId('bottom-nav');
     await expect(bottomNav).toBeVisible();
 
     await expect(page).toHaveScreenshot('mobile-nav-baseline.png', screenshotOptions);

@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { type ReactNode, useCallback, useTransition } from 'react';
+import { type ReactNode, useCallback, useState, useTransition } from 'react';
 import { AuthStatus, type AuthStatusProps } from '@/components/auth/AuthStatus';
 import { Tooltip, TooltipProvider } from '@/components/common/Tooltip';
 import { useSupabaseStatus } from '@/lib/hooks/useSupabaseStatus';
@@ -29,12 +29,28 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const supabaseStatus = useSupabaseStatus();
+  const [globalSearch, setGlobalSearch] = useState('');
 
   const handleRefresh = useCallback(() => {
     startTransition(() => {
       router.refresh();
     });
   }, [router]);
+
+  const handleGlobalSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!globalSearch.trim()) return;
+
+    // Determine target based on current pathname to make search context-aware
+    let target = '/library/songs';
+    if (pathname?.includes('/library/notebooks')) target = '/library/notebooks';
+    else if (pathname?.includes('/library/snippets')) target = '/library/snippets';
+    else if (pathname?.includes('/library/setlists')) target = '/library/setlists';
+
+    // Redirect to determined library tab with search param
+    router.push(`${target}?search=${encodeURIComponent(globalSearch.trim())}`);
+    setGlobalSearch('');
+  };
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: Library, tab: 'dashboard' },
@@ -63,7 +79,7 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
                   DrumCharter
                 </h1>
                 <p className="text-on-surface-variant text-[10px] uppercase tracking-[0.2em] font-label truncate opacity-60">
-                  Pro Console
+                  Drum Charting for Professionals
                 </p>
               </div>
             </Link>
@@ -144,15 +160,18 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
           </div>
 
           <div className="flex items-center gap-4 lg:gap-8">
-            <div className="relative group hidden lg:block">
+            <form onSubmit={handleGlobalSearch} className="relative group hidden lg:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 w-4 h-4" />
               <input
                 className="bg-surface-container-low border-none text-[10px] font-label font-bold tracking-widest w-64 pl-10 pr-4 py-2.5 rounded-full focus:ring-1 focus:ring-primary/30 text-on-surface placeholder:text-on-surface-variant/30 outline-none transition-all"
-                placeholder="SEARCH LIBRARY..."
+                placeholder="SEARCH SONGS, SNIPPETS..."
                 type="text"
                 aria-label="Search library"
+                data-testid="global-search-input"
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
               />
-            </div>
+            </form>
 
             <div className="flex items-center gap-3 text-on-surface-variant/60">
               <Tooltip content="Refresh data" side="bottom">
@@ -182,7 +201,10 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
         </main>
 
         {/* Bottom Navigation (Mobile Only) */}
-        <nav className="fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/10 flex items-center justify-around md:hidden z-50 no-print">
+        <nav
+          data-testid="bottom-nav"
+          className="fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-outline-variant/10 flex items-center justify-around md:hidden z-50 no-print"
+        >
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
             const Icon = item.icon;
@@ -196,7 +218,7 @@ export function AppShell({ children, initialUser, initialProfile }: AppShellProp
               >
                 <Icon className={`w-5 h-5 ${isActive ? 'scale-110' : ''}`} />
                 <span className="text-[8px] font-headline font-black uppercase tracking-widest">
-                  {item.name === 'Dashboard' ? 'Home' : item.name}
+                  {item.name}
                 </span>
               </Link>
             );

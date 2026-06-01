@@ -32,7 +32,7 @@ export default async function Home() {
                 DrumCharter
               </span>
               <span className="text-[9px] font-headline font-bold tracking-[0.3em] text-primary uppercase mt-0.5">
-                Sonic Architect
+                Drum Charting for Professionals
               </span>
             </div>
           </Link>
@@ -42,7 +42,7 @@ export default async function Home() {
                 Features
               </a>
               <a href="#demo" className="hover:text-primary transition-colors">
-                Live Engine
+                Live Demo
               </a>
               <Link href="/manual" className="hover:text-primary transition-colors">
                 Manual
@@ -69,7 +69,7 @@ export default async function Home() {
               </span>
             </div>
             <p className="text-xs font-headline font-bold text-on-surface-variant/40 uppercase tracking-[0.3em]">
-              © {new Date().getFullYear()} Sonic Architect Console v1.0-alpha
+              © {new Date().getFullYear()} DrumCharter v1.0-alpha
             </p>
           </div>
 
