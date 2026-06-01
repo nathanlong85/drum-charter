@@ -174,21 +174,24 @@ jobs:
       - image: cimg/node:22.14.0
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: pnpm
+      - run:
+          name: Install Supabase CLI
+          command: |
+            curl -fsSL https://supabase.com/install.sh | bash
+            echo 'export PATH="$HOME/.supabase/bin:$PATH"' >> $BASH_ENV
       - run:
           name: Push Migrations to Staging
           command: |
             if [ "$CIRCLE_BRANCH" = "staging" ]; then
-              pnpm exec supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
-              pnpm exec supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
+              supabase link --project-ref $SUPABASE_PROJECT_ID_STAGING --password $SUPABASE_DB_PASSWORD_STAGING
+              supabase db push --password $SUPABASE_DB_PASSWORD_STAGING
             fi
       - run:
           name: Push Migrations to Production
           command: |
             if [ "$CIRCLE_BRANCH" = "main" ]; then
-              pnpm exec supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
-              pnpm exec supabase db push --password $SUPABASE_DB_PASSWORD_PROD
+              supabase link --project-ref $SUPABASE_PROJECT_ID_PROD --password $SUPABASE_DB_PASSWORD_PROD
+              supabase db push --password $SUPABASE_DB_PASSWORD_PROD
             fi
 
 # -------------------------------------------------------------------------------------
