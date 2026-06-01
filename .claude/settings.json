@@ -1,11 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(openspec status *)",
-      "Bash(pnpm *)",
-      "Bash(npx tsc *)",
-      "Bash(npx playwright *)",
-      "Bash(npx supabase *)"
+      "Bash(*)"
     ]
   },
   "hooks": {

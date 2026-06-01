@@ -177,8 +177,11 @@ jobs:
       - run:
           name: Install Supabase CLI
           command: |
-            curl -fsSL https://supabase.com/install.sh | bash
-            echo 'export PATH="$HOME/.supabase/bin:$PATH"' >> $BASH_ENV
+            SUPABASE_VERSION="2.97.0"
+            curl -fsSL "https://github.com/supabase/cli/releases/download/v${SUPABASE_VERSION}/supabase_linux_amd64.tar.gz" -o /tmp/supabase.tar.gz
+            tar -xzf /tmp/supabase.tar.gz -C /tmp
+            sudo mv /tmp/supabase /usr/local/bin/supabase
+            supabase --version
       - run:
           name: Push Migrations to Staging
           command: |
