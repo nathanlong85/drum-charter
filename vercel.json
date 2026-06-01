@@ -1,7 +1,6 @@
 {
   "buildCommand": "pnpm build",
   "installCommand": "pnpm install",
-  "nodeVersion": "22.x",
   "env": {
     "NEXT_PUBLIC_FORCE_SW": "true"
   }
