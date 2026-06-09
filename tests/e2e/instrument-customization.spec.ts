@@ -26,8 +26,12 @@ test.describe('Instrument Customization', () => {
     await page.getByTitle('Edit Instruments').click();
     await expect(page.getByTestId('add-instrument-button')).toBeVisible();
 
-    // Add a new instrument
+    // Add a new instrument via modal
     await page.getByTestId('add-instrument-button').click();
+    const addModal = page.locator('div[role="dialog"]');
+    await expect(addModal).toBeVisible();
+    await addModal.getByLabel(/Category/i).selectOption('misc');
+    await addModal.getByRole('button', { name: /Add Instrument/i }).click();
     await expect(page.getByTestId(/instrument-row-misc/).first()).toBeVisible();
 
     // Edit the new instrument
@@ -44,7 +48,7 @@ test.describe('Instrument Customization', () => {
     // Change metadata
     await modal.getByLabel(/Custom Name/i).fill('Custom Tom');
     await modal.getByLabel(/Category/i).selectOption('tom');
-    await modal.getByLabel(/Variety/i).fill('Floor Tom');
+    await modal.getByLabel(/Type/i).selectOption('Floor Tom');
     await modal.getByRole('button', { name: /Save Changes/i }).click();
 
     // Verify update

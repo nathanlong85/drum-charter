@@ -1,9 +1,10 @@
 'use client';
 
 import { Plus } from 'lucide-react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { GrooveGrid } from '@/lib/types/groove';
 import { generateId } from '@/lib/utils/id';
+import { AddInstrumentModal } from './AddInstrumentModal';
 import { GrooveGridProvider, useGrooveGrid } from './GrooveGridContext';
 import { GrooveGridToolbar } from './GrooveGridToolbar';
 import { InstrumentRow } from './InstrumentRow';
@@ -82,6 +83,7 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
     readOnly,
     isEditingInstruments,
   } = useGrooveGrid();
+  const [showAddModal, setShowAddModal] = useState(false);
   const { measures, timeSignature, resolution } = state;
   const safeBeatValue = Math.max(1, timeSignature.beatValue);
   const notesPerBeat = resolution / safeBeatValue;
@@ -155,15 +157,7 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
 
                 {!readOnly && isEditingInstruments && rowIndex === rowCount - 1 && (
                   <button
-                    onClick={() =>
-                      dispatch({
-                        type: 'ADD_INSTRUMENT',
-                        id: generateId(),
-                        category: 'misc',
-                        presetVariety: 'Misc',
-                        customName: 'misc',
-                      })
-                    }
+                    onClick={() => setShowAddModal(true)}
                     data-testid="add-instrument-button"
                     className="flex items-center gap-3 px-6 py-4 hover:bg-primary/5 text-on-surface-variant/40 hover:text-primary transition-all group border-t border-outline-variant/10"
                   >
@@ -180,6 +174,20 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
           );
         })}
       </div>
+      {showAddModal && (
+        <AddInstrumentModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={({ category, presetVariety, customName }) =>
+            dispatch({
+              type: 'ADD_INSTRUMENT',
+              id: generateId(),
+              category,
+              presetVariety,
+              customName,
+            })
+          }
+        />
+      )}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { Trash2, X } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { DrumCategory, DrumInstrument } from '@/lib/types/groove';
+import { PRESET_VARIETIES } from '@/lib/utils/instrumentPresets';
 
 interface InstrumentSettingsModalProps {
   instrument: DrumInstrument;
@@ -102,7 +103,13 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
                 <select
                   id="inst-category"
                   value={category}
-                  onChange={(e) => setCategory(e.target.value as DrumCategory)}
+                  onChange={(e) => {
+                    const newCat = e.target.value as DrumCategory;
+                    setCategory(newCat);
+                    if (!PRESET_VARIETIES[newCat].includes(variety)) {
+                      setVariety(PRESET_VARIETIES[newCat][0]);
+                    }
+                  }}
                   className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface outline-none transition-all font-headline font-bold appearance-none cursor-pointer"
                 >
                   {CATEGORIES.map((cat) => (
@@ -129,16 +136,32 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
                 htmlFor="inst-variety"
                 className="text-[10px] font-headline font-black uppercase tracking-[0.2em] text-on-surface-variant/40 ml-1"
               >
-                Variety (Sample Preset)
+                Type
               </label>
-              <input
-                id="inst-variety"
-                type="text"
-                value={variety}
-                onChange={(e) => setVariety(e.target.value)}
-                className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface placeholder:text-on-surface-variant/20 outline-none transition-all font-headline font-bold"
-                placeholder="e.g. Snare"
-              />
+              <div className="relative group">
+                <select
+                  id="inst-variety"
+                  value={variety}
+                  onChange={(e) => setVariety(e.target.value)}
+                  className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface outline-none transition-all font-headline font-bold appearance-none cursor-pointer"
+                >
+                  {PRESET_VARIETIES[category].map((v) => (
+                    <option key={v} value={v} className="bg-surface-container-high">
+                      {v}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant/40">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="3"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
               <p className="text-[10px] text-on-surface-variant/40 italic font-body ml-1 uppercase tracking-wider">
                 This affects which samples are played back.
               </p>

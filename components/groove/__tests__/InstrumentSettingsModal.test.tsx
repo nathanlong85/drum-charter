@@ -116,15 +116,16 @@ describe('InstrumentSettingsModal', () => {
     );
 
     fireEvent.change(screen.getByLabelText(/Custom Name/i), { target: { value: 'New Name' } });
-    fireEvent.change(screen.getByLabelText(/Category/i), { target: { value: 'kick' } });
-    fireEvent.change(screen.getByLabelText(/Variety/i), { target: { value: 'Electronic Kick' } });
+    fireEvent.change(screen.getByLabelText(/Category/i), { target: { value: 'tom' } });
+    // Variety resets to 'High Tom' when category changes; pick a different valid option
+    fireEvent.change(screen.getByLabelText(/Type/i), { target: { value: 'Floor Tom' } });
 
     fireEvent.click(screen.getByRole('button', { name: /Save Changes/i }));
 
     expect(onSave).toHaveBeenCalledWith({
       customName: 'New Name',
-      category: 'kick',
-      presetVariety: 'Electronic Kick',
+      category: 'tom',
+      presetVariety: 'Floor Tom',
     });
     expect(onClose).toHaveBeenCalled();
   });
