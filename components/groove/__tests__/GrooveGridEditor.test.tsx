@@ -167,8 +167,18 @@ describe('GrooveGridEditor', () => {
     fireEvent.click(screen.getByTitle('Edit Instruments'));
     fireEvent.click(screen.getByTestId('add-instrument-button'));
 
+    // Modal opens — select tom category so the result is distinct from existing instruments
     await waitFor(() => {
-      expect(screen.queryByText('misc')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    const dialog = screen.getByRole('dialog');
+    fireEvent.change(within(dialog).getByLabelText('Category'), { target: { value: 'tom' } });
+
+    fireEvent.click(within(dialog).getByRole('button', { name: /Add Instrument/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('High Tom')).toBeInTheDocument();
     });
     expect(onChange).toHaveBeenCalled();
   });
