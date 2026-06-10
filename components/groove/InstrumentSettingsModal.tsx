@@ -58,6 +58,11 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
     onClose();
   };
 
+  const knownVarieties = PRESET_VARIETIES[category] || [];
+  const varietyOptions = knownVarieties.includes(variety)
+    ? knownVarieties
+    : [...knownVarieties, variety];
+
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
@@ -151,7 +156,7 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
                   onChange={(e) => setVariety(e.target.value)}
                   className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface outline-none transition-all font-headline font-bold appearance-none cursor-pointer"
                 >
-                  {(PRESET_VARIETIES[category] || []).map((v) => (
+                  {varietyOptions.map((v) => (
                     <option key={v} value={v} className="bg-surface-container-high">
                       {v}
                     </option>
