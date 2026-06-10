@@ -54,10 +54,7 @@ export const AddInstrumentModal: React.FC<AddInstrumentModalProps> = ({ onClose,
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" />
-        <Dialog.Content
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-surface-container-low rounded-3xl shadow-3xl w-full max-w-md border border-outline-variant/10 animate-in zoom-in-95 duration-200 overflow-hidden"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
+        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-surface-container-low rounded-3xl shadow-3xl w-full max-w-md border border-outline-variant/10 animate-in zoom-in-95 duration-200 overflow-hidden">
           <div className="flex items-center justify-between p-6 border-b border-outline-variant/10 bg-surface-container">
             <Dialog.Title className="text-xl font-headline font-black text-on-surface uppercase tracking-tight">
               Add Instrument
