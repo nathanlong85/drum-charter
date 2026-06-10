@@ -1,6 +1,6 @@
 import type { DrumCategory } from '@/lib/types/groove';
 
-export const PRESET_VARIETIES: Record<DrumCategory, string[]> = {
+export const PRESET_VARIETIES: Record<DrumCategory, [string, ...string[]]> = {
   kick: ['Kick'],
   snare: ['Snare'],
   'hi-hat': ['Hi-Hat'],

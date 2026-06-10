@@ -22,6 +22,11 @@ interface AddInstrumentModalProps {
   onAdd: (data: { category: DrumCategory; presetVariety: string; customName: string }) => void;
 }
 
+const DIALOG_CONTENT_CLASS =
+  'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-surface-container-low' +
+  ' rounded-3xl shadow-3xl w-full max-w-md border border-outline-variant/10' +
+  ' animate-in zoom-in-95 duration-200 overflow-hidden';
+
 export const AddInstrumentModal: React.FC<AddInstrumentModalProps> = ({ onClose, onAdd }) => {
   const [category, setCategory] = useState<DrumCategory>('kick');
   const [variety, setVariety] = useState<string>(PRESET_VARIETIES.kick[0]);
@@ -29,7 +34,8 @@ export const AddInstrumentModal: React.FC<AddInstrumentModalProps> = ({ onClose,
 
   const handleCategoryChange = (newCat: DrumCategory) => {
     setCategory(newCat);
-    setVariety(PRESET_VARIETIES[newCat][0]);
+    const varieties = PRESET_VARIETIES[newCat] || [];
+    setVariety(varieties[0] ?? '');
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -54,7 +60,7 @@ export const AddInstrumentModal: React.FC<AddInstrumentModalProps> = ({ onClose,
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-surface-container-low rounded-3xl shadow-3xl w-full max-w-md border border-outline-variant/10 animate-in zoom-in-95 duration-200 overflow-hidden">
+        <Dialog.Content className={DIALOG_CONTENT_CLASS}>
           <div className="flex items-center justify-between p-6 border-b border-outline-variant/10 bg-surface-container">
             <Dialog.Title className="text-xl font-headline font-black text-on-surface uppercase tracking-tight">
               Add Instrument
@@ -106,7 +112,7 @@ export const AddInstrumentModal: React.FC<AddInstrumentModalProps> = ({ onClose,
                   onChange={(e) => setVariety(e.target.value)}
                   className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface outline-none transition-all font-headline font-bold appearance-none cursor-pointer"
                 >
-                  {PRESET_VARIETIES[category].map((v) => (
+                  {(PRESET_VARIETIES[category] || []).map((v) => (
                     <option key={v} value={v} className="bg-surface-container-high">
                       {v}
                     </option>

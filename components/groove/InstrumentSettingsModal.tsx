@@ -7,6 +7,11 @@ import { useEffect, useRef, useState } from 'react';
 import type { DrumCategory, DrumInstrument } from '@/lib/types/groove';
 import { PRESET_VARIETIES } from '@/lib/utils/instrumentPresets';
 
+const DIALOG_CONTENT_CLASS =
+  'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-surface-container-low' +
+  ' rounded-3xl shadow-3xl w-full max-w-md border border-outline-variant/10' +
+  ' animate-in zoom-in-95 duration-200 overflow-hidden';
+
 interface InstrumentSettingsModalProps {
   instrument: DrumInstrument;
   onClose: () => void;
@@ -58,7 +63,7 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" />
         <Dialog.Content
-          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-surface-container-low rounded-3xl shadow-3xl w-full max-w-md border border-outline-variant/10 animate-in zoom-in-95 duration-200 overflow-hidden"
+          className={DIALOG_CONTENT_CLASS}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <div className="flex items-center justify-between p-6 border-b border-outline-variant/10 bg-surface-container">
@@ -106,8 +111,9 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
                   onChange={(e) => {
                     const newCat = e.target.value as DrumCategory;
                     setCategory(newCat);
-                    if (!PRESET_VARIETIES[newCat].includes(variety)) {
-                      setVariety(PRESET_VARIETIES[newCat][0]);
+                    const varieties = PRESET_VARIETIES[newCat] || [];
+                    if (!varieties.includes(variety)) {
+                      setVariety(varieties[0] ?? '');
                     }
                   }}
                   className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface outline-none transition-all font-headline font-bold appearance-none cursor-pointer"
@@ -145,7 +151,7 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
                   onChange={(e) => setVariety(e.target.value)}
                   className="w-full px-5 py-4 bg-surface-container-highest border border-transparent focus:border-primary/30 rounded-2xl text-on-surface outline-none transition-all font-headline font-bold appearance-none cursor-pointer"
                 >
-                  {PRESET_VARIETIES[category].map((v) => (
+                  {(PRESET_VARIETIES[category] || []).map((v) => (
                     <option key={v} value={v} className="bg-surface-container-high">
                       {v}
                     </option>
