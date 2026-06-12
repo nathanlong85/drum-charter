@@ -16,7 +16,7 @@ interface InstrumentRowProps {
   rowIndex?: number;
   onDragStart?: (instIdx: number) => void;
   onDragEnd?: () => void;
-  onDragOver?: (instIdx: number) => void;
+  onDragOver?: (instIdx: number, rowIndex?: number) => void;
   onDrop?: (toIndex: number) => void;
   isDragOver?: boolean;
   isDragging?: boolean;
@@ -96,7 +96,7 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
         onDragOver
           ? (e) => {
               e.preventDefault();
-              onDragOver(instIdx);
+              onDragOver(instIdx, rowIndex);
             }
           : undefined
       }
@@ -111,26 +111,24 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
     >
       {/* Instrument Info Panel */}
       <div
-        className={`w-32 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0 ${
-          !readOnly && isEditing ? 'cursor-grab active:cursor-grabbing' : ''
-        }`}
+        className="w-32 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0"
         style={{ height: 'var(--note-cell-size, 40px)' }}
-        draggable={!readOnly && isEditing}
-        onDragStart={
-          !readOnly && isEditing && onDragStart
-            ? (e) => {
-                e.stopPropagation();
-                onDragStart(instIdx);
-              }
-            : undefined
-        }
-        onDragEnd={!readOnly && isEditing && onDragEnd ? onDragEnd : undefined}
       >
         {!readOnly && isEditing && (
           <div
-            className="mr-1 text-on-surface-variant/40 hover:text-primary transition-colors flex-shrink-0"
+            className="mr-1 text-on-surface-variant/40 hover:text-primary transition-colors flex-shrink-0 cursor-grab active:cursor-grabbing"
             aria-hidden="true"
             data-testid={`instrument-drag-handle-${instrument.id}`}
+            draggable
+            onDragStart={
+              onDragStart
+                ? (e) => {
+                    e.stopPropagation();
+                    onDragStart(instIdx);
+                  }
+                : undefined
+            }
+            onDragEnd={onDragEnd}
           >
             <GripVertical size={12} />
           </div>

@@ -86,6 +86,7 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [dragFromIndex, setDragFromIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [dragOverRowIndex, setDragOverRowIndex] = useState<number | null>(null);
 
   const handleInstrumentDragStart = useCallback((instIdx: number) => {
     setDragFromIndex(instIdx);
@@ -94,10 +95,12 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
   const handleInstrumentDragEnd = useCallback(() => {
     setDragFromIndex(null);
     setDragOverIndex(null);
+    setDragOverRowIndex(null);
   }, []);
 
-  const handleInstrumentDragOver = useCallback((instIdx: number) => {
-    setDragOverIndex(instIdx);
+  const handleInstrumentDragOver = useCallback((instIdx: number, rowIdx?: number) => {
+    setDragOverIndex((prev) => (prev === instIdx ? prev : instIdx));
+    setDragOverRowIndex((prev) => (prev === (rowIdx ?? null) ? prev : (rowIdx ?? null)));
   }, []);
 
   const handleInstrumentDrop = useCallback(
@@ -107,6 +110,7 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
       }
       setDragFromIndex(null);
       setDragOverIndex(null);
+      setDragOverRowIndex(null);
     },
     [dragFromIndex, dispatch],
   );
@@ -180,9 +184,13 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
                     rowIndex={rowIndex}
                     onDragStart={handleInstrumentDragStart}
                     onDragEnd={handleInstrumentDragEnd}
-                    onDragOver={handleInstrumentDragOver}
+                    onDragOver={(instIdx) => handleInstrumentDragOver(instIdx, rowIndex)}
                     onDrop={handleInstrumentDrop}
-                    isDragOver={dragOverIndex === instIdx && dragFromIndex !== instIdx}
+                    isDragOver={
+                      dragOverIndex === instIdx &&
+                      dragOverRowIndex === rowIndex &&
+                      dragFromIndex !== instIdx
+                    }
                     isDragging={dragFromIndex === instIdx}
                   />
                 ))}
