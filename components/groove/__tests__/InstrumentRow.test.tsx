@@ -97,6 +97,27 @@ describe('InstrumentRow', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('does not show grip handle in edit mode when readOnly', () => {
+    render(
+      <Tooltip.Provider>
+        <GrooveGridProvider initialGrid={initialGrid} bpm={120} readOnly>
+          <EditModeActivator>
+            <InstrumentRow
+              instrument={mockInstrument}
+              instIdx={0}
+              startNoteIdx={0}
+              endNoteIdx={4}
+            />
+          </EditModeActivator>
+        </GrooveGridProvider>
+      </Tooltip.Provider>,
+    );
+
+    expect(
+      screen.queryByTestId(`instrument-drag-handle-${mockInstrument.id}`),
+    ).not.toBeInTheDocument();
+  });
+
   it('calls onDragStart when dragging begins in edit mode', async () => {
     const onDragStart = vi.fn();
     renderInEditMode(

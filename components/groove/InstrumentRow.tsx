@@ -115,9 +115,10 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
         style={{ height: 'var(--note-cell-size, 40px)' }}
       >
         {!readOnly && isEditing && (
-          <div
+          <button
+            type="button"
             className="mr-1 text-on-surface-variant/40 hover:text-primary transition-colors flex-shrink-0 cursor-grab active:cursor-grabbing"
-            aria-hidden="true"
+            aria-label={`Reorder ${instrument.customName || instrument.category}`}
             data-testid={`instrument-drag-handle-${instrument.id}`}
             draggable
             onDragStart={
@@ -129,9 +130,18 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
                 : undefined
             }
             onDragEnd={onDragEnd}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowUp' && instIdx > 0) {
+                e.preventDefault();
+                dispatch({ type: 'REORDER_INSTRUMENTS', fromIndex: instIdx, toIndex: instIdx - 1 });
+              } else if (e.key === 'ArrowDown' && instIdx < state.instruments.length - 1) {
+                e.preventDefault();
+                dispatch({ type: 'REORDER_INSTRUMENTS', fromIndex: instIdx, toIndex: instIdx + 1 });
+              }
+            }}
           >
             <GripVertical size={12} />
-          </div>
+          </button>
         )}
 
         <DropdownMenu.Root>
