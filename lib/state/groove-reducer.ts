@@ -37,6 +37,7 @@ export type GrooveAction =
       updates: Partial<Pick<DrumInstrument, 'category' | 'presetVariety' | 'customName' | 'muted'>>;
     }
   | { type: 'MOVE_INSTRUMENT'; id: string; direction: 'up' | 'down' }
+  | { type: 'REORDER_INSTRUMENTS'; fromIndex: number; toIndex: number }
   | { type: 'SET_GRID_SETTINGS'; settings: Partial<Pick<GrooveGrid, 'playbackOptionalHits'>> }
   | { type: 'SET_RESOLUTION'; resolution: 4 | 8 | 16 }
   | { type: 'SET_MEASURES'; measures: number }
@@ -373,6 +374,19 @@ export function grooveReducer(state: GrooveGrid, action: GrooveAction): GrooveGr
         ...state,
         instruments: newInstruments,
       };
+    }
+
+    case 'REORDER_INSTRUMENTS': {
+      const { fromIndex, toIndex } = action;
+      const len = state.instruments.length;
+      if (fromIndex === toIndex) return state;
+      if (fromIndex < 0 || fromIndex >= len || toIndex < 0 || toIndex >= len) return state;
+
+      const newInstruments = [...state.instruments];
+      const [moved] = newInstruments.splice(fromIndex, 1);
+      newInstruments.splice(toIndex, 0, moved);
+
+      return { ...state, instruments: newInstruments };
     }
 
     case 'SET_GRID_SETTINGS': {

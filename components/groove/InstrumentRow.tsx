@@ -1,7 +1,7 @@
 'use client';
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { ChevronDown, ChevronUp, Settings2, Trash2, Volume2, VolumeX, Wand2 } from 'lucide-react';
+import { GripVertical, Settings2, Trash2, Volume2, VolumeX, Wand2 } from 'lucide-react';
 import type React from 'react';
 import type { DrumInstrument } from '@/lib/types/groove';
 import { getFilteredPresets } from '@/lib/utils/rowPresets';
@@ -14,6 +14,12 @@ interface InstrumentRowProps {
   startNoteIdx: number;
   endNoteIdx: number;
   rowIndex?: number;
+  onDragStart?: (instIdx: number) => void;
+  onDragEnd?: () => void;
+  onDragOver?: (instIdx: number, rowIndex?: number) => void;
+  onDrop?: (toIndex: number) => void;
+  isDragOver?: boolean;
+  isDragging?: boolean;
 }
 
 export const InstrumentRow: React.FC<InstrumentRowProps> = ({
@@ -22,6 +28,12 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   startNoteIdx,
   endNoteIdx,
   rowIndex,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
+  isDragOver = false,
+  isDragging = false,
 }) => {
   const {
     state,
@@ -77,9 +89,25 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
     <div
       className={`flex group/row border-b border-outline-variant/10 hover:bg-surface-container-high/30 transition-colors ${
         instrument.muted ? 'opacity-40' : ''
-      }`}
+      } ${isDragOver ? 'border-t-2 border-t-primary' : ''} ${isDragging ? 'opacity-50' : ''}`}
       data-testid={instrumentRowTestId}
       data-row-index={rowIndex}
+      onDragOver={
+        onDragOver
+          ? (e) => {
+              e.preventDefault();
+              onDragOver(instIdx, rowIndex);
+            }
+          : undefined
+      }
+      onDrop={
+        onDrop
+          ? (e) => {
+              e.preventDefault();
+              onDrop(instIdx);
+            }
+          : undefined
+      }
     >
       {/* Instrument Info Panel */}
       <div
@@ -87,38 +115,33 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
         style={{ height: 'var(--note-cell-size, 40px)' }}
       >
         {!readOnly && isEditing && (
-          <div className="flex flex-col mr-1">
-            <button
-              type="button"
-              onClick={() =>
-                dispatch({
-                  type: 'MOVE_INSTRUMENT',
-                  id: instrument.id,
-                  direction: 'up',
-                })
+          <button
+            type="button"
+            className="mr-1 text-on-surface-variant/40 hover:text-primary transition-colors flex-shrink-0 cursor-grab active:cursor-grabbing"
+            aria-label={`Reorder ${instrument.customName || instrument.category}`}
+            data-testid={`instrument-drag-handle-${instrument.id}`}
+            draggable
+            onDragStart={
+              onDragStart
+                ? (e) => {
+                    e.stopPropagation();
+                    onDragStart(instIdx);
+                  }
+                : undefined
+            }
+            onDragEnd={onDragEnd}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowUp' && instIdx > 0) {
+                e.preventDefault();
+                dispatch({ type: 'REORDER_INSTRUMENTS', fromIndex: instIdx, toIndex: instIdx - 1 });
+              } else if (e.key === 'ArrowDown' && instIdx < state.instruments.length - 1) {
+                e.preventDefault();
+                dispatch({ type: 'REORDER_INSTRUMENTS', fromIndex: instIdx, toIndex: instIdx + 1 });
               }
-              className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
-              title="Move Up"
-              aria-label="Move instrument up"
-            >
-              <ChevronUp size={10} strokeWidth={4} />
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                dispatch({
-                  type: 'MOVE_INSTRUMENT',
-                  id: instrument.id,
-                  direction: 'down',
-                })
-              }
-              className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
-              title="Move Down"
-              aria-label="Move instrument down"
-            >
-              <ChevronDown size={10} strokeWidth={4} />
-            </button>
-          </div>
+            }}
+          >
+            <GripVertical size={12} />
+          </button>
         )}
 
         <DropdownMenu.Root>

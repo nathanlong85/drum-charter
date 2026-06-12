@@ -1,9 +1,12 @@
+'use client';
+
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type React from 'react';
+import { useEffect } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import type { DrumInstrument, GrooveGrid } from '@/lib/types/groove';
-import { GrooveGridProvider } from '../GrooveGridContext';
+import { GrooveGridProvider, useGrooveGrid } from '../GrooveGridContext';
 import { InstrumentRow } from '../InstrumentRow';
 
 const mockInstrument: DrumInstrument = {
@@ -31,6 +34,23 @@ const renderWithProvider = (ui: React.ReactElement, grid: GrooveGrid = initialGr
     </Tooltip.Provider>,
   );
 
+function EditModeActivator({ children }: { children: React.ReactNode }) {
+  const { setIsEditingInstruments } = useGrooveGrid();
+  useEffect(() => {
+    setIsEditingInstruments(true);
+  }, [setIsEditingInstruments]);
+  return <>{children}</>;
+}
+
+const renderInEditMode = (ui: React.ReactElement, grid: GrooveGrid = initialGrid) =>
+  render(
+    <Tooltip.Provider>
+      <GrooveGridProvider initialGrid={grid} bpm={120}>
+        <EditModeActivator>{ui}</EditModeActivator>
+      </GrooveGridProvider>
+    </Tooltip.Provider>,
+  );
+
 describe('InstrumentRow', () => {
   it('renders instrument name and notes', () => {
     renderWithProvider(
@@ -38,7 +58,6 @@ describe('InstrumentRow', () => {
     );
 
     expect(screen.getByText('Main Snare')).toBeInTheDocument();
-    // 4 notes rendered
     expect(screen.getAllByTestId('note-cell')).toHaveLength(4);
   });
 
@@ -55,15 +74,67 @@ describe('InstrumentRow', () => {
     fireEvent.click(screen.getAllByTestId('note-cell')[0]);
     expect(onChange).toHaveBeenCalled();
 
-    // Context menu should trigger state change in provider (setting pickerPos)
-    // but since we only render the row, we can't see the picker.
-    // We can verify it doesn't crash and the right-click is handled.
     fireEvent.contextMenu(screen.getAllByTestId('note-cell')[1]);
   });
 
-  // We can't easily reach into the provider to set isEditing without a test helper component
-  // or just checking if it reacts to the button in the real UI.
-  // For unit tests of InstrumentRow, we might need to expose isEditing via props again
-  // OR just test it within GrooveGridEditor.
-  // Actually, InstrumentRow still reads isEditing from context.
+  it('shows grip handle in edit mode', async () => {
+    renderInEditMode(
+      <InstrumentRow instrument={mockInstrument} instIdx={0} startNoteIdx={0} endNoteIdx={4} />,
+    );
+
+    expect(
+      await screen.findByTestId(`instrument-drag-handle-${mockInstrument.id}`),
+    ).toBeInTheDocument();
+  });
+
+  it('does not show grip handle outside edit mode', () => {
+    renderWithProvider(
+      <InstrumentRow instrument={mockInstrument} instIdx={0} startNoteIdx={0} endNoteIdx={4} />,
+    );
+
+    expect(
+      screen.queryByTestId(`instrument-drag-handle-${mockInstrument.id}`),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not show grip handle in edit mode when readOnly', () => {
+    render(
+      <Tooltip.Provider>
+        <GrooveGridProvider initialGrid={initialGrid} bpm={120} readOnly>
+          <EditModeActivator>
+            <InstrumentRow
+              instrument={mockInstrument}
+              instIdx={0}
+              startNoteIdx={0}
+              endNoteIdx={4}
+            />
+          </EditModeActivator>
+        </GrooveGridProvider>
+      </Tooltip.Provider>,
+    );
+
+    expect(
+      screen.queryByTestId(`instrument-drag-handle-${mockInstrument.id}`),
+    ).not.toBeInTheDocument();
+  });
+
+  it('calls onDragStart when dragging begins in edit mode', async () => {
+    const onDragStart = vi.fn();
+    renderInEditMode(
+      <InstrumentRow
+        instrument={mockInstrument}
+        instIdx={0}
+        startNoteIdx={0}
+        endNoteIdx={4}
+        onDragStart={onDragStart}
+      />,
+    );
+
+    const panel = await screen.findByTestId(`instrument-drag-handle-${mockInstrument.id}`);
+    // The draggable div is the parent of the handle
+    const draggablePanel = panel.closest('[draggable="true"]') as HTMLElement;
+    expect(draggablePanel).not.toBeNull();
+    fireEvent.dragStart(draggablePanel);
+    expect(onDragStart).toHaveBeenCalledWith(0);
+  });
 });
