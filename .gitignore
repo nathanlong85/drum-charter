@@ -59,6 +59,7 @@ coderabbit_full_review.txt
 tmp/
 
 # Gemini
+.gemini/commands/
 .gemini/skills/
 .gemini/settings.json.bak
 
