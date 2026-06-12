@@ -1,6 +1,16 @@
 'use client';
 
-import { Bell, BellOff, Layers, Play, RefreshCw, Square, Trash2, Volume2 } from 'lucide-react';
+import {
+  Bell,
+  BellOff,
+  Layers,
+  Play,
+  RefreshCw,
+  SlidersHorizontal,
+  Square,
+  Trash2,
+  Volume2,
+} from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
 import type { BeatResolution } from '@/lib/types/groove';
@@ -332,7 +342,7 @@ const ToolbarTools: React.FC = () => {
                 className={`${controlBtnClass} ${isEditingInstruments ? 'text-primary bg-primary/10' : ''}`}
                 title={isEditingInstruments ? 'Finish Editing' : 'Edit Instruments'}
               >
-                <RefreshCw size={18} className={isEditingInstruments ? 'animate-spin-slow' : ''} />
+                <SlidersHorizontal size={18} />
               </button>
 
               <button
