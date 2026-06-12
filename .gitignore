@@ -73,6 +73,8 @@ tmp/
 !.agents/skills/release-manager/
 
 # Cursor local rules and skills overlays
+.cursor/commands/
+
 .cursor/rules/local/**
 !.cursor/rules/local/
 !.cursor/rules/local/.keep
@@ -87,6 +89,8 @@ tmp/
 # Claude local rules and skills overlays
 CLAUDE.local.md
 .claude/CLAUDE.local.md
+
+.claude/commands/
 
 .claude/rules/local/**
 !.claude/rules/local/

@@ -1,0 +1,9 @@
+schema: spec-driven
+
+context: |
+  **Tech stack**: Next.js 16 (App Router, Server Components, Server Actions, `--webpack` flag required); React 19; TypeScript 5; Tailwind CSS 4 (CSS variables, JIT); Supabase (@supabase/ssr, strict RLS, local Docker on port 54321); Serwist (PWA/service worker, disabled in dev unless NEXT_PUBLIC_FORCE_SW=true).
+  **Testing**: Vitest for unit tests (jsdom, co-located in `__tests__/`); Playwright for e2e tests (Chrome only, runs against built app unless SKIP_BUILD=true). Test setup: `tests/e2e/auth.setup.ts` creates authenticated session in `playwright/.auth/user.json`.
+  **Test Coverage**: Code must have 100% coverage. User journeys must be fully tested; edge cases must be tested.
+  **Style and Code Formatting**: Biome (linting + formatting); 2-space indent; single quotes; 100-character line limit. No comments unless the WHY is non-obvious. Minimal code — no speculative features or premature abstraction.
+  **Linting**: Biome: must reach zero errors AND zero warnings before code is considered done. Run `pnpm lint && pnpm lint:fix && pnpm lint:md` before review.
+  **Review Process**: Use `/code-review` or `/code-review ultra` for multi-dimensional review. Address ALL findings from code-review-fetch (never dismiss based on "TypeScript guarantees" at DB boundaries or "linter passed" for style). Feature branches use format `feature/<issue-number>-description`; PR targets `staging` (main is production-only). Standing permission: commit/push feature branches without per-message approval; batch related commits into fewer pushes to conserve CircleCI quota. Git: no destructive ops (--force, reset --hard, branch deletion) without explicit approval in that message.
