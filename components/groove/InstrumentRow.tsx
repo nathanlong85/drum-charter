@@ -1,7 +1,7 @@
 'use client';
 
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { ChevronDown, ChevronUp, Settings2, Trash2, Volume2, VolumeX, Wand2 } from 'lucide-react';
+import { GripVertical, Settings2, Trash2, Volume2, VolumeX, Wand2 } from 'lucide-react';
 import type React from 'react';
 import type { DrumInstrument } from '@/lib/types/groove';
 import { getFilteredPresets } from '@/lib/utils/rowPresets';
@@ -14,6 +14,12 @@ interface InstrumentRowProps {
   startNoteIdx: number;
   endNoteIdx: number;
   rowIndex?: number;
+  onDragStart?: (instIdx: number) => void;
+  onDragEnd?: () => void;
+  onDragOver?: (instIdx: number) => void;
+  onDrop?: (toIndex: number) => void;
+  isDragOver?: boolean;
+  isDragging?: boolean;
 }
 
 export const InstrumentRow: React.FC<InstrumentRowProps> = ({
@@ -22,6 +28,12 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
   startNoteIdx,
   endNoteIdx,
   rowIndex,
+  onDragStart,
+  onDragEnd,
+  onDragOver,
+  onDrop,
+  isDragOver = false,
+  isDragging = false,
 }) => {
   const {
     state,
@@ -77,47 +89,50 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
     <div
       className={`flex group/row border-b border-outline-variant/10 hover:bg-surface-container-high/30 transition-colors ${
         instrument.muted ? 'opacity-40' : ''
-      }`}
+      } ${isDragOver ? 'border-t-2 border-t-primary' : ''} ${isDragging ? 'opacity-50' : ''}`}
       data-testid={instrumentRowTestId}
       data-row-index={rowIndex}
+      onDragOver={
+        onDragOver
+          ? (e) => {
+              e.preventDefault();
+              onDragOver(instIdx);
+            }
+          : undefined
+      }
+      onDrop={
+        onDrop
+          ? (e) => {
+              e.preventDefault();
+              onDrop(instIdx);
+            }
+          : undefined
+      }
     >
       {/* Instrument Info Panel */}
       <div
-        className="w-32 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0"
+        className={`w-32 flex items-center bg-surface-container-low border-r border-outline-variant/10 relative px-2 flex-shrink-0 ${
+          !readOnly && isEditing ? 'cursor-grab active:cursor-grabbing' : ''
+        }`}
         style={{ height: 'var(--note-cell-size, 40px)' }}
+        draggable={!readOnly && isEditing}
+        onDragStart={
+          !readOnly && isEditing && onDragStart
+            ? (e) => {
+                e.stopPropagation();
+                onDragStart(instIdx);
+              }
+            : undefined
+        }
+        onDragEnd={!readOnly && isEditing && onDragEnd ? onDragEnd : undefined}
       >
         {!readOnly && isEditing && (
-          <div className="flex flex-col mr-1">
-            <button
-              type="button"
-              onClick={() =>
-                dispatch({
-                  type: 'MOVE_INSTRUMENT',
-                  id: instrument.id,
-                  direction: 'up',
-                })
-              }
-              className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
-              title="Move Up"
-              aria-label="Move instrument up"
-            >
-              <ChevronUp size={10} strokeWidth={4} />
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                dispatch({
-                  type: 'MOVE_INSTRUMENT',
-                  id: instrument.id,
-                  direction: 'down',
-                })
-              }
-              className="p-0.5 hover:bg-primary/10 text-on-surface-variant/40 hover:text-primary transition-colors"
-              title="Move Down"
-              aria-label="Move instrument down"
-            >
-              <ChevronDown size={10} strokeWidth={4} />
-            </button>
+          <div
+            className="mr-1 text-on-surface-variant/40 hover:text-primary transition-colors flex-shrink-0"
+            aria-hidden="true"
+            data-testid={`instrument-drag-handle-${instrument.id}`}
+          >
+            <GripVertical size={12} />
           </div>
         )}
 

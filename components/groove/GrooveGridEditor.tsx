@@ -84,6 +84,32 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
     isEditingInstruments,
   } = useGrooveGrid();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [dragFromIndex, setDragFromIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  const handleInstrumentDragStart = useCallback((instIdx: number) => {
+    setDragFromIndex(instIdx);
+  }, []);
+
+  const handleInstrumentDragEnd = useCallback(() => {
+    setDragFromIndex(null);
+    setDragOverIndex(null);
+  }, []);
+
+  const handleInstrumentDragOver = useCallback((instIdx: number) => {
+    setDragOverIndex(instIdx);
+  }, []);
+
+  const handleInstrumentDrop = useCallback(
+    (toIndex: number) => {
+      if (dragFromIndex !== null && dragFromIndex !== toIndex) {
+        dispatch({ type: 'REORDER_INSTRUMENTS', fromIndex: dragFromIndex, toIndex });
+      }
+      setDragFromIndex(null);
+      setDragOverIndex(null);
+    },
+    [dragFromIndex, dispatch],
+  );
   const { measures, timeSignature, resolution } = state;
   const safeBeatValue = Math.max(1, timeSignature.beatValue);
   const notesPerBeat = resolution / safeBeatValue;
@@ -152,6 +178,12 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
                     startNoteIdx={startNoteIdx}
                     endNoteIdx={endNoteIdx}
                     rowIndex={rowIndex}
+                    onDragStart={handleInstrumentDragStart}
+                    onDragEnd={handleInstrumentDragEnd}
+                    onDragOver={handleInstrumentDragOver}
+                    onDrop={handleInstrumentDrop}
+                    isDragOver={dragOverIndex === instIdx && dragFromIndex !== instIdx}
+                    isDragging={dragFromIndex === instIdx}
                   />
                 ))}
 

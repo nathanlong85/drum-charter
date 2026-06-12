@@ -267,4 +267,63 @@ describe('grooveReducer', () => {
     expect(nextState.instruments[0].velocities![1]).toBe(0.7);
     expect(nextState.instruments[0].velocities![2]).toBe(1.2);
   });
+
+  describe('REORDER_INSTRUMENTS', () => {
+    const fiveInstrumentGrid: GrooveGrid = {
+      ...initialGrid,
+      instruments: ['a', 'b', 'c', 'd', 'e'].map((id) => ({
+        id,
+        category: 'hi-hat' as const,
+        presetVariety: 'Hi-Hat',
+        customName: id,
+        notes: new Array(16).fill('none'),
+        velocities: new Array(16).fill(0),
+      })),
+    };
+
+    it('moves an instrument to an earlier position', () => {
+      const next = grooveReducer(fiveInstrumentGrid, {
+        type: 'REORDER_INSTRUMENTS',
+        fromIndex: 3,
+        toIndex: 1,
+      });
+      expect(next.instruments.map((i) => i.id)).toEqual(['a', 'd', 'b', 'c', 'e']);
+    });
+
+    it('moves an instrument to a later position', () => {
+      const next = grooveReducer(fiveInstrumentGrid, {
+        type: 'REORDER_INSTRUMENTS',
+        fromIndex: 0,
+        toIndex: 4,
+      });
+      expect(next.instruments.map((i) => i.id)).toEqual(['b', 'c', 'd', 'e', 'a']);
+    });
+
+    it('is a no-op when fromIndex equals toIndex', () => {
+      const next = grooveReducer(fiveInstrumentGrid, {
+        type: 'REORDER_INSTRUMENTS',
+        fromIndex: 2,
+        toIndex: 2,
+      });
+      expect(next).toBe(fiveInstrumentGrid);
+    });
+
+    it('is a no-op when fromIndex is out of bounds', () => {
+      const next = grooveReducer(fiveInstrumentGrid, {
+        type: 'REORDER_INSTRUMENTS',
+        fromIndex: 10,
+        toIndex: 1,
+      });
+      expect(next).toBe(fiveInstrumentGrid);
+    });
+
+    it('is a no-op when toIndex is out of bounds', () => {
+      const next = grooveReducer(fiveInstrumentGrid, {
+        type: 'REORDER_INSTRUMENTS',
+        fromIndex: 1,
+        toIndex: 10,
+      });
+      expect(next).toBe(fiveInstrumentGrid);
+    });
+  });
 });
