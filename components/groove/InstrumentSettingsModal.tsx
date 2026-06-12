@@ -59,9 +59,8 @@ export const InstrumentSettingsModal: React.FC<InstrumentSettingsModalProps> = (
   };
 
   const knownVarieties = PRESET_VARIETIES[category] || [];
-  const varietyOptions = knownVarieties.includes(variety)
-    ? knownVarieties
-    : [...knownVarieties, variety];
+  const varietyOptions =
+    variety && !knownVarieties.includes(variety) ? [...knownVarieties, variety] : knownVarieties;
 
   return (
     <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
