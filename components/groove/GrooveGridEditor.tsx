@@ -84,6 +84,36 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
     isEditingInstruments,
   } = useGrooveGrid();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [dragFromIndex, setDragFromIndex] = useState<number | null>(null);
+  const [dragOver, setDragOver] = useState<{ instIdx: number; rowIndex: number } | null>(null);
+
+  const handleInstrumentDragStart = useCallback((instIdx: number) => {
+    setDragFromIndex(instIdx);
+  }, []);
+
+  const handleInstrumentDragEnd = useCallback(() => {
+    setDragFromIndex(null);
+    setDragOver(null);
+  }, []);
+
+  const handleInstrumentDragOver = useCallback((instIdx: number, rowIndex?: number) => {
+    setDragOver((prev) => {
+      const safeRowIndex = rowIndex ?? 0;
+      if (prev?.instIdx === instIdx && prev?.rowIndex === safeRowIndex) return prev;
+      return { instIdx, rowIndex: safeRowIndex };
+    });
+  }, []);
+
+  const handleInstrumentDrop = useCallback(
+    (toIndex: number) => {
+      if (dragFromIndex !== null && dragFromIndex !== toIndex) {
+        dispatch({ type: 'REORDER_INSTRUMENTS', fromIndex: dragFromIndex, toIndex });
+      }
+      setDragFromIndex(null);
+      setDragOver(null);
+    },
+    [dragFromIndex, dispatch],
+  );
   const { measures, timeSignature, resolution } = state;
   const safeBeatValue = Math.max(1, timeSignature.beatValue);
   const notesPerBeat = resolution / safeBeatValue;
@@ -152,6 +182,17 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
                     startNoteIdx={startNoteIdx}
                     endNoteIdx={endNoteIdx}
                     rowIndex={rowIndex}
+                    onDragStart={handleInstrumentDragStart}
+                    onDragEnd={handleInstrumentDragEnd}
+                    onDragOver={(instIdx) => handleInstrumentDragOver(instIdx, rowIndex)}
+                    onDrop={handleInstrumentDrop}
+                    isDragOver={
+                      dragFromIndex !== null &&
+                      dragFromIndex !== instIdx &&
+                      dragOver?.instIdx === instIdx &&
+                      dragOver?.rowIndex === rowIndex
+                    }
+                    isDragging={dragFromIndex === instIdx}
                   />
                 ))}
 
