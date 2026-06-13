@@ -125,6 +125,9 @@ export const InstrumentRow: React.FC<InstrumentRowProps> = ({
               onDragStart
                 ? (e) => {
                     e.stopPropagation();
+                    if (e.dataTransfer) {
+                      e.dataTransfer.setData('text/plain', instIdx.toString());
+                    }
                     onDragStart(instIdx);
                   }
                 : undefined

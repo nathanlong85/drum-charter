@@ -131,10 +131,11 @@ describe('InstrumentRow', () => {
     );
 
     const panel = await screen.findByTestId(`instrument-drag-handle-${mockInstrument.id}`);
-    // The draggable div is the parent of the handle
+    // The draggable button is the element itself
     const draggablePanel = panel.closest('[draggable="true"]') as HTMLElement;
     expect(draggablePanel).not.toBeNull();
-    fireEvent.dragStart(draggablePanel);
+    // jsdom doesn't populate dataTransfer, so provide a minimal mock
+    fireEvent.dragStart(draggablePanel, { dataTransfer: { setData: vi.fn() } });
     expect(onDragStart).toHaveBeenCalledWith(0);
   });
 });

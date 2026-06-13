@@ -85,8 +85,7 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
   } = useGrooveGrid();
   const [showAddModal, setShowAddModal] = useState(false);
   const [dragFromIndex, setDragFromIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [dragOverRowIndex, setDragOverRowIndex] = useState<number | null>(null);
+  const [dragOver, setDragOver] = useState<{ instIdx: number; rowIndex: number } | null>(null);
 
   const handleInstrumentDragStart = useCallback((instIdx: number) => {
     setDragFromIndex(instIdx);
@@ -94,13 +93,15 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
 
   const handleInstrumentDragEnd = useCallback(() => {
     setDragFromIndex(null);
-    setDragOverIndex(null);
-    setDragOverRowIndex(null);
+    setDragOver(null);
   }, []);
 
-  const handleInstrumentDragOver = useCallback((instIdx: number, rowIdx?: number) => {
-    setDragOverIndex((prev) => (prev === instIdx ? prev : instIdx));
-    setDragOverRowIndex((prev) => (prev === (rowIdx ?? null) ? prev : (rowIdx ?? null)));
+  const handleInstrumentDragOver = useCallback((instIdx: number, rowIndex?: number) => {
+    setDragOver((prev) => {
+      const safeRowIndex = rowIndex ?? 0;
+      if (prev?.instIdx === instIdx && prev?.rowIndex === safeRowIndex) return prev;
+      return { instIdx, rowIndex: safeRowIndex };
+    });
   }, []);
 
   const handleInstrumentDrop = useCallback(
@@ -109,8 +110,7 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
         dispatch({ type: 'REORDER_INSTRUMENTS', fromIndex: dragFromIndex, toIndex });
       }
       setDragFromIndex(null);
-      setDragOverIndex(null);
-      setDragOverRowIndex(null);
+      setDragOver(null);
     },
     [dragFromIndex, dispatch],
   );
@@ -187,9 +187,10 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
                     onDragOver={(instIdx) => handleInstrumentDragOver(instIdx, rowIndex)}
                     onDrop={handleInstrumentDrop}
                     isDragOver={
-                      dragOverIndex === instIdx &&
-                      dragOverRowIndex === rowIndex &&
-                      dragFromIndex !== instIdx
+                      dragFromIndex !== null &&
+                      dragFromIndex !== instIdx &&
+                      dragOver?.instIdx === instIdx &&
+                      dragOver?.rowIndex === rowIndex
                     }
                     isDragging={dragFromIndex === instIdx}
                   />
