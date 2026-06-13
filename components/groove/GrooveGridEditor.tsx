@@ -187,9 +187,10 @@ function GridBody({ measuresPerRow }: { measuresPerRow: number }) {
                     onDragOver={(instIdx) => handleInstrumentDragOver(instIdx, rowIndex)}
                     onDrop={handleInstrumentDrop}
                     isDragOver={
+                      dragFromIndex !== null &&
+                      dragFromIndex !== instIdx &&
                       dragOver?.instIdx === instIdx &&
-                      dragOver?.rowIndex === rowIndex &&
-                      dragFromIndex !== instIdx
+                      dragOver?.rowIndex === rowIndex
                     }
                     isDragging={dragFromIndex === instIdx}
                   />
