@@ -56,13 +56,14 @@ test.describe('Instrument Customization', () => {
     await expect(modal).not.toBeVisible();
     await expect(page.getByTestId(/instrument-row-custom-tom/).first()).toBeVisible();
 
-    // Reorder: Move Custom Tom up (it should be at the bottom currently)
+    // Reorder: Move Custom Tom up using keyboard on the drag handle
     // Rows: Hi-Hat, Snare, Kick, Custom Tom
-    await page
+    const customTomHandle = page
       .getByTestId(/instrument-row-custom-tom/)
       .first()
-      .getByTitle('Move Up')
-      .click();
+      .locator('[data-testid*="instrument-drag-handle"]');
+    await customTomHandle.focus();
+    await customTomHandle.press('ArrowUp');
 
     // Verify order (Kick should now be below Custom Tom)
     const rows = page.locator('[data-testid^="instrument-row-"]');
@@ -86,7 +87,7 @@ test.describe('Instrument Customization', () => {
     // Finish Editing
     await page.getByTitle('Finish Editing').click();
     await expect(page.getByTestId('add-instrument-button')).toBeHidden();
-    await expect(page.getByTitle('Move Up').first()).toBeHidden();
+    await expect(page.locator('[data-testid*="instrument-drag-handle"]').first()).not.toBeVisible();
   });
 
   test('should toggle optional hits playback', async ({ page }) => {
